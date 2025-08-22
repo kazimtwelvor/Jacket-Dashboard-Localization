@@ -1,0 +1,463 @@
+// import { NextResponse } from "next/server"
+// import { auth } from "@clerk/nextjs/server"
+
+// import prismadb from "@/lib/prismadb"
+
+// export async function GET(req: Request, { params }: { params: { storeId: string } }) {
+//   try {
+//     const { searchParams } = new URL(req.url)
+//     const status = searchParams.get("status") || undefined
+//     const paymentStatus = searchParams.get("paymentStatus") || undefined
+//     const fulfillmentStatus = searchParams.get("fulfillmentStatus") || undefined
+//     const customerId = searchParams.get("customerId") || undefined
+//     const page = Number.parseInt(searchParams.get("page") || "1")
+//     const limit = Number.parseInt(searchParams.get("limit") || "10")
+//     const skip = (page - 1) * limit
+
+//     if (!params.storeId) {
+//       return new NextResponse("Store ID is required", { status: 400 })
+//     }
+
+//     const orders = await prismadb.order.findMany({
+//       where: {
+//         storeId: params.storeId,
+//         ...(status && { status: status as any }),
+//         ...(paymentStatus && { paymentStatus }),
+//         ...(fulfillmentStatus && { fulfillmentStatus }),
+//         ...(customerId && { userId: customerId }),
+//       },
+//       include: {
+//         orderItems: {
+//           include: {
+//             product: {
+//               include: {
+//                 images: true,
+//               },
+//             },
+//           },
+//         },
+//         user: true,
+//       },
+//       orderBy: {
+//         createdAt: "desc",
+//       },
+//       skip,
+//       take: limit,
+//     })
+
+//     // Get total count for pagination
+//     const totalCount = await prismadb.order.count({
+//       where: {
+//         storeId: params.storeId,
+//         ...(status && { status: status as any }),
+//         ...(paymentStatus && { paymentStatus }),
+//         ...(fulfillmentStatus && { fulfillmentStatus }),
+//         ...(customerId && { userId: customerId }),
+//       },
+//     })
+
+//     return NextResponse.json({
+//       orders,
+//       totalCount,
+//       page,
+//       limit,
+//       totalPages: Math.ceil(totalCount / limit),
+//     })
+//   } catch (error) {
+//     console.log("[ORDERS_GET]", error)
+//     return new NextResponse("Internal error", { status: 500 })
+//   }
+// }
+
+// export async function POST(req: Request, { params }: { params: { storeId: string } }) {
+//   try {
+//     const { userId } = await auth()
+//     const body = await req.json()
+
+//     const {
+//       userId: customerId,
+//       phone,
+//       address,
+//       isPaid,
+//       orderItems,
+//       status,
+//       paymentMethod,
+//       shippingMethod,
+//       shippingCost,
+//       tax,
+//       discount,
+//       total,
+//       notes,
+//       trackingNumber,
+//       customerEmail,
+//       billingAddress,
+//       shippingAddress,
+//       fulfillmentStatus,
+//       estimatedDelivery,
+//       actualDelivery,
+//       transactionId,
+//       paymentStatus,
+//     } = body
+
+//     if (!userId) {
+//       return new NextResponse("Unauthenticated", { status: 401 })
+//     }
+
+//     if (!params.storeId) {
+//       return new NextResponse("Store ID is required", { status: 400 })
+//     }
+
+//     if (!orderItems || !orderItems.length) {
+//       return new NextResponse("Order items are required", { status: 400 })
+//     }
+
+//     // Check if user has access to this store
+//     const storeByUserId = await prismadb.store.findFirst({
+//       where: {
+//         id: params.storeId,
+//         userId,
+//       },
+//     })
+
+//     // If user is not the owner, check if they are a member with appropriate permissions
+//     if (!storeByUserId) {
+//       const dbUser = await prismadb.user.findFirst({
+//         where: {
+//           clerkId: userId,
+//         },
+//       })
+
+//       if (!dbUser) {
+//         return new NextResponse("Unauthorized", { status: 403 })
+//       }
+
+//       const storeMember = await prismadb.storeUser.findFirst({
+//         where: {
+//           storeId: params.storeId,
+//           userId: dbUser.id,
+//         },
+//       })
+
+//       if (!storeMember || !storeMember.permissions.includes("MANAGE_ORDERS")) {
+//         return new NextResponse("Unauthorized", { status: 403 })
+//       }
+//     }
+
+//     // Create the order with all provided fields
+//     const order = await prismadb.order.create({
+//       data: {
+//         storeId: params.storeId,
+//         userId: customerId,
+//         phone: phone || "",
+//         address: address || "",
+//         isPaid: isPaid || false,
+//         status: status || "PENDING",
+//         paymentMethod: paymentMethod || null,
+//         shippingMethod: shippingMethod || null,
+//         shippingCost: shippingCost || 0,
+//         tax: tax || 0,
+//         discount: discount || 0,
+//         total: total || 0,
+//         notes: notes || null,
+//         trackingNumber: trackingNumber || null,
+//         customerEmail: customerEmail || null,
+//         billingAddress: billingAddress || null,
+//         shippingAddress: shippingAddress || null,
+//         fulfillmentStatus: fulfillmentStatus || "pending",
+//         estimatedDelivery: estimatedDelivery ? new Date(estimatedDelivery) : null,
+//         actualDelivery: actualDelivery ? new Date(actualDelivery) : null,
+//         transactionId: transactionId || null,
+//         paymentStatus: paymentStatus || "pending",
+//         orderItems: {
+//           createMany: {
+//             data: orderItems.map((item: any) => ({
+//               productId: item.productId,
+//               quantity: item.quantity || 1,
+//               price: item.price,
+//               originalPrice: item.originalPrice || item.price,
+//               discountAmount: item.discountAmount || 0,
+//               total: item.total || item.price * (item.quantity || 1),
+//               sizeIds: item.sizeIds || [],
+//               colorIds: item.colorIds || [],
+//               selectedOptions: item.selectedOptions || {},
+//               productSku: item.productSku || null,
+//               productName: item.productName || null,
+//               customerName: item.customerName || "Customer",
+//             })),
+//           },
+//         },
+//       },
+//       include: {
+//         orderItems: true,
+//       },
+//     })
+
+//     return NextResponse.json(order)
+//   } catch (error) {
+//     console.log("[ORDERS_POST]", error)
+//     return new NextResponse("Internal error", { status: 500 })
+//   }
+// }
+import { NextResponse } from "next/server"
+import { auth } from "@clerk/nextjs/server"
+
+import prismadb from "@/lib/prismadb"
+
+export async function GET(req: Request, { params }: { params: { storeId: string } }) {
+  try {
+    const { searchParams } = new URL(req.url)
+    const status = searchParams.get("status") || undefined
+    const paymentStatus = searchParams.get("paymentStatus") || undefined
+    const fulfillmentStatus = searchParams.get("fulfillmentStatus") || undefined
+    const customerId = searchParams.get("customerId") || undefined
+    const page = Number.parseInt(searchParams.get("page") || "1")
+    const limit = Number.parseInt(searchParams.get("limit") || "10")
+    const skip = (page - 1) * limit
+
+    if (!params.storeId) {
+      return new NextResponse("Store ID is required", { status: 400 })
+    }
+
+    const orders = await prismadb.order.findMany({
+      where: {
+        storeId: params.storeId,
+        ...(status && { status: status as any }),
+        ...(paymentStatus && { paymentStatus }),
+        ...(fulfillmentStatus && { fulfillmentStatus }),
+        ...(customerId && { userId: customerId }),
+      },
+      include: {
+        orderItems: {
+          include: {
+            product: {
+              include: {
+                images: true,
+              },
+            },
+          },
+        },
+        user: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      skip,
+      take: limit,
+    })
+
+    // Get total count for pagination
+    const totalCount = await prismadb.order.count({
+      where: {
+        storeId: params.storeId,
+        ...(status && { status: status as any }),
+        ...(paymentStatus && { paymentStatus }),
+        ...(fulfillmentStatus && { fulfillmentStatus }),
+        ...(customerId && { userId: customerId }),
+      },
+    })
+
+    // Convert Decimal fields to numbers for client compatibility
+    const serializedOrders = orders.map(order => ({
+      ...order,
+      shippingCost: Number(order.shippingCost),
+      tax: Number(order.tax),
+      discount: Number(order.discount),
+      total: Number(order.total),
+      orderItems: order.orderItems.map(item => ({
+        ...item,
+        price: Number(item.price),
+        originalPrice: Number(item.originalPrice),
+        discountAmount: Number(item.discountAmount),
+        total: Number(item.total)
+      }))
+    }))
+
+    return NextResponse.json({
+      orders: serializedOrders,
+      totalCount,
+      page,
+      limit,
+      totalPages: Math.ceil(totalCount / limit),
+    })
+  } catch (error) {
+    console.log("[ORDERS_GET]", error)
+    return new NextResponse("Internal error", { status: 500 })
+  }
+}
+
+export async function POST(req: Request, { params }: { params: { storeId: string } }) {
+  try {
+    const { userId } = await auth()
+    const body = await req.json()
+
+    const {
+      userId: customerId,
+      customerName,
+      phone,
+      address,
+      isPaid,
+      orderItems,
+      status,
+      paymentMethod,
+      shippingMethod,
+      shippingCost,
+      tax,
+      discount,
+      total,
+      notes,
+      trackingNumber,
+      customerEmail,
+      billingAddress,
+      shippingAddress,
+      city,
+      country,
+      state,
+      zipCode,
+      fulfillmentStatus,
+      estimatedDelivery,
+      actualDelivery,
+      transactionId,
+      paymentStatus,
+      cardNumber,
+      expirationDate,
+      securityCode,
+      cardCountry,
+    } = body
+
+    if (!userId) {
+      return new NextResponse("Unauthenticated", { status: 401 })
+    }
+
+    if (!params.storeId) {
+      return new NextResponse("Store ID is required", { status: 400 })
+    }
+
+    if (!orderItems || !orderItems.length) {
+      return new NextResponse("Order items are required", { status: 400 })
+    }
+
+    // Check if user has access to this store
+    const storeByUserId = await prismadb.store.findFirst({
+      where: {
+        id: params.storeId,
+        userId,
+      },
+    })
+
+    // If user is not the owner, check if they are a member with appropriate permissions
+    if (!storeByUserId) {
+      const dbUser = await prismadb.user.findFirst({
+        where: {
+          clerkId: userId,
+        },
+      })
+
+      if (!dbUser) {
+        return new NextResponse("Unauthorized", { status: 403 })
+      }
+
+      const storeMember = await prismadb.storeUser.findFirst({
+        where: {
+          storeId: params.storeId,
+          userId: dbUser.id,
+        },
+      })
+
+      if (!storeMember || !storeMember.permissions.includes("MANAGE_ORDERS")) {
+        return new NextResponse("Unauthorized", { status: 403 })
+      }
+    }
+
+    // Create user if customerId is provided but doesn't exist
+    let finalUserId = null
+    if (customerId) {
+      const existingUser = await prismadb.user.findUnique({
+        where: { id: customerId }
+      })
+      
+      if (existingUser) {
+        finalUserId = customerId
+      }
+      // If user doesn't exist, we'll create order without userId (guest order)
+    }
+
+    // Create the order with all provided fields
+    const order = await prismadb.order.create({
+      data: {
+        storeId: params.storeId,
+        userId: finalUserId,
+        customerName: customerName || null,
+        phone: phone || "",
+        address: address || "",
+        isPaid: isPaid || false,
+        status: status || "PENDING",
+        paymentMethod: paymentMethod ? paymentMethod.toUpperCase() : null,
+        shippingMethod: shippingMethod || null,
+        shippingCost: shippingCost || 0,
+        tax: tax || 0,
+        discount: discount || 0,
+        total: total || 0,
+        notes: notes || null,
+        trackingNumber: trackingNumber || null,
+        customerEmail: customerEmail || null,
+        billingAddress: billingAddress || null,
+        shippingAddress: shippingAddress || null,
+        city: city || null,
+        country: country || null,
+        state: state || null,
+        zipCode: zipCode || null,
+        fulfillmentStatus: fulfillmentStatus || "pending",
+        estimatedDelivery: estimatedDelivery ? new Date(estimatedDelivery) : null,
+        actualDelivery: actualDelivery ? new Date(actualDelivery) : null,
+        transactionId: transactionId || null,
+        paymentStatus: paymentStatus || "pending",
+        cardNumber: cardNumber || null,
+        expirationDate: expirationDate || null,
+        securityCode: securityCode || null,
+        cardCountry: cardCountry || null,
+        orderItems: {
+          createMany: {
+            data: orderItems.map((item: any) => ({
+              productId: item.productId,
+              quantity: item.quantity || 1,
+              price: item.price,
+              originalPrice: item.originalPrice || item.price,
+              discountAmount: item.discountAmount || 0,
+              total: item.total || item.price * (item.quantity || 1),
+              sizeIds: item.sizeIds || [],
+              colorIds: item.colorIds || [],
+              selectedOptions: item.selectedOptions || {},
+              productSku: item.productSku || null,
+              productName: item.productName || null,
+              customerName: item.customerName || "Customer",
+            })),
+          },
+        },
+      },
+      include: {
+        orderItems: true,
+      },
+    })
+
+    // Convert Decimal fields to numbers for client compatibility
+    const serializedOrder = {
+      ...order,
+      shippingCost: Number(order.shippingCost),
+      tax: Number(order.tax),
+      discount: Number(order.discount),
+      total: Number(order.total),
+      orderItems: order.orderItems.map(item => ({
+        ...item,
+        price: Number(item.price),
+        originalPrice: Number(item.originalPrice),
+        discountAmount: Number(item.discountAmount),
+        total: Number(item.total)
+      }))
+    }
+
+    return NextResponse.json(serializedOrder)
+  } catch (error) {
+    console.log("[ORDERS_POST]", error)
+    return new NextResponse("Internal error", { status: 500 })
+  }
+}

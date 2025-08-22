@@ -1,0 +1,255 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+html,
+body,
+:root {
+  height: 100%;
+}
+
+/* TipTap Editor Styles */
+.tiptap-editor .ProseMirror {
+  min-height: 300px;
+  outline: none;
+}
+
+.tiptap-editor .ProseMirror p {
+  margin-bottom: 0.75em;
+}
+
+.tiptap-editor .ProseMirror h1 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-bottom: 0.5em;
+}
+
+.tiptap-editor .ProseMirror h2 {
+  font-size: 1.3em;
+  font-weight: bold;
+  margin-bottom: 0.5em;
+}
+
+.tiptap-editor .ProseMirror h3 {
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-bottom: 0.5em;
+}
+
+.tiptap-editor .ProseMirror ul {
+  list-style-type: disc;
+  padding-left: 1.5em;
+  margin-bottom: 0.75em;
+}
+
+.tiptap-editor .ProseMirror ol {
+  list-style-type: decimal;
+  padding-left: 1.5em;
+  margin-bottom: 0.75em;
+}
+
+.tiptap-editor .ProseMirror[data-placeholder]::before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  pointer-events: none;
+  position: absolute;
+}
+
+.tiptap-editor .ProseMirror [data-text-align="center"] {
+  text-align: center;
+}
+
+.tiptap-editor .ProseMirror [data-text-align="right"] {
+  text-align: right;
+}
+
+.tiptap-editor .ProseMirror [data-text-align="left"] {
+  text-align: left;
+}
+
+/* Add this to your globals.css file */
+.dragging {
+  opacity: 0.6;
+  cursor: grabbing !important;
+}
+
+/* Improve drop target visibility */
+[data-craftjs-droppable="true"] {
+  min-height: 20px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+[data-craftjs-droppable="true"]::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  transition: all 0.2s ease;
+}
+
+[data-craftjs-droppable="true"][data-craftjs-highlighted="true"]::after {
+  background-color: rgba(16, 185, 129, 0.1);
+  border: 2px dashed rgba(16, 185, 129, 0.6);
+}
+
+[data-craftjs-droppable="true"][data-craftjs-error="true"]::after {
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 2px dashed rgba(239, 68, 68, 0.6);
+}
+
+@layer base {
+  :root {
+    --sidebar-width: 240px;
+
+    /* Light theme colors */
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 221.2 83% 53%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83% 53%;
+
+    /* Chart colors */
+    --chart-1: 221.2 83% 53%;
+    --chart-2: 262 83% 58%;
+    --chart-3: 24 75% 50%;
+    --chart-4: 173 58% 39%;
+    --chart-5: 43 74% 49%;
+
+    /* Sidebar specific colors */
+    --sidebar-background: 222 47% 11%;
+    --sidebar-foreground: 214 32% 91%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 223 47% 14%;
+    --sidebar-accent-foreground: 214 32% 91%;
+    --sidebar-border: 223 47% 14%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* Dark theme colors */
+    --background: 222 47% 11%;
+    --foreground: 214 32% 91%;
+    --card: 222 47% 13%;
+    --card-foreground: 214 32% 91%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 214 32% 91%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 214 32% 91%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 214 32% 91%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 214 32% 91%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+
+    /* Chart colors */
+    --chart-1: 199 89% 48%;
+    --chart-2: 162 47% 50%;
+    --chart-3: 30 82% 58%;
+    --chart-4: 269 56% 62%;
+    --chart-5: 340 65% 60%;
+
+    /* Sidebar specific colors - unchanged in dark mode */
+    --sidebar-background: 222 47% 11%;
+    --sidebar-foreground: 214 32% 91%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 223 47% 14%;
+    --sidebar-accent-foreground: 214 32% 91%;
+    --sidebar-border: 223 47% 14%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground transition-colors duration-300;
+  }
+}
+
+@layer utilities {
+  @keyframes shine {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(100%);
+    }
+  }
+
+  .animate-shine {
+    animation: shine 2s infinite;
+  }
+}
+
+/* Drag and drop styling */
+.drop-zone {
+  position: relative;
+  min-height: 100px;
+  transition: all 0.2s ease;
+}
+
+.drop-zone.craftjs-droppable-active {
+  outline: 2px dashed #10b981;
+  outline-offset: -2px;
+  background-color: rgba(16, 185, 129, 0.05);
+}
+
+.craftjs-node-selected {
+  position: relative;
+}
+
+.craftjs-node-selected::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  border: 2px solid #3b82f6;
+  border-radius: 4px;
+  z-index: 1;
+}
+
+.component-drag-handle {
+  cursor: grab;
+}
+
+.component-drag-handle:active {
+  cursor: grabbing;
+}

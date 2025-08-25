@@ -2,6 +2,17 @@ import { NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import prismadb from "@/lib/prismadb"
 
+// CORS headers
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+}
+
+export async function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders })
+}
+
 export async function POST(
   req: Request,
   { params }: { params: { storeId: string } }
@@ -16,7 +27,7 @@ export async function POST(
     console.log('[CATEGORY_PAGES_POST] IsPublished field:', body.isPublished)
     
     if (!userId) {
-      return new NextResponse("Unauthenticated", { status: 401 })
+      return new NextResponse("Unauthenticated", { status: 401, headers: corsHeaders })
     }
 
     // Skip permission checks - allow any authenticated user
@@ -50,11 +61,11 @@ export async function POST(
 
 
     if (!name) {
-      return new NextResponse("Name is required", { status: 400 })
+      return new NextResponse("Name is required", { status: 400, headers: corsHeaders })
     }
 
     if (!slug) {
-      return new NextResponse("Slug is required", { status: 400 })
+      return new NextResponse("Slug is required", { status: 400, headers: corsHeaders })
     }
 
     // Check if slug is unique for this store
@@ -66,7 +77,7 @@ export async function POST(
     })
 
     if (existingCategoryPage) {
-      return new NextResponse("Slug already exists", { status: 400 })
+      return new NextResponse("Slug already exists", { status: 400, headers: corsHeaders })
     }
 
     // Use the provided imageUrl
@@ -111,10 +122,10 @@ export async function POST(
       }
     }
 
-    return NextResponse.json(responseData)
+    return NextResponse.json(responseData, { headers: corsHeaders })
   } catch (error) {
     console.log("[CATEGORY_PAGES_POST] Error:", error)
-    return new NextResponse(`Internal error: ${error.message}`, { status: 500 })
+    return new NextResponse(`Internal error: ${error.message}`, { status: 500, headers: corsHeaders })
   }
 }
 
@@ -126,7 +137,7 @@ export async function GET(
     const { storeId } = params;
     
     if (!storeId) {
-      return new NextResponse("Store ID is required", { status: 400 })
+      return new NextResponse("Store ID is required", { status: 400, headers: corsHeaders })
     }
 
     const { searchParams } = new URL(req.url)
@@ -211,12 +222,12 @@ export async function GET(
         return true;
       });
       
-      return NextResponse.json(filteredData);
+      return NextResponse.json(filteredData, { headers: corsHeaders });
     }
 
-    return NextResponse.json(responseData)
+    return NextResponse.json(responseData, { headers: corsHeaders })
   } catch (error) {
     console.log("[CATEGORY_PAGES_GET]", error)
-    return new NextResponse("Internal error", { status: 500 })
+    return new NextResponse("Internal error", { status: 500, headers: corsHeaders })
   }
 }

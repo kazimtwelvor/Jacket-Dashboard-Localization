@@ -1,0 +1,86 @@
+export enum Role {
+  OWNER = "OWNER",
+  ADMIN = "ADMIN",
+  EDITOR = "EDITOR",
+  VIEWER = "VIEWER",
+  SUPER_ADMIN = "SUPER_ADMIN",
+}
+
+export enum Permission {
+  // Store permissions
+  MANAGE_STORE = "MANAGE_STORE",
+  DELETE_STORE = "DELETE_STORE",
+  TRANSFER_OWNERSHIP = "TRANSFER_OWNERSHIP",
+
+  // User management
+  VIEW_USERS = "VIEW_USERS",
+  INVITE_USER = "INVITE_USER",
+  REMOVE_USER = "REMOVE_USER",
+  MANAGE_USERS = "MANAGE_USERS",
+
+  // Product permissions
+  VIEW_PRODUCTS = "VIEW_PRODUCTS",
+  CREATE_PRODUCTS = "CREATE_PRODUCTS",
+  EDIT_PRODUCTS = "EDIT_PRODUCTS",
+  DELETE_PRODUCTS = "DELETE_PRODUCTS",
+
+  // Category permissions
+  VIEW_CATEGORIES = "VIEW_CATEGORIES",
+  CREATE_CATEGORIES = "CREATE_CATEGORIES",
+  EDIT_CATEGORIES = "EDIT_CATEGORIES",
+  DELETE_CATEGORIES = "DELETE_CATEGORIES",
+
+  // Order permissions
+  VIEW_ORDERS = "VIEW_ORDERS",
+  MANAGE_ORDERS = "MANAGE_ORDERS",
+
+  // Billboard permissions
+  VIEW_BILLBOARDS = "VIEW_BILLBOARDS",
+  CREATE_BILLBOARDS = "CREATE_BILLBOARDS",
+  EDIT_BILLBOARDS = "EDIT_BILLBOARDS",
+  DELETE_BILLBOARDS = "DELETE_BILLBOARDS",
+
+  // Size permissions
+  VIEW_SIZES = "VIEW_SIZES",
+  CREATE_SIZES = "CREATE_SIZES",
+  EDIT_SIZES = "EDIT_SIZES",
+  DELETE_SIZES = "DELETE_SIZES",
+
+  // Color permissions
+  VIEW_COLORS = "VIEW_COLORS",
+  CREATE_COLORS = "CREATE_COLORS",
+  EDIT_COLORS = "EDIT_COLORS",
+  DELETE_COLORS = "DELETE_COLORS",
+
+  // Dashboard permissions
+  VIEW_DASHBOARD = "VIEW_DASHBOARD",
+  VIEW_ANALYTICS = "VIEW_ANALYTICS",
+  VIEW_SALES = "VIEW_SALES",
+}
+
+export type RolePermissions = {
+  [key in Role]: Permission[]
+}
+
+export const DEFAULT_ROLE_PERMISSIONS: Record<Role, Permission[]> = {
+  [Role.OWNER]: Object.values(Permission),
+  [Role.SUPER_ADMIN]: Object.values(Permission),
+  [Role.ADMIN]: [
+    Permission.VIEW_PRODUCTS,
+    Permission.CREATE_PRODUCTS,
+    Permission.EDIT_PRODUCTS,
+    Permission.VIEW_CATEGORIES,
+    Permission.CREATE_CATEGORIES,
+    Permission.EDIT_CATEGORIES,
+    Permission.VIEW_ORDERS,
+    Permission.VIEW_USERS,
+  ],
+  [Role.EDITOR]: [
+    Permission.VIEW_PRODUCTS,
+    Permission.CREATE_PRODUCTS,
+    Permission.EDIT_PRODUCTS,
+    Permission.VIEW_CATEGORIES,
+    Permission.VIEW_ORDERS,
+  ],
+  [Role.VIEWER]: [Permission.VIEW_PRODUCTS, Permission.VIEW_CATEGORIES, Permission.VIEW_ORDERS],
+}

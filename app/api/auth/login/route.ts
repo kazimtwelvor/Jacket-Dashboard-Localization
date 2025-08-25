@@ -12,6 +12,12 @@ const loginSchema = z.object({
   recaptchaToken: z.string().optional(),
 })
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*", // You can replace "*" with a specific origin for security
+  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json()
@@ -20,7 +26,13 @@ export async function POST(req: Request) {
     const validationResult = loginSchema.safeParse(body)
     if (!validationResult.success) {
       console.log("Login validation failed:", validationResult.error.errors)
-      return NextResponse.json({ error: validationResult.error.errors[0].message }, { status: 400 })
+      return new NextResponse(
+        JSON.stringify({ error: validationResult.error.errors[0].message }),
+        {
+          status: 400,
+          headers: corsHeaders,
+        }
+      )
     }
 
     const { email, password, storeId, recaptchaToken } = validationResult.data
@@ -32,7 +44,10 @@ export async function POST(req: Request) {
 
     if (!storeExists) {
       console.log(`Store not found: ${storeId}`)
-      return NextResponse.json({ error: "Store not found" }, { status: 404 })
+      return new NextResponse(JSON.stringify({ error: "Store not found" }), {
+        status: 404,
+        headers: corsHeaders,
+      })
     }
 
     // Check if reCAPTCHA is enabled for this store
@@ -40,42 +55,37 @@ export async function POST(req: Request) {
       where: { storeId, enabled: true, enabledOnLogin: true },
     })
 
-    console.log("reCAPTCHA settings:", recaptchaSettings)
-
-    // Verify reCAPTCHA if enabled
-    if (recaptchaSettings && recaptchaSettings.enabled && recaptchaSettings.enabledOnLogin) {
-      console.log("reCAPTCHA verification required")
-
+    if (recaptchaSettings) {
       if (!recaptchaToken) {
         console.log("No reCAPTCHA token provided")
-        return NextResponse.json({ error: "reCAPTCHA verification required" }, { status: 400 })
+        return new NextResponse(
+          JSON.stringify({ error: "reCAPTCHA verification required" }),
+          { status: 400, headers: corsHeaders }
+        )
       }
 
-      console.log(`reCAPTCHA token received, length: ${recaptchaToken.length}`)
-      console.log(`reCAPTCHA version: ${recaptchaSettings.version}`)
-      console.log(`Secret key available: ${!!recaptchaSettings.secretKey}`)
-
       let isVerified = false
+
       if (recaptchaSettings.version === "v3") {
-        console.log(`Verifying reCAPTCHA v3 token with threshold: ${recaptchaSettings.threshold || 0.5}`)
         isVerified = await verifyRecaptchaV3(
           recaptchaToken,
           recaptchaSettings.secretKey,
-          recaptchaSettings.threshold || 0.5,
+          recaptchaSettings.threshold || 0.5
         )
       } else {
-        console.log("Verifying reCAPTCHA v2 token")
         isVerified = await verifyRecaptcha(recaptchaToken, recaptchaSettings.secretKey)
       }
 
-      console.log(`reCAPTCHA verification result: ${isVerified ? "success" : "failed"}`)
-
       if (!isVerified) {
-        return NextResponse.json({ error: "reCAPTCHA verification failed" }, { status: 400 })
+        console.log("reCAPTCHA verification failed")
+        return new NextResponse(
+          JSON.stringify({ error: "reCAPTCHA verification failed" }),
+          { status: 400, headers: corsHeaders }
+        )
       }
     }
 
-    // Find user by email in this store
+    // Find user by email and store
     const user = await prismadb.storeUser.findFirst({
       where: {
         email,
@@ -84,23 +94,25 @@ export async function POST(req: Request) {
     })
 
     if (!user) {
-      console.log(`User not found: ${email} in store ${storeId}`)
-      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
+      return new NextResponse(JSON.stringify({ error: "Invalid credentials" }), {
+        status: 401,
+        headers: corsHeaders,
+      })
     }
 
-    // Verify password
     const passwordMatch = await bcrypt.compare(password, user.passwordHash)
 
     if (!passwordMatch) {
-      console.log(`Password mismatch for user: ${email}`)
-      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
+      return new NextResponse(JSON.stringify({ error: "Invalid credentials" }), {
+        status: 401,
+        headers: corsHeaders,
+      })
     }
 
-    // Generate JWT token
     const jwtSecret = process.env.JWT_SECRET
     if (!jwtSecret) {
       console.error("JWT_SECRET environment variable is not defined")
-      throw new Error("JWT_SECRET environment variable is not defined")
+      throw new Error("JWT_SECRET is not defined")
     }
 
     const token = jwt.sign(
@@ -110,15 +122,11 @@ export async function POST(req: Request) {
         storeId: user.storeId,
       },
       jwtSecret,
-      { expiresIn: "7d" },
+      { expiresIn: "7d" }
     )
 
-    // Remove sensitive information before sending response
     const { passwordHash, resetToken, verifyToken, ...safeUser } = user
 
-    console.log(`Login successful for user: ${email}`)
-
-    // Update last login
     try {
       await prismadb.storeUser.update({
         where: { id: user.id },
@@ -126,27 +134,32 @@ export async function POST(req: Request) {
       })
     } catch (updateError) {
       console.error("Error updating last login:", updateError)
-      // Continue even if this fails
     }
 
-    return NextResponse.json({
-      user: safeUser,
-      token,
-      message: "Login successful",
-    })
+    return new NextResponse(
+      JSON.stringify({
+        user: safeUser,
+        token,
+        message: "Login successful",
+      }),
+      {
+        status: 200,
+        headers: corsHeaders,
+      }
+    )
   } catch (error) {
     console.error("[LOGIN_ERROR]", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    return new NextResponse(JSON.stringify({ error: "Internal server error" }), {
+      status: 500,
+      headers: corsHeaders,
+    })
   }
 }
 
+// Handle preflight requests
 export async function OPTIONS() {
   return new NextResponse(null, {
-    status: 200,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    },
+    status: 204,
+    headers: corsHeaders,
   })
 }

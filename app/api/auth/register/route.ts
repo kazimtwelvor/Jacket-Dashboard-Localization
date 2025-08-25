@@ -18,17 +18,37 @@ const registerSchema = z.object({
   recaptchaToken: z.string().optional(),
 })
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*", // Replace with frontend origin in production
+  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json()
 
     const validationResult = registerSchema.safeParse(body)
     if (!validationResult.success) {
-      return NextResponse.json({ error: validationResult.error.errors }, { status: 400 })
+      return new NextResponse(JSON.stringify({ error: validationResult.error.errors }), {
+        status: 400,
+        headers: corsHeaders,
+      })
     }
 
-    const { name, email, password, storeId, phone, address, city, state, zipCode, country, recaptchaToken } =
-      validationResult.data
+    const {
+      name,
+      email,
+      password,
+      storeId,
+      phone,
+      address,
+      city,
+      state,
+      zipCode,
+      country,
+      recaptchaToken,
+    } = validationResult.data
 
     // Check if store exists
     const storeExists = await prismadb.store.findUnique({
@@ -36,18 +56,23 @@ export async function POST(req: Request) {
     })
 
     if (!storeExists) {
-      return NextResponse.json({ error: "Store not found" }, { status: 404 })
+      return new NextResponse(JSON.stringify({ error: "Store not found" }), {
+        status: 404,
+        headers: corsHeaders,
+      })
     }
 
-    // Check if reCAPTCHA is enabled for this store
+    // Check if reCAPTCHA is enabled
     const recaptchaSettings = await prismadb.recaptchaSettings.findFirst({
       where: { storeId, enabled: true, enabledOnRegister: true },
     })
 
-    // Verify reCAPTCHA if enabled
-    if (recaptchaSettings && recaptchaSettings.enabled && recaptchaSettings.enabledOnRegister) {
+    if (recaptchaSettings?.enabled && recaptchaSettings.enabledOnRegister) {
       if (!recaptchaToken) {
-        return NextResponse.json({ error: "reCAPTCHA verification required" }, { status: 400 })
+        return new NextResponse(JSON.stringify({ error: "reCAPTCHA verification required" }), {
+          status: 400,
+          headers: corsHeaders,
+        })
       }
 
       let isVerified = false
@@ -55,18 +80,21 @@ export async function POST(req: Request) {
         isVerified = await verifyRecaptchaV3(
           recaptchaToken,
           recaptchaSettings.secretKey,
-          recaptchaSettings.threshold || 0.5,
+          recaptchaSettings.threshold || 0.5
         )
       } else {
         isVerified = await verifyRecaptcha(recaptchaToken, recaptchaSettings.secretKey)
       }
 
       if (!isVerified) {
-        return NextResponse.json({ error: "reCAPTCHA verification failed" }, { status: 400 })
+        return new NextResponse(JSON.stringify({ error: "reCAPTCHA verification failed" }), {
+          status: 400,
+          headers: corsHeaders,
+        })
       }
     }
 
-    // Check if email already exists for this store
+    // Check if user already exists
     const existingUser = await prismadb.storeUser.findFirst({
       where: {
         email,
@@ -75,13 +103,16 @@ export async function POST(req: Request) {
     })
 
     if (existingUser) {
-      return NextResponse.json({ error: "Email already in use" }, { status: 409 })
+      return new NextResponse(JSON.stringify({ error: "Email already in use" }), {
+        status: 409,
+        headers: corsHeaders,
+      })
     }
 
-    // Hash password
+    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    // Create new user
+    // Create user
     const newUser = await prismadb.storeUser.create({
       data: {
         name,
@@ -94,44 +125,46 @@ export async function POST(req: Request) {
         state,
         zipCode,
         country,
-        isVerified: true, // Automatically verify the user
+        isVerified: true,
       },
     })
 
-    // Remove sensitive information before sending response
+    // Remove sensitive fields
     const { passwordHash, resetToken, ...safeUser } = newUser
 
-    // Try to send welcome email, but don't block registration if it fails
+    // Send welcome email (optional)
     try {
-      // Use Promise.race with a timeout to prevent hanging
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Email sending timed out")), 2000),
+        setTimeout(() => reject(new Error("Email sending timed out")), 2000)
       )
+      // await Promise.race([sendWelcomeEmail(), timeoutPromise]) ← if you implement email sending
     } catch (emailError) {
       console.error("[WELCOME_EMAIL_ERROR]", emailError)
-      // Continue with registration even if email fails
     }
 
-    return NextResponse.json(
-      {
+    return new NextResponse(
+      JSON.stringify({
         user: safeUser,
         message: "User registered successfully.",
-      },
-      { status: 201 },
+      }),
+      {
+        status: 201,
+        headers: corsHeaders,
+      }
     )
   } catch (error) {
     console.error("[REGISTER_ERROR]", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    return new NextResponse(JSON.stringify({ error: "Internal server error" }), {
+      status: 500,
+      headers: corsHeaders,
+    })
   }
 }
 
+// Handle preflight CORS requests
 export async function OPTIONS() {
   return new NextResponse(null, {
-    status: 200,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    },
+    status: 204,
+    headers: corsHeaders,
   })
 }

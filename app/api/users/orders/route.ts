@@ -2,16 +2,19 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prismadb from "@/lib/prismadb";
 
+// CORS Headers
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": "*", // Change this to a specific domain for production
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 
+// Handle preflight requests (OPTIONS)
 export async function OPTIONS() {
   return NextResponse.json({}, { headers: corsHeaders });
 }
 
+// Handle GET request
 export async function GET(req: Request) {
   try {
     const { userId } = await auth();
@@ -78,6 +81,7 @@ export async function GET(req: Request) {
       },
     });
 
+    // Convert Decimal fields to numbers
     const serializedOrders = orders.map(order => ({
       ...order,
       shippingCost: Number(order.shippingCost),

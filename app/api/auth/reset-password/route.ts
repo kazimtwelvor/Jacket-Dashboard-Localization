@@ -4,7 +4,7 @@ import bcrypt from "bcrypt"
 import { z } from "zod"
 
 const resetPasswordSchema = z.object({
-  token: z.string().min(1, "Reset token is required"),
+  email: z.string().email("Valid email is required"),
   password: z.string().min(8, "Password must be at least 8 characters"),
   storeId: z.string().uuid("Invalid store ID"),
 })
@@ -29,47 +29,18 @@ export async function POST(req: Request) {
       )
     }
 
-    const { token, password, storeId } = validationResult.data
-
-    // Debug logging
-    console.log("[RESET_PASSWORD_DEBUG] Token:", token)
-    console.log("[RESET_PASSWORD_DEBUG] StoreId:", storeId)
-    console.log("[RESET_PASSWORD_DEBUG] Current time:", new Date())
-
-    const allUsersWithTokens = await prismadb.storeUser.findMany({
-      where: { storeId },
-      select: { id: true, resetToken: true, resetTokenExp: true },
-    })
-    console.log("[RESET_PASSWORD_DEBUG] All users with tokens:", allUsersWithTokens)
+    const { email, password, storeId } = validationResult.data
 
     const user = await prismadb.storeUser.findFirst({
       where: {
-        resetToken: token,
+        email,
         storeId,
-        resetTokenExp: {
-          gt: new Date(),
-        },
       },
     })
 
     if (!user) {
-      const expiredUser = await prismadb.storeUser.findFirst({
-        where: {
-          resetToken: token,
-          storeId,
-        },
-      })
-
-      if (expiredUser) {
-        console.log("[RESET_PASSWORD_DEBUG] Token found but expired. Exp:", expiredUser.resetTokenExp)
-        return setCorsHeaders(
-          NextResponse.json({ error: "Reset token has expired" }, { status: 400 })
-        )
-      }
-
-      console.log("[RESET_PASSWORD_DEBUG] No user found with token")
       return setCorsHeaders(
-        NextResponse.json({ error: "Invalid reset token" }, { status: 400 })
+        NextResponse.json({ error: "User not found" }, { status: 400 })
       )
     }
 
@@ -79,8 +50,6 @@ export async function POST(req: Request) {
       where: { id: user.id },
       data: {
         passwordHash: hashedPassword,
-        resetToken: null,
-        resetTokenExp: null,
       },
     })
 

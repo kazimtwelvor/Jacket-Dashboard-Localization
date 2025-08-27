@@ -2,6 +2,17 @@ import { NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import prismadb from "@/lib/prismadb"
 
+// CORS headers
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+}
+
+export async function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders })
+}
+
 export async function POST(req: Request, { params }: { params: { storeId: string } }) {
   try {
     const { userId } = await auth()
@@ -76,7 +87,7 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       },
     })
 
-    return NextResponse.json(category)
+    return NextResponse.json(category, { headers: corsHeaders })
   } catch (err) {
     console.log(`[CATEGORIES_POST] ${err}`)
     return new NextResponse(`Internal error`, { status: 500 })
@@ -109,7 +120,7 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
         imageUrl: page.imageUrl || ""
       }))
       
-      return NextResponse.json(formattedCategoryPages)
+      return NextResponse.json(formattedCategoryPages, { headers: corsHeaders })
     } else {
       // Build where clause for filtering
       const whereClause: any = {
@@ -128,7 +139,7 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
         where: whereClause,
       })
       
-      return NextResponse.json(categories)
+      return NextResponse.json(categories, { headers: corsHeaders })
     }
   } catch (err) {
     console.log(`[CATEGORIES_GET] ${err}`)

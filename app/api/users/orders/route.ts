@@ -1,49 +1,62 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import prismadb from "@/lib/prismadb";
+import jwt from "jsonwebtoken";
 
+// CORS Headers
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With, Accept, Origin, Cache-Control, X-File-Name, X-Store-Id",
+  "Access-Control-Allow-Credentials": "true",
+  "Access-Control-Max-Age": "86400",
 };
 
+// Handle preflight requests (OPTIONS)
 export async function OPTIONS() {
   return NextResponse.json({}, { headers: corsHeaders });
 }
 
+// Handle GET request
 export async function GET(req: Request) {
   try {
-    const { userId } = await auth();
     const { searchParams } = new URL(req.url);
     const storeId = searchParams.get("storeId");
     const status = searchParams.get("status");
     const paymentStatus = searchParams.get("paymentStatus");
 
-    if (!userId) {
-      return new NextResponse("Unauthorized", {
+    // Extract bearer token
+    const authHeader = req.headers.get("authorization");
+    const token = authHeader?.replace("Bearer ", "");
+
+    if (!token) {
+      return new NextResponse("Unauthorized - No token provided", {
         status: 401,
         headers: corsHeaders,
       });
     }
 
-    const dbUser = await prismadb.user.findFirst({
-      where: { clerkId: userId },
-    });
-
-    if (!dbUser) {
-      return new NextResponse("User not found", {
-        status: 404,
+    // Verify JWT token
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      return new NextResponse("JWT secret not configured", {
+        status: 500,
         headers: corsHeaders,
       });
     }
 
-    const storeUser = await prismadb.storeUser.findFirst({
-      where: { userId: dbUser.id },
-    });
+    let payload: any;
+    try {
+      payload = jwt.verify(token, jwtSecret);
+    } catch (error) {
+      return new NextResponse("Invalid token", {
+        status: 401,
+        headers: corsHeaders,
+      });
+    }
 
-    if (!storeUser) {
-      return new NextResponse("Store user not found", {
+    const userEmail = payload.email;
+    if (!userEmail) {
+      return new NextResponse("User email not found in token", {
         status: 404,
         headers: corsHeaders,
       });
@@ -51,7 +64,7 @@ export async function GET(req: Request) {
 
     const orders = await prismadb.order.findMany({
       where: {
-        userId: storeUser.id,
+        customerEmail: userEmail,
         ...(storeId && { storeId }),
         ...(status && { status: status as any }),
         ...(paymentStatus && { paymentStatus }),
@@ -78,6 +91,7 @@ export async function GET(req: Request) {
       },
     });
 
+    // Convert Decimal fields to numbers
     const serializedOrders = orders.map(order => ({
       ...order,
       shippingCost: Number(order.shippingCost),

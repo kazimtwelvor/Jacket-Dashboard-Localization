@@ -9,7 +9,7 @@ export async function GET(req: Request) {
       return new Response("Email is required", { status: 400 })
     }
 
-    const existingUser = await prismadb.user.findFirst({
+    const existingUser = await prismadb.storeUser.findFirst({
       where: {
         email: { equals: email, mode: "insensitive" },
       },
@@ -22,5 +22,3 @@ export async function GET(req: Request) {
     return new Response("Internal error", { status: 500 })
   }
 }
-
-

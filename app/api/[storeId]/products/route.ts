@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server"
 import prismadb from "@/lib/prismadb"
+import { corsHeaders, handleCors, withCors } from "@/lib/cors"
+
+export async function OPTIONS() {
+  return handleCors()
+}
 
 export async function GET(req: Request, { params }: { params: { storeId: string } }) {
   try {
@@ -197,7 +202,7 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
     const hasNextPage = page < totalPages
     const hasPreviousPage = page > 1
 
-    return NextResponse.json({
+    return withCors({
       products: serializedProducts,
       pagination: {
         currentPage: page,
@@ -210,6 +215,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
     })
   } catch (err) {
     console.error(`[PRODUCTS_GET] Error:`, err)
-    return new NextResponse(`Internal error: ${err.message}`, { status: 500 })
+    return new NextResponse(`Internal error: ${err.message}`, { status: 500, headers: corsHeaders })
   }
 }

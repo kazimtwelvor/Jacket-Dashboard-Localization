@@ -38,6 +38,7 @@ export const DraftClient: React.FC<DraftClientProps> = ({ data, trashedData, use
   const [previewModalOpen, setPreviewModalOpen] = useState(false)
   const [previewProduct, setPreviewProduct] = useState<any>(null)
   const [currentPage, setCurrentPage] = useState(1)
+  const [showAllProducts, setShowAllProducts] = useState(false)
   const itemsPerPage = 12
 
   const onTrash = async (product: any) => {
@@ -110,6 +111,21 @@ export const DraftClient: React.FC<DraftClientProps> = ({ data, trashedData, use
           <TabsTrigger value="trash">Trash ({trashedData.length})</TabsTrigger>
         </TabsList>
         
+        <div className="flex items-center gap-2 mt-4">
+          <Button
+            variant={showAllProducts ? "default" : "outline"}
+            size="sm"
+            onClick={() => setShowAllProducts(!showAllProducts)}
+          >
+            {showAllProducts ? "Show Paginated" : "Show All Products"}
+          </Button>
+          {showAllProducts && (
+            <span className="text-sm text-muted-foreground">
+              Showing all {activeTab === "all" ? data.length : trashedData.length} products
+            </span>
+          )}
+        </div>
+        
         <TabsContent value="all" className="space-y-4">
           <ProductsView 
             data={data} 
@@ -117,6 +133,7 @@ export const DraftClient: React.FC<DraftClientProps> = ({ data, trashedData, use
             loading={loading} 
             isTrash={false}
             userRole={userRole}
+            showAllProducts={showAllProducts}
             onPreview={async (product) => {
               try {
                 const response = await fetch(`/api/${params?.storeId}/products/${product.id}`)
@@ -140,6 +157,7 @@ export const DraftClient: React.FC<DraftClientProps> = ({ data, trashedData, use
               setSelectedProduct(product)
               setDeleteModalOpen(true)
             }}
+            showAllProducts={showAllProducts}
             onPreview={async (product) => {
               try {
                 const response = await fetch(`/api/${params?.storeId}/products/${product.id}`)
@@ -170,6 +188,7 @@ interface ProductsViewProps {
   loading: boolean
   isTrash: boolean
   userRole?: string
+  showAllProducts?: boolean
 }
 
 const ProductsView: React.FC<ProductsViewProps> = ({ 
@@ -180,7 +199,8 @@ const ProductsView: React.FC<ProductsViewProps> = ({
   onPreview, 
   loading, 
   isTrash,
-  userRole 
+  userRole,
+  showAllProducts = false
 }) => {
   const [searchTerm, setSearchTerm] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("all")
@@ -403,7 +423,7 @@ const ProductsView: React.FC<ProductsViewProps> = ({
 
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
-  const paginatedProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage)
+  const paginatedProducts = showAllProducts ? filteredProducts : filteredProducts.slice(startIndex, startIndex + itemsPerPage)
 
   return (
     <>
@@ -828,7 +848,7 @@ const ProductsView: React.FC<ProductsViewProps> = ({
       )}
 
       {/* Pagination */}
-      {totalPages > 1 && (() => {
+      {!showAllProducts && totalPages > 1 && (() => {
         const getVisiblePages = () => {
           const maxVisible = 5
           let start = Math.max(1, currentPage - Math.floor(maxVisible / 2))

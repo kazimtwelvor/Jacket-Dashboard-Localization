@@ -86,14 +86,38 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ store
       })
     }
 
-    // Delete the product
-    const product = await prismadb.product.delete({
-      where: {
-        id: resolvedParams.productId,
-      },
+    // Delete all related records first to avoid foreign key constraints
+    await prismadb.$transaction(async (tx) => {
+      // Delete wishlist items
+      await tx.wishlistItem.deleteMany({
+        where: {
+          productId: resolvedParams.productId,
+        },
+      })
+
+      // Delete reviews
+      await tx.review.deleteMany({
+        where: {
+          productId: resolvedParams.productId,
+        },
+      })
+
+      // Delete order items
+      await tx.orderItem.deleteMany({
+        where: {
+          productId: resolvedParams.productId,
+        },
+      })
+
+      // Finally delete the product
+      await tx.product.delete({
+        where: {
+          id: resolvedParams.productId,
+        },
+      })
     })
 
-    return NextResponse.json(product)
+    return NextResponse.json({ message: "Product permanently deleted" })
   } catch (error) {
     console.log("[PRODUCT_PERMANENT_DELETE]", error)
     return new NextResponse("Internal error", { status: 500 })

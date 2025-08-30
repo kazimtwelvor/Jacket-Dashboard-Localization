@@ -113,7 +113,7 @@ export const BlogContentSection: React.FC<BlogContentSectionProps> = ({
     <div className="py-8">
       <div className="mb-8">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />
+          <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title || "" }} />
           <Button
             variant="outline"
             size="sm"
@@ -126,7 +126,7 @@ export const BlogContentSection: React.FC<BlogContentSectionProps> = ({
         </div>
 
         <div className="relative mb-8">
-          <div className="prose max-w-none mb-4" dangerouslySetInnerHTML={{ __html: text }} />
+          <div className="prose max-w-none mb-4" dangerouslySetInnerHTML={{ __html: text || "" }} />
           <Button
             variant="outline"
             size="sm"
@@ -181,7 +181,7 @@ export const BlogContentSection: React.FC<BlogContentSectionProps> = ({
 
       <div className="bg-gray-50 p-6 rounded-lg">
         <div className="flex justify-between items-center mb-3">
-          <h3 className="text-xl font-bold" dangerouslySetInnerHTML={{ __html: subtitleHeading }} />
+          <h3 className="text-xl font-bold" dangerouslySetInnerHTML={{ __html: subtitleHeading || "" }} />
           <Button
             variant="outline"
             size="sm"
@@ -194,7 +194,7 @@ export const BlogContentSection: React.FC<BlogContentSectionProps> = ({
         </div>
 
         <div className="relative">
-          <div className="text-gray-700" dangerouslySetInnerHTML={{ __html: subtitleText }} />
+          <div className="text-gray-700" dangerouslySetInnerHTML={{ __html: subtitleText || "" }} />
           <div className="mt-3">
             <Button
               variant="outline"

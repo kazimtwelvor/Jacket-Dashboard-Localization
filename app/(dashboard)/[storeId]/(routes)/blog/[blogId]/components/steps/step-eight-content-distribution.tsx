@@ -58,6 +58,7 @@ export const StepEightContentDistribution: React.FC<StepEightContentDistribution
               value={subtitle}
               onSave={onSaveText}
               className="text-gray-700"
+              isInline={true}
             />
           </p>
           {content.map((paragraph, idx) => (
@@ -68,6 +69,7 @@ export const StepEightContentDistribution: React.FC<StepEightContentDistribution
                 onSave={onSaveText}
                 className="text-gray-700"
                 isTextarea={true}
+                isInline={true}
               />
             </p>
           ))}
@@ -103,6 +105,7 @@ export const StepEightContentDistribution: React.FC<StepEightContentDistribution
                   value={cardDescriptions[idx]}
                   onSave={onSaveText}
                   className="text-sm text-white opacity-80"
+                  isInline={true}
                 />
               </p>
             </div>

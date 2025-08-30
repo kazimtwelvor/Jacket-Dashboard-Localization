@@ -35,6 +35,8 @@ model Store {
   recaptchaSettings   RecaptchaSettings?
   blogs               Blog[]
   categoryPages       CategoryPage[] @relation("StoreToCategoryPage")
+  contactForms        ContactForm[]
+  newsletterForms     NewsletterForm[]
   
   // Payment fields
   paypalClientId      String?   @default("")
@@ -753,4 +755,48 @@ model CategoryPage {
 enum CategoryPageStatus {
   DRAFT
   PUBLISHED
+}
+
+model ContactForm {
+  id                    String            @id @default(cuid())
+  storeId               String
+  store                 Store             @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  firstName             String
+  lastName              String
+  email                 String
+  subject               String
+  message               String            @db.Text
+  agreeToPrivacyPolicy  Boolean           @default(false)
+  status                ContactFormStatus @default(PENDING)
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+
+  @@index([storeId])
+  @@index([email])
+}
+
+enum ContactFormStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model NewsletterForm {
+  id        String              @id @default(cuid())
+  storeId   String
+  store     Store               @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  email     String
+  status    NewsletterFormStatus @default(ACTIVE)
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+
+  @@index([storeId])
+  @@index([email])
+}
+
+enum NewsletterFormStatus {
+  ACTIVE
+  INACTIVE
+  UNSUBSCRIBED
 }

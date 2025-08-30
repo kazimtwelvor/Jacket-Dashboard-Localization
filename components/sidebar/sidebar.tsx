@@ -25,6 +25,7 @@ import {
   DollarSign,
   FileText,
   FileType,
+  ClipboardList,
 } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import {
@@ -159,6 +160,12 @@ export const Sidebar = ({ className, items = [], memberStores = [] }: SidebarPro
           label: "Reviews",
           icon: Star,
           active: pathname.includes(`/${params.storeId}/reviews`),
+        },
+        {
+          href: `/${params.storeId}/forms`,
+          label: "Forms",
+          icon: ClipboardList,
+          active: pathname.includes(`/${params.storeId}/forms`),
         },
       ],
     },

@@ -447,12 +447,12 @@ export const EditableText: React.FC<EditableTextProps> = ({
       onMouseDown={(e) => e.preventDefault()}
     >
       {isRichText ? (
-        <div
+        <span
           className="w-full prose prose-sm max-w-none"
           dangerouslySetInnerHTML={{ __html: value || "Click to edit" }}
         />
       ) : (
-        <WrapperElement className="w-full">{value || "Click to edit"}</WrapperElement>
+        <span className="w-full">{value || "Click to edit"}</span>
       )}
       <Button
         size="sm"

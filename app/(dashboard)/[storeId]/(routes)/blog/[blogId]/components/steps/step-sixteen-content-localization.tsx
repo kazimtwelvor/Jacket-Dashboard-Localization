@@ -90,14 +90,14 @@ export const StepSixteenContentLocalization: React.FC<StepSixteenContentLocaliza
                 <h3 className="text-lg font-bold text-[#0A2463] mb-2 pointer-events-auto">
                   <EditableText
                     field={`timelineItems.0.title`}
-                    value={timelineItems[0].title}
+                    value={timelineItems[0]?.title || "Market Research"}
                     onSave={(field, value) => handleSaveTimelineItem(0, "title", value)}
                   />
                 </h3>
                 <p className="text-gray-700 pointer-events-auto">
                   <EditableText
                     field={`timelineItems.0.description`}
-                    value={timelineItems[0].description}
+                    value={timelineItems[0]?.description || "Understand local preferences, cultural nuances, and market-specific needs to inform your localization strategy."}
                     onSave={(field, value) => handleSaveTimelineItem(0, "description", value)}
                     isTextarea={true}
                   />
@@ -131,14 +131,14 @@ export const StepSixteenContentLocalization: React.FC<StepSixteenContentLocaliza
                 <h3 className="text-lg font-bold text-[#0A2463] mb-2 pointer-events-auto">
                   <EditableText
                     field={`timelineItems.1.title`}
-                    value={timelineItems[1].title}
+                    value={timelineItems[1]?.title || "Translation & Adaptation"}
                     onSave={(field, value) => handleSaveTimelineItem(1, "title", value)}
                   />
                 </h3>
                 <p className="text-gray-700 pointer-events-auto">
                   <EditableText
                     field={`timelineItems.1.description`}
-                    value={timelineItems[1].description}
+                    value={timelineItems[1]?.description || "Professional translation and cultural adaptation of your content to ensure it resonates with local audiences."}
                     onSave={(field, value) => handleSaveTimelineItem(1, "description", value)}
                     isTextarea={true}
                   />
@@ -172,14 +172,14 @@ export const StepSixteenContentLocalization: React.FC<StepSixteenContentLocaliza
                 <h3 className="text-lg font-bold text-[#0A2463] mb-2 pointer-events-auto">
                   <EditableText
                     field={`timelineItems.2.title`}
-                    value={timelineItems[2].title}
+                    value={timelineItems[2]?.title || "Local SEO & Distribution"}
                     onSave={(field, value) => handleSaveTimelineItem(2, "title", value)}
                   />
                 </h3>
                 <p className="text-gray-700 pointer-events-auto">
                   <EditableText
                     field={`timelineItems.2.description`}
-                    value={timelineItems[2].description}
+                    value={timelineItems[2]?.description || "Optimize your localized content for local search engines and distribute through region-specific channels."}
                     onSave={(field, value) => handleSaveTimelineItem(2, "description", value)}
                     isTextarea={true}
                   />

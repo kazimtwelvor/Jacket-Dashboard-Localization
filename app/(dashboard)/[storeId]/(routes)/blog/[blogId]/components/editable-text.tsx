@@ -447,7 +447,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
       onMouseDown={(e) => e.preventDefault()}
     >
       {isRichText ? (
-        <WrapperElement
+        <div
           className="w-full prose prose-sm max-w-none"
           dangerouslySetInnerHTML={{ __html: value || "Click to edit" }}
         />

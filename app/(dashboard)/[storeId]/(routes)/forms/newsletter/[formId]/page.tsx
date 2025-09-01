@@ -1,21 +1,23 @@
-import { NewsletterFormDetail } from "./components/newsletter-form-detail"
+import { NewsletterFormEdit } from "./components/newsletter-form-edit"
+import prismadb from "@/lib/prismadb"
 
-const NewsletterFormPage = ({ params }: { params: { formId: string } }) => {
-  // Mock newsletter form data
-  const newsletterForm = {
-    id: params.formId,
-    name: "Alice Johnson",
-    email: "alice.johnson@example.com", 
-    preferences: "Weekly updates",
-    createdAt: "January 10th, 2024",
-    type: "newsletter"
+const NewsletterFormEditPage = async ({ params }: { params: { formId: string, storeId: string } }) => {
+  const newsletterForm = await prismadb.newsletterForm.findUnique({
+    where: {
+      id: params.formId,
+      storeId: params.storeId,
+    },
+  })
+
+  if (!newsletterForm) {
+    return <div>Newsletter form not found</div>
   }
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
-      <NewsletterFormDetail data={newsletterForm} />
+      <NewsletterFormEdit initialData={newsletterForm} />
     </div>
   )
 }
 
-export default NewsletterFormPage
+export default NewsletterFormEditPage

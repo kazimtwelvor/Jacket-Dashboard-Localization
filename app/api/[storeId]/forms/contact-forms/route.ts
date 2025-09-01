@@ -1,6 +1,26 @@
 import { NextResponse } from "next/server"
 import prismadb from "@/lib/prismadb"
 
+function corsHeaders() {
+  const allowedOrigins = [
+    process.env.FRONTEND_STORE_URL,
+    'http://localhost:3000'
+  ].filter(Boolean)
+
+  return {
+    'Access-Control-Allow-Origin': allowedOrigins.join(', '),
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  }
+}
+
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: corsHeaders(),
+  })
+}
+
 export async function GET(
   req: Request,
   { params }: { params: { storeId: string } }
@@ -15,10 +35,15 @@ export async function GET(
       },
     })
 
-    return NextResponse.json(contactForms)
+    return NextResponse.json(contactForms, {
+      headers: corsHeaders(),
+    })
   } catch (error) {
     console.log("[CONTACT_FORMS_GET]", error)
-    return new NextResponse("Internal error", { status: 500 })
+    return new NextResponse("Internal error", { 
+      status: 500,
+      headers: corsHeaders(),
+    })
   }
 }
 
@@ -27,13 +52,15 @@ export async function POST(
   { params }: { params: { storeId: string } }
 ) {
   try {
-    const { userId } = await auth()
     const body = await req.json()
 
     const { firstName, lastName, email, subject, message, agreeToPrivacyPolicy, status } = body
 
     if (!firstName || !lastName || !email || !subject || !message) {
-      return new NextResponse("Missing required fields", { status: 400 })
+      return new NextResponse("Missing required fields", { 
+        status: 400,
+        headers: corsHeaders(),
+      })
     }
 
     const contactForm = await prismadb.contactForm.create({
@@ -49,9 +76,14 @@ export async function POST(
       },
     })
 
-    return NextResponse.json(contactForm)
+    return NextResponse.json(contactForm, {
+      headers: corsHeaders(),
+    })
   } catch (error) {
     console.log("[CONTACT_FORMS_POST]", error)
-    return new NextResponse("Internal error", { status: 500 })
+    return new NextResponse("Internal error", { 
+      status: 500,
+      headers: corsHeaders(),
+    })
   }
 }

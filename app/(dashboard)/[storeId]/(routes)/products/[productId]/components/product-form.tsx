@@ -131,7 +131,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       console.log("Initial colorLinks:", initialData.colorLinks)
       console.log("Initial images with metadata:", initialData.images)
       console.log("Initial relatedProducts:", initialData.relatedProducts)
-      console.log("Initial relatedProducts:", initialData.relatedProducts)
+      console.log("🔥 INITIAL DATA isParentProduct:", initialData.isParentProduct)
+      console.log("🔥 INITIAL DATA isParentProduct type:", typeof initialData.isParentProduct)
     }
   }, [initialData])
 
@@ -344,6 +345,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
         // Extract individual schemas from the combined schema
         schema: initialData.schema || "",
         tempReviewsId: "", // Always empty for existing products
+        isParentProduct: initialData.isParentProduct || false,
+        parentProductId: initialData.parentProductId || "",
         schema1: (() => {
           try {
             if (initialData.schema) {
@@ -496,6 +499,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
         schema2: "",
         schema3: "",
         tempReviewsId: "",
+        isParentProduct: false,
+        parentProductId: "",
       }
 
   // Add this after the parsedInitialData definition to log the extracted schemas
@@ -992,6 +997,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
 
       // Set submit type to publish
       formData.append("submitType", "publish")
+      formData.append("isParentProduct", formValues.isParentProduct ? "true" : "false")
+      formData.append("parentProductId", formValues.parentProductId || "")
+      
+      console.log("isParentProduct being sent:", formValues.isParentProduct)
+      console.log("parentProductId being sent:", formValues.parentProductId)
 
       // Add all required fields directly
       formData.append("name", formValues.name || "")

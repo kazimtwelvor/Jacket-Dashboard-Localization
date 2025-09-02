@@ -2,6 +2,105 @@ import { NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import prismadb from "@/lib/prismadb"
 
+// Function to sync color variations across related products (bidirectional)
+async function syncColorVariations(currentProductId: string, storeId: string, specifications: any) {
+  try {
+    if (!specifications?.color || !Array.isArray(specifications.color) || specifications.color.length === 0) {
+      return
+    }
+
+    const currentColors = specifications.color
+    console.log(`Syncing color variations for product ${currentProductId} with colors:`, currentColors)
+
+    // Find all products that share ANY color with current product
+    const relatedProducts = await prismadb.product.findMany({
+      where: {
+        storeId: storeId,
+        isDeleted: false,
+        id: { not: currentProductId },
+        OR: currentColors.map(color => ({
+          specifications: {
+            path: ['color'],
+            array_contains: [color]
+          }
+        }))
+      }
+    })
+
+    console.log(`Found ${relatedProducts.length} related products to sync`)
+
+    // Collect all unique colors from current product and all related products
+    const allUniqueColors = new Set(currentColors)
+    
+    for (const relatedProduct of relatedProducts) {
+      try {
+        let existingSpecs = {}
+        if (relatedProduct.specifications) {
+          existingSpecs = typeof relatedProduct.specifications === 'string' 
+            ? JSON.parse(relatedProduct.specifications) 
+            : relatedProduct.specifications
+        }
+        const existingColors = existingSpecs.color || []
+        existingColors.forEach(color => allUniqueColors.add(color))
+      } catch (error) {
+        console.error(`Error parsing specs for product ${relatedProduct.id}:`, error)
+      }
+    }
+
+    const finalColorArray = Array.from(allUniqueColors)
+    console.log(`All unique colors to sync:`, finalColorArray)
+
+    // Update current product with all colors
+    try {
+      const currentSpecs = typeof specifications === 'string' ? JSON.parse(specifications) : specifications
+      const updatedCurrentSpecs = {
+        ...currentSpecs,
+        color: finalColorArray
+      }
+
+      await prismadb.product.update({
+        where: { id: currentProductId },
+        data: {
+          specifications: updatedCurrentSpecs
+        }
+      })
+      console.log(`Updated current product ${currentProductId} with all colors:`, finalColorArray)
+    } catch (error) {
+      console.error(`Error updating current product ${currentProductId}:`, error)
+    }
+
+    // Update all related products with all colors
+    for (const relatedProduct of relatedProducts) {
+      try {
+        let existingSpecs = {}
+        if (relatedProduct.specifications) {
+          existingSpecs = typeof relatedProduct.specifications === 'string' 
+            ? JSON.parse(relatedProduct.specifications) 
+            : relatedProduct.specifications
+        }
+
+        const updatedSpecs = {
+          ...existingSpecs,
+          color: finalColorArray
+        }
+
+        await prismadb.product.update({
+          where: { id: relatedProduct.id },
+          data: {
+            specifications: updatedSpecs
+          }
+        })
+
+        console.log(`Updated product ${relatedProduct.id} with all colors:`, finalColorArray)
+      } catch (error) {
+        console.error(`Error updating product ${relatedProduct.id}:`, error)
+      }
+    }
+  } catch (error) {
+    console.error('Error in syncColorVariations:', error)
+  }
+}
+
 // Update the GET method to include image metadata
 export async function GET(req: Request, { params }: { params: { productId: string } }) {
   try {
@@ -563,6 +662,9 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
     if (!updatedProductWithReviews) {
       return new NextResponse("Product not found after update", { status: 404 })
     }
+
+    // Sync color variations with related products
+    await syncColorVariations(productId, storeId, specificationsObject)
 
     // Serialize Decimal objects to strings before returning
     const serializedProduct = {

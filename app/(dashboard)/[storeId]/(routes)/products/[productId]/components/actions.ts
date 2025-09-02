@@ -246,6 +246,21 @@ export async function createProduct(formData: FormData) {
     // Using String() to ensure we're comparing strings, as formData.get() returns strings
     const isFeaturedValue = formData.get("isFeatured")
     const isFeatured = isFeaturedValue === "true" || String(isFeaturedValue) === "true"
+    
+    // Handle isParentProduct value
+    const isParentProductValue = formData.get("isParentProduct")
+    const isParentProduct = isParentProductValue === "true" || String(isParentProductValue) === "true"
+    
+    // Handle parentProductId value
+    const parentProductId = formData.get("parentProductId") as string || null
+    
+    console.log("isParentProduct debug:", {
+      rawValue: isParentProductValue,
+      processedValue: isParentProduct,
+      typeOfRawValue: typeof isParentProductValue,
+    })
+    
+    console.log("Final isParentProduct being saved to DB:", isParentProduct)
 
     console.log("isFeatured value:", {
       rawValue: isFeaturedValue,
@@ -456,6 +471,7 @@ export async function createProduct(formData: FormData) {
 
     // Process color links with extra safety checks
     let colorLinksData = {}
+    let colorLinksString = "{}"
 
     try {
       if (colorLinksJson) {
@@ -475,6 +491,7 @@ export async function createProduct(formData: FormData) {
             // Ensure it's an object
             if (typeof parsedData === "object" && parsedData !== null) {
               colorLinksData = parsedData
+              colorLinksString = colorLinksJson
               console.log("Successfully parsed colorLinks into an object")
             } else {
               console.log("Parsed colorLinks but result is not an object:", typeof parsedData)
@@ -494,8 +511,12 @@ export async function createProduct(formData: FormData) {
       colorLinksData = {}
     }
 
+    // Save color links for all products (both parent and child)
+    let colorLinksToSave = colorLinksData
+
     // Log the final structure for verification
     console.log("Final colorLinksData structure:", JSON.stringify(colorLinksData).substring(0, 100))
+    console.log("ColorLinks to save:", JSON.stringify(colorLinksToSave))
 
     // First try to get colorDetails if it exists
     if (colorDetailsJson) {
@@ -643,9 +664,11 @@ export async function createProduct(formData: FormData) {
       reviewCount: reviewCount || "0", // Ensure default value
       purchaseNote,
       isFeatured,
+      isParentProduct,
+      parentProductId,
       colorDetails, // This should be the parsed object or from DB
       sizeDetails: sizeDetailsData || [], // Ensure this is never null
-      colorLinks: colorLinksData,
+      colorLinks: colorLinksToSave,
       schema: schemaDataString, // Use the stringified combined schema
       // Add creator information
       createdById: dbUser.id,
@@ -663,6 +686,13 @@ export async function createProduct(formData: FormData) {
     })
 
     console.log("Final tags being saved to database:", productData.tags)
+
+    // Validate that at least one color is selected
+    const selectedColors = specifications ? JSON.parse(specifications).color || [] : []
+    if (!selectedColors || selectedColors.length === 0) {
+      throw new Error("At least one color must be selected before saving the product")
+    }
+    console.log("Color validation passed:", selectedColors)
 
     // Parse cached reviews if they exist
     let cachedReviews = null

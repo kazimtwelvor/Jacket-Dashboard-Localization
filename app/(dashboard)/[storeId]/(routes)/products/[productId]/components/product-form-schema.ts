@@ -122,6 +122,10 @@ export const formSchema = z.object({
   // Temporary reviews ID for new products
   tempReviewsId: z.string().optional(),
   cachedReviews: z.array(z.any()).optional().default([]),
+  
+  // Parent product flag
+  isParentProduct: z.boolean().optional().default(false),
+  parentProductId: z.string().optional(),
 })
 
 // Export the type for the form values

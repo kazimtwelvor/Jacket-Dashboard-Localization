@@ -63,18 +63,8 @@ const formatContent = (content: string): string => {
 
   let cleanContent = content.trim()
 
-  // Convert <h1>, <h2>, <h3> to inline spans when inside text
-  cleanContent = cleanContent
-    // Replace <h1>, <h2> → inline-heading
-    .replace(/<h[1-2][^>]*>(.*?)<\/h[1-2]>/g, '<span class="inline-heading">$1</span>')
-    // Replace <h3> → inline-subheading
-    .replace(/<h3[^>]*>(.*?)<\/h3>/g, '<span class="inline-subheading">$1</span>')
-    // Ensure content is wrapped in paragraph if not already
-    .replace(/^([^<])/g, '<p>$1')
-    .replace(/([^>])$/g, '$1</p>')
-
-  // If no paragraph tags, wrap in one
-  if (!cleanContent.includes('<p>')) {
+  // Ensure content is wrapped in paragraph if not already and doesn't start with a block element
+  if (!cleanContent.match(/^<(p|h[1-6]|div|ul|ol|blockquote)/)) {
     cleanContent = `<p>${cleanContent}</p>`
   }
 
@@ -89,10 +79,14 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
 
     const editor = useEditor({
       extensions: [
-        StarterKit,
+        StarterKit.configure({
+          heading: {
+            levels: [1, 2, 3, 4, 5, 6],
+          },
+        }),
         Underline,
         TextAlign.configure({
-          types: ["paragraph", "image"],
+          types: ["paragraph", "heading", "image"],
           alignments: ["left", "center", "right"],
         }),
         Link.configure({
@@ -337,12 +331,14 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
                 const { from, to } = editor.state.selection
                 const selectedText = editor.state.doc.textBetween(from, to)
                 if (selectedText.trim()) {
-                  editor.chain().focus().deleteSelection().insertContent(`<span class="inline-heading">${selectedText.trim()}</span>`).run()
+                  editor.chain().focus().deleteSelection().insertContent(`<h2>${selectedText.trim()}</h2>`).run()
+                } else {
+                  editor.chain().focus().toggleHeading({ level: 2 }).run()
                 }
               }}
               disabled={disabled}
               className={cn("h-8 w-8 p-0", 
-                editor.getHTML().includes('class="inline-heading"') && "bg-muted"
+                editor.isActive('heading', { level: 2 }) && "bg-muted"
               )}
             >
               <Heading2 className="h-4 w-4" />
@@ -355,12 +351,14 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
                 const { from, to } = editor.state.selection
                 const selectedText = editor.state.doc.textBetween(from, to)
                 if (selectedText.trim()) {
-                  editor.chain().focus().deleteSelection().insertContent(`<span class="inline-subheading">${selectedText.trim()}</span>`).run()
+                  editor.chain().focus().deleteSelection().insertContent(`<h3>${selectedText.trim()}</h3>`).run()
+                } else {
+                  editor.chain().focus().toggleHeading({ level: 3 }).run()
                 }
               }}
               disabled={disabled}
               className={cn("h-8 w-8 p-0", 
-                editor.getHTML().includes('class="inline-subheading"') && "bg-muted"
+                editor.isActive('heading', { level: 3 }) && "bg-muted"
               )}
             >
               <Heading3 className="h-4 w-4" />

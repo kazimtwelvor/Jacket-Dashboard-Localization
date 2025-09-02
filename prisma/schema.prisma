@@ -37,7 +37,6 @@ model Store {
   categoryPages       CategoryPage[] @relation("StoreToCategoryPage")
   contactForms        ContactForm[]
   newsletterForms     NewsletterForm[]
-  
   // Payment fields
   paypalClientId      String?   @default("")
   paypalClientSecret  String?   @default("")
@@ -336,6 +335,8 @@ model Product {
 
   // Product classification
   productType  String? @default("variable") // simple, variable, grouped, etc.
+  isParentProduct Boolean? @default(false)
+  parentProductId String? // Reference to parent product
 
   // Virtual/downloadable
   isVirtual      Boolean? @default(false)
@@ -757,6 +758,7 @@ enum CategoryPageStatus {
   PUBLISHED
 }
 
+
 model ContactForm {
   id                    String            @id @default(cuid())
   storeId               String
@@ -800,3 +802,4 @@ enum NewsletterFormStatus {
   INACTIVE
   UNSUBSCRIBED
 }
+

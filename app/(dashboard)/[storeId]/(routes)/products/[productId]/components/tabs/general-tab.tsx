@@ -268,7 +268,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
           </div>
         </CardHeader>
         <CardContent className="p-6">
-          <ColorLinksSection form={form} />
+          <ColorLinksSection form={form} storeId={storeId} currentProductId={currentProductId} />
         </CardContent>
       </Card>
 

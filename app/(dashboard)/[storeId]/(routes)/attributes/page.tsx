@@ -10,7 +10,6 @@ const Page = async ({
   params: { storeId: string }
   searchParams: { tab?: string; action?: string }
 }) => {
-  // Fetch all data needed for the tabs
   const categories = await prismadb.category.findMany({
     where: {
       storeId: params.storeId,
@@ -41,7 +40,6 @@ const Page = async ({
     },
   })
 
-  // Handle redirects for new item creation
   if (searchParams.action === "new") {
     switch (searchParams.tab) {
       case "categories":
@@ -53,7 +51,6 @@ const Page = async ({
     }
   }
 
-  // Get product counts for each category
   const products = await prismadb.product.findMany({
     where: {
       storeId: params.storeId,
@@ -67,7 +64,6 @@ const Page = async ({
   })
 
   const formattedCategories = categories.map((item) => {
-    // Count products that have this category in their categoryData
     const productCount = products.filter((product) => {
       const categoryData = product.categoryData as any
       if (!categoryData) return false
@@ -94,7 +90,6 @@ const Page = async ({
   })
 
   const formattedSizes = sizes.map((item) => {
-    // Count products that have this size in their sizeDetails
     const productCount = products.filter((product) => {
       const sizeDetails = product.sizeDetails as any
       if (!sizeDetails || !Array.isArray(sizeDetails)) return false
@@ -111,7 +106,6 @@ const Page = async ({
   })
 
   const formattedColors = colors.map((item) => {
-    // Count products that have this color in their colorDetails
     const productCount = products.filter((product) => {
       const colorDetails = product.colorDetails as any
       if (!colorDetails || !Array.isArray(colorDetails)) return false

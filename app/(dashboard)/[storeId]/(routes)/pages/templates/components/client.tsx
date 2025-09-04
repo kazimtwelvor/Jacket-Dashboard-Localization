@@ -15,7 +15,7 @@ const TEMPLATES = [
 
 export const TemplatesClient = () => {
   const params = useParams()
-  const storeId = params.storeId as string
+  const storeId = params?.storeId as string
 
   return (
     <>

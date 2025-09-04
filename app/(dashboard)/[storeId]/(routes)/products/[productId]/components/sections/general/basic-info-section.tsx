@@ -159,7 +159,6 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
     if (selectedColorVariations && selectedColorVariations.length > 0) {
       const currentColorSpecs = form.getValues("specifications.color") || []
 
-      const colorVariationsSet = new Set(selectedColorVariations)
       const colorSpecsSet = new Set(currentColorSpecs)
 
       let needsUpdate = false

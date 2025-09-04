@@ -35,7 +35,7 @@ export const TrashCellAction: React.FC<TrashCellActionProps> = ({ data }) => {
     try {
       setLoading(true)
 
-      const response = await fetch(`/api/${params.storeId}/products/${data.id}/restore`, {
+      const response = await fetch(`/api/${params?.storeId}/products/${data.id}/restore`, {
         method: "PATCH",
       })
 
@@ -56,7 +56,7 @@ export const TrashCellAction: React.FC<TrashCellActionProps> = ({ data }) => {
     try {
       setLoading(true)
 
-      const response = await fetch(`/api/${params.storeId}/products/${data.id}/permanent?deleteImages=${deleteImages}`, {
+      const response = await fetch(`/api/${params?.storeId}/products/${data.id}/permanent?deleteImages=${deleteImages}`, {
         method: "DELETE",
       })
 

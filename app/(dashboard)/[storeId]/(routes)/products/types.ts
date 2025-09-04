@@ -1,6 +1,4 @@
-// Define all product-related types in one place for consistency
 
-// Update the Product interface to use colorDetails and sizeDetails instead of colorIds and sizeIds
 export interface Product {
   id: string
   storeId: string
@@ -11,7 +9,7 @@ export interface Product {
   isArchived: boolean
   isPublished: boolean
   colorId: string
-  colorDetails?: any // Replace colorIds with colorDetails
+  colorDetails?: any
   images: Image[]
   sku: string
   stockStatus?: string
@@ -22,7 +20,7 @@ export interface Product {
   style?: string[]
   tags?: string[]
   gender?: string
-  colorLinks?: string | object // Update type to accept both string and object
+  colorLinks?: string | object 
   metaTitle?: string
   metaDescription?: string
   slug?: string
@@ -32,13 +30,13 @@ export interface Product {
   brandName?: string
   ratingValue?: string
   reviewCount?: string
-  schema?: string // Ensure this field exists to store JSON-LD schema
+  schema?: string 
   purchaseNote?: string
   menuOrder?: number
   productType?: string
   seoScore?: number
-  productSizes?: ProductSize[] // Add this field to store multiple sizes
-  sizeDetails?: any // Replace sizeIds with sizeDetails
+  productSizes?: ProductSize[]
+  sizeDetails?: any
   createdAt: Date
   updatedAt: Date
 }
@@ -78,7 +76,6 @@ export interface Color {
   value2?: string | null
 }
 
-// Product specifications type
 export interface ProductSpecifications {
   externalMaterial: string[]
   internalMaterial: string[]
@@ -89,17 +86,15 @@ export interface ProductSpecifications {
   color: string[]
 }
 
-// Product categories type
 export interface ProductCategories {
   gender: string
   material: string[]
   style: string[]
   variationColors: string[]
   colorVariationLinks: Record<string, string>
-  sizes: string[] // Add sizes array to store selected size IDs
+  sizes: string[]
 }
 
-// Product SEO type
 export interface ProductSEO {
   metaTitle: string
   metaDescription: string
@@ -112,7 +107,6 @@ export interface ProductSEO {
   canonicalUrl: string
 }
 
-// Product form values type
 export interface ProductFormValues {
   name: string
   description: string
@@ -135,9 +129,6 @@ export interface ProductFormValues {
 }
 
 
-// Product column type for data table
-// Update the ProductColumn interface to include creator information
-// Add these fields to the ProductColumn interface
 export type ProductColumn = {
   id: string
   name: string
@@ -184,7 +175,6 @@ export type ProductColumn = {
 }
 
 
-// Specification options for dropdown menus
 export const specificationOptions = {
   externalMaterial: ["Leather", "Cotton", "Polyester", "Nylon", "Denim", "Wool", "Suede", "Canvas", "Silk"],
   internalMaterial: ["Viscose", "Cotton", "Polyester", "Satin", "Fleece", "Nylon", "Silk", "None"],
@@ -230,10 +220,8 @@ export const specificationOptions = {
   ],
 }
 
-// Material options
 export const materialOptions = ["Leather", "Denim", "Wool", "Suede", "Fleece"]
 
-// Style options
 export const styleOptions = [
   "Bomber",
   "Puffer",
@@ -247,7 +235,6 @@ export const styleOptions = [
   "Long Coat",
 ]
 
-// Gender options
 export const genderOptions = [
   { label: "Men", value: "men" },
   { label: "Women", value: "women" },

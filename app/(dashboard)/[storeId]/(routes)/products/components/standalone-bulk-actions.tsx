@@ -33,7 +33,6 @@ export const StandaloneBulkActions: React.FC<StandaloneBulkActionsProps> = ({
       return
     }
 
-    // Ensure storeId is included in the URL
     if (!storeId) {
       console.error("Store ID is missing")
       toast.error("Store ID is missing. Please refresh the page and try again.")
@@ -41,11 +40,9 @@ export const StandaloneBulkActions: React.FC<StandaloneBulkActionsProps> = ({
     }
 
     try {
-      // Use a direct navigation approach to avoid potential issues with router.push
       const url = `/${storeId}/products/bulk-edit?ids=${selectedRows.join(",")}`
       console.log("Navigating to:", url)
 
-      // Use window.location for a full page navigation
       window.location.href = url
     } catch (error) {
       console.error("Navigation error:", error)

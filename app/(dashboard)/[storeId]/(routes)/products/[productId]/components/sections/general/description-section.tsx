@@ -42,7 +42,7 @@ interface DescriptionImage {
   url: string
   link?: string
   alignment: ImageAlignment
-  size: number // Size as percentage of container width (25-100)
+  size: number 
 }
 
 export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) => {
@@ -52,7 +52,7 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [imageLink, setImageLink] = useState("")
   const [imageAlignment, setImageAlignment] = useState<ImageAlignment>("center")
-  const [imageSize, setImageSize] = useState<number>(100) // Default to 100% width
+  const [imageSize, setImageSize] = useState<number>(100)
   const [descriptionText, setDescriptionText] = useState("")
   const [descriptionImages, setDescriptionImages] = useState<DescriptionImage[]>([])
   const { toast } = useToast()

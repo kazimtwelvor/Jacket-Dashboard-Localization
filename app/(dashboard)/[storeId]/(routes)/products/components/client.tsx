@@ -1,4 +1,3 @@
-// Client component for managing products in the admin dashboard
 "use client"
 
 import type React from "react"
@@ -48,19 +47,14 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
   const [itemsPerPage, setItemsPerPage] = useState<number | "all">(20)
   const [isBulkPublishing, setIsBulkPublishing] = useState(false)
 
-
-
-  // Filter products based on status
   const publishedProducts = data.filter((product) => product.isPublished && !product.isArchived)
   const archivedProducts = data.filter((product) => product.isArchived)
 
-  // Count for each status
   const allCount = data.length
   const publishedCount = publishedProducts.length
   const archivedCount = archivedProducts.length
   const trashCount = trashedData.length
 
-  // Calculate statistics
   const totalValue = data.reduce((sum, product) => {
     const price = Number.parseFloat(product.price.replace(/[^0-9.-]+/g, ""))
     return sum + price
@@ -70,7 +64,6 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
 
   const storeId = params?.storeId as string
 
-  // Bulk publish handler
   const handleBulkPublish = async () => {
     if (!isOwner) {
       toast.error("Only store owners can bulk publish products")
@@ -109,10 +102,9 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
     } else {
       setItemsPerPage(Number(value))
     }
-    setCurrentPage(1) // Reset to first page when changing items per page
+    setCurrentPage(1) 
   }
 
-  // Filter products based on search term and active tab
   const getFilteredProductsForTab = () => {
     let listToFilter: ProductColumn[] | TrashProductColumn[] = []
     if (activeTab === "published") {
@@ -120,18 +112,17 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
     } else if (activeTab === "archived") {
       listToFilter = archivedProducts
     } else if (activeTab === "trash") {
-      listToFilter = trashedData // Trash tab uses DataTable, not this pagination logic
+      listToFilter = trashedData 
     }
     return listToFilter.filter(
       (product) => 
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.sku?.toLowerCase().includes(searchTerm.toLowerCase())
-    ) as ProductColumn[] // Cast assuming trash will be handled separately by DataTable
+    ) as ProductColumn[]
   }
 
   const filteredProducts = getFilteredProductsForTab()
 
-  // Pagination logic
   const totalItems = filteredProducts.length
   let currentDisplayProducts: ProductColumn[]
   let displayTotalPages: number
@@ -149,10 +140,9 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
     const numericItemsPerPage = Number(itemsPerPage)
     displayTotalPages = totalItems > 0 ? Math.ceil(totalItems / numericItemsPerPage) : 1
     
-    // Adjust currentPage if it's out of bounds
     const safeCurrentPage = Math.min(currentPage, displayTotalPages) || 1;
     if (currentPage !== safeCurrentPage) {
-        setCurrentPage(safeCurrentPage); // This might cause an extra render, can be optimized if needed
+        setCurrentPage(safeCurrentPage); 
     }
 
     displayStartIndex = (safeCurrentPage - 1) * numericItemsPerPage
@@ -173,10 +163,10 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
 
 
   const renderPagination = () => {
-    if (totalItems === 0 && activeTab !== "trash") { // Don't show pagination if no items, except for trash tab DataTable
+    if (totalItems === 0 && activeTab !== "trash") { 
         return <div className="text-center py-4 text-sm text-muted-foreground">No products found.</div>;
     }
-    if (activeTab === "trash") return null; // DataTable in trash handles its own pagination
+    if (activeTab === "trash") return null; 
 
     return (
       <div className="flex flex-col sm:flex-row items-center justify-between mt-4 gap-4">
@@ -206,7 +196,6 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
                 />
               </PaginationItem>
               {Array.from({ length: Math.min(5, displayTotalPages) }, (_, i) => {
-                // Logic to show pages around current page or start/end
                 let pageNumber: number;
                 if (displayTotalPages <= 5) {
                     pageNumber = i + 1;
@@ -253,7 +242,6 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
 
   return (
     <div className="space-y-6">
-      {/* Header with stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/50 dark:to-blue-900/30 border-blue-200 dark:border-blue-800">
           <CardHeader className="pb-2">
@@ -330,7 +318,7 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
         </Card>
       </div>
 
-      {/* Main content */}
+
       <Card className="border-none shadow-md">
         <CardHeader className="pb-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

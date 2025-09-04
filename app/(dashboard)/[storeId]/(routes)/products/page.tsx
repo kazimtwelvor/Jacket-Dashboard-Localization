@@ -26,7 +26,6 @@ const ProductsPage: React.FC<ProductsPageProps> = async ({ params }) => {
       return <div>Authentication required</div>
     }
 
-    // Check if user is store owner (direct ownership check)
     const store = await prismadb.store.findUnique({
       where: {
         id: storeId,
@@ -38,7 +37,6 @@ const ProductsPage: React.FC<ProductsPageProps> = async ({ params }) => {
     
     const isOwner = store?.userId === userId
 
-    // Get all products without any filtering
     const products = await prismadb.product.findMany({
       where: {
         storeId: storeId,
@@ -59,7 +57,6 @@ const ProductsPage: React.FC<ProductsPageProps> = async ({ params }) => {
       },
     })
 
-    // Debug: Log the first product to see if updatedByName is present
     if (products.length > 0) {
       console.log("First product from database:", {
         id: products[0].id,
@@ -69,7 +66,6 @@ const ProductsPage: React.FC<ProductsPageProps> = async ({ params }) => {
       })
     }
 
-    // Get trashed products
     const trashedProducts = await prismadb.product.findMany({
       where: {
         storeId: storeId,
@@ -90,7 +86,6 @@ const ProductsPage: React.FC<ProductsPageProps> = async ({ params }) => {
       },
     })
 
-    // Format the active products for the data table
     const formattedProducts = products.map((product) => ({
       id: product.id,
       name: product.name,
@@ -104,31 +99,27 @@ const ProductsPage: React.FC<ProductsPageProps> = async ({ params }) => {
         : "Uncategorized",
       sku: product.sku,
       stockStatus: product.stockStatus || "instock",
-      // Get size names from sizeDetails JSON array
       sizes: product.sizeDetails
         ? JSON.parse(JSON.stringify(product.sizeDetails))
             .map((size: any) => size.name)
             .join(", ")
         : "N/A",
-      // Get color names from colorDetails JSON array
       colors: product.colorDetails
         ? JSON.parse(JSON.stringify(product.colorDetails))
             .map((color: any) => color.name)
             .join(", ")
         : "N/A",
-      // Use the first image URL if available, otherwise use placeholder
       imageUrl:
         product.images && product.images.length > 0 && product.images[0].image
           ? product.images[0].image.url
           : "/placeholder.svg",
       createdAt: format(product.createdAt, "MMMM do, yyyy"),
-      createdByName: product.createdByName || "Unknown", // Add the creator's name
-      updatedByName: product.updatedByName || undefined, // Add the updater's name
-      updatedAt: product.updatedAt ? format(product.updatedAt, "MMMM do, yyyy") : undefined, // Add the update timestamp
-      publishedAt: format(product.createdAt, "MMMM do, yyyy"), // Use creation date for published date
+      createdByName: product.createdByName || "Unknown",
+      updatedByName: product.updatedByName || undefined,
+      updatedAt: product.updatedAt ? format(product.updatedAt, "MMMM do, yyyy") : undefined,
+      publishedAt: format(product.createdAt, "MMMM do, yyyy"),
     }))
 
-    // Format the trashed products for the data table
     const formattedTrashedProducts = trashedProducts.map((product) => ({
       id: product.id,
       name: product.name,
@@ -148,18 +139,15 @@ const ProductsPage: React.FC<ProductsPageProps> = async ({ params }) => {
             .map((color: any) => color.name)
             .join(", ")
         : "N/A",
-      // Use the first image URL if available, otherwise use placeholder
       imageUrl:
         product.images && product.images.length > 0 && product.images[0].image
           ? product.images[0].image.url
           : "/placeholder.svg",
     }))
 
-    // Find the top 3 creators with the most products (excluding "Unknown")
     const creatorCounts = formattedProducts.reduce(
       (acc, product) => {
         const creator = product.createdByName
-        // Skip "Unknown" creators
         if (creator && creator !== "Unknown") {
           acc[creator] = (acc[creator] || 0) + 1
         }
@@ -168,13 +156,11 @@ const ProductsPage: React.FC<ProductsPageProps> = async ({ params }) => {
       {} as Record<string, number>,
     )
 
-    // Sort creators by count and get top 3
     const topCreators = Object.entries(creatorCounts)
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 3)
 
-    // If there are no creators or less than 3, pad the array with empty entries
     while (topCreators.length < 3) {
       topCreators.push({ name: "None", count: 0 })
     }

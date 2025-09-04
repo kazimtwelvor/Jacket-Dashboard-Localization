@@ -1,14 +1,11 @@
 "use client"
-
 import type React from "react"
-
 import { useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { useToast } from "@/hooks/use-toast"
-
 import {
   Dialog,
   DialogContent,
@@ -64,7 +61,6 @@ export const QuickEditModal: React.FC<QuickEditModalProps> = ({ isOpen, onClose,
     try {
       setLoading(true)
 
-      // If saving as draft, explicitly set isArchived to false
       if (data.isPublished === false && data.isArchived === false) {
         data.isPublished = false
         data.isArchived = false
@@ -75,7 +71,7 @@ export const QuickEditModal: React.FC<QuickEditModalProps> = ({ isOpen, onClose,
         data.isArchived = true
       }
 
-      const response = await fetch(`/api/${params.storeId}/products/${product.id}`, {
+      const response = await fetch(`/api/${params?.storeId}/products/${product.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

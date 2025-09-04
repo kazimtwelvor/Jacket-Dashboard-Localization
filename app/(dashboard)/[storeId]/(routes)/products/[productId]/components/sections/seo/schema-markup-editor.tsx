@@ -16,7 +16,7 @@ import { validateSchema } from "../../schema-validator"
 import { SCHEMA_TEMPLATES, getTemplateById, fillTemplate } from "../../schema-templates"
 
 export const SchemaMarkupEditor = () => {
-  const { watch, setValue, getValues } = useFormContext()
+  const { watch, setValue } = useFormContext()
   const [schemaValue, setSchemaValue] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [warnings, setWarnings] = useState<string[]>([])

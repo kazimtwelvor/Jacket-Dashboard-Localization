@@ -7,7 +7,6 @@ import Image from "@tiptap/extension-image"
 import Underline from "@tiptap/extension-underline"
 import TextAlign from "@tiptap/extension-text-align"
 import Link from "@tiptap/extension-link"
-import { Extension } from "@tiptap/core"
 import {
   AlignRight,
   Bold,

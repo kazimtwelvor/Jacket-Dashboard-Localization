@@ -2,7 +2,17 @@
 
 import type React from "react"
 
-import { useState, useCallback, ElementType } from "react"
+import { useState, useCallback } from "react"
+
+interface ElementType {
+  id: string
+  type: string
+  content: string
+  styles?: Record<string, any>
+  children?: ElementType[]
+  settings?: Record<string, any>
+  productData?: any
+}
 import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Heading } from "@/components/ui/heading"
@@ -283,10 +293,8 @@ const convertTemplateToPageBuilderElements = (templateData: any): ElementType[] 
       padding: "2rem",
     },
   })
-
   return elements
 }
-
 
 export const CustomTemplate: React.FC<CustomTemplateProps> = ({ isEditing = false }) => {
   const params = useParams()
@@ -650,7 +658,7 @@ export const CustomTemplate: React.FC<CustomTemplateProps> = ({ isEditing = fals
     setBannerImage(bannerImage.filter((val) => val !== url))
   }
 
-  const handleCoverageOptionChange = (index: number, field: keyof (typeof coverageOptions)[0], value: string) => {
+  const handleCoverageOptionChange = (index: number, field: string, value: string) => {
     setCoverageOptions((prev) => {
       const newOptions = [...prev]
       newOptions[index] = {
@@ -916,7 +924,7 @@ export const CustomTemplate: React.FC<CustomTemplateProps> = ({ isEditing = fals
 
       localStorage.setItem("templateElements", JSON.stringify(pageBuilderElements))
 
-      router.push(`/${params.storeId}/pages/new?template=custom`)
+      router.push(`/${params?.storeId}/pages/new?template=custom`)
     } catch (error) {
       console.error("Error exporting template:", error)
       toast.error("Error exporting template. Please try again.")

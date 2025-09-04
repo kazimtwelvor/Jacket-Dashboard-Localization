@@ -46,19 +46,16 @@ export const ReviewsSection = () => {
   const productDescription = form.watch("description")
   const reviewsEnabled = form.watch("reviews")
 
-  // Get the current product ID from the URL
   const getProductId = () => {
     const pathParts = window.location.pathname.split("/")
     return pathParts[pathParts.length - 1]
   }
 
-  // Get the store ID from the URL
   const getStoreId = () => {
     const pathParts = window.location.pathname.split("/")
     return pathParts[1]
   }
 
-  // Load existing reviews and cached reviews when component mounts
   useEffect(() => {
     const loadExistingReviews = async () => {
       const productId = getProductId()
@@ -72,7 +69,6 @@ export const ReviewsSection = () => {
             setExistingReviews(result.reviews)
           }
           
-          // Restore cached reviews from localStorage if they exist
           const savedCachedReviews = localStorage.getItem(`cachedReviews_${productId}`)
           if (savedCachedReviews) {
             const parsedReviews = JSON.parse(savedCachedReviews)
@@ -85,7 +81,6 @@ export const ReviewsSection = () => {
           setIsLoadingReviews(false)
         }
       } else if (productId === "new") {
-        // For new products, restore from localStorage
         const savedCachedReviews = localStorage.getItem(`cachedReviews_new`)
         if (savedCachedReviews) {
           const parsedReviews = JSON.parse(savedCachedReviews)
@@ -97,7 +92,6 @@ export const ReviewsSection = () => {
     
     loadExistingReviews()
     
-    // Load review count
     const loadReviewCount = async () => {
       const productId = getProductId()
       const storeId = getStoreId()
@@ -135,7 +129,6 @@ export const ReviewsSection = () => {
       const productId = getProductId()
       const storeId = getStoreId()
 
-      // For existing products, cache reviews to be saved on publish
       if (productId && storeId && productId !== "new") {
         console.log(`Generating ${reviewCount} reviews for existing product ${productId} (to be saved on publish)`)
 
@@ -144,13 +137,10 @@ export const ReviewsSection = () => {
         if (result.success) {
           const newReviews = result.reviews || []
           
-          // Store reviews in form for saving on publish
           form.setValue("cachedReviews", newReviews, { shouldDirty: true, shouldValidate: false })
           
-          // Store reviews in component state for display
           setCachedReviews(newReviews)
           
-          // Persist in localStorage as backup
           localStorage.setItem(`cachedReviews_${productId}`, JSON.stringify(newReviews))
           setLastGenerationCount(result.createdCount || 0)
 
@@ -161,7 +151,6 @@ export const ReviewsSection = () => {
               : `Successfully generated ${result.createdCount} reviews. They will be saved when you publish the product.`,
           })
 
-          // Enable reviews in the form if not already enabled
           if (!reviewsEnabled) {
             form.setValue("reviews", true, { shouldDirty: true })
           }

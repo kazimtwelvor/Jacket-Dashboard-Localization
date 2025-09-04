@@ -116,7 +116,7 @@ const TextFormatToolbar = ({
   onFormat,
   onLinkClick,
 }: {
-  targetRef: React.RefObject<HTMLTextAreaElement>
+  targetRef: React.RefObject<HTMLTextAreaElement | null>
   onFormat: (tag: string, endTag: string) => void
   onLinkClick: () => void
 }) => {
@@ -272,12 +272,12 @@ export const TwoColumnContent: React.FC<TwoColumnContentProps> = ({
   const rightSecondContentRef = useRef<HTMLTextAreaElement>(null)
 
   const [linkDialogOpen, setLinkDialogOpen] = useState(false)
-  const [currentTextarea, setCurrentTextarea] = useState<React.RefObject<HTMLTextAreaElement> | null>(null)
+  const [currentTextarea, setCurrentTextarea] = useState<React.RefObject<HTMLTextAreaElement | null> | null>(null)
   const [currentUpdateFn, setCurrentUpdateFn] = useState<((value: string) => void) | null>(null)
   const [selectedText, setSelectedText] = useState("")
 
   const insertFormatting = (
-    ref: React.RefObject<HTMLTextAreaElement>,
+    ref: React.RefObject<HTMLTextAreaElement | null>,
     startTag: string,
     endTag: string,
     updateFn: (value: string) => void,
@@ -302,7 +302,7 @@ export const TwoColumnContent: React.FC<TwoColumnContentProps> = ({
     }, 0)
   }
 
-  const handleLinkClick = (ref: React.RefObject<HTMLTextAreaElement>, updateFn: (value: string) => void) => {
+  const handleLinkClick = (ref: React.RefObject<HTMLTextAreaElement | null>, updateFn: (value: string) => void) => {
     const textarea = ref.current
     if (!textarea) return
 

@@ -3,31 +3,27 @@
 import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { X } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-
 interface ProductFiltersProps {
   categories: { id: string; name: string }[]
   sizes: { id: string; name: string }[]
   colors: { id: string; name: string; value: string }[]
 }
-
 export const ProductFilters = ({ categories, sizes, colors }: ProductFiltersProps) => {
   const router = useRouter()
   const searchParams = useSearchParams()
-
   const [activeFilters, setActiveFilters] = useState({
-    categoryId: searchParams.get("categoryId") || "",
-    sizeId: searchParams.get("sizeId") || "",
-    colorId: searchParams.get("colorId") || "",
-    status: searchParams.get("status") || "",
+    categoryId: searchParams?.get("categoryId") || "",
+    sizeId: searchParams?.get("sizeId") || "",
+    colorId: searchParams?.get("colorId") || "",
+    status: searchParams?.get("status") || "",
   })
 
   const applyFilter = (key: string, value: string) => {
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(searchParams?.toString() || "")
 
     if (value) {
       params.set(key, value)

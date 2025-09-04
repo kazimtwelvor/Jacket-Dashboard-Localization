@@ -51,18 +51,14 @@ export const ProductPreviewModal = ({ isOpen, onClose, product }: ProductPreview
   
   if (!product) return null
   
-  // Get all product images - handle both API response format and table format
   const images = product.images && product.images.length > 0 
     ? product.images.map(img => {
-        // API response format: { id, url, altText, ... }
         if (img.url) return img.url
-        // Table format: { image: { url } }
         if (img.image?.url) return img.image.url
         return null
       }).filter(Boolean)
     : ["/placeholder.svg"]
   
-  // Ensure we always have at least one image
   const displayImages = images.length > 0 ? images : ["/placeholder.svg"]
 
   const nextImage = () => {
@@ -89,7 +85,6 @@ export const ProductPreviewModal = ({ isOpen, onClose, product }: ProductPreview
         </DialogHeader>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-y-auto max-h-[calc(90vh-100px)]">
-          {/* Left side - Images */}
           <div className="space-y-4">
             <div className="relative aspect-[3/5] bg-gray-100 overflow-hidden">
               <Image
@@ -142,7 +137,6 @@ export const ProductPreviewModal = ({ isOpen, onClose, product }: ProductPreview
             )}
           </div>
 
-          {/* Right side - Details */}
           <div className="space-y-4">
             <div>
               <h2 className="text-2xl font-bold">{product.name}</h2>
@@ -229,7 +223,6 @@ export const ProductPreviewModal = ({ isOpen, onClose, product }: ProductPreview
                   <div className="text-sm text-muted-foreground">
                     {(() => {
                       try {
-                        // Handle both string and object specifications
                         const specs = typeof product.specifications === 'string' 
                           ? JSON.parse(product.specifications)
                           : product.specifications

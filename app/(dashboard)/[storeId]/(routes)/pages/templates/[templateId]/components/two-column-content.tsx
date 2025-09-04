@@ -55,12 +55,10 @@ interface LinkDialogProps {
   selectedText: string
 }
 
-// Link insertion dialog component
 const LinkDialog = ({ isOpen, onClose, onInsert, selectedText }: LinkDialogProps) => {
   const [url, setUrl] = useState("https://")
   const [linkText, setLinkText] = useState("")
 
-  // Update linkText when selectedText changes or dialog opens
   React.useEffect(() => {
     if (isOpen && selectedText) {
       setLinkText(selectedText)
@@ -73,7 +71,6 @@ const LinkDialog = ({ isOpen, onClose, onInsert, selectedText }: LinkDialogProps
     e.preventDefault()
     onInsert(url, linkText || "Link")
     onClose()
-    // Reset form
     setUrl("https://")
   }
 
@@ -114,7 +111,6 @@ const LinkDialog = ({ isOpen, onClose, onInsert, selectedText }: LinkDialogProps
   )
 }
 
-// Simple formatting toolbar component
 const TextFormatToolbar = ({
   targetRef,
   onFormat,
@@ -270,19 +266,16 @@ export const TwoColumnContent: React.FC<TwoColumnContentProps> = ({
   const [leftExpanded, setLeftExpanded] = useState(false)
   const [rightExpanded, setRightExpanded] = useState(false)
 
-  // Refs for textareas
   const leftContentRef = useRef<HTMLTextAreaElement>(null)
   const leftSecondContentRef = useRef<HTMLTextAreaElement>(null)
   const rightContentRef = useRef<HTMLTextAreaElement>(null)
   const rightSecondContentRef = useRef<HTMLTextAreaElement>(null)
 
-  // State for link dialog
   const [linkDialogOpen, setLinkDialogOpen] = useState(false)
   const [currentTextarea, setCurrentTextarea] = useState<React.RefObject<HTMLTextAreaElement> | null>(null)
   const [currentUpdateFn, setCurrentUpdateFn] = useState<((value: string) => void) | null>(null)
   const [selectedText, setSelectedText] = useState("")
 
-  // Function to insert formatting at cursor position
   const insertFormatting = (
     ref: React.RefObject<HTMLTextAreaElement>,
     startTag: string,
@@ -301,7 +294,6 @@ export const TwoColumnContent: React.FC<TwoColumnContentProps> = ({
 
     updateFn(newText)
 
-    // Set cursor position after update
     setTimeout(() => {
       if (textarea) {
         textarea.focus()
@@ -310,7 +302,6 @@ export const TwoColumnContent: React.FC<TwoColumnContentProps> = ({
     }, 0)
   }
 
-  // Function to handle link button click
   const handleLinkClick = (ref: React.RefObject<HTMLTextAreaElement>, updateFn: (value: string) => void) => {
     const textarea = ref.current
     if (!textarea) return
@@ -320,14 +311,12 @@ export const TwoColumnContent: React.FC<TwoColumnContentProps> = ({
     const text = textarea.value
     const selection = text.substring(start, end)
 
-    // Only open dialog after setting the selected text
     setSelectedText(selection)
     setCurrentTextarea(ref)
     setCurrentUpdateFn(() => updateFn)
     setLinkDialogOpen(true)
   }
 
-  // Function to insert link
   const insertLink = (url: string, text: string) => {
     if (!currentTextarea || !currentUpdateFn) return
 
@@ -338,21 +327,17 @@ export const TwoColumnContent: React.FC<TwoColumnContentProps> = ({
     const end = textarea.selectionEnd
     const currentText = textarea.value
 
-    // Create the link HTML
     const linkHtml = `<a href="${url}" target="_blank" rel="noopener noreferrer">${text}</a>`
 
-    // If there's a selection, replace it; otherwise, insert at cursor
     const newText = currentText.substring(0, start) + linkHtml + currentText.substring(end)
 
     currentUpdateFn(newText)
 
-    // Reset state
     setCurrentTextarea(null)
     setCurrentUpdateFn(null)
     setSelectedText("")
   }
 
-  // Function to truncate text to first 250 words
   const truncateText = (text: string) => {
     const words = text.split(" ")
     if (words.length <= 250) return text
@@ -361,7 +346,6 @@ export const TwoColumnContent: React.FC<TwoColumnContentProps> = ({
 
   return (
     <div className="w-full py-12 px-4 bg-slate-900 text-white">
-      {/* Link Dialog */}
       <LinkDialog
         isOpen={linkDialogOpen}
         onClose={() => setLinkDialogOpen(false)}
@@ -519,7 +503,6 @@ export const TwoColumnContent: React.FC<TwoColumnContentProps> = ({
         <h2 className="text-3xl font-bold text-center mb-12 text-orange-500">{mainHeading}</h2>
 
         <div className="grid md:grid-cols-2 gap-8">
-          {/* Left Column */}
           <div className="space-y-4">
             <h3 className="text-xl font-semibold text-orange-400 border-b border-orange-400 pb-2">{leftColumnTitle}</h3>
             <div className="prose prose-invert max-w-none">
@@ -554,7 +537,6 @@ export const TwoColumnContent: React.FC<TwoColumnContentProps> = ({
             </div>
           </div>
 
-          {/* Right Column */}
           <div className="space-y-4">
             <h3 className="text-xl font-semibold text-orange-400 border-b border-orange-400 pb-2">
               {rightColumnTitle}

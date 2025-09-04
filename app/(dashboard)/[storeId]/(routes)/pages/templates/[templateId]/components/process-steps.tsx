@@ -150,7 +150,6 @@ export const ProcessSteps: React.FC<ProcessStepsProps> = ({
 
       <div className="container mx-auto max-w-6xl">
         <div className="flex flex-col lg:flex-row items-center gap-8">
-          {/* Left side - Process Steps */}
           <div className="lg:w-1/2">
             <div className="space-y-6">
               <article className="process-step">
@@ -209,7 +208,6 @@ export const ProcessSteps: React.FC<ProcessStepsProps> = ({
             </div>
           </div>
 
-          {/* Right side - Process Image */}
           <div className="lg:w-1/2 flex justify-center">
             <div className="relative w-full max-w-md">
               <Image

@@ -27,9 +27,6 @@ interface WikihowTemplateProps {
   onDelete?: () => void
 }
 
-// Update the WikihowTemplate component to include UI elements for adding and removing parts and steps
-
-// First, let's modify the Part interface to include an id for better tracking
 interface Part {
   id: string
   title: string
@@ -74,7 +71,6 @@ export const WikihowTemplate: React.FC<WikihowTemplateProps> = ({
       "A blog post is a piece of writing that appears on a website audience. Before you begin writing your blog post, you should have a clear understanding of your target audience. If you're writing for your own blog, you probably know your audience. If you're guest blogging, you'll want to make sure your post aligns with the site's usual content.",
   )
 
-  // Update the useState for parts to include ids
   const [parts, setParts] = useState<Part[]>(
     propParts || [
       {
@@ -154,7 +150,6 @@ export const WikihowTemplate: React.FC<WikihowTemplateProps> = ({
     ],
   )
 
-  // Update the addPart function to include an id
   const addPart = () => {
     const newPartId = `part${parts.length + 1}`
     const newParts = [...parts, { id: newPartId, title: "New Part", steps: [] }]
@@ -162,10 +157,8 @@ export const WikihowTemplate: React.FC<WikihowTemplateProps> = ({
     onPartsChange?.(newParts)
   }
 
-  // Update the removePart function
   const removePart = (index: number) => {
     if (parts.length <= 1) {
-      // Don't allow removing the last part
       return
     }
     const newParts = [...parts]
@@ -174,7 +167,6 @@ export const WikihowTemplate: React.FC<WikihowTemplateProps> = ({
     onPartsChange?.(newParts)
   }
 
-  // Update the addStep function to include an id
   const addStep = (partIndex: number) => {
     const newParts = [...parts]
     const stepCount = newParts[partIndex].steps.length
@@ -189,10 +181,8 @@ export const WikihowTemplate: React.FC<WikihowTemplateProps> = ({
     onPartsChange?.(newParts)
   }
 
-  // Update the removeStep function
   const removeStep = (partIndex: number, stepIndex: number) => {
     if (parts[partIndex].steps.length <= 1) {
-      // Don't allow removing the last step in a part
       return
     }
     const newParts = [...parts]
@@ -201,7 +191,6 @@ export const WikihowTemplate: React.FC<WikihowTemplateProps> = ({
     onPartsChange?.(newParts)
   }
 
-  // Add a function to add a tip to a step
   const addTip = (partIndex: number, stepIndex: number) => {
     const newParts = [...parts]
     newParts[partIndex].steps[stepIndex].tips.push("New tip")
@@ -209,10 +198,8 @@ export const WikihowTemplate: React.FC<WikihowTemplateProps> = ({
     onPartsChange?.(newParts)
   }
 
-  // Add a function to remove a tip from a step
   const removeTip = (partIndex: number, stepIndex: number, tipIndex: number) => {
     if (parts[partIndex].steps[stepIndex].tips.length <= 1) {
-      // Don't allow removing the last tip
       return
     }
     const newParts = [...parts]
@@ -221,7 +208,6 @@ export const WikihowTemplate: React.FC<WikihowTemplateProps> = ({
     onPartsChange?.(newParts)
   }
 
-  // Update the updatePartTitle function
   const updatePartTitle = (index: number, newTitle: string) => {
     const newParts = [...parts]
     newParts[index].title = newTitle
@@ -229,7 +215,6 @@ export const WikihowTemplate: React.FC<WikihowTemplateProps> = ({
     onPartsChange?.(newParts)
   }
 
-  // Update the updateStepTitle function
   const updateStepTitle = (partIndex: number, stepIndex: number, newTitle: string) => {
     const newParts = [...parts]
     newParts[partIndex].steps[stepIndex].title = newTitle
@@ -237,7 +222,6 @@ export const WikihowTemplate: React.FC<WikihowTemplateProps> = ({
     onPartsChange?.(newParts)
   }
 
-  // Update the updateStepContent function
   const updateStepContent = (partIndex: number, stepIndex: number, newContent: string) => {
     const newParts = [...parts]
     newParts[partIndex].steps[stepIndex].content = newContent
@@ -245,7 +229,6 @@ export const WikihowTemplate: React.FC<WikihowTemplateProps> = ({
     onPartsChange?.(newParts)
   }
 
-  // Update the updateStepTips function
   const updateStepTip = (partIndex: number, stepIndex: number, tipIndex: number, newTip: string) => {
     const newParts = [...parts]
     newParts[partIndex].steps[stepIndex].tips[tipIndex] = newTip
@@ -256,14 +239,11 @@ export const WikihowTemplate: React.FC<WikihowTemplateProps> = ({
   return (
     <div className="bg-white">
       <div className="container mx-auto px-4 py-6 flex flex-col">
-        {/* Article Content */}
         <div className="w-full">
-          {/* Article Title */}
           <div className="flex flex-col md:flex-row justify-between mb-4">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2 md:mb-0">{title}</h1>
           </div>
 
-          {/* Article Introduction */}
           <div className="mb-8">
             <p className="text-gray-700 mb-4">{introduction}</p>
             <div className="flex justify-center my-4">
@@ -274,7 +254,6 @@ export const WikihowTemplate: React.FC<WikihowTemplateProps> = ({
             </div>
           </div>
 
-          {/* Parts and Steps */}
           {parts.map((part, partIndex) => (
             <div key={part.id} className="mb-10 relative">
               <div className="sticky top-0 z-10 bg-white flex justify-between items-center border-b border-gray-200 py-2">
@@ -425,7 +404,6 @@ export const WikihowTemplate: React.FC<WikihowTemplateProps> = ({
             </Button>
           )}
 
-          {/* Author Section */}
           <div className="border border-gray-200 rounded-md p-4 mb-6">
             <div className="flex items-center mb-4">
               <Image

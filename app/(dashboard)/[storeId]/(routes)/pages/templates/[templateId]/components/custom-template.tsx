@@ -22,13 +22,10 @@ interface CustomTemplateProps {
   isEditing?: boolean
 }
 
-// Add a new function after all the other imports
-// This function will convert the template to page builder elements
 const convertTemplateToPageBuilderElements = (templateData: any): ElementType[] => {
   const elements: ElementType[] = []
   const generateId = () => Math.random().toString(36).substr(2, 9)
 
-  // Hero Banner Section
   if (templateData.title) {
     elements.push({
       id: generateId(),
@@ -43,7 +40,6 @@ const convertTemplateToPageBuilderElements = (templateData: any): ElementType[] 
     })
   }
 
-  // Two Column Content Section
   if (templateData.mainHeading) {
     const container: ElementType = {
       id: generateId(),
@@ -100,7 +96,6 @@ const convertTemplateToPageBuilderElements = (templateData: any): ElementType[] 
     elements.push(container)
   }
 
-  // Coverage Options
   if (templateData.coverageHeading) {
     const coverageContainer: ElementType = {
       id: generateId(),
@@ -124,7 +119,6 @@ const convertTemplateToPageBuilderElements = (templateData: any): ElementType[] 
       },
     }
 
-    // Add product cards for each coverage option
     templateData.coverageOptions?.forEach((option: any) => {
       coverageContainer.children?.push({
         id: generateId(),
@@ -148,7 +142,6 @@ const convertTemplateToPageBuilderElements = (templateData: any): ElementType[] 
     elements.push(coverageContainer)
   }
 
-  // Product Options section
   if (templateData.productOptionsHeading) {
     elements.push({
       id: generateId(),
@@ -165,7 +158,6 @@ const convertTemplateToPageBuilderElements = (templateData: any): ElementType[] 
     })
   }
 
-  // Quotation section
   if (templateData.quotationHeading) {
     elements.push({
       id: generateId(),
@@ -191,7 +183,6 @@ const convertTemplateToPageBuilderElements = (templateData: any): ElementType[] 
     }
   }
 
-  // Process Steps
   if (templateData.step1Title) {
     const stepsContainer: ElementType = {
       id: generateId(),
@@ -262,7 +253,6 @@ const convertTemplateToPageBuilderElements = (templateData: any): ElementType[] 
     elements.push(stepsContainer)
   }
 
-  // FAQ Section
   if (templateData.faqTitle) {
     elements.push({
       id: generateId(),
@@ -274,7 +264,6 @@ const convertTemplateToPageBuilderElements = (templateData: any): ElementType[] 
     })
   }
 
-  // Satisfaction Banner
   if (templateData.bannerHeading) {
     elements.push({
       id: generateId(),
@@ -286,7 +275,6 @@ const convertTemplateToPageBuilderElements = (templateData: any): ElementType[] 
     })
   }
 
-  // Contact Section
   elements.push({
     id: generateId(),
     type: "contact",
@@ -299,7 +287,6 @@ const convertTemplateToPageBuilderElements = (templateData: any): ElementType[] 
   return elements
 }
 
-// Replace the CustomTemplate component with this updated version
 
 export const CustomTemplate: React.FC<CustomTemplateProps> = ({ isEditing = false }) => {
   const params = useParams()
@@ -307,7 +294,6 @@ export const CustomTemplate: React.FC<CustomTemplateProps> = ({ isEditing = fals
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState("edit")
 
-  // Hero Banner state
   const [bannerImage, setBannerImage] = useState<string[]>([])
   const [isUploading, setIsUploading] = useState(false)
   const [title, setTitle] = useState<string>("Lorem Ipsum Headline")
@@ -316,7 +302,6 @@ export const CustomTemplate: React.FC<CustomTemplateProps> = ({ isEditing = fals
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor.",
   )
 
-  // Two Column Content state
   const [mainHeading, setMainHeading] = useState<string>("Why Choose Custom Products?")
   const [leftColumnTitle, setLeftColumnTitle] = useState<string>("Team Identity, Ranking, and Recognition")
   const [leftColumnContent, setLeftColumnContent] = useState<string>(
@@ -336,7 +321,6 @@ export const CustomTemplate: React.FC<CustomTemplateProps> = ({ isEditing = fals
     "Additionally, morale patches serve as motivation. Many teams use humorous or motivational designs to boost spirits and create camaraderie. Whether it's a patch with an inside joke, a team motto, or a symbol of achievement, these patches add a fun and personal touch to the game. Don't settle for generic gear—upgrade your products today and enhance your tactical advantages on the battlefield!",
   )
 
-  // Coverage Options state
   const [coverageHeading, setCoverageHeading] = useState<string>("Create A Fully Customizable Product")
   const [coverageOptions, setCoverageOptions] = useState([
     {
@@ -359,7 +343,6 @@ export const CustomTemplate: React.FC<CustomTemplateProps> = ({ isEditing = fals
     },
   ])
 
-  // Product Options Tabs state
   const [productOptionsHeading, setProductOptionsHeading] = useState<string>("Embroidered Patches Options")
   const [productOptionsDescription, setProductOptionsDescription] = useState<string>(
     "Choosing the right backing for your custom embroidered patches ensures durability, ease of application, and versatility. Here are the best options to suit your needs:",
@@ -437,8 +420,6 @@ export const CustomTemplate: React.FC<CustomTemplateProps> = ({ isEditing = fals
     },
   ])
 
-  const [showcaseHeading, setShowcaseHeading] = useState<string>("Our Product Range")
-  const [showcaseSubHeading, setShowcaseSubHeading] = useState<string>("Explore our high-quality custom patches")
   const [showcaseProducts, setShowcaseProducts] = useState([
     {
       image: "/placeholder.svg?height=300&width=300",
@@ -503,7 +484,6 @@ export const CustomTemplate: React.FC<CustomTemplateProps> = ({ isEditing = fals
     "Once approved, your patches go into production. We offer the fastest turnaround times in the industry and guarantee delivery on time, just as you envisioned. Plus, enjoy free shipping on qualifying orders!",
   )
 
-  // Banner state
   const [bannerHeading, setBannerHeading] = useState("Every Custom Patch We Make is")
   const [bannerHighlightedText, setBannerHighlightedText] = useState("Backed by Our Outstanding")
   const [bannerEndText, setBannerEndText] = useState("Customer Service")
@@ -515,7 +495,6 @@ export const CustomTemplate: React.FC<CustomTemplateProps> = ({ isEditing = fals
   const [phoneLabel, setPhoneLabel] = useState("Call Toll-Free")
   const [phoneValue, setPhoneValue] = useState("1866-847-2824")
 
-  // FAQ state
   const [faqTitle, setFaqTitle] = useState("Frequently Asked Questions")
   const [faqDescription, setFaqDescription] = useState("Everything you need to know about our custom patches")
   const [faqs, setFaqs] = useState([
@@ -655,7 +634,6 @@ export const CustomTemplate: React.FC<CustomTemplateProps> = ({ isEditing = fals
   const onUse = async () => {
     try {
       setIsLoading(true)
-      // We'll now export to page builder instead of just redirecting
       await exportToPageBuilder()
     } catch (error) {
       console.error("Error using template:", error)
@@ -665,7 +643,6 @@ export const CustomTemplate: React.FC<CustomTemplateProps> = ({ isEditing = fals
   }
 
   const handleBannerImageChange = (url: string) => {
-    // For banner, we only want one image, so replace any existing ones
     setBannerImage([url])
   }
 
@@ -684,7 +661,6 @@ export const CustomTemplate: React.FC<CustomTemplateProps> = ({ isEditing = fals
     })
   }
 
-  // Create separate handlers for each card to ensure they're completely independent
   const handleCoverageOption1ImageChange = useCallback((url: string) => {
     setCoverageOptions((prev) => {
       const newOptions = [...prev]
@@ -751,7 +727,6 @@ export const CustomTemplate: React.FC<CustomTemplateProps> = ({ isEditing = fals
     })
   }, [])
 
-  // Product Options handlers
   const handleProductOptionChange = (
     tabIndex: number,
     optionIndex: number,
@@ -887,12 +862,10 @@ export const CustomTemplate: React.FC<CustomTemplateProps> = ({ isEditing = fals
     })
   }
 
-  // Add a new function to export the template to the page builder
   const exportToPageBuilder = async () => {
     try {
       setIsLoading(true)
 
-      // Gather all template data
       const templateData = {
         bannerImage,
         title,
@@ -937,16 +910,12 @@ export const CustomTemplate: React.FC<CustomTemplateProps> = ({ isEditing = fals
         faqs,
       }
 
-      // Convert template to page builder elements
       const pageBuilderElements = convertTemplateToPageBuilderElements(templateData)
 
-      // Log for debugging
       console.log("Template elements created:", pageBuilderElements)
 
-      // Store elements in localStorage instead of sessionStorage for better persistence
       localStorage.setItem("templateElements", JSON.stringify(pageBuilderElements))
 
-      // Navigate to create a new page with this template
       router.push(`/${params.storeId}/pages/new?template=custom`)
     } catch (error) {
       console.error("Error exporting template:", error)

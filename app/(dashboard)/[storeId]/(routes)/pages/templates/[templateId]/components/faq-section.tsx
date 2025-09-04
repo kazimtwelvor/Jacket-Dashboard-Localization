@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { TipTapEditor } from "@/components/ui/tiptap-editor"
 import { PlusIcon, X } from "lucide-react"
 
 interface FAQItem {
@@ -46,11 +45,9 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
   onAddFAQ,
   onRemoveFAQ,
 }) => {
-  // Split FAQs into left and right columns
   const leftColumnFAQs = faqs.slice(0, Math.ceil(faqs.length / 2))
   const rightColumnFAQs = faqs.slice(Math.ceil(faqs.length / 2))
 
-  // Function to handle FAQ toggle
   const handleFAQToggle = (e: React.MouseEvent<HTMLDivElement>) => {
     if (isEditing) return
 
@@ -205,7 +202,6 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
           <p className="premium-description text-center">{description}</p>
 
           <div className="faq-grid">
-            {/* Left Column */}
             <div className="faq-column">
               <div className="faq-accordion">
                 {leftColumnFAQs.map((faq) => (
@@ -230,7 +226,6 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
               </div>
             </div>
 
-            {/* Right Column */}
             <div className="faq-column">
               <div className="faq-accordion">
                 {rightColumnFAQs.map((faq) => (

@@ -60,7 +60,6 @@ export const QuotationSection: React.FC<QuotationSectionProps> = ({
   const [autoFlipIndex, setAutoFlipIndex] = useState<number | null>(null)
   const [isMobile, setIsMobile] = useState(false)
 
-  // Check if we're on mobile
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768)
@@ -74,7 +73,6 @@ export const QuotationSection: React.FC<QuotationSectionProps> = ({
     }
   }, [])
 
-  // Auto-flip cards on mobile
   useEffect(() => {
     if (!isMobile) return
 
@@ -96,9 +94,7 @@ export const QuotationSection: React.FC<QuotationSectionProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle form submission
     console.log("Form submitted:", formData)
-    // Reset form
     setFormData({
       name: "",
       email: "",
@@ -112,7 +108,6 @@ export const QuotationSection: React.FC<QuotationSectionProps> = ({
     })
   }
 
-  // Default products if none provided
   const defaultProducts = [
     {
       image: "https://d2.fineyst.com/wp-content/uploads/2025/02/1731559237846Custom-PVC-Patches.jpg",
@@ -158,7 +153,6 @@ export const QuotationSection: React.FC<QuotationSectionProps> = ({
     },
   ]
 
-  // Use provided products or default ones
   const displayProducts = products.length > 0 ? products : defaultProducts
 
   return (
@@ -278,7 +272,6 @@ export const QuotationSection: React.FC<QuotationSectionProps> = ({
         <p className="text-center text-gray-600 max-w-3xl mx-auto mb-12">{subHeading}</p>
 
         <div className="flex flex-col xl:flex-row gap-8">
-          {/* Left side - Patches Showcase */}
           <div className="w-full xl:w-1/2">
             <div className="patches-showcase">
               <div className="patches-gallery">
@@ -321,7 +314,6 @@ export const QuotationSection: React.FC<QuotationSectionProps> = ({
             </div>
           </div>
 
-          {/* Right side - Form */}
           <div className="w-full xl:w-1/2 bg-gray-100 p-8 rounded-xl shadow-md">
             <h3 className="text-xl font-bold mb-4">GET QUOTE</h3>
             <p className="text-sm text-gray-600 mb-6">

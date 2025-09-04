@@ -49,7 +49,6 @@ export const SatisfactionBanner: React.FC<SatisfactionBannerProps> = ({
 }) => {
   const [particlesCreated, setParticlesCreated] = useState(false)
 
-  // Create particles on component mount
   useEffect(() => {
     if (typeof window !== "undefined" && !isEditing && !particlesCreated) {
       createParticles()
@@ -57,7 +56,6 @@ export const SatisfactionBanner: React.FC<SatisfactionBannerProps> = ({
     }
   }, [isEditing, particlesCreated])
 
-  // Function to create particles
   const createParticles = () => {
     const particles = document.querySelector(".particles")
     if (!particles) return
@@ -68,16 +66,13 @@ export const SatisfactionBanner: React.FC<SatisfactionBannerProps> = ({
       const particle = document.createElement("div")
       particle.className = "particle"
 
-      // Random size between 2-4px
       const size = Math.random() * 2 + 2
       particle.style.width = `${size}px`
       particle.style.height = `${size}px`
 
-      // Random position
       particle.style.left = `${Math.random() * 100}%`
       particle.style.top = `${Math.random() * 100}%`
 
-      // Random animation
       const duration = Math.random() * 20 + 10
       const delay = Math.random() * -20
 

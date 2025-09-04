@@ -1,7 +1,4 @@
-
-
 "use client"
-
 import type React from "react"
 import { useState, useRef } from "react"
 import {
@@ -47,19 +44,16 @@ import {
 import { Button } from "@/components/ui/button"
 import { useParams } from "next/navigation"
 
-// Add the imports for the custom template components
 import { HeroBanner } from "../../templates/[templateId]/components/hero-banner"
 import { ProcessSteps } from "../../templates/[templateId]/components/process-steps"
 import { TwoColumnContent } from "../../templates/[templateId]/components/two-column-content"
 import { SatisfactionBanner } from "../../templates/[templateId]/components/satisfaction-banner"
 import { ProductOptionsTabs } from "../../templates/[templateId]/components/product-options-tabs"
 
-// Add imports for the new custom template components below the existing imports:
 import { CoverageOptions } from "../../templates/[templateId]/components/coverage-options"
 import { QuotationSection } from "../../templates/[templateId]/components/quotation-section"
 import { FAQSection } from "../../templates/[templateId]/components/faq-section"
 
-// Update the ElementType type to include the new custom template elements
 type ElementType = {
   id: string
   type:
@@ -127,7 +121,6 @@ type ElementType = {
       desktop?: boolean
     }
   }
-  // Custom template element properties
   heroBannerData?: {
     bannerImage: string[]
     title: string
@@ -235,8 +228,6 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
   const dragItem = useRef<any>(null)
   const dragNode = useRef<any>(null)
 
-  // Update the components array to include the new custom template elements
-  // Find the components array in the PageBuilder component and add a new category for custom templates
   const components = [
     {
       category: "Basic",
@@ -325,7 +316,6 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
     window.open(previewUrl, "_blank")
   }
 
-  // Update the getDefaultContent function to include default content for the new custom template elements
   const getDefaultContent = (type: string) => {
     switch (type) {
       case "heading":
@@ -379,7 +369,6 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
     }
   }
 
-  // Add default data for custom template elements
   const getDefaultHeroBannerData = () => ({
     bannerImage: [],
     title: "Welcome to Our Store",
@@ -491,7 +480,6 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
     ],
   })
 
-  // First, update the getDefaultQuotationSectionData function to match the structure expected by the QuotationSection component
   const getDefaultQuotationSectionData = () => ({
     mainHeading: "Custom Patches",
     subHeading: "Get your custom patches with our premium quality materials and craftsmanship",
@@ -593,7 +581,6 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
     setIsDragging(true)
   }
 
-  // Update the handleDrop function to include the new custom template elements
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
     const type = e.dataTransfer.getData("type") as ElementType["type"]
@@ -618,7 +605,6 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
       },
     }
 
-    // Add custom template data based on the element type
     if (type === "hero-banner") {
       newElement.heroBannerData = getDefaultHeroBannerData()
     } else if (type === "process-steps") {
@@ -1221,7 +1207,6 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
             />
           </div>
         )
-      // Now update the renderElement function's case for "quotation-section" to correctly pass the data to the component
       case "quotation-section":
         return (
           <div style={baseStyles} onClick={() => handleElementClick(element)} className="w-full">
@@ -1261,7 +1246,6 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
     }
   }
 
-  // Update the PropertyEditor component to include more comprehensive editing for custom template components
 
   const PropertyEditor = ({ element }: { element: ElementType }) => {
     return (
@@ -1600,7 +1584,6 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
           </>
         )}
 
-        {/* Hero Banner Properties */}
         {element.type === "hero-banner" && (
           <div className="border-t pt-4 mt-4">
             <h3 className="font-medium text-sm mb-3">Hero Banner Properties</h3>
@@ -1665,7 +1648,6 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
           </div>
         )}
 
-        {/* Process Steps Properties */}
         {element.type === "process-steps" && (
           <div className="border-t pt-4 mt-4">
             <h3 className="font-medium text-sm mb-3">Process Steps Properties</h3>
@@ -1775,7 +1757,6 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
           </div>
         )}
 
-        {/* Two Column Content Properties */}
         {element.type === "two-column-content" && (
           <div className="border-t pt-4 mt-4">
             <h3 className="font-medium text-sm mb-3">Two Column Content Properties</h3>
@@ -1913,7 +1894,6 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
           </div>
         )}
 
-        {/* Satisfaction Banner Properties */}
         {element.type === "satisfaction-banner" && (
           <div className="border-t pt-4 mt-4">
             <h3 className="font-medium text-sm mb-3">Satisfaction Banner Properties</h3>
@@ -2035,7 +2015,6 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
           </div>
         )}
 
-        {/* Product Options Tabs Properties */}
         {element.type === "product-options-tabs" && (
           <div className="border-t pt-4 mt-4">
             <h3 className="font-medium text-sm mb-3">Product Options Properties</h3>
@@ -2126,7 +2105,6 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
           </div>
         )}
 
-        {/* Coverage Options Properties */}
         {element.type === "coverage-options" && (
           <div className="border-t pt-4 mt-4">
             <h3 className="font-medium text-sm mb-3">Coverage Options Properties</h3>
@@ -2203,7 +2181,6 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
           </div>
         )}
 
-        {/* FAQ Section Properties */}
         {element.type === "faq-section" && (
           <div className="border-t pt-4 mt-4">
             <h3 className="font-medium text-sm mb-3">FAQ Section Properties</h3>
@@ -2293,7 +2270,6 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
           </div>
         )}
 
-        {/* Quotation Section Properties */}
         {element.type === "quotation-section" && (
           <div className="border-t pt-4 mt-4">
             <h3 className="font-medium text-sm mb-3">Quotation Section Properties</h3>
@@ -2449,7 +2425,6 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
 
   return (
     <div className="flex flex-col h-full bg-gray-50">
-      {/* Fixed Toolbar */}
       <div className="sticky top-0 left-0 right-0 bg-white border-b border-gray-200 px-4 py-2 z-50 flex items-center justify-between">
         <div className="flex items-center">
           <Button onClick={onClose} variant="outline" size="sm" className="mr-4">
@@ -2506,9 +2481,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
         </div>
       </div>
 
-      {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Components Sidebar */}
         <div className="w-64 bg-white border-r border-gray-200 overflow-auto">
           <div className="p-4">
             <h2 className="text-lg font-semibold mb-4 flex items-center">
@@ -2538,7 +2511,6 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
           </div>
         </div>
 
-        {/* Canvas */}
         <div className="flex-1 overflow-auto p-4" onDrop={handleDrop} onDragOver={handleDragOver}>
           <div
             className={`mx-auto bg-white rounded-lg shadow-lg min-h-[calc(100vh-8rem)] p-8 transition-all duration-300 ${
@@ -2554,7 +2526,6 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
           </div>
         </div>
 
-        {/* Properties Sidebar */}
         <div className="w-64 bg-white border-l border-gray-200 overflow-auto">
           <div className="p-4">
             <h2 className="text-lg font-semibold mb-4 flex items-center">

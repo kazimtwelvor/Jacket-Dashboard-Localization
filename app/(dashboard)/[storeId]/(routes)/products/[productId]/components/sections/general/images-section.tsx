@@ -36,7 +36,6 @@ const SortableImage = ({ url, onRemove, onViewDetails, metadata }: SortableImage
     transition,
   }
 
-  // Extract filename from URL
   const filename = url.split("/").pop() || url
 
   return (
@@ -53,7 +52,6 @@ const SortableImage = ({ url, onRemove, onViewDetails, metadata }: SortableImage
         className="w-full h-full object-cover"
       />
 
-      {/* Image controls */}
       <div className="absolute top-2 right-2 flex gap-1">
         <TooltipProvider>
           <Tooltip>
@@ -93,7 +91,6 @@ const SortableImage = ({ url, onRemove, onViewDetails, metadata }: SortableImage
         </Button>
       </div>
 
-      {/* Filename label */}
       <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs py-1 px-2 truncate">
         {filename}
       </div>
@@ -107,46 +104,36 @@ export const ImagesSection = ({ isUploading }: { isUploading: boolean }) => {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   const [selectedImageMetadata, setSelectedImageMetadata] = useState<any>(null)
   const params = useParams()
-  const storeId = params.storeId as string
 
-  // Handle main image metadata changes
-  const handleMainImageMetadataChange = (metadata) => {
+  const handleMainImageMetadataChange = (metadata: any) => {
     console.log("Main image metadata changed:", metadata)
     form.setValue("mainImageMetadata", metadata, { shouldDirty: true })
   }
 
-  // Handle gallery image metadata changes
-  const handleGalleryImageMetadataChange = (metadata, index) => {
+  const handleGalleryImageMetadataChange = (metadata: any, index: number) => {
     console.log(`Gallery image ${index} metadata changed:`, metadata)
 
-    // Get current metadata array
     const currentMetadata = form.getValues("imagesMetadata") || []
 
-    // Create a new array with the updated metadata at the specified index
     const newMetadata = [...currentMetadata]
     while (newMetadata.length <= index) {
       newMetadata.push({})
     }
     newMetadata[index] = metadata
 
-    // Update the form
     form.setValue("imagesMetadata", newMetadata, { shouldDirty: true })
   }
 
-  // Function to handle viewing image details
   const handleViewDetails = (imageUrl: string) => {
     console.log("View details clicked for:", imageUrl)
 
-    // Determine if this is the main image or a gallery image
     const isMainImage = form.getValues("mainImage") === imageUrl
 
     if (isMainImage) {
-      // For main image, use mainImageMetadata
       const metadata = form.getValues("mainImageMetadata")
       console.log("Main image metadata:", metadata)
       setSelectedImageMetadata(metadata)
     } else {
-      // For gallery images, find the index and use the corresponding metadata
       const galleryImages = form.getValues("images") || []
       const index = galleryImages.indexOf(imageUrl)
 
@@ -165,19 +152,15 @@ export const ImagesSection = ({ isUploading }: { isUploading: boolean }) => {
     setIsDetailModalOpen(true)
   }
 
-  // Function to handle deleting an image from details modal
   const handleDeleteImage = (imageUrl: string) => {
-    // For main image
     if (form.getValues("mainImage") === imageUrl) {
       form.setValue("mainImage", "", { shouldDirty: true, shouldValidate: true })
       form.setValue("mainImageMetadata", null, { shouldDirty: true })
     }
-    // For gallery images
     else {
       const currentImages = form.getValues("images") || []
       const index = currentImages.indexOf(imageUrl)
 
-      // Also remove metadata for this image
       if (index !== -1) {
         const currentMetadata = form.getValues("imagesMetadata") || []
         const newMetadata = [...currentMetadata]
@@ -185,24 +168,20 @@ export const ImagesSection = ({ isUploading }: { isUploading: boolean }) => {
         form.setValue("imagesMetadata", newMetadata, { shouldDirty: true })
       }
 
-      const updatedImages = currentImages.filter((url) => url !== url)
+      const updatedImages = currentImages.filter((currentUrl) => currentUrl !== imageUrl)
       form.setValue("images", updatedImages, { shouldDirty: true, shouldValidate: true })
     }
     setIsDetailModalOpen(false)
   }
 
-  // Handle metadata changes from the sidebar
-  const handleMetadataChange = (metadata) => {
+  const handleMetadataChange = (metadata: any) => {
     if (!selectedImageForDetail) return
 
-    // Determine if this is the main image or a gallery image
     const isMainImage = form.getValues("mainImage") === selectedImageForDetail
 
     if (isMainImage) {
-      // For main image, update mainImageMetadata
       handleMainImageMetadataChange(metadata)
     } else {
-      // For gallery images, find the index and update the corresponding metadata
       const galleryImages = form.getValues("images") || []
       const index = galleryImages.indexOf(selectedImageForDetail)
 
@@ -224,11 +203,9 @@ export const ImagesSection = ({ isUploading }: { isUploading: boolean }) => {
   )
 
   const handleDragStart = () => {
-    // setIsDragging(true)
   }
 
   const handleDragEnd = (event: any) => {
-    // setIsDragging(false)
     const { active, over } = event
 
     if (active.id !== over.id) {
@@ -239,7 +216,6 @@ export const ImagesSection = ({ isUploading }: { isUploading: boolean }) => {
       const newOrder = arrayMove(images, oldIndex, newIndex)
       form.setValue("images", newOrder, { shouldDirty: true, shouldValidate: true })
 
-      // Also reorder the metadata
       const imagesMetadata = form.getValues("imagesMetadata") || []
       if (imagesMetadata.length > 0) {
         const newMetadataOrder = arrayMove(imagesMetadata, oldIndex, newIndex)
@@ -248,21 +224,16 @@ export const ImagesSection = ({ isUploading }: { isUploading: boolean }) => {
     }
   }
 
-  // Function to handle adding multiple images at once
   const handleAddMultipleImages = (urls: string[]) => {
     const currentImages = form.getValues("images") || []
-    // Filter out any URLs that are already in the gallery
     const newImages = urls.filter((url) => !currentImages.includes(url))
 
     if (newImages.length > 0) {
-      // Combine existing images with new ones
       const updatedImages = [...currentImages, ...newImages]
-      // Update the form with all images at once
       form.setValue("images", updatedImages, { shouldDirty: true, shouldValidate: true })
     }
   }
 
-  // Get metadata for a specific gallery image
   const getGalleryImageMetadata = (url: string) => {
     const galleryImages = form.getValues("images") || []
     const index = galleryImages.indexOf(url)
@@ -286,7 +257,6 @@ export const ImagesSection = ({ isUploading }: { isUploading: boolean }) => {
             <p className="text-sm text-muted-foreground">Upload high-quality images of your product</p>
 
             <div className="grid md:grid-cols-2 gap-6">
-              {/* Main Product Image Section */}
               <FormField
                 control={form.control}
                 name="mainImage"
@@ -326,7 +296,6 @@ export const ImagesSection = ({ isUploading }: { isUploading: boolean }) => {
                 )}
               />
 
-              {/* Gallery Images Section */}
               <FormField
                 control={form.control}
                 name="images"
@@ -373,7 +342,7 @@ export const ImagesSection = ({ isUploading }: { isUploading: boolean }) => {
 
                             <div className="max-w-[200px]">
                               <ImageUpload
-                                value={[]} // Don't show preview here since we're showing them above
+                                value={[]}
                                 disabled={isUploading}
                                 onChange={(url) => {
                                   if (!field.value.includes(url)) {
@@ -385,7 +354,6 @@ export const ImagesSection = ({ isUploading }: { isUploading: boolean }) => {
                                   const currentImages = field.value || []
                                   const index = currentImages.indexOf(url)
 
-                                  // Also remove metadata for this image
                                   if (index !== -1) {
                                     const currentMetadata = form.getValues("imagesMetadata") || []
                                     const newMetadata = [...currentMetadata]
@@ -408,9 +376,11 @@ export const ImagesSection = ({ isUploading }: { isUploading: boolean }) => {
                                 }
                                 onMetadataChange={(metadata) => {
                                   const currentImages = field.value || []
-                                  const index = currentImages.indexOf(selectedImageForDetail)
-                                  if (index !== -1) {
-                                    handleGalleryImageMetadataChange(metadata, index)
+                                  if (selectedImageForDetail) {
+                                    const index = currentImages.indexOf(selectedImageForDetail)
+                                    if (index !== -1) {
+                                      handleGalleryImageMetadataChange(metadata, index)
+                                    }
                                   }
                                 }}
                               />
@@ -429,7 +399,6 @@ export const ImagesSection = ({ isUploading }: { isUploading: boolean }) => {
         </CardContent>
       </Card>
 
-      {/* Standalone Image Detail Sidebar */}
       {isDetailModalOpen && selectedImageForDetail && (
         <ImageDetailSidebar
           isOpen={isDetailModalOpen}

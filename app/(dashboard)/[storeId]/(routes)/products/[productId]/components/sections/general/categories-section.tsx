@@ -16,19 +16,16 @@ import type { ProductFormValues } from "../../product-form-schema"
 export const CategoriesSection = () => {
   const form = useFormContext<ProductFormValues>()
 
-  // State for popover open/close
   const [openGender, setOpenGender] = useState(false)
   const [openMaterial, setOpenMaterial] = useState(false)
   const [openStyle, setOpenStyle] = useState(false)
 
-  // Watch values for multi-selects
   const materialValues = useWatch({
     control: form.control,
     name: "categories.material",
     defaultValue: [],
   })
 
-  // Watch external material specifications to sync with material categories
   const externalMaterialValues = useWatch({
     control: form.control,
     name: "specifications.externalMaterial",
@@ -41,17 +38,12 @@ export const CategoriesSection = () => {
     defaultValue: [],
   })
 
-  // Sync external material specifications with material categories
   useEffect(() => {
-    // Only update if the arrays are different
     if (externalMaterialValues && materialValues) {
-      const externalMaterialSet = new Set(externalMaterialValues)
       const materialSet = new Set(materialValues)
 
-      // Check if the sets are different
       let needsUpdate = false
 
-      // Check if external materials has items not in material categories
       for (const material of externalMaterialValues) {
         if (!materialSet.has(material)) {
           needsUpdate = true
@@ -59,7 +51,6 @@ export const CategoriesSection = () => {
         }
       }
 
-      // If they're different, update material categories based on external materials
       if (needsUpdate) {
         console.log("Syncing material categories from external materials:", externalMaterialValues)
         form.setValue("categories.material", [...externalMaterialValues], {
@@ -70,7 +61,6 @@ export const CategoriesSection = () => {
     }
   }, [externalMaterialValues, form])
 
-  // Gender options
   const genderOptions = [
     { label: "Men", value: "men" },
     { label: "Women", value: "women" },
@@ -78,7 +68,6 @@ export const CategoriesSection = () => {
     { label: "Kids", value: "kids" },
   ]
 
-  // Material options
   const materialOptions = [
     "Cotton",
     "Polyester",
@@ -92,7 +81,6 @@ export const CategoriesSection = () => {
     "Nylon",
   ]
 
-  // Style options
   const styleOptions = [
     "Casual",
     "Formal",
@@ -106,19 +94,16 @@ export const CategoriesSection = () => {
     "Athleisure",
   ]
 
-  // Handlers for multi-select
   const handleMaterialSelect = (material: string) => {
     const currentValues = form.getValues("categories.material") || []
     const newValues = currentValues.includes(material)
       ? currentValues.filter((value) => value !== material)
       : [...currentValues, material]
 
-    // Update material categories
     form.setValue("categories.material", newValues, {
       shouldValidate: true,
     })
 
-    // Also update external material specifications to keep them in sync
     const currentExternalMaterial = form.getValues("specifications.externalMaterial") || []
     const newExternalMaterial =
       material in currentExternalMaterial
@@ -148,7 +133,6 @@ export const CategoriesSection = () => {
         <CardDescription>Assign categories and attributes to help customers find your product</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Gender Selection */}
         <FormField
           control={form.control}
           name="categories.gender"
@@ -206,7 +190,6 @@ export const CategoriesSection = () => {
           )}
         />
 
-        {/* Material Selection */}
         <FormField
           control={form.control}
           name="categories.material"
@@ -275,7 +258,6 @@ export const CategoriesSection = () => {
           )}
         />
 
-        {/* Style Selection */}
         <FormField
           control={form.control}
           name="categories.style"

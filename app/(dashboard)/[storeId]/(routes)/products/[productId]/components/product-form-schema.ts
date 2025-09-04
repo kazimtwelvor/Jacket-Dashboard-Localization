@@ -1,6 +1,5 @@
 import * as z from "zod"
 
-// Define the schema for the product form with proper validation
 export const formSchema = z.object({
   // Basic information
   name: z.string().min(1, "Product name is required"),
@@ -126,6 +125,22 @@ export const formSchema = z.object({
   // Parent product flag
   isParentProduct: z.boolean().optional().default(false),
   parentProductId: z.string().optional(),
+  
+  // Image metadata
+  mainImageMetadata: z.object({
+    altText: z.string().optional(),
+    title: z.string().optional(),
+    caption: z.string().optional(),
+    description: z.string().optional(),
+    excludeFromSitemap: z.boolean().optional(),
+  }).optional().nullable(),
+  imagesMetadata: z.array(z.object({
+    altText: z.string().optional(),
+    title: z.string().optional(),
+    caption: z.string().optional(),
+    description: z.string().optional(),
+    excludeFromSitemap: z.boolean().optional(),
+  })).optional().default([]),
 })
 
 // Export the type for the form values

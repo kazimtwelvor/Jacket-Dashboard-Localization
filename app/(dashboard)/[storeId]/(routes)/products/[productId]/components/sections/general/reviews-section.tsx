@@ -20,7 +20,6 @@ import { getProductReviews } from "../../actions/get-product-reviews"
 import { testReviewSave } from "../../actions/test-review-save"
 import { getReviewCount } from "../../actions/get-review-count"
 
-// Define the review type
 interface ProductReview {
   id?: string
   text: string
@@ -170,9 +169,7 @@ export const ReviewsSection = () => {
           throw new Error(result.error || "Failed to generate reviews")
         }
       } 
-      // For new products, generate and store reviews temporarily
       else if (storeId) {
-        // Import dynamically to avoid server component issues
         const { generateReviewsForNewProduct } = await import("../../actions/generate-reviews-for-new-product")
         
         console.log(`Generating ${reviewCount} reviews for new product (to be saved later)`)
@@ -180,22 +177,17 @@ export const ReviewsSection = () => {
         const result = await generateReviewsForNewProduct(productName, productDescription, reviewCount, storeId)
         
         if (result.success) {
-          // Store the tempProductId and cached reviews in the form data
-          form.setValue("tempReviewsId", result.tempProductId, { shouldDirty: true, shouldValidate: false })
-          form.setValue("cachedReviews", result.reviews, { shouldDirty: true, shouldValidate: false })
+          form.setValue("tempReviewsId", result.tempProductId || undefined, { shouldDirty: true, shouldValidate: false })
+          form.setValue("cachedReviews", result.reviews || [], { shouldDirty: true, shouldValidate: false })
           
-          // Store reviews in component state for display
           setCachedReviews(result.reviews || [])
           
-          // Persist in localStorage as backup for new products
           localStorage.setItem(`cachedReviews_new`, JSON.stringify(result.reviews))
           
-          // Debug log to verify the reviews are set in the form
           console.log("Cached reviews set in form:", result.reviews)
           console.log("Form cachedReviews value:", form.getValues("cachedReviews"))
           console.log("Form tempReviewsId value:", form.getValues("tempReviewsId"))
           
-          // Enable reviews in the form
           form.setValue("reviews", true, { shouldDirty: true })
           
           setLastGenerationCount(result.count)
@@ -220,7 +212,6 @@ export const ReviewsSection = () => {
       console.error("Error generating reviews:", error)
       const errorMessage = error instanceof Error ? error.message : "An unknown error occurred"
       
-      // Check if it's a rate limit error and provide specific guidance
       if (errorMessage.includes("Rate limit") || errorMessage.includes("429")) {
         setError("Rate limit exceeded. Please wait a few minutes and try again with fewer reviews.")
         toast({

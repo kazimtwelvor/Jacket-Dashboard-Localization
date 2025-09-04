@@ -31,7 +31,6 @@ export async function getProductReviews(storeId: string, productId: string) {
       })),
     }
   } catch (error) {
-    console.error("Error fetching product reviews:", error)
     return {
       success: false,
       reviews: [],

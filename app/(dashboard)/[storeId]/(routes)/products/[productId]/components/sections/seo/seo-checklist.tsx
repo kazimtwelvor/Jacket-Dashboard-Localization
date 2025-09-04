@@ -22,14 +22,12 @@ export const SeoChecklist: React.FC<SeoChecklistProps> = ({
   imageAltText,
   structuredData,
 }) => {
-  // Calculate actual values
   const titleLength = metaTitle?.length || 0
   const descriptionLength = metaDescription?.length || 0
   const hasFocusKeyword = !!focusKeyword && focusKeyword.trim() !== ""
   const hasImageAlt = !!imageAltText
   const hasStructuredData = !!structuredData
 
-  // Determine whether each section passes the criteria
   const titleValid = titleLength > 0 && titleLength <= 60
   const descriptionValid = descriptionLength > 0 && descriptionLength <= 160
 

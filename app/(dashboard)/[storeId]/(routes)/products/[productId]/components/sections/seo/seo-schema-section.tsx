@@ -18,7 +18,6 @@ export const SeoSchemaSection = ({ form, productData }: SeoSchemaProps) => {
   const [showSecondarySchema, setShowSecondarySchema] = useState(false)
   const [showAdditionalSchema, setShowAdditionalSchema] = useState(false)
 
-  // Check if we have schema data for each tab
   useEffect(() => {
     const schema1 = form.getValues("schema1")
     const schema2 = form.getValues("schema2")
@@ -30,19 +29,16 @@ export const SeoSchemaSection = ({ form, productData }: SeoSchemaProps) => {
       schema3: schema3 ? "exists" : "empty",
     })
 
-    // Show secondary schema tab if we have data
     if (schema2 && schema2.trim() !== "") {
       setShowSecondarySchema(true)
       console.log("Enabling secondary schema tab")
     }
 
-    // Show additional schema tab if we have data
     if (schema3 && schema3.trim() !== "") {
       setShowAdditionalSchema(true)
       console.log("Enabling additional schema tab")
     }
 
-    // Log schema data for debugging
     console.log("Schema data loaded:", {
       schema1: schema1 ? schema1.substring(0, 50) + "..." : "none",
       schema2: schema2 ? schema2.substring(0, 50) + "..." : "none",
@@ -50,52 +46,43 @@ export const SeoSchemaSection = ({ form, productData }: SeoSchemaProps) => {
     })
   }, [form])
 
-  // Handle schema changes
   const handleSchemaChange = (schemaField: string, schema: string) => {
     console.log(`Updating ${schemaField} with new schema data`)
     form.setValue(schemaField, schema, { shouldDirty: true })
 
-    // After updating an individual schema, update the combined schema
     setTimeout(() => {
       const schema1 = form.getValues("schema1")
       const schema2 = form.getValues("schema2")
       const schema3 = form.getValues("schema3")
 
       try {
-        // Create a combined schema object
         const combinedSchema = {}
 
-        // Process schema1 (Product schema)
         if (schema1) {
           const parsedSchema1 = typeof schema1 === "string" ? JSON.parse(schema1) : schema1
           if (parsedSchema1) {
-            // Use templateName if available, or @type, or default to "Product"
             const schemaType = parsedSchema1.templateName || parsedSchema1["@type"] || "Product"
-            combinedSchema[schemaType] = parsedSchema1
+            ;(combinedSchema as any)[schemaType] = parsedSchema1
           }
         }
 
-        // Process schema2
         if (schema2) {
           const parsedSchema2 = typeof schema2 === "string" ? JSON.parse(schema2) : schema2
           if (parsedSchema2) {
             const schemaType = parsedSchema2.templateName || parsedSchema2["@type"] || "FAQPage"
-            combinedSchema[schemaType] = parsedSchema2
+            ;(combinedSchema as any)[schemaType] = parsedSchema2
           }
         }
 
-        // Process schema3
         if (schema3) {
           const parsedSchema3 = typeof schema3 === "string" ? JSON.parse(schema3) : schema3
           if (parsedSchema3) {
             const schemaType = parsedSchema3.templateName || parsedSchema3["@type"] || "HowTo"
-            combinedSchema[schemaType] = parsedSchema3
+            ;(combinedSchema as any)[schemaType] = parsedSchema3
           }
         }
 
-        // Only update if we have at least one schema
         if (Object.keys(combinedSchema).length > 0) {
-          // Convert to string and update the form
           const schemaString = JSON.stringify(combinedSchema)
           form.setValue("schema", schemaString, { shouldDirty: true })
           console.log("Combined schemas updated with", Object.keys(combinedSchema).length, "schemas")
@@ -106,7 +93,6 @@ export const SeoSchemaSection = ({ form, productData }: SeoSchemaProps) => {
     }, 300)
   }
 
-  // Get schema type from schema data
   const getSchemaType = (schemaData: string): string => {
     if (!schemaData) return "Product"
 
@@ -119,12 +105,9 @@ export const SeoSchemaSection = ({ form, productData }: SeoSchemaProps) => {
     }
   }
 
-  // Add secondary schema
   const addSecondarySchema = () => {
     setShowSecondarySchema(true)
     setActiveSchemaTab("secondary")
-
-    // If no schema2 exists, create a default one
     if (!form.getValues("schema2")) {
       const defaultSchema = {
         "@context": "https://schema.org",
@@ -147,12 +130,10 @@ export const SeoSchemaSection = ({ form, productData }: SeoSchemaProps) => {
     }
   }
 
-  // Add additional schema
   const addAdditionalSchema = () => {
     setShowAdditionalSchema(true)
     setActiveSchemaTab("additional")
 
-    // If no schema3 exists, create a default one
     if (!form.getValues("schema3")) {
       const defaultSchema = {
         "@context": "https://schema.org",
@@ -185,7 +166,6 @@ export const SeoSchemaSection = ({ form, productData }: SeoSchemaProps) => {
     }
   }
 
-  // Remove secondary schema
   const removeSecondarySchema = () => {
     form.setValue("schema2", "", { shouldDirty: true })
     setShowSecondarySchema(false)
@@ -193,7 +173,6 @@ export const SeoSchemaSection = ({ form, productData }: SeoSchemaProps) => {
     console.log("Removed secondary schema")
   }
 
-  // Remove additional schema
   const removeAdditionalSchema = () => {
     form.setValue("schema3", "", { shouldDirty: true })
     setShowAdditionalSchema(false)
@@ -246,7 +225,7 @@ export const SeoSchemaSection = ({ form, productData }: SeoSchemaProps) => {
           </div>
 
           <TabsContent value="primary" className="space-y-4">
-            <Alert variant="info" className="mb-4">
+            <Alert variant="default" className="mb-4">
               <AlertDescription>
                 The primary schema is required and will be the main structured data for this product.
               </AlertDescription>
@@ -264,7 +243,7 @@ export const SeoSchemaSection = ({ form, productData }: SeoSchemaProps) => {
           {showSecondarySchema && (
             <TabsContent value="secondary" className="space-y-4">
               <div className="flex justify-between items-center mb-4">
-                <Alert variant="info" className="mb-0 flex-1 mr-2">
+                <Alert variant="default" className="mb-0 flex-1 mr-2">
                   <AlertDescription>
                     Secondary schema provides additional structured data for search engines.
                   </AlertDescription>
@@ -295,7 +274,7 @@ export const SeoSchemaSection = ({ form, productData }: SeoSchemaProps) => {
           {showAdditionalSchema && (
             <TabsContent value="additional" className="space-y-4">
               <div className="flex justify-between items-center mb-4">
-                <Alert variant="info" className="mb-0 flex-1 mr-2">
+                <Alert variant="default" className="mb-0 flex-1 mr-2">
                   <AlertDescription>Additional schema provides even more context for search engines.</AlertDescription>
                 </Alert>
 

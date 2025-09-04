@@ -24,7 +24,7 @@ export const SchemaMarkupEditor = () => {
   const [enabled, setEnabled] = useState(true)
   const [selectedTemplate, setSelectedTemplate] = useState("default")
   const params = useParams()
-  const storeId = params.storeId as string
+  const storeId = params?.storeId as string
 
   const formProductName = watch("name")
   const formProductDescription = watch("description")
@@ -39,7 +39,6 @@ export const SchemaMarkupEditor = () => {
   const specifications = watch("specifications")
   const categories = watch("categories")
 
-  // Fetch store information
   useEffect(() => {
     const fetchStoreInfo = async () => {
       try {
@@ -59,16 +58,13 @@ export const SchemaMarkupEditor = () => {
     fetchStoreInfo()
   }, [storeId])
 
-  // Initialize schema from form value
   useEffect(() => {
     if (schema) {
       try {
-        // If it's a string, try to parse it
         if (typeof schema === "string") {
           const parsedSchema = JSON.parse(schema)
           setSchemaValue(JSON.stringify(parsedSchema, null, 2))
 
-          // Try to determine the template type from schema
           if (parsedSchema["@type"] === "Book") {
             setSelectedTemplate("book")
           } else if (parsedSchema["@type"] === "SoftwareApplication") {
@@ -83,7 +79,6 @@ export const SchemaMarkupEditor = () => {
             setSelectedTemplate("default")
           }
         } else {
-          // If it's already an object
           setSchemaValue(JSON.stringify(schema, null, 2))
         }
         setError(null)
@@ -92,12 +87,10 @@ export const SchemaMarkupEditor = () => {
         setError("Invalid JSON format. Please check your schema markup.")
       }
     } else {
-      // If no schema exists, generate a default one
       generateTemplate("default")
     }
   }, [schema])
 
-  // Validate schema when it changes
   useEffect(() => {
     if (schemaValue) {
       try {
@@ -114,13 +107,11 @@ export const SchemaMarkupEditor = () => {
     }
   }, [schemaValue])
 
-  // Generate a template schema based on product data and template type
   const generateTemplate = (templateType = selectedTemplate) => {
     const storeDomain = storeInfo?.url || window.location.origin
     const productSlug = slug || formProductName?.toLowerCase().replace(/\s+/g, "-") || "product"
     const productUrl = `${storeDomain}/products/${productSlug}`
 
-    // Get template from our templates library
     const template = getTemplateById(templateType)
 
     if (!template) {
@@ -128,7 +119,6 @@ export const SchemaMarkupEditor = () => {
       return
     }
 
-    // Prepare data for the template
     const data = {
       name: formProductName || "Product Name",
       description: formProductDescription || "Product Description",
@@ -148,19 +138,17 @@ export const SchemaMarkupEditor = () => {
       material: specifications?.externalMaterial || [],
       model: sku || "",
       manufacturer: brandName || storeInfo?.name || "Manufacturer",
-      author: "Author Name", // Default value
+      author: "Author Name", 
       publisher: brandName || storeInfo?.name || "Publisher Name",
       isbn: sku || "",
-      numberOfPages: "100", // Default value
-      servingSize: "100g", // Default value
-      applicationCategory: "Application", // Default value
-      operatingSystem: "Web Browser", // Default value
+      numberOfPages: "100", 
+      servingSize: "100g", 
+      applicationCategory: "Application", 
+      operatingSystem: "Web Browser", 
     }
 
-    // Fill the template with our data
     const filledTemplate = fillTemplate(template.template, data)
 
-    // Set the generated schema
     const formattedSchema = JSON.stringify(filledTemplate, null, 2)
     setSchemaValue(formattedSchema)
     setValue("schema", formattedSchema)
@@ -168,12 +156,10 @@ export const SchemaMarkupEditor = () => {
     setError(null)
   }
 
-  // Handle schema changes
   const handleSchemaChange = (value: string) => {
     setSchemaValue(value)
 
     try {
-      // Validate JSON
       JSON.parse(value)
       setValue("schema", value)
       setError(null)
@@ -182,13 +168,11 @@ export const SchemaMarkupEditor = () => {
     }
   }
 
-  // Handle template selection change
   const handleTemplateChange = (value: string) => {
     setSelectedTemplate(value)
     generateTemplate(value)
   }
 
-  // Toggle schema enabled/disabled
   const handleToggleSchema = (isEnabled: boolean) => {
     setEnabled(isEnabled)
     if (isEnabled && !schemaValue) {
@@ -244,7 +228,7 @@ export const SchemaMarkupEditor = () => {
             )}
 
             {warnings.length > 0 && (
-              <Alert variant="warning" className="bg-amber-50 border-amber-200">
+              <Alert variant="default" className="bg-amber-50 border-amber-200">
                 <AlertTriangle className="h-4 w-4 text-amber-600" />
                 <AlertDescription className="text-amber-700">
                   <p className="font-medium mb-1">Schema has warnings:</p>

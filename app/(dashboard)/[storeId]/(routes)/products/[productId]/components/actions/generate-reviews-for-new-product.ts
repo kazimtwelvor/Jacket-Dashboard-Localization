@@ -1,7 +1,6 @@
 "use server"
 
 import { auth } from "@clerk/nextjs/server"
-import prismadb from "@/lib/prismadb"
 
 interface ProductReview {
   text: string
@@ -22,12 +21,10 @@ export async function generateReviewsForNewProduct(
       throw new Error("Unauthenticated")
     }
 
-    // Check if GEMINI_API_KEY is available
     if (!process.env.GEMINI_API_KEY) {
       throw new Error("GEMINI_API_KEY environment variable is not set")
     }
 
-    // Generate reviews using Gemini AI
     const prompt = `Generate ${reviewCount} realistic product reviews for a product called "${productName}". 
     ${productDescription ? `Product description: ${productDescription}` : ""}
     
@@ -52,7 +49,6 @@ export async function generateReviewsForNewProduct(
     
     Important: Return ONLY the JSON array, no additional text or formatting.`
 
-    // Call the Gemini API with retry logic
     let response
     let retryCount = 0
     const maxRetries = 3
@@ -77,15 +73,14 @@ export async function generateReviewsForNewProduct(
         )
         
         if (response.status === 429) {
-          // Rate limited, wait and retry
-          const waitTime = Math.pow(2, retryCount) * 1000 // Exponential backoff
+          const waitTime = Math.pow(2, retryCount) * 1000 
           console.log(`Rate limited, waiting ${waitTime}ms before retry ${retryCount + 1}/${maxRetries}`)
           await new Promise(resolve => setTimeout(resolve, waitTime))
           retryCount++
           continue
         }
         
-        break // Success or non-retryable error
+        break
       } catch (fetchError) {
         retryCount++
         if (retryCount >= maxRetries) {
@@ -97,7 +92,6 @@ export async function generateReviewsForNewProduct(
 
     if (!response || !response.ok) {
       if (response?.status === 429) {
-        // Generate fallback reviews when rate limited
         console.log("Rate limited, generating fallback reviews")
         const fallbackReviews = generateFallbackReviews(reviewCount, productName)
         const tempProductId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
@@ -124,23 +118,18 @@ export async function generateReviewsForNewProduct(
     const rawText = data.candidates[0].content.parts[0].text
     console.log("Raw Gemini response:", rawText)
 
-    // Clean the response to extract JSON
     let cleanedText = rawText.trim()
     
-    // Remove markdown code blocks if present
     if (cleanedText.startsWith("```json")) {
       cleanedText = cleanedText.replace(/```json\n?/, "").replace(/\n?```$/, "")
     } else if (cleanedText.startsWith("```")) {
       cleanedText = cleanedText.replace(/```\n?/, "").replace(/\n?```$/, "")
     }
 
-    // Parse the JSON response
     let generatedReviews: ProductReview[]
     try {
       generatedReviews = JSON.parse(cleanedText)
     } catch (parseError) {
-      console.error("Failed to parse Gemini response as JSON:", parseError)
-      console.error("Cleaned text:", cleanedText)
       throw new Error("Failed to parse AI response")
     }
 
@@ -167,7 +156,6 @@ export async function generateReviewsForNewProduct(
   }
 }
 
-// Fallback review generator
 function generateFallbackReviews(count: number, productName: string): ProductReview[] {
   const names = [
     "Sarah Johnson", "Mike Chen", "Emma Davis", "James Wilson", "Lisa Garcia",

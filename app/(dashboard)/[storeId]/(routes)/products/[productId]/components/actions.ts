@@ -1,5 +1,3 @@
-
-
 "use server"
 
 import { auth } from "@clerk/nextjs/server"
@@ -347,7 +345,7 @@ export async function createProduct(formData: FormData) {
     const schema3Json = formData.get("schema3") as string
     const schemaJson = formData.get("schema") as string
 
-    let combinedSchema = {}
+    let combinedSchema: any = {}
 
     if (schemaJson && schemaJson.trim() !== "") {
       try {

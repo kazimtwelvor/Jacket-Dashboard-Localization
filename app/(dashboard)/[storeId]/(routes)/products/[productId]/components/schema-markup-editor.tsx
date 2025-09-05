@@ -14,14 +14,13 @@ import { AlertTriangle, Code, CheckCircle2 } from "lucide-react"
 import { SCHEMA_TEMPLATES, getTemplateById, fillTemplate } from "./schema-templates"
 
 export const SchemaMarkupEditor = () => {
-  const { watch, setValue, getValues } = useFormContext()
+  const { watch, setValue } = useFormContext()
   const [schemaValue, setSchemaValue] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [isEnabled, setIsEnabled] = useState(true)
   const [selectedTemplate, setSelectedTemplate] = useState("default")
   const [isValid, setIsValid] = useState(true)
 
-  // Get form values
   const formProductName = watch("name")
   const formProductDescription = watch("description")
   const formProductPrice = watch("regularPrice")
@@ -34,17 +33,14 @@ export const SchemaMarkupEditor = () => {
   const salePrice = watch("salePrice")
   const specifications = watch("specifications")
 
-  // Initialize schema from form value
   useEffect(() => {
     if (schema) {
       try {
-        // If it's a string, try to parse it
         if (typeof schema === "string") {
           const parsedSchema = JSON.parse(schema)
           setSchemaValue(JSON.stringify(parsedSchema, null, 2))
           setIsValid(true)
 
-          // Try to determine the template type from schema
           if (parsedSchema["@type"] === "Book") {
             setSelectedTemplate("book")
           } else if (parsedSchema["@type"] === "SoftwareApplication") {
@@ -59,7 +55,6 @@ export const SchemaMarkupEditor = () => {
             setSelectedTemplate("default")
           }
         } else {
-          // If it's already an object
           setSchemaValue(JSON.stringify(schema, null, 2))
           setIsValid(true)
         }
@@ -70,18 +65,15 @@ export const SchemaMarkupEditor = () => {
         setIsValid(false)
       }
     } else {
-      // If no schema exists, generate a default one
       generateTemplate("default")
     }
   }, [schema])
 
-  // Generate a template schema based on product data and template type
   const generateTemplate = (templateType = selectedTemplate) => {
     const storeDomain = window.location.origin
     const productSlug = slug || formProductName?.toLowerCase().replace(/\s+/g, "-") || "product"
     const productUrl = `${storeDomain}/products/${productSlug}`
 
-    // Get template from our templates library
     const template = getTemplateById(templateType)
 
     if (!template) {
@@ -89,7 +81,6 @@ export const SchemaMarkupEditor = () => {
       return
     }
 
-    // Prepare data for the template
     const data = {
       name: formProductName || "Product Name",
       description: formProductDescription || "Product Description",
@@ -109,19 +100,17 @@ export const SchemaMarkupEditor = () => {
       material: specifications?.externalMaterial || [],
       model: sku || "",
       manufacturer: brandName || "Manufacturer",
-      author: "Author Name", // Default value
+      author: "Author Name",
       publisher: brandName || "Publisher Name",
       isbn: sku || "",
-      numberOfPages: "100", // Default value
-      servingSize: "100g", // Default value
-      applicationCategory: "Application", // Default value
-      operatingSystem: "Web Browser", // Default value
+      numberOfPages: "100", 
+      servingSize: "100g", 
+      applicationCategory: "Application", 
+      operatingSystem: "Web Browser", 
     }
 
-    // Fill the template with our data
     const filledTemplate = fillTemplate(template.template, data)
 
-    // Set the generated schema
     const formattedSchema = JSON.stringify(filledTemplate, null, 2)
     setSchemaValue(formattedSchema)
     setValue("schema", formattedSchema)
@@ -130,12 +119,10 @@ export const SchemaMarkupEditor = () => {
     setIsValid(true)
   }
 
-  // Handle schema changes
   const handleSchemaChange = (value: string) => {
     setSchemaValue(value)
 
     try {
-      // Validate JSON
       JSON.parse(value)
       setValue("schema", value)
       setError(null)
@@ -143,23 +130,19 @@ export const SchemaMarkupEditor = () => {
     } catch (e) {
       setError("Invalid JSON format. Please check your schema markup.")
       setIsValid(false)
-      // Still update the form value so user doesn't lose their work
       setValue("schema", value)
     }
   }
 
-  // Handle template selection change
   const handleTemplateChange = (value: string) => {
     setSelectedTemplate(value)
     generateTemplate(value)
   }
 
-  // Handle enable/disable toggle
   const handleEnableToggle = (checked: boolean) => {
     setIsEnabled(checked)
     setValue("seo.structuredData", checked)
 
-    // If enabling and no schema, generate one
     if (checked && !schemaValue) {
       generateTemplate()
     }

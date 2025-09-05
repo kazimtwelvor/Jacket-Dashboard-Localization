@@ -31,19 +31,16 @@ export const StoreNameProvider = ({ storeId, children }: StoreNameProviderProps)
     const fetchStoreName = async () => {
       try {
         setIsLoading(true)
-        // Fetch store info from the API
         const response = await axios.get(`/api/stores/${storeId}/info`)
 
         if (response.data && response.data.name) {
           setStoreName(response.data.name)
         } else {
-          // Fallback to a formatted version of the store ID if name is not available
           setStoreName(`Store ${storeId.substring(0, 8)}`)
         }
       } catch (err) {
         console.error("Error fetching store name:", err)
         setError(err instanceof Error ? err : new Error("Failed to fetch store name"))
-        // Fallback to a formatted version of the store ID
         setStoreName(`Store ${storeId.substring(0, 8)}`)
       } finally {
         setIsLoading(false)

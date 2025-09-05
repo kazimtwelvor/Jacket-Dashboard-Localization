@@ -104,7 +104,7 @@ export const VariationsTab: React.FC<VariationsTabProps> = ({ form, sizes, color
               <h3 className="text-lg font-semibold">Product Variations Setup</h3>
               <p className="text-sm text-muted-foreground">Configure categories, sizes, and colors for your product</p>
             </div>
-            <Badge variant={getOverallCompletion() === 100 ? "success" : "outline"} className="px-3 py-1">
+            <Badge variant={getOverallCompletion() === 100 ? "outline" : "outline"} className="px-3 py-1">
               {getOverallCompletion()}% Complete
             </Badge>
           </div>
@@ -198,7 +198,7 @@ export const VariationsTab: React.FC<VariationsTabProps> = ({ form, sizes, color
                 </Tooltip>
               </TooltipProvider>
             </div>
-            <Badge variant={getCategoriesCompletion() === 100 ? "success" : "outline"}>
+            <Badge variant={getCategoriesCompletion() === 100 ? "outline" : "outline"}>
               {getCategoriesCompletion()}% Complete
             </Badge>
           </div>
@@ -225,7 +225,7 @@ export const VariationsTab: React.FC<VariationsTabProps> = ({ form, sizes, color
                 </Tooltip>
               </TooltipProvider>
             </div>
-            <Badge variant={getSizesCompletion() === 100 ? "success" : "outline"}>
+            <Badge variant={getSizesCompletion() === 100 ? "outline" : "outline"}>
               {getSizesCompletion()}% Complete
             </Badge>
           </div>
@@ -252,7 +252,7 @@ export const VariationsTab: React.FC<VariationsTabProps> = ({ form, sizes, color
                 </Tooltip>
               </TooltipProvider>
             </div>
-            <Badge variant={getColorsCompletion() === 100 ? "success" : "outline"}>
+            <Badge variant={getColorsCompletion() === 100 ? "outline" : "outline"}>
               {getColorsCompletion()}% Complete
             </Badge>
           </div>
@@ -283,7 +283,7 @@ export const VariationsTab: React.FC<VariationsTabProps> = ({ form, sizes, color
                 </Tooltip>
               </TooltipProvider>
             </div>
-            <Badge variant={getLinksCompletion() === 100 ? "success" : "outline"}>
+            <Badge variant={getLinksCompletion() === 100 ? "outline" : "outline"}>
               {getLinksCompletion()}% Complete
             </Badge>
           </div>

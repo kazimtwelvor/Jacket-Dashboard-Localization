@@ -10,7 +10,6 @@ export async function getReviewCount(storeId: string, productId?: string) {
       throw new Error("Unauthenticated")
     }
 
-    console.log("Getting review count for:", { storeId, productId })
 
     const totalReviews = await prismadb.review.count({
       where: {
@@ -45,20 +44,6 @@ export async function getReviewCount(storeId: string, productId?: string) {
         },
       },
     })
-
-    console.log("Review count results:", {
-      totalReviews,
-      productReviews,
-      sampleReviews: sampleReviews.map(r => ({
-        id: r.id,
-        productName: r.product.name,
-        userName: r.userName,
-        rating: r.rating,
-        isApproved: r.isApproved,
-        createdAt: r.createdAt,
-      })),
-    })
-
     return {
       success: true,
       totalReviews,
@@ -74,7 +59,6 @@ export async function getReviewCount(storeId: string, productId?: string) {
       })),
     }
   } catch (error) {
-    console.error("Get review count error:", error)
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unknown error occurred",

@@ -1,9 +1,7 @@
 "use client"
-
 import { Check, ChevronsUpDown } from "lucide-react"
 import { useFormContext, useWatch } from "react-hook-form"
 import { useState, useEffect } from "react"
-
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -15,7 +13,6 @@ import type { ProductFormValues } from "../../product-form-schema"
 
 export const CategoriesSection = () => {
   const form = useFormContext<ProductFormValues>()
-
   const [openGender, setOpenGender] = useState(false)
   const [openMaterial, setOpenMaterial] = useState(false)
   const [openStyle, setOpenStyle] = useState(false)

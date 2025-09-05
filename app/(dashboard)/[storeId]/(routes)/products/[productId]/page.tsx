@@ -6,16 +6,6 @@ import { ProductForm } from "./components/product-form"
 import type { Product, Image } from "../types"
 import { StoreNameProvider } from "./components/store-name-provider"
 
-interface ProductWithImages extends Omit<Product, "images"> {
-  images: {
-    image: {
-      id: string
-      url: string
-    }
-    order: number
-  }[]
-}
-
 interface ProductPageProps {
   params: {
     productId: string
@@ -25,7 +15,6 @@ interface ProductPageProps {
 
 const ProductPage: React.FC<ProductPageProps> = async ({ params }) => {
   const { userId } = await auth()
-  // Extract storeId and productId as strings to avoid the NextJS dynamic API warning
   const storeId = params.storeId as string
   const productId = params.productId as string
 
@@ -33,7 +22,6 @@ const ProductPage: React.FC<ProductPageProps> = async ({ params }) => {
     redirect("/sign-in")
   }
 
-  // Modified query to include all needed fields
   const product = await prismadb.product.findUnique({
     where: {
       id: productId,
@@ -95,7 +83,6 @@ const ProductPage: React.FC<ProductPageProps> = async ({ params }) => {
     },
   })
 
-  // Transform the data structure to match what the form expects
   const productWithImages: Product | null = product
     ? {
         id: product.id,
@@ -131,7 +118,6 @@ const ProductPage: React.FC<ProductPageProps> = async ({ params }) => {
         tags: product.tags || [],
         gender: product.gender || undefined,
         keywords: product.keywords || [],
-        // Fix for colorLinks - properly handle different formats
         colorLinks: (() => {
           try {
             if (!product.colorLinks) return undefined
@@ -142,7 +128,6 @@ const ProductPage: React.FC<ProductPageProps> = async ({ params }) => {
             }
 
             if (typeof product.colorLinks === "string") {
-              // Check if it's the problematic "[object Object]" string
               if (product.colorLinks === "[object Object]") {
                 console.log("Found '[object Object]' string in page.tsx, using empty object")
                 return {}

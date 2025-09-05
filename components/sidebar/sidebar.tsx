@@ -77,39 +77,39 @@ export const Sidebar = ({ className, items = [], memberStores = [] }: SidebarPro
       category: "Dashboard",
       items: [
         {
-          href: `/${params.storeId}`,
+          href: `/${params?.storeId}`,
           label: "Overview",
           icon: LayoutDashboard,
-          active: pathname === `/${params.storeId}`,
+          active: pathname === `/${params?.storeId}`,
         },
       ],
     },
     {
       category: "Content",
       items: [
+        // {
+        //   href: `/${params.storeId}/billboards`,
+        //   label: "Billboards",
+        //   icon: ImageIcon,
+        //   active: pathname.includes(`/${params.storeId}/billboards`),
+        // },
         {
-          href: `/${params.storeId}/billboards`,
-          label: "Billboards",
-          icon: ImageIcon,
-          active: pathname.includes(`/${params.storeId}/billboards`),
-        },
-        {
-          href: `/${params.storeId}/pages`,
+          href: `/${params?.storeId}/pages`,
           label: "Pages",
           icon: LayoutTemplate,
-          active: pathname.includes(`/${params.storeId}/pages`),
+          active: pathname?.includes(`/${params?.storeId}/pages`),
         },
         {
-          href: `/${params.storeId}/blog`,
+          href: `/${params?.storeId}/blog`,
           label: "Blog",
           icon: FileText,
-          active: pathname.includes(`/${params.storeId}/blog`),
+          active: pathname?.includes(`/${params?.storeId}/blog`),
         },
         {
-          href: `/${params.storeId}/category-page`,
+          href: `/${params?.storeId}/category-page`,
           label: "Category Pages",
           icon: FileType,
-          active: pathname.includes(`/${params.storeId}/category-page`),
+          active: pathname?.includes(`/${params?.storeId}/category-page`),
         },
       ],
     },
@@ -117,32 +117,32 @@ export const Sidebar = ({ className, items = [], memberStores = [] }: SidebarPro
       category: "Products",
       items: [
         {
-          href: `/${params.storeId}/products`,
+          href: `/${params?.storeId}/products`,
           label: "Products",
           icon: Package,
-          active: pathname.includes(`/${params.storeId}/products`),
+          active: pathname?.includes(`/${params?.storeId}/products`),
         },
         {
-          href: `/${params.storeId}/attributes`,
+          href: `/${params?.storeId}/attributes`,
           label: "Attributes",
           icon: Layers,
           active:
-            pathname.includes(`/${params.storeId}/attributes`) ||
-            pathname.includes(`/${params.storeId}/categories`) ||
-            pathname.includes(`/${params.storeId}/sizes`) ||
-            pathname.includes(`/${params.storeId}/colors`),
+            pathname?.includes(`/${params?.storeId}/attributes`) ||
+            pathname?.includes(`/${params?.storeId}/categories`) ||
+            pathname?.includes(`/${params?.storeId}/sizes`) ||
+            pathname?.includes(`/${params?.storeId}/colors`),
         },
         {
-          href: `/${params.storeId}/images`,
+          href: `/${params?.storeId}/images`,
           label: "Image Gallery",
           icon: Images,
-          active: pathname.includes(`/${params.storeId}/images`),
+          active: pathname?.includes(`/${params?.storeId}/images`),
         },
         {
-          href: `/${params.storeId}/draft`,
+          href: `/${params?.storeId}/draft`,
           label: "Draft",
           icon: FileText,
-          active: pathname.includes(`/${params.storeId}/draft`),
+          active: pathname?.includes(`/${params?.storeId}/draft`),
         },
       ],
     },
@@ -150,22 +150,22 @@ export const Sidebar = ({ className, items = [], memberStores = [] }: SidebarPro
       category: "Sales",
       items: [
         {
-          href: `/${params.storeId}/orders`,
+          href: `/${params?.storeId}/orders`,
           label: "Orders",
           icon: ShoppingCart,
-          active: pathname.includes(`/${params.storeId}/orders`),
+          active: pathname?.includes(`/${params?.storeId}/orders`),
         },
         {
-          href: `/${params.storeId}/reviews`,
+          href: `/${params?.storeId}/reviews`,
           label: "Reviews",
           icon: Star,
-          active: pathname.includes(`/${params.storeId}/reviews`),
+          active: pathname?.includes(`/${params?.storeId}/reviews`),
         },
         {
-          href: `/${params.storeId}/forms`,
+          href: `/${params?.storeId}/forms`,
           label: "Forms",
           icon: ClipboardList,
-          active: pathname.includes(`/${params.storeId}/forms`),
+          active: pathname?.includes(`/${params?.storeId}/forms`),
         },
       ],
     },
@@ -173,23 +173,23 @@ export const Sidebar = ({ className, items = [], memberStores = [] }: SidebarPro
       category: "System",
       items: [
         {
-          href: `/${params.storeId}/settings`,
+          href: `/${params?.storeId}/settings`,
           label: "Settings",
           icon: Settings,
-          active: pathname.includes(`/${params.storeId}/settings`),
+          active: pathname?.includes(`/${params?.storeId}/settings`),
         },
         {
-          href: `/${params.storeId}/settings/members`,
+          href: `/${params?.storeId}/settings/members`,
           label: "Team Members",
           icon: Users,
-          active: pathname.includes(`/${params.storeId}/settings/members`),
+          active: pathname?.includes(`/${params?.storeId}/settings/members`),
         },
 
         {
-          href: `/${params.storeId}/settings/payments`,
+          href: `/${params?.storeId}/settings/payments`,
           label: "Payments",
           icon: DollarSign,
-          active: pathname.includes(`/${params.storeId}/settings/payments`),
+          active: pathname?.includes(`/${params?.storeId}/settings/payments`),
         },
       ],
     },
@@ -298,7 +298,7 @@ export const Sidebar = ({ className, items = [], memberStores = [] }: SidebarPro
                             className="text-sm text-white hover:bg-[#2d4266] aria-selected:bg-[#2d4266]"
                           >
                             {store.name}
-                            {store.id === params.storeId && <span className="ml-auto text-[#4cc9f0]">✓</span>}
+                            {store.id === params?.storeId && <span className="ml-auto text-[#4cc9f0]">✓</span>}
                           </CommandItem>
                         ))}
                       </CommandGroup>

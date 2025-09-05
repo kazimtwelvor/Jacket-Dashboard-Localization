@@ -203,6 +203,8 @@ type ElementType = {
     heading: string
     description: string
     faqs: Array<{
+      id: string
+      icon: string
       question: string
       answer: string
     }>
@@ -312,7 +314,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
   }
 
   const handlePreview = () => {
-    const previewUrl = `/preview/${params.storeId}/pages/preview?content=${encodeURIComponent(JSON.stringify(elements))}`
+    const previewUrl = `/preview/${params?.storeId}/pages/preview?content=${encodeURIComponent(JSON.stringify(elements))}`
     window.open(previewUrl, "_blank")
   }
 
@@ -534,15 +536,21 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
     description: "Find answers to common questions about our products and services",
     faqs: [
       {
+        id: "faq1",
+        icon: "❓",
         question: "How do I place an order?",
         answer:
           "You can place an order through our website by selecting the product you want and clicking the 'Add to Cart' button. Then follow the checkout process.",
       },
       {
+        id: "faq2",
+        icon: "💳",
         question: "What payment methods do you accept?",
         answer: "We accept all major credit cards, PayPal, and bank transfers. All payments are securely processed.",
       },
       {
+        id: "faq3",
+        icon: "🚚",
         question: "How long does shipping take?",
         answer:
           "Shipping typically takes 3-5 business days for domestic orders and 7-14 business days for international orders.",
@@ -1232,12 +1240,17 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
           <div style={baseStyles} onClick={() => handleElementClick(element)} className="w-full">
             <FAQSection
               isEditing={false}
-              heading={element.faqSectionData?.heading || ""}
+              title={element.faqSectionData?.heading || ""}
               description={element.faqSectionData?.description || ""}
               faqs={element.faqSectionData?.faqs || []}
-              onHeadingChange={() => {}}
+              onTitleChange={() => {}}
               onDescriptionChange={() => {}}
-              onFaqsChange={() => {}}
+              onFAQChange={() => {}}
+              onFAQListItemChange={() => {}}
+              onAddFAQListItem={() => {}}
+              onRemoveFAQListItem={() => {}}
+              onAddFAQ={() => {}}
+              onRemoveFAQ={() => {}}
             />
           </div>
         )
@@ -1595,7 +1608,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                   value={element.heroBannerData?.title || ""}
                   onChange={(e) =>
                     updateElement(element.id, {
-                      heroBannerData: { ...element.heroBannerData, title: e.target.value },
+                      heroBannerData: { ...element.heroBannerData, title: e.target.value } as any,
                     })
                   }
                   className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -1609,7 +1622,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                   value={element.heroBannerData?.subtitle || ""}
                   onChange={(e) =>
                     updateElement(element.id, {
-                      heroBannerData: { ...element.heroBannerData, subtitle: e.target.value },
+                      heroBannerData: { ...element.heroBannerData, subtitle: e.target.value } as any,
                     })
                   }
                   className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -1622,7 +1635,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                   value={element.heroBannerData?.description || ""}
                   onChange={(e) =>
                     updateElement(element.id, {
-                      heroBannerData: { ...element.heroBannerData, description: e.target.value },
+                      heroBannerData: { ...element.heroBannerData, description: e.target.value } as any,
                     })
                   }
                   rows={2}
@@ -1637,7 +1650,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                   value={element.heroBannerData?.bannerImage?.[0] || ""}
                   onChange={(e) =>
                     updateElement(element.id, {
-                      heroBannerData: { ...element.heroBannerData, bannerImage: [e.target.value] },
+                      heroBannerData: { ...element.heroBannerData, bannerImage: [e.target.value] } as any,
                     })
                   }
                   placeholder="Enter image URL"
@@ -1659,7 +1672,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                   value={element.processStepsData?.mainImage || ""}
                   onChange={(e) =>
                     updateElement(element.id, {
-                      processStepsData: { ...element.processStepsData, mainImage: e.target.value },
+                      processStepsData: { ...element.processStepsData, mainImage: e.target.value } as any,
                     })
                   }
                   placeholder="Enter image URL"
@@ -1675,7 +1688,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                     value={element.processStepsData?.step1Title || ""}
                     onChange={(e) =>
                       updateElement(element.id, {
-                        processStepsData: { ...element.processStepsData, step1Title: e.target.value },
+                        processStepsData: { ...element.processStepsData, step1Title: e.target.value } as any,
                       })
                     }
                     className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -1687,7 +1700,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                     value={element.processStepsData?.step1Content || ""}
                     onChange={(e) =>
                       updateElement(element.id, {
-                        processStepsData: { ...element.processStepsData, step1Content: e.target.value },
+                        processStepsData: { ...element.processStepsData, step1Content: e.target.value } as any,
                       })
                     }
                     rows={2}
@@ -1704,7 +1717,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                     value={element.processStepsData?.step2Title || ""}
                     onChange={(e) =>
                       updateElement(element.id, {
-                        processStepsData: { ...element.processStepsData, step2Title: e.target.value },
+                        processStepsData: { ...element.processStepsData, step2Title: e.target.value } as any,
                       })
                     }
                     className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -1716,7 +1729,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                     value={element.processStepsData?.step2Content || ""}
                     onChange={(e) =>
                       updateElement(element.id, {
-                        processStepsData: { ...element.processStepsData, step2Content: e.target.value },
+                        processStepsData: { ...element.processStepsData, step2Content: e.target.value } as any,
                       })
                     }
                     rows={2}
@@ -1733,7 +1746,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                     value={element.processStepsData?.step3Title || ""}
                     onChange={(e) =>
                       updateElement(element.id, {
-                        processStepsData: { ...element.processStepsData, step3Title: e.target.value },
+                        processStepsData: { ...element.processStepsData, step3Title: e.target.value } as any,
                       })
                     }
                     className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -1745,7 +1758,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                     value={element.processStepsData?.step3Content || ""}
                     onChange={(e) =>
                       updateElement(element.id, {
-                        processStepsData: { ...element.processStepsData, step3Content: e.target.value },
+                        processStepsData: { ...element.processStepsData, step3Content: e.target.value } as any,
                       })
                     }
                     rows={2}
@@ -1768,7 +1781,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                   value={element.twoColumnData?.mainHeading || ""}
                   onChange={(e) =>
                     updateElement(element.id, {
-                      twoColumnData: { ...element.twoColumnData, mainHeading: e.target.value },
+                      twoColumnData: { ...element.twoColumnData, mainHeading: e.target.value } as any,
                     })
                   }
                   className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -1785,7 +1798,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                       value={element.twoColumnData?.leftColumnTitle || ""}
                       onChange={(e) =>
                         updateElement(element.id, {
-                          twoColumnData: { ...element.twoColumnData, leftColumnTitle: e.target.value },
+                          twoColumnData: { ...element.twoColumnData, leftColumnTitle: e.target.value } as any,
                         })
                       }
                       className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -1797,7 +1810,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                       value={element.twoColumnData?.leftColumnContent || ""}
                       onChange={(e) =>
                         updateElement(element.id, {
-                          twoColumnData: { ...element.twoColumnData, leftColumnContent: e.target.value },
+                          twoColumnData: { ...element.twoColumnData, leftColumnContent: e.target.value } as any,
                         })
                       }
                       rows={2}
@@ -1811,7 +1824,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                       value={element.twoColumnData?.leftColumnSecondTitle || ""}
                       onChange={(e) =>
                         updateElement(element.id, {
-                          twoColumnData: { ...element.twoColumnData, leftColumnSecondTitle: e.target.value },
+                          twoColumnData: { ...element.twoColumnData, leftColumnSecondTitle: e.target.value } as any,
                         })
                       }
                       className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -1823,7 +1836,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                       value={element.twoColumnData?.leftColumnSecondContent || ""}
                       onChange={(e) =>
                         updateElement(element.id, {
-                          twoColumnData: { ...element.twoColumnData, leftColumnSecondContent: e.target.value },
+                          twoColumnData: { ...element.twoColumnData, leftColumnSecondContent: e.target.value } as any,
                         })
                       }
                       rows={2}
@@ -1843,7 +1856,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                       value={element.twoColumnData?.rightColumnTitle || ""}
                       onChange={(e) =>
                         updateElement(element.id, {
-                          twoColumnData: { ...element.twoColumnData, rightColumnTitle: e.target.value },
+                          twoColumnData: { ...element.twoColumnData, rightColumnTitle: e.target.value } as any,
                         })
                       }
                       className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -1855,7 +1868,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                       value={element.twoColumnData?.rightColumnContent || ""}
                       onChange={(e) =>
                         updateElement(element.id, {
-                          twoColumnData: { ...element.twoColumnData, rightColumnContent: e.target.value },
+                          twoColumnData: { ...element.twoColumnData, rightColumnContent: e.target.value } as any,
                         })
                       }
                       rows={2}
@@ -1869,7 +1882,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                       value={element.twoColumnData?.rightColumnSecondTitle || ""}
                       onChange={(e) =>
                         updateElement(element.id, {
-                          twoColumnData: { ...element.twoColumnData, rightColumnSecondTitle: e.target.value },
+                          twoColumnData: { ...element.twoColumnData, rightColumnSecondTitle: e.target.value } as any,
                         })
                       }
                       className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -1881,7 +1894,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                       value={element.twoColumnData?.rightColumnSecondContent || ""}
                       onChange={(e) =>
                         updateElement(element.id, {
-                          twoColumnData: { ...element.twoColumnData, rightColumnSecondContent: e.target.value },
+                          twoColumnData: { ...element.twoColumnData, rightColumnSecondContent: e.target.value } as any,
                         })
                       }
                       rows={2}
@@ -1905,7 +1918,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                   value={element.satisfactionBannerData?.heading || ""}
                   onChange={(e) =>
                     updateElement(element.id, {
-                      satisfactionBannerData: { ...element.satisfactionBannerData, heading: e.target.value },
+                      satisfactionBannerData: { ...element.satisfactionBannerData, heading: e.target.value } as any,
                     })
                   }
                   className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -1919,7 +1932,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                   value={element.satisfactionBannerData?.highlightedText || ""}
                   onChange={(e) =>
                     updateElement(element.id, {
-                      satisfactionBannerData: { ...element.satisfactionBannerData, highlightedText: e.target.value },
+                      satisfactionBannerData: { ...element.satisfactionBannerData, highlightedText: e.target.value } as any,
                     })
                   }
                   className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -1933,7 +1946,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                   value={element.satisfactionBannerData?.endText || ""}
                   onChange={(e) =>
                     updateElement(element.id, {
-                      satisfactionBannerData: { ...element.satisfactionBannerData, endText: e.target.value },
+                      satisfactionBannerData: { ...element.satisfactionBannerData, endText: e.target.value } as any,
                     })
                   }
                   className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -1946,7 +1959,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                   value={element.satisfactionBannerData?.subtext || ""}
                   onChange={(e) =>
                     updateElement(element.id, {
-                      satisfactionBannerData: { ...element.satisfactionBannerData, subtext: e.target.value },
+                      satisfactionBannerData: { ...element.satisfactionBannerData, subtext: e.target.value } as any,
                     })
                   }
                   rows={2}
@@ -1962,7 +1975,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                     value={element.satisfactionBannerData?.emailLabel || ""}
                     onChange={(e) =>
                       updateElement(element.id, {
-                        satisfactionBannerData: { ...element.satisfactionBannerData, emailLabel: e.target.value },
+                        satisfactionBannerData: { ...element.satisfactionBannerData, emailLabel: e.target.value } as any,
                       })
                     }
                     className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -1975,7 +1988,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                     value={element.satisfactionBannerData?.emailValue || ""}
                     onChange={(e) =>
                       updateElement(element.id, {
-                        satisfactionBannerData: { ...element.satisfactionBannerData, emailValue: e.target.value },
+                        satisfactionBannerData: { ...element.satisfactionBannerData, emailValue: e.target.value } as any,
                       })
                     }
                     className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -1991,7 +2004,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                     value={element.satisfactionBannerData?.phoneLabel || ""}
                     onChange={(e) =>
                       updateElement(element.id, {
-                        satisfactionBannerData: { ...element.satisfactionBannerData, phoneLabel: e.target.value },
+                        satisfactionBannerData: { ...element.satisfactionBannerData, phoneLabel: e.target.value } as any,
                       })
                     }
                     className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -2004,7 +2017,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                     value={element.satisfactionBannerData?.phoneValue || ""}
                     onChange={(e) =>
                       updateElement(element.id, {
-                        satisfactionBannerData: { ...element.satisfactionBannerData, phoneValue: e.target.value },
+                        satisfactionBannerData: { ...element.satisfactionBannerData, phoneValue: e.target.value } as any,
                       })
                     }
                     className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -2026,7 +2039,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                   value={element.productOptionsData?.mainHeading || ""}
                   onChange={(e) =>
                     updateElement(element.id, {
-                      productOptionsData: { ...element.productOptionsData, mainHeading: e.target.value },
+                      productOptionsData: { ...element.productOptionsData, mainHeading: e.target.value } as any,
                     })
                   }
                   className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -2039,7 +2052,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                   value={element.productOptionsData?.mainDescription || ""}
                   onChange={(e) =>
                     updateElement(element.id, {
-                      productOptionsData: { ...element.productOptionsData, mainDescription: e.target.value },
+                      productOptionsData: { ...element.productOptionsData, mainDescription: e.target.value } as any,
                     })
                   }
                   rows={2}
@@ -2061,7 +2074,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                             const newOptions = [...(element.productOptionsData?.backingOptions || [])]
                             newOptions[index] = { ...newOptions[index], title: e.target.value }
                             updateElement(element.id, {
-                              productOptionsData: { ...element.productOptionsData, backingOptions: newOptions },
+                              productOptionsData: { ...element.productOptionsData, backingOptions: newOptions } as any,
                             })
                           }}
                           className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -2075,7 +2088,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                             const newOptions = [...(element.productOptionsData?.backingOptions || [])]
                             newOptions[index] = { ...newOptions[index], description: e.target.value }
                             updateElement(element.id, {
-                              productOptionsData: { ...element.productOptionsData, backingOptions: newOptions },
+                              productOptionsData: { ...element.productOptionsData, backingOptions: newOptions } as any,
                             })
                           }}
                           rows={2}
@@ -2091,7 +2104,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                             const newOptions = [...(element.productOptionsData?.backingOptions || [])]
                             newOptions[index] = { ...newOptions[index], image: e.target.value }
                             updateElement(element.id, {
-                              productOptionsData: { ...element.productOptionsData, backingOptions: newOptions },
+                              productOptionsData: { ...element.productOptionsData, backingOptions: newOptions } as any,
                             })
                           }}
                           className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -2116,7 +2129,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                   value={element.coverageOptionsData?.mainHeading || ""}
                   onChange={(e) =>
                     updateElement(element.id, {
-                      coverageOptionsData: { ...element.coverageOptionsData, mainHeading: e.target.value },
+                      coverageOptionsData: { ...element.coverageOptionsData, mainHeading: e.target.value } as any,
                     })
                   }
                   className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -2137,7 +2150,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                             const newOptions = [...(element.coverageOptionsData?.options || [])]
                             newOptions[index] = { ...newOptions[index], percentage: e.target.value }
                             updateElement(element.id, {
-                              coverageOptionsData: { ...element.coverageOptionsData, options: newOptions },
+                              coverageOptionsData: { ...element.coverageOptionsData, options: newOptions } as any,
                             })
                           }}
                           className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -2151,7 +2164,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                             const newOptions = [...(element.coverageOptionsData?.options || [])]
                             newOptions[index] = { ...newOptions[index], description: e.target.value }
                             updateElement(element.id, {
-                              coverageOptionsData: { ...element.coverageOptionsData, options: newOptions },
+                              coverageOptionsData: { ...element.coverageOptionsData, options: newOptions } as any,
                             })
                           }}
                           rows={2}
@@ -2167,7 +2180,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                             const newOptions = [...(element.coverageOptionsData?.options || [])]
                             newOptions[index] = { ...newOptions[index], image: e.target.value }
                             updateElement(element.id, {
-                              coverageOptionsData: { ...element.coverageOptionsData, options: newOptions },
+                              coverageOptionsData: { ...element.coverageOptionsData, options: newOptions } as any,
                             })
                           }}
                           className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -2192,7 +2205,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                   value={element.faqSectionData?.heading || ""}
                   onChange={(e) =>
                     updateElement(element.id, {
-                      faqSectionData: { ...element.faqSectionData, heading: e.target.value },
+                      faqSectionData: { ...element.faqSectionData, heading: e.target.value } as any,
                     })
                   }
                   className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -2205,7 +2218,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                   value={element.faqSectionData?.description || ""}
                   onChange={(e) =>
                     updateElement(element.id, {
-                      faqSectionData: { ...element.faqSectionData, description: e.target.value },
+                      faqSectionData: { ...element.faqSectionData, description: e.target.value } as any,
                     })
                   }
                   rows={2}
@@ -2227,7 +2240,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                             const newFaqs = [...(element.faqSectionData?.faqs || [])]
                             newFaqs[index] = { ...newFaqs[index], question: e.target.value }
                             updateElement(element.id, {
-                              faqSectionData: { ...element.faqSectionData, faqs: newFaqs },
+                              faqSectionData: { ...element.faqSectionData, faqs: newFaqs } as any,
                             })
                           }}
                           className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -2241,7 +2254,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                             const newFaqs = [...(element.faqSectionData?.faqs || [])]
                             newFaqs[index] = { ...newFaqs[index], answer: e.target.value }
                             updateElement(element.id, {
-                              faqSectionData: { ...element.faqSectionData, faqs: newFaqs },
+                              faqSectionData: { ...element.faqSectionData, faqs: newFaqs } as any,
                             })
                           }}
                           rows={2}
@@ -2255,10 +2268,15 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                   onClick={() => {
                     const newFaqs = [
                       ...(element.faqSectionData?.faqs || []),
-                      { question: "New Question", answer: "New Answer" },
+                      { 
+                        id: `faq-${Date.now()}`, 
+                        icon: "❓", 
+                        question: "New Question", 
+                        answer: "New Answer" 
+                      },
                     ]
                     updateElement(element.id, {
-                      faqSectionData: { ...element.faqSectionData, faqs: newFaqs },
+                      faqSectionData: { ...element.faqSectionData, faqs: newFaqs } as any,
                     })
                   }}
                   className="mt-2 w-full flex items-center justify-center px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm"
@@ -2281,7 +2299,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                   value={element.quotationSectionData?.mainHeading || ""}
                   onChange={(e) =>
                     updateElement(element.id, {
-                      quotationSectionData: { ...element.quotationSectionData, mainHeading: e.target.value },
+                      quotationSectionData: { ...element.quotationSectionData, mainHeading: e.target.value } as any,
                     })
                   }
                   className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -2295,7 +2313,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                   value={element.quotationSectionData?.subHeading || ""}
                   onChange={(e) =>
                     updateElement(element.id, {
-                      quotationSectionData: { ...element.quotationSectionData, subHeading: e.target.value },
+                      quotationSectionData: { ...element.quotationSectionData, subHeading: e.target.value } as any,
                     })
                   }
                   className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -2316,7 +2334,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                             const newProducts = [...(element.quotationSectionData?.products || [])]
                             newProducts[index] = { ...newProducts[index], title: e.target.value }
                             updateElement(element.id, {
-                              quotationSectionData: { ...element.quotationSectionData, products: newProducts },
+                              quotationSectionData: { ...element.quotationSectionData, products: newProducts } as any,
                             })
                           }}
                           className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -2331,7 +2349,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                             const newProducts = [...(element.quotationSectionData?.products || [])]
                             newProducts[index] = { ...newProducts[index], tagText: e.target.value }
                             updateElement(element.id, {
-                              quotationSectionData: { ...element.quotationSectionData, products: newProducts },
+                              quotationSectionData: { ...element.quotationSectionData, products: newProducts } as any,
                             })
                           }}
                           className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -2346,12 +2364,12 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                             const newProducts = [...(element.quotationSectionData?.products || [])]
                             newProducts[index] = { ...newProducts[index], buttonText: e.target.value }
                             updateElement(element.id, {
-                              quotationSectionData: { ...element.quotationSectionData, products: newProducts },
+                              quotationSectionData: { ...element.quotationSectionData, products: newProducts } as any,
                             })
                           }}
                           className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
                         />
-                      </div>
+                      </div>  
                       <div>
                         <label className="block text-xs text-gray-600">Image URL</label>
                         <input
@@ -2361,7 +2379,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                             const newProducts = [...(element.quotationSectionData?.products || [])]
                             newProducts[index] = { ...newProducts[index], image: e.target.value }
                             updateElement(element.id, {
-                              quotationSectionData: { ...element.quotationSectionData, products: newProducts },
+                              quotationSectionData: { ...element.quotationSectionData, products: newProducts } as any,
                             })
                           }}
                           className="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -2378,7 +2396,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                               features: e.target.value.split("\n").filter((line) => line.trim() !== ""),
                             }
                             updateElement(element.id, {
-                              quotationSectionData: { ...element.quotationSectionData, products: newProducts },
+                              quotationSectionData: { ...element.quotationSectionData, products: newProducts } as any,
                             })
                           }}
                           rows={3}
@@ -2401,7 +2419,7 @@ export const PageBuilder: React.FC<PageBuilderProps> = ({ onClose, onSave, onPub
                       },
                     ]
                     updateElement(element.id, {
-                      quotationSectionData: { ...element.quotationSectionData, products: newProducts },
+                      quotationSectionData: { ...element.quotationSectionData, products: newProducts } as any,
                     })
                   }}
                   className="mt-2 w-full flex items-center justify-center px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm"

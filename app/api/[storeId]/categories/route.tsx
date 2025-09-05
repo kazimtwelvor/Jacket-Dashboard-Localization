@@ -89,7 +89,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
 
     return NextResponse.json(category, { headers: corsHeaders })
   } catch (err) {
-    console.log(`[CATEGORIES_POST] ${err}`)
     return new NextResponse(`Internal error`, { status: 500 })
   }
 }
@@ -142,7 +141,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       return NextResponse.json(categories, { headers: corsHeaders })
     }
   } catch (err) {
-    console.log(`[CATEGORIES_GET] ${err}`)
     return new NextResponse(`Internal error`, { status: 500 })
   }
 }

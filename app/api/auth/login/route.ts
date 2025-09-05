@@ -21,11 +21,9 @@ const corsHeaders = {
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    console.log("Login request received:", { ...body, password: "[REDACTED]" })
 
     const validationResult = loginSchema.safeParse(body)
     if (!validationResult.success) {
-      console.log("Login validation failed:", validationResult.error.errors)
       return new NextResponse(
         JSON.stringify({ error: validationResult.error.errors[0].message }),
         {
@@ -43,7 +41,6 @@ export async function POST(req: Request) {
     })
 
     if (!storeExists) {
-      console.log(`Store not found: ${storeId}`)
       return new NextResponse(JSON.stringify({ error: "Store not found" }), {
         status: 404,
         headers: corsHeaders,
@@ -57,7 +54,6 @@ export async function POST(req: Request) {
 
     if (recaptchaSettings) {
       if (!recaptchaToken) {
-        console.log("No reCAPTCHA token provided")
         return new NextResponse(
           JSON.stringify({ error: "reCAPTCHA verification required" }),
           { status: 400, headers: corsHeaders }
@@ -77,7 +73,6 @@ export async function POST(req: Request) {
       }
 
       if (!isVerified) {
-        console.log("reCAPTCHA verification failed")
         return new NextResponse(
           JSON.stringify({ error: "reCAPTCHA verification failed" }),
           { status: 400, headers: corsHeaders }
@@ -111,7 +106,6 @@ export async function POST(req: Request) {
 
     const jwtSecret = process.env.JWT_SECRET
     if (!jwtSecret) {
-      console.error("JWT_SECRET environment variable is not defined")
       throw new Error("JWT_SECRET is not defined")
     }
 
@@ -133,7 +127,6 @@ export async function POST(req: Request) {
         data: { lastLogin: new Date() },
       })
     } catch (updateError) {
-      console.error("Error updating last login:", updateError)
     }
 
     return new NextResponse(
@@ -148,7 +141,6 @@ export async function POST(req: Request) {
       }
     )
   } catch (error) {
-    console.error("[LOGIN_ERROR]", error)
     return new NextResponse(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
       headers: corsHeaders,

@@ -10,7 +10,6 @@ export async function POST(
     const body = await req.json()
     const { ids } = body
     
-    console.log('[PRODUCTS_BY_IDS_POST] Request:', { storeId, ids })
 
     if (!storeId) {
       return new NextResponse("Store ID is required", { status: 400 })
@@ -38,7 +37,6 @@ export async function POST(
       },
     })
 
-    // Format the response
     const formattedProducts = products.map(product => ({
       id: product.id,
       name: product.name,
@@ -53,11 +51,9 @@ export async function POST(
         ) : [],
     }))
 
-    console.log('[PRODUCTS_BY_IDS_POST] Response:', formattedProducts.length, 'products found')
     
     return NextResponse.json(formattedProducts)
   } catch (error) {
-    console.error("[PRODUCTS_BY_IDS]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

@@ -59,7 +59,6 @@ export async function GET(req: Request) {
       category,
     })
   } catch (error) {
-    console.error("Error in test-category route:", error)
     return NextResponse.json(
       {
         success: false,

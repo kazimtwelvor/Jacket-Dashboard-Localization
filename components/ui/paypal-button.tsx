@@ -33,7 +33,6 @@ export const PayPalButton: React.FC<PayPalButtonProps> = ({ items, customerId, o
           setError("PayPal is not configured for this store")
         }
       } catch (error) {
-        console.error("Failed to fetch PayPal config:", error)
         setError("Failed to load PayPal configuration")
       } finally {
         setLoading(false)
@@ -51,7 +50,6 @@ export const PayPalButton: React.FC<PayPalButtonProps> = ({ items, customerId, o
       })
       return response.data.orderId
     } catch (error) {
-      console.error("Error creating PayPal order:", error)
       toast.error("Failed to create PayPal order")
       if (onError) onError(error)
       throw error
@@ -72,7 +70,6 @@ export const PayPalButton: React.FC<PayPalButtonProps> = ({ items, customerId, o
         throw new Error("Failed to capture order")
       }
     } catch (error) {
-      console.error("Error capturing PayPal order:", error)
       toast.error("Payment failed. Please try again.")
       if (onError) onError(error)
       return false
@@ -106,7 +103,6 @@ export const PayPalButton: React.FC<PayPalButtonProps> = ({ items, customerId, o
           createOrder={createOrder}
           onApprove={onApprove}
           onError={(err) => {
-            console.error("PayPal error:", err)
             toast.error("PayPal error occurred")
             if (onError) onError(err)
           }}

@@ -59,7 +59,6 @@ export async function POST(req: Request) {
       })
     )
   } catch (error) {
-    console.error("[RESET_PASSWORD_ERROR]", error)
     return setCorsHeaders(
       NextResponse.json({ error: "Internal server error" }, { status: 500 })
     )

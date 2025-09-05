@@ -21,7 +21,6 @@ export async function checkRole(requiredRole: string): Promise<boolean> {
 
     return userRole === requiredRole
   } catch (error) {
-    console.error("Error checking role:", error)
     return false
   }
 }
@@ -38,7 +37,6 @@ export async function getUserRole(): Promise<string | null> {
     const user = await clerkClient.users.getUser(userId)
     return (user.publicMetadata.role as string) || null
   } catch (error) {
-    console.error("Error getting user role:", error)
     return null
   }
 }

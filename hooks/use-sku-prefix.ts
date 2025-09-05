@@ -16,7 +16,6 @@ export const useSkuPrefix = (storeId: string) => {
         setSkuPrefix(response.data.skuPrefix || "SKU")
         setError(null)
       } catch (err) {
-        console.error("Error fetching SKU prefix:", err)
         setError("Failed to fetch SKU prefix")
       } finally {
         setIsLoading(false)

@@ -47,7 +47,7 @@ export const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({
   storeUrl,
   onUpload,
   isUploading,
-  multiSelect = true, // Enable multi-select by default
+  multiSelect = true, 
   onViewDetails,
 }) => {
   const [images, setImages] = useState<GalleryImage[]>([])
@@ -69,14 +69,12 @@ export const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({
     }
   }, [isOpen, storeUrl])
 
-  // Reset selected images when modal is opened/closed
   useEffect(() => {
     if (!isOpen) {
       setSelectedImages([])
     }
   }, [isOpen])
 
-  // Reset form fields when a new image is selected
   useEffect(() => {
     if (selectedImage) {
       const selectedImageObj = images.find((img) => {
@@ -107,13 +105,10 @@ export const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({
 
       const data = await response.json()
 
-      // Process the images with real data
       const processedImages = (data.images || []).map((img: any) => {
-        // Extract file extension to determine file type
         const fileExtension = img.name.split(".").pop()?.toLowerCase() || ""
         let fileType = "application/octet-stream"
 
-        // Map common extensions to MIME types
         if (["jpg", "jpeg"].includes(fileExtension)) fileType = "image/jpeg"
         else if (fileExtension === "png") fileType = "image/png"
         else if (fileExtension === "gif") fileType = "image/gif"
@@ -132,7 +127,6 @@ export const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({
 
       setImages(processedImages)
     } catch (error) {
-      console.error("Error fetching images:", error)
     } finally {
       setIsLoading(false)
     }
@@ -167,7 +161,6 @@ export const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({
       onSelect(fullUrl)
       onClose()
     } else {
-      // Multi-select mode - toggle selection
       setSelectedImages((prev) => {
         if (prev.includes(imageUrl)) {
           return prev.filter((url) => url !== imageUrl)
@@ -179,15 +172,14 @@ export const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({
   }
 
   const handleViewDetails = (imageUrl: string, e: React.MouseEvent) => {
-    e.stopPropagation() // Prevent triggering other click handlers
+    e.stopPropagation() 
 
     if (onViewDetails) {
       const baseUrl = storeUrl?.endsWith("/") ? storeUrl.slice(0, -1) : storeUrl
       const fullUrl = `${baseUrl}${imageUrl}`
       onViewDetails(fullUrl)
-      onClose() // Close the gallery modal
+      onClose() 
     } else {
-      // Fallback to old behavior
       const baseUrl = storeUrl?.endsWith("/") ? storeUrl.slice(0, -1) : storeUrl
       const fullUrl = `${baseUrl}${imageUrl}`
       setSelectedImage(fullUrl)
@@ -197,10 +189,8 @@ export const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({
 
   const handleDeleteImage = async (imageUrl: string) => {
     try {
-      // Mock API call
       await new Promise((resolve) => setTimeout(resolve, 500))
 
-      // Update local state
       const updatedImages = images.filter((img) => {
         const baseUrl = storeUrl?.endsWith("/") ? storeUrl.slice(0, -1) : storeUrl
         const fullUrl = `${baseUrl}${img.url}`
@@ -211,22 +201,17 @@ export const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({
       setIsDetailSidebarOpen(false)
       toast.success("Image deleted successfully")
     } catch (error) {
-      console.error("Error deleting image:", error)
       toast.error("Failed to delete image")
     }
   }
 
-  // Update the handleConfirmSelection function to ensure all selected images are properly passed
   const handleConfirmSelection = () => {
     if (selectedImages.length > 0 && storeUrl) {
       const baseUrl = storeUrl.endsWith("/") ? storeUrl.slice(0, -1) : storeUrl
-      // Create an array of full URLs for all selected images
       const fullUrls = selectedImages.map((url) => `${baseUrl}${url}`)
 
-      console.log("Selected images:", fullUrls) // Debug log
       toast.success(`Adding ${fullUrls.length} images to gallery`)
 
-      // Pass the entire array of URLs to onSelect
       onSelect(fullUrls)
       onClose()
     }

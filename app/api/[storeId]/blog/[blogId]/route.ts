@@ -16,7 +16,6 @@ export async function GET(req: Request, { params }: { params: { blogId: string }
 
     return NextResponse.json(blog)
   } catch (error) {
-    console.log("[BLOG_GET]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }
@@ -90,29 +89,13 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       return blogTitle && blogTitle.toLowerCase().trim() === trimmedTitle.toLowerCase()
     })
 
-    console.log("[BLOG_PATCH] Title check:", { 
-      title: trimmedTitle, 
-      storeId: params.storeId, 
-      blogId: params.blogId,
-      existingBlogByTitle: existingBlogByTitle ? { id: existingBlogByTitle.id } : null 
-    })
+  
 
     if (existingBlogByTitle) {
-      console.log("[BLOG_PATCH] Title already exists, returning error")
       return new NextResponse("Title already exists", { status: 400 })
     }
 
-    console.log("[BLOG_PATCH] Raw body data for problematic steps:", {
-      step8: body.guideContent?.steps?.[7],
-      step9: body.guideContent?.steps?.[8],
-      step10: body.guideContent?.steps?.[9],
-      step11: body.guideContent?.steps?.[10],
-      step12: body.guideContent?.steps?.[11],
-      step13: body.guideContent?.steps?.[12],
-      step16: body.guideContent?.steps?.[15],
-      step17: body.guideContent?.steps?.[16],
-      step18: body.guideContent?.steps?.[17],
-    })
+
 
     const processedSteps =
       body.guideContent?.steps
@@ -140,17 +123,12 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
               return ""
             })
 
-            // Extra logging for problematic steps
             if (problematicSteps.includes(index)) {
-              console.log(`[BLOG_PATCH] Processed Step ${index + 1} images:`, JSON.stringify(processedStep.images))
             }
           } else if (problematicSteps.includes(index)) {
-            // Initialize empty images array for problematic steps if it doesn't exist
             processedStep.images = []
-            console.log(`[BLOG_PATCH] Initialized empty images array for Step ${index + 1}`)
           }
 
-          // Add step-specific fields based on step type/index
           switch (index) {
             case 7: // Step 8 - Content Distribution
               processedStep.cardTitles = step.cardTitles || ["Social Media", "Email Marketing", "Content Syndication"]
@@ -161,7 +139,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
               ]
               break
             case 8: // Step 9 - Video Marketing
-              // Ensure we have the image field
               if (!processedStep.image && processedStep.images && processedStep.images[0]) {
                 processedStep.image = processedStep.images[0]
               }
@@ -179,7 +156,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
               ]
               break
             case 10: // Step 11 - Content Personalization
-              // Ensure we have the image field
               if (!processedStep.image && processedStep.images && processedStep.images[0]) {
                 processedStep.image = processedStep.images[0]
               }
@@ -237,7 +213,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
               processedStep.buttonText = step.buttonText || "View All Case Studies"
               break
             default:
-              // For other steps, preserve any custom fields they might have
               if (step.cardTitles) {
                 processedStep.cardTitles = step.cardTitles
               }
@@ -247,7 +222,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
               if (step.imageLabels) {
                 processedStep.imageLabels = step.imageLabels
               }
-              // For other steps, preserve any custom fields they might have
               Object.keys(step).forEach((key) => {
                 if (!processedStep[key] && key !== "id") {
                   processedStep[key] = step[key]
@@ -258,7 +232,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
           return processedStep
         }) || []
 
-    // Structure all form data into a single content JSON object with section IDs
     const contentJson = {
       metadata: {
         id: "metadata-1",
@@ -291,7 +264,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
         id: "section-3",
         title: body.guideContent?.title || "Complete Guide",
         steps: processedSteps,
-        // Only include keyTakeaways if it's active
         ...(body.guideContent?.keyTakeaways?.isActive !== false
           ? {
               keyTakeaways: {
@@ -312,18 +284,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       },
     }
 
-    // Add this before the blog update call
-    console.log("[BLOG_PATCH] Problematic steps before save:", {
-      step8: processedSteps[7]?.images,
-      step9: processedSteps[8]?.image,
-      step10: processedSteps[9]?.images,
-      step11: processedSteps[10]?.image,
-      step12: processedSteps[11]?.images,
-      step13: processedSteps[12]?.images,
-      step16: processedSteps[15]?.images,
-      step17: processedSteps[16]?.images,
-      step18: processedSteps[17]?.images,
-    })
 
     const blog = await prismadb.blog.update({
       where: {
@@ -336,7 +296,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
 
     return NextResponse.json(blog)
   } catch (error) {
-    console.log("[BLOG_PATCH]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }
@@ -372,7 +331,6 @@ export async function DELETE(req: Request, { params }: { params: { storeId: stri
 
     return NextResponse.json(blog)
   } catch (error) {
-    console.log("[BLOG_DELETE]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

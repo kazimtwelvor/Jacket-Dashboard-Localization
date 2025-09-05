@@ -41,7 +41,6 @@ export function RoleSelector({ memberId, storeId, currentRole, disabled = false 
         setValue(role)
         window.location.reload()
       } else {
-        console.error("Failed to update role")
       }
     } catch (error) {
       console.error(error)

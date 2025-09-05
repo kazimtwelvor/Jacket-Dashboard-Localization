@@ -40,7 +40,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
 
     return NextResponse.json({ role: storeUser.role })
   } catch (error) {
-    console.error("[USER_ROLE_GET]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

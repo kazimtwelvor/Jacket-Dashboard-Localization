@@ -47,7 +47,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       return NextResponse.json(imageCounts)
     }
   } catch (error) {
-    console.log("[IMAGE_USAGE_GET]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

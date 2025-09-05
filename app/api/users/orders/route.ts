@@ -109,7 +109,6 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ orders: serializedOrders }, { headers: corsHeaders });
   } catch (error) {
-    console.error("[USER_ORDERS_GET]", error);
     return new NextResponse("Internal error", {
       status: 500,
       headers: corsHeaders,

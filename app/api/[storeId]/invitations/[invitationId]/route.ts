@@ -55,7 +55,6 @@ export async function DELETE(req: Request, { params }: { params: { storeId: stri
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.log("[INVITATION_DELETE]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

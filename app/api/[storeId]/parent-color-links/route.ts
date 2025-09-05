@@ -42,7 +42,6 @@ export async function GET(
         try {
           colorLinks = JSON.parse(product.colorLinks)
         } catch (e) {
-          console.error("Error parsing colorLinks:", e)
           colorLinks = {}
         }
       } else {
@@ -52,7 +51,6 @@ export async function GET(
 
     return NextResponse.json({ colorLinks })
   } catch (error) {
-    console.log("[PARENT_COLOR_LINKS_GET]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

@@ -3,7 +3,6 @@ import { auth } from "@clerk/nextjs/server"
 
 import prismadb from "@/lib/prismadb"
 
-// PATCH - Update multiple products
 export async function PATCH(req: Request, { params }: { params: { storeId: string } }) {
   try {
     const { userId } = await auth()
@@ -39,12 +38,9 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       return new NextResponse("Unauthorized", { status: 403 })
     }
 
-    console.log(`[PRODUCTS_BULK_PATCH] Updating ${ids.length} products with data:`, data)
 
-    // Process data for update
     const updateData: any = {}
 
-    // Handle boolean fields
     if (data.isFeatured !== undefined) {
       updateData.isFeatured = data.isFeatured === true || data.isFeatured === "true"
     }
@@ -61,7 +57,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       updateData.isDiscounted = data.isDiscounted === true || data.isDiscounted === "true"
     }
 
-    // Handle string fields
     if (data.name) updateData.name = data.name
     if (data.categoryId) updateData.categoryId = data.categoryId
     if (data.colorDetails) updateData.colorDetails = data.colorDetails
@@ -73,12 +68,10 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
     if (data.style) updateData.style = data.style
     if (data.tags) updateData.tags = data.tags
 
-    // Handle numeric fields
     if (data.price) updateData.price = Number.parseFloat(data.price)
     if (data.salePrice) updateData.salePrice = Number.parseFloat(data.salePrice)
     if (data.originalPrice) updateData.originalPrice = Number.parseFloat(data.originalPrice)
 
-    // Handle object fields
     if (data.specifications) {
       updateData.specifications =
         typeof data.specifications === "object" ? data.specifications : JSON.parse(data.specifications || "{}")
@@ -105,11 +98,9 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       data: updateData,
     })
 
-    console.log(`[PRODUCTS_BULK_PATCH] Updated ${updatedProducts.count} products`)
 
     return NextResponse.json({ success: true, count: updatedProducts.count })
   } catch (error) {
-    console.log("[PRODUCTS_BULK_PATCH] Error:", error instanceof Error ? error.message : "Unknown error")
     return new NextResponse("Internal error", { status: 500 })
   }
 }
@@ -146,7 +137,6 @@ export async function DELETE(req: Request, { params }: { params: { storeId: stri
       return new NextResponse("Unauthorized", { status: 403 })
     }
 
-    // Delete product images first to avoid orphaned records
     await prismadb.image.deleteMany({
       where: {
         productId: {
@@ -155,7 +145,6 @@ export async function DELETE(req: Request, { params }: { params: { storeId: stri
       },
     })
 
-    // Delete the products
     const deletedProducts = await prismadb.product.deleteMany({
       where: {
         id: {
@@ -167,7 +156,6 @@ export async function DELETE(req: Request, { params }: { params: { storeId: stri
 
     return NextResponse.json(deletedProducts)
   } catch (error) {
-    console.log("[PRODUCTS_BULK_DELETE] Error:", error instanceof Error ? error.message : "Unknown error")
     return new NextResponse("Internal error", { status: 500 })
   }
 }

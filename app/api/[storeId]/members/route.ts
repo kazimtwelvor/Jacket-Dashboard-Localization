@@ -1,64 +1,8 @@
-// import { NextResponse } from "next/server"
-// import { auth } from "@clerk/nextjs/server"
-
-// import { db } from "@/lib/db"
-
-// export async function GET(req: Request, { params }: { params: { storeId: string } }) {
-//   try {
-//     const { userId } = await auth()
-
-//     if (!userId) {
-//       return new NextResponse("Unauthenticated", { status: 401 })
-//     }
-
-//     // Check if user has access to this store
-//     const storeUser = await db.storeUser.findFirst({
-//       where: {
-//         userId,
-//         storeId: params.storeId,
-//       },
-//     })
-
-//     if (!storeUser) {
-//       return new NextResponse("Unauthorized", { status: 403 })
-//     }
-
-//     // Only admin and owner can view members
-//     if (storeUser.role !== "ADMIN" && storeUser.role !== "OWNER") {
-//       return new NextResponse("Unauthorized", { status: 403 })
-//     }
-
-//     const members = await db.storeUser.findMany({
-//       where: {
-//         storeId: params.storeId,
-//       },
-//       include: {
-//         user: {
-//           select: {
-//             id: true,
-//             name: true,
-//             email: true,
-//             image: true,
-//           },
-//         },
-//       },
-//       orderBy: {
-//         createdAt: "desc",
-//       },
-//     })
-
-//     return NextResponse.json(members)
-//   } catch (error) {
-//     console.log("[MEMBERS_GET]", error)
-//     return new NextResponse("Internal error", { status: 500 })
-//   }
-// }
 
 import prismadb from "@/lib/prismadb"
 import { auth } from "@clerk/nextjs/server"
 import { NextResponse } from "next/server"
 
-// GET all members of a store
 export async function GET(req: Request, { params }: { params: { storeId: string } }) {
   try {
     const { userId } = await auth()
@@ -72,7 +16,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       return new NextResponse("Store ID is required", { status: 400 })
     }
 
-    // Check if the user has access to this store
     const store = await prismadb.store.findFirst({
       where: {
         id: storeId,
@@ -95,7 +38,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       return new NextResponse("Unauthorized", { status: 403 })
     }
 
-    // Get all members for this store
     const members = await prismadb.member.findMany({
       where: {
         storeId,
@@ -114,12 +56,10 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
 
     return NextResponse.json(members)
   } catch (error) {
-    console.log("[MEMBERS_GET]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }
 
-// POST to add a new member to a store
 export async function POST(req: Request, { params }: { params: { storeId: string } }) {
   try {
     const { userId } = await auth()
@@ -143,7 +83,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       return new NextResponse("Role is required", { status: 400 })
     }
 
-    // Check if the user has permission to add members
     const store = await prismadb.store.findFirst({
       where: {
         id: storeId,
@@ -167,7 +106,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       return new NextResponse("Unauthorized", { status: 403 })
     }
 
-    // Find the user by email
     const user = await prismadb.user.findUnique({
       where: {
         email,
@@ -178,7 +116,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       return new NextResponse("User not found", { status: 404 })
     }
 
-    // Check if the user is already a member
     const existingMember = await prismadb.member.findFirst({
       where: {
         storeId,
@@ -190,7 +127,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       return new NextResponse("User is already a member of this store", { status: 400 })
     }
 
-    // Add the user as a member
     const member = await prismadb.member.create({
       data: {
         storeId,
@@ -201,7 +137,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
 
     return NextResponse.json(member)
   } catch (error) {
-    console.log("[MEMBERS_POST]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

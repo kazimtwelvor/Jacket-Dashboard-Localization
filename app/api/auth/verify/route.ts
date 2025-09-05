@@ -43,7 +43,6 @@ export async function POST(req: Request) {
       message: "Email verified successfully",
     })
   } catch (error) {
-    console.error("[VERIFY_ERROR]", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

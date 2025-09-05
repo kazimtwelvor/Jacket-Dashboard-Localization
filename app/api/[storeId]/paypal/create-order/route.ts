@@ -94,7 +94,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
     const response = await paypalClient.execute(request)
 
     if (response.statusCode !== 201) {
-      console.error("PayPal order creation failed:", response)
       return new NextResponse("Failed to create PayPal order", { status: 500 })
     }
 
@@ -127,7 +126,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       { headers: corsHeaders },
     )
   } catch (error) {
-    console.error("[PAYPAL_CREATE_ORDER]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

@@ -40,7 +40,6 @@ export async function GET(req: NextRequest, { params }: { params: { storeId: str
       errorLogUrl: `/api/${storeId}/products/import/errors?timestamp=${Date.now()}`,
     })
   } catch (error) {
-    console.error("[PRODUCTS_IMPORT_STATUS]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

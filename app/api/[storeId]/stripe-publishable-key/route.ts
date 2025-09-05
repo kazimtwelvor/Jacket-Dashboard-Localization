@@ -34,7 +34,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
 
     return NextResponse.json({ publishableKey: store.stripePublishableKey }, { headers })
   } catch (error) {
-    console.log("[STRIPE_PUBLISHABLE_KEY_GET]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

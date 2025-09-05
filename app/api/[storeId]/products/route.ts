@@ -23,19 +23,15 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
     const baseWhereClause = {
       storeId: storeId,
       isDeleted: false,
-      // For admin requests, show all products; for public, only published
       ...(isAdmin ? {} : { isPublished: true, isArchived: false }),
     }
 
-    // Get filter parameters
     const colors = searchParams.get("colors")
     const materials = searchParams.get("materials")
     const styles = searchParams.get("styles")
     const genders = searchParams.get("genders")
     
-    console.log("Requested filters:", { colors, materials, styles, genders })
     
-    // Get all products with full data
     const allProducts = await prismadb.product.findMany({
       where: baseWhereClause,
       include: {
@@ -61,19 +57,14 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       }
     })
     
-    console.log(`Retrieved ${allProducts.length} published products before additional filtering`)
     
-    // Filter products manually based on the query parameters
     let filteredProducts = [...allProducts]
     
-    // Filter by colors if specified
     if (colors) {
       const colorsList = colors.toLowerCase().split(',')
       filteredProducts = filteredProducts.filter(product => {
-        // Skip products without colorDetails
         if (!product.colorDetails) return false
         
-        // Parse colorDetails if it's a string
         let colorData = product.colorDetails
         if (typeof colorData === 'string') {
           try {
@@ -83,7 +74,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
           }
         }
         
-        // Check if any color matches
         if (Array.isArray(colorData)) {
           return colorData.some(color => 
             color && color.name && colorsList.includes(color.name.toLowerCase())
@@ -93,10 +83,8 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
         return false
       })
       
-      console.log(`After color filtering: ${filteredProducts.length} products`)
     }
     
-    // Filter by materials if specified
     if (materials) {
       const materialsList = materials.toLowerCase().split(',')
       filteredProducts = filteredProducts.filter(product => {
@@ -117,10 +105,8 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
         return materialsList.includes(productMaterial.toLowerCase())
       })
       
-      console.log(`After material filtering: ${filteredProducts.length} products`)
     }
     
-    // Filter by styles if specified
     if (styles) {
       const stylesList = styles.toLowerCase().split(',')
       filteredProducts = filteredProducts.filter(product => {
@@ -141,10 +127,8 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
         return stylesList.includes(productStyle.toLowerCase())
       })
       
-      console.log(`After style filtering: ${filteredProducts.length} products`)
     }
     
-    // Filter by genders if specified
     if (genders) {
       const gendersList = genders.toLowerCase().split(',')
       filteredProducts = filteredProducts.filter(product => {
@@ -165,14 +149,11 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
         return gendersList.includes(productGender.toLowerCase())
       })
       
-      console.log(`After gender filtering: ${filteredProducts.length} products`)
     }
     
-    // Apply pagination
     const totalProducts = filteredProducts.length
     const paginatedProducts = filteredProducts.slice(skip, skip + limit)
     
-    // Format the response with full product data
     const serializedProducts = paginatedProducts.map(product => ({
       ...product,
       price: product.price.toString(),
@@ -197,7 +178,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       })),
     }))
 
-    // Calculate pagination info
     const totalPages = Math.ceil(totalProducts / limit)
     const hasNextPage = page < totalPages
     const hasPreviousPage = page > 1
@@ -214,7 +194,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       }
     })
   } catch (err) {
-    console.error(`[PRODUCTS_GET] Error:`, err)
     return new NextResponse(`Internal error: ${err.message}`, { status: 500, headers: corsHeaders })
   }
 }

@@ -103,7 +103,6 @@ export async function generateReviewsForNewProduct(
         }
       }
       const errorData = response ? await response.json() : {}
-      console.error("Gemini API error:", errorData)
       throw new Error(`API call failed: ${response?.statusText || 'Network error'}`)
     }
 
@@ -143,7 +142,6 @@ export async function generateReviewsForNewProduct(
       reviews: generatedReviews,
     }
   } catch (error) {
-    console.error("Error generating reviews for new product:", error)
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unknown error occurred",

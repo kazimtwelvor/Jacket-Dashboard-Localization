@@ -35,7 +35,6 @@ export const ColorVariationsSection: React.FC<ColorVariationsSectionProps> = ({ 
       }
 
       if (needsUpdate) {
-        console.log("Syncing color variations from color specifications:", colorSpecifications)
         form.setValue("categories.variationColors", [...colorSpecifications], {
           shouldValidate: true,
           shouldDirty: true,

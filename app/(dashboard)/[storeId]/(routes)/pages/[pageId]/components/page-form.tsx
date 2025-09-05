@@ -59,14 +59,11 @@ export const PageForm: React.FC<PageFormProps> = ({ initialData, categories }) =
 
             toast.success("Template loaded successfully!")
           } else {
-            console.error("Template elements are empty or not an array")
             toast.error("Template elements could not be loaded properly")
           }
         } else {
-          console.error("No template elements found in localStorage")
         }
       } catch (error) {
-        console.error("Error loading template elements:", error)
         toast.error("Error loading template")
       }
     }

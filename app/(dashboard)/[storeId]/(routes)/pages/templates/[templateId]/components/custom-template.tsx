@@ -644,7 +644,6 @@ export const CustomTemplate: React.FC<CustomTemplateProps> = ({ isEditing = fals
       setIsLoading(true)
       await exportToPageBuilder()
     } catch (error) {
-      console.error("Error using template:", error)
     } finally {
       setIsLoading(false)
     }
@@ -925,7 +924,6 @@ export const CustomTemplate: React.FC<CustomTemplateProps> = ({ isEditing = fals
 
       router.push(`/${params?.storeId}/pages/new?template=custom`)
     } catch (error) {
-      console.error("Error exporting template:", error)
       toast.error("Error exporting template. Please try again.")
     } finally {
       setIsLoading(false)

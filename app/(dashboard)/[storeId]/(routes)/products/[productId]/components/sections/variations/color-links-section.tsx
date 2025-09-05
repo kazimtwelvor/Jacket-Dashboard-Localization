@@ -49,12 +49,10 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
 
     if (initialData) {
       if (currentValue === undefined && initialData.isParentProduct !== undefined) {
-        console.log("Setting isParentProduct from initialData:", initialData.isParentProduct)
         form.setValue("isParentProduct", Boolean(initialData.isParentProduct), { shouldDirty: false })
       }
 
       if (!parentProductIdValue && initialData.parentProductId) {
-        console.log("Setting parentProductId from initialData:", initialData.parentProductId)
         form.setValue("parentProductId", initialData.parentProductId, { shouldDirty: false })
       }
     }
@@ -62,7 +60,6 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
     if (parentProductIdValue && !selectedParentProduct) {
       const foundParent = products.find(p => p.id === parentProductIdValue)
       if (foundParent) {
-        console.log("Found parent product:", foundParent)
         setSelectedParentProduct(foundParent)
         fetchParentColorLinks(parentProductIdValue)
       }
@@ -109,7 +106,6 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
         const data = await response.json()
         setParentProducts(data)
       } catch (error) {
-        console.error("Error fetching parent products:", error)
       }
     }
 
@@ -152,10 +148,6 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
     displayColors.forEach(color => {
       cleanLinks[color] = links[color] || ""
     })
-    console.log("🔥 COLOR SYNC DEBUG:")
-    console.log("displayColors:", displayColors)
-    console.log("links from form:", links)
-    console.log("cleanLinks result:", cleanLinks)
     setColorLinks(cleanLinks)
   }, [form, displayColors])
 

@@ -23,8 +23,6 @@ export const SizeSelectionSection: React.FC<SizeSelectionSectionProps> = ({ size
     : []
 
   useEffect(() => {
-    console.log("Selected sizes raw value:", selectedSizes)
-    console.log("Converted to IDs for comparison:", selectedSizeIds)
   }, [selectedSizes])
 
   const handleSizeChange = (sizeId: string, checked: boolean) => {
@@ -51,10 +49,7 @@ export const SizeSelectionSection: React.FC<SizeSelectionSectionProps> = ({ size
 
       form.setValue("sizeDetails", sizeDetailsArray, { shouldValidate: false })
 
-      console.log("Updated size IDs:", updatedSizeIds)
-      console.log("Updated size details:", sizeDetailsArray)
     } catch (error) {
-      console.error("Error in handleSizeChange:", error)
     }
   }
 

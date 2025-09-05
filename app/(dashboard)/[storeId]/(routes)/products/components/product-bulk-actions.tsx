@@ -42,7 +42,6 @@ export const ProductBulkActions = ({ selectedIds, storeId, onActionComplete }: P
         throw new Error("Failed to delete products")
       }
     } catch (error) {
-      console.error("Error deleting products:", error)
       toast.error("Something went wrong")
     } finally {
       setLoading(false)
@@ -64,7 +63,6 @@ export const ProductBulkActions = ({ selectedIds, storeId, onActionComplete }: P
         throw new Error("Failed to update products")
       }
     } catch (error) {
-      console.error("Error updating products:", error)
       toast.error("Failed to update products")
     } finally {
       setLoading(false)
@@ -85,7 +83,6 @@ export const ProductBulkActions = ({ selectedIds, storeId, onActionComplete }: P
         throw new Error("Failed to duplicate products")
       }
     } catch (error) {
-      console.error("Error duplicating products:", error)
       toast.error("Failed to duplicate products")
     } finally {
       setLoading(false)

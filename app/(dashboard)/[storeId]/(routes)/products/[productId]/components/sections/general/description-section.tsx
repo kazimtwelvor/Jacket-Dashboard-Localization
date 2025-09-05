@@ -155,7 +155,6 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
         description: "The image has been added to your product description.",
       })
     } catch (error) {
-      console.error("Error adding image to description:", error)
       toast({
         title: "Error",
         description: "Could not add image to description. Please try again.",
@@ -189,7 +188,6 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
         description: `Image alignment changed to ${alignment}.`,
       })
     } catch (error) {
-      console.error("Error updating image alignment:", error)
       toast({
         title: "Error",
         description: "Could not update image alignment. Please try again.",
@@ -216,7 +214,6 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
         description: `Image size changed to ${size}%.`,
       })
     } catch (error) {
-      console.error("Error updating image size:", error)
       toast({
         title: "Error",
         description: "Could not update image size. Please try again.",
@@ -238,7 +235,6 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
         description: "The image has been removed from your product description.",
       })
     } catch (error) {
-      console.error("Error removing image:", error)
       toast({
         title: "Error",
         description: "Could not remove image. Please try again.",
@@ -267,7 +263,6 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
         description: "All images have been removed from the product description.",
       })
     } catch (error) {
-      console.error("Error removing all images:", error)
       toast({
         title: "Error",
         description: "Could not remove images. Please try again.",
@@ -315,7 +310,6 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
       form.setValue("description", combinedDescription, { shouldDirty: true, shouldTouch: true })
 
     } catch (error) {
-      console.error("Error updating description field:", error)
     }
   }
 

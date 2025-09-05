@@ -23,31 +23,18 @@ export const SeoSchemaSection = ({ form, productData }: SeoSchemaProps) => {
     const schema2 = form.getValues("schema2")
     const schema3 = form.getValues("schema3")
 
-    console.log("Checking schema data for tabs:", {
-      schema1: schema1 ? "exists" : "empty",
-      schema2: schema2 ? "exists" : "empty",
-      schema3: schema3 ? "exists" : "empty",
-    })
 
     if (schema2 && schema2.trim() !== "") {
       setShowSecondarySchema(true)
-      console.log("Enabling secondary schema tab")
     }
 
     if (schema3 && schema3.trim() !== "") {
       setShowAdditionalSchema(true)
-      console.log("Enabling additional schema tab")
     }
 
-    console.log("Schema data loaded:", {
-      schema1: schema1 ? schema1.substring(0, 50) + "..." : "none",
-      schema2: schema2 ? schema2.substring(0, 50) + "..." : "none",
-      schema3: schema3 ? schema3.substring(0, 50) + "..." : "none",
-    })
   }, [form])
 
   const handleSchemaChange = (schemaField: string, schema: string) => {
-    console.log(`Updating ${schemaField} with new schema data`)
     form.setValue(schemaField, schema, { shouldDirty: true })
 
     setTimeout(() => {
@@ -85,10 +72,8 @@ export const SeoSchemaSection = ({ form, productData }: SeoSchemaProps) => {
         if (Object.keys(combinedSchema).length > 0) {
           const schemaString = JSON.stringify(combinedSchema)
           form.setValue("schema", schemaString, { shouldDirty: true })
-          console.log("Combined schemas updated with", Object.keys(combinedSchema).length, "schemas")
         }
       } catch (error) {
-        console.error("Error combining schemas after schema change:", error)
       }
     }, 300)
   }
@@ -100,7 +85,6 @@ export const SeoSchemaSection = ({ form, productData }: SeoSchemaProps) => {
       const parsed = JSON.parse(schemaData)
       return parsed["@type"] || "Product"
     } catch (e) {
-      console.error("Error parsing schema data to get type:", e)
       return "Product"
     }
   }
@@ -126,7 +110,6 @@ export const SeoSchemaSection = ({ form, productData }: SeoSchemaProps) => {
       }
 
       form.setValue("schema2", JSON.stringify(defaultSchema, null, 2), { shouldDirty: true })
-      console.log("Created default secondary schema (FAQ)")
     }
   }
 
@@ -162,7 +145,6 @@ export const SeoSchemaSection = ({ form, productData }: SeoSchemaProps) => {
       }
 
       form.setValue("schema3", JSON.stringify(defaultSchema, null, 2), { shouldDirty: true })
-      console.log("Created default additional schema (Breadcrumb)")
     }
   }
 
@@ -170,14 +152,12 @@ export const SeoSchemaSection = ({ form, productData }: SeoSchemaProps) => {
     form.setValue("schema2", "", { shouldDirty: true })
     setShowSecondarySchema(false)
     setActiveSchemaTab("primary")
-    console.log("Removed secondary schema")
   }
 
   const removeAdditionalSchema = () => {
     form.setValue("schema3", "", { shouldDirty: true })
     setShowAdditionalSchema(false)
     setActiveSchemaTab(showSecondarySchema ? "secondary" : "primary")
-    console.log("Removed additional schema")
   }
 
   return (

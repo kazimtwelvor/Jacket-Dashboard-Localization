@@ -143,7 +143,6 @@ export const DraftClient: React.FC<DraftClientProps> = ({ data, trashedData, use
                   setPreviewModalOpen(true)
                 }
               } catch (error) {
-                console.error('Error fetching product details:', error)
               }
             }}
           />
@@ -167,7 +166,6 @@ export const DraftClient: React.FC<DraftClientProps> = ({ data, trashedData, use
                   setPreviewModalOpen(true)
                 }
               } catch (error) {
-                console.error('Error fetching product details:', error)
               }
             }}
             loading={loading} 
@@ -244,7 +242,6 @@ const ProductsView: React.FC<ProductsViewProps> = ({
       }
       setSelectedProducts([])
     } catch (error) {
-      console.error('Bulk trash error:', error)
     }
   }
 
@@ -256,7 +253,6 @@ const ProductsView: React.FC<ProductsViewProps> = ({
       }
       setSelectedProducts([])
     } catch (error) {
-      console.error('Bulk restore error:', error)
     }
   }
 
@@ -268,7 +264,6 @@ const ProductsView: React.FC<ProductsViewProps> = ({
       }
       setSelectedProducts([])
     } catch (error) {
-      console.error('Bulk delete error:', error)
     }
   }
 

@@ -95,7 +95,6 @@ export const ImportProductsForm: React.FC<ImportProductsFormProps> = ({ storeId 
 
       toast.success("Template downloaded successfully")
     } catch (error) {
-      console.error("Template download error:", error)
       toast.error("Failed to download template")
     }
   }
@@ -174,7 +173,6 @@ export const ImportProductsForm: React.FC<ImportProductsFormProps> = ({ storeId 
               toast.error(response.message || "Import failed")
             }
           } catch (parseError) {
-            console.error("Error parsing response:", parseError)
             setImportStatus("error")
             toast.error("Error processing import response")
           }
@@ -203,7 +201,6 @@ export const ImportProductsForm: React.FC<ImportProductsFormProps> = ({ storeId 
 
       xhr.send(formData)
     } catch (error) {
-      console.error("Import error:", error)
       setImportStatus("error")
       setIsUploading(false)
       toast.error("Failed to import products")

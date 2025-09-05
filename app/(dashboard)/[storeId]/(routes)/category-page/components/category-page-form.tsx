@@ -221,11 +221,6 @@ export const CategoryPageForm: React.FC<CategoryPageFormProps> = ({ initialData 
           const response = await axios.patch(updateUrl, formData);
           toast.success(status === 'PUBLISHED' ? "Category page published successfully" : "Category page updated successfully");
         } catch (updateError: any) {
-          console.error('Update error details:', {
-            status: updateError?.response?.status,
-            data: updateError?.response?.data,
-            message: updateError?.message
-          });
           throw updateError;
         }
       } else {
@@ -233,11 +228,6 @@ export const CategoryPageForm: React.FC<CategoryPageFormProps> = ({ initialData 
           const response = await axios.post(`/api/${params?.storeId}/category-pages`, formData);
           toast.success(status === 'PUBLISHED' ? "Category page published successfully" : "Category page created successfully");
         } catch (createError: any) {
-          console.error('Create error details:', {
-            status: createError?.response?.status,
-            data: createError?.response?.data,
-            message: createError?.message
-          });
           throw createError;
         }
       }

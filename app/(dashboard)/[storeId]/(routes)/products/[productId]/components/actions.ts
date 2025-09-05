@@ -107,7 +107,6 @@ async function generateUniqueSku(storeId: string, manualSku: string | null): Pro
 
     return newSku
   } catch (error) {
-    console.error("Error generating SKU:", error)
     const timestamp = Date.now().toString().slice(-8)
     return `SKU-${timestamp}`
   }
@@ -631,8 +630,6 @@ export async function createProduct(formData: FormData) {
               
             }
           } catch (reviewError) {
-            console.error("Error saving cached reviews during product update:", reviewError)
-            console.error("Review error details:", reviewError instanceof Error ? reviewError.message : String(reviewError))
           }
         } else {
         }
@@ -677,7 +674,6 @@ export async function createProduct(formData: FormData) {
           })
         }
       } catch (error) {
-        console.error("Error updating product:", error)
         throw error
       }
     } else {
@@ -768,8 +764,6 @@ export async function createProduct(formData: FormData) {
               
             }
           } catch (reviewError) {
-            console.error("Error saving cached reviews for new product:", reviewError)
-            console.error("Review error details:", reviewError instanceof Error ? reviewError.message : String(reviewError))
           }
         } else {
         }
@@ -790,12 +784,10 @@ export async function createProduct(formData: FormData) {
             })
             
           } catch (reviewError) {
-            console.error("Error moving temporary reviews:", reviewError)
             // Don't fail the entire product creation if review moving fails
           }
         }
       } catch (error) {
-        console.error("Error creating product:", error)
         throw error
       }
     }

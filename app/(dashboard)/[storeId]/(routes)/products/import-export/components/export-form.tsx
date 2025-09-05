@@ -85,7 +85,6 @@ export const ExportProductsForm: React.FC<ExportProductsFormProps> = ({ storeId,
 
       if (!response.ok) {
         const errorText = await response.text()
-        console.error("Export API error:", errorText)
         throw new Error(errorText || "Failed to start export")
       }
 
@@ -115,7 +114,6 @@ export const ExportProductsForm: React.FC<ExportProductsFormProps> = ({ storeId,
       toast.success("Export completed successfully")
       router.refresh()
     } catch (error) {
-      console.error("Export error:", error)
       toast.error(error instanceof Error ? error.message : "Failed to export products")
     } finally {
       setIsLoading(false)

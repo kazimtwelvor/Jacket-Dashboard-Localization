@@ -143,7 +143,6 @@ export const PaymentMethodsForm: React.FC<PaymentMethodsFormProps> = ({ initialD
         const response = await axios.get(`/api/stores/${params.storeId}/stripe-accounts`)
         setStripeAccounts(response.data)
       } catch (error) {
-        console.error("Failed to fetch Stripe accounts:", error)
         toast.error("Failed to load Stripe accounts")
       }
     }

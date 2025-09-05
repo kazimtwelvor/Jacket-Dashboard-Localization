@@ -119,7 +119,6 @@ export async function duplicateProduct(productId: string, storeId: string) {
     revalidatePath(`/${storeId}/products`)
     return duplicatedProduct
   } catch (error) {
-    console.error("[DUPLICATE_PRODUCT]", error)
     throw new Error("Failed to duplicate product")
   }
 }

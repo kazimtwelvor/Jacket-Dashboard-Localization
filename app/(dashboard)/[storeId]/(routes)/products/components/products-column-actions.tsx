@@ -61,7 +61,6 @@ export const ProductsColumnActions: React.FC<ProductsColumnActionsProps> = ({ da
         router.push(`/${params?.storeId}/products/${response.data.id}`)
       }
     } catch (error) {
-      console.error("Error duplicating product:", error)
       toast.error("Failed to duplicate product.")
     } finally {
       setLoading(false)

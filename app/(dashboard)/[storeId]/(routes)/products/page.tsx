@@ -178,7 +178,6 @@ const ProductsPage: React.FC<ProductsPageProps> = async ({ params }) => {
       </div>
     )
   } catch (error) {
-    console.error("Error loading products:", error)
     return (
       <div className="flex-col">
         <div className="flex-1 space-y-4 p-8 pt-6">

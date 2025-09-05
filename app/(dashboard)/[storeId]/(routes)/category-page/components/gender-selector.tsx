@@ -37,7 +37,6 @@ export const GenderSelector: React.FC<GenderSelectorProps> = ({ form }) => {
           { id: "kids", name: "Kids" }
         ])
       } catch (error) {
-        console.error("Failed to fetch genders:", error)
         setGenders([
           { id: "men", name: "Men" },
           { id: "women", name: "Women" },

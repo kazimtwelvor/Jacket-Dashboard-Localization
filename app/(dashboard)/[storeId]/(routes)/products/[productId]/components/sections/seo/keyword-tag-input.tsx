@@ -32,7 +32,6 @@ export const KeywordTagInput: React.FC<KeywordTagInputProps> = ({ keywords = [],
       shouldDirty: true,
     })
 
-    console.log("Keywords updated:", newKeywords)
   }
 
   useEffect(() => {

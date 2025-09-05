@@ -32,7 +32,6 @@ export function generateProductSchema(options: SchemaGeneratorOptions): string {
       JSON.parse(options.customSchema)
       return options.customSchema
     } catch (e) {
-      console.error("Invalid custom schema JSON:", e)
     }
   }
 

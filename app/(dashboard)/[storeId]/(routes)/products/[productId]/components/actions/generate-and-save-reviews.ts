@@ -115,7 +115,6 @@ export async function generateAndSaveReviews(
         }
       }
       const errorData = response ? await response.json() : {}
-      console.error("Gemini API error:", errorData)
       throw new Error(`API call failed: ${response?.statusText || 'Network error'}`)
     }
 

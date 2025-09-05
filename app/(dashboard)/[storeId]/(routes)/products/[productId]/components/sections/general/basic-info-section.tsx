@@ -91,7 +91,6 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
       const data = await response.json();
       setIsSlugUnique(data.isUnique);
     } catch (error) {
-      console.error("Error checking slug uniqueness:", error);
       setIsSlugUnique(null);
     } finally {
       setIsCheckingSlug(false);

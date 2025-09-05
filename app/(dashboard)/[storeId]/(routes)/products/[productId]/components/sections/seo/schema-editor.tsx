@@ -105,13 +105,11 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
           onSchemaChange(JSON.stringify(parsed))
         }
       } catch (e) {
-        console.error("Error parsing schema in editor:", e)
       }
     }
   }
 
   const generateSchema = () => {
-    console.log(`Generating schema of type: ${selectedTemplate}`)
     let schema = {}
 
     switch (selectedTemplate) {
@@ -153,7 +151,6 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
     setIsValid(true)
     setValidationMessage("")
 
-    console.log(`Generated schema of type: ${selectedTemplate}`)
   }
 
   // Generate Product schema
@@ -417,7 +414,6 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
   }
 
   const handleTemplateChange = (value: string) => {
-    console.log(`Template changed from ${selectedTemplate} to ${value}`)
     setSelectedTemplate(value)
   }
 
@@ -569,7 +565,6 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
           generateSchema()
         }
       } catch (e) {
-        console.error("Error parsing schema data:", e)
         generateSchema()
       }
     } else {

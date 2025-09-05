@@ -29,23 +29,16 @@ export const ColorsClient: React.FC<ColorsClientProps> = ({ data }) => {
   const [filterType, setFilterType] = useState("all")
   const [sortBy, setSortBy] = useState("createdAt")
 
-  // Helper function to determine if a color is light or dark
   const isLightColor = (hexColor: string) => {
-    // Remove the hash if it exists
     hexColor = hexColor.replace("#", "")
 
-    // Convert to RGB
     const r = Number.parseInt(hexColor.substr(0, 2), 16)
     const g = Number.parseInt(hexColor.substr(2, 2), 16)
     const b = Number.parseInt(hexColor.substr(4, 2), 16)
-
-    // Calculate brightness
     const brightness = (r * 299 + g * 587 + b * 114) / 1000
-
     return brightness > 128
   }
 
-  // Filter and sort data
   const filteredData = data
     .filter((color) => {
       if (searchQuery) {
@@ -75,7 +68,6 @@ export const ColorsClient: React.FC<ColorsClientProps> = ({ data }) => {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     })
 
-  // Calculate stats
   const totalColors = data.length
   const lightColors = data.filter((color) => isLightColor(color.value)).length
   const darkColors = totalColors - lightColors
@@ -84,7 +76,7 @@ export const ColorsClient: React.FC<ColorsClientProps> = ({ data }) => {
     <>
       <div className="flex items-center justify-between">
         <Heading title={`Colors (${filteredData.length})`} description="Manage colors for your store" />
-        <Button onClick={() => router.push(`/${params.storeId}/colors/new`)}>
+        <Button onClick={() => router.push(`/${params?.storeId}/colors/new`)}>
           <Plus className="mr-2 h-4 w-4" />
           Add New
         </Button>

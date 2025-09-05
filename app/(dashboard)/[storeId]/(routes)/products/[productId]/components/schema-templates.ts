@@ -1,8 +1,3 @@
-/**
- * Schema Templates
- *
- * This file contains predefined schema templates for different product types
- */
 
 export interface SchemaTemplate {
   id: string
@@ -182,25 +177,18 @@ export const SCHEMA_TEMPLATES: SchemaTemplate[] = [
   },
 ]
 
-/**
- * Get a template by ID
- */
+
 export function getTemplateById(id: string): SchemaTemplate | undefined {
   return SCHEMA_TEMPLATES.find((template) => template.id === id)
 }
 
-/**
- * Fill template with data
- */
+
 export function fillTemplate(template: any, data: Record<string, any>): any {
   const result = JSON.parse(JSON.stringify(template))
 
-  // Recursive function to replace placeholders
   function replacePlaceholders(obj: any): any {
     if (typeof obj === "string") {
-      // Replace {{placeholder}} with actual data
       return obj.replace(/\{\{(\w+)\}\}/g, (match, key) => {
-        // Special handling for arrays
         if (key === "image" && Array.isArray(data[key])) {
           return data[key].length > 0 ? data[key][0] : ""
         }
@@ -223,7 +211,6 @@ export function fillTemplate(template: any, data: Record<string, any>): any {
     return obj
   }
 
-  // Special handling for image field if it's an array
   if (Array.isArray(data.image) && data.image.length > 0) {
     result.image = data.image
   }

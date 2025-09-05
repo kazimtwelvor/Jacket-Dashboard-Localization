@@ -34,7 +34,7 @@ export const ColorCard: React.FC<ColorCardProps> = ({ color, onClick }) => {
   const onDelete = async () => {
     try {
       setLoading(true)
-      await axios.delete(`/api/${params.storeId}/colors/${color.id}`)
+      await axios.delete(`/api/${params?.storeId}/colors/${color.id}`)
       router.refresh()
       toast.success("Color deleted successfully.")
     } catch {
@@ -47,7 +47,7 @@ export const ColorCard: React.FC<ColorCardProps> = ({ color, onClick }) => {
 
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation()
-    router.push(`/${params.storeId}/colors/${color.id}`)
+    router.push(`/${params?.storeId}/colors/${color.id}`)
   }
 
   const handleDelete = (e: React.MouseEvent) => {
@@ -55,20 +55,15 @@ export const ColorCard: React.FC<ColorCardProps> = ({ color, onClick }) => {
     setOpen(true)
   }
 
-  // Determine if this is a light or dark color
   const isLightColor = (hexColor: string) => {
-    // Remove the hash if it exists
     hexColor = hexColor.replace("#", "")
 
-    // Convert to RGB
     const r = Number.parseInt(hexColor.substr(0, 2), 16)
     const g = Number.parseInt(hexColor.substr(2, 2), 16)
     const b = Number.parseInt(hexColor.substr(4, 2), 16)
 
-    // Calculate brightness (using the formula for relative luminance)
     const brightness = (r * 299 + g * 587 + b * 114) / 1000
 
-    // Return true if the color is light (brightness > 128)
     return brightness > 128
   }
 

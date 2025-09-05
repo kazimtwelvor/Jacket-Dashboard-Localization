@@ -51,9 +51,7 @@ export const RelatedProductsSelector: React.FC<RelatedProductsSelectorProps> = (
       try {
         setLoading(true)
         const response = await axios.get(`/api/${storeId}/products?admin=true&limit=1000`)
-        // Handle the nested response structure
         const allProducts = response.data.products || response.data || []
-        // Filter out current product only if editing (currentProductId exists)
         const filteredProducts = currentProductId 
           ? allProducts.filter((product: Product) => product.id !== currentProductId)
           : allProducts

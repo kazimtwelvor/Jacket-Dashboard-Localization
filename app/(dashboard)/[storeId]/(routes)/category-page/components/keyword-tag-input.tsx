@@ -67,7 +67,7 @@ export const KeywordTagInput: React.FC<KeywordTagInputProps> = ({ form }) => {
     } else {
       form.setValue(
         "supportingKeywords",
-        supportingKeywords.filter(k => k !== keyword),
+        supportingKeywords.filter((k: string) => k !== keyword),
         {
           shouldValidate: true,
           shouldDirty: true,
@@ -79,7 +79,7 @@ export const KeywordTagInput: React.FC<KeywordTagInputProps> = ({ form }) => {
   const promoteToPrimary = (keyword: string) => {
     if (keyword === focusKeyword) return 
     
-    const newSupportingKeywords = supportingKeywords.filter(k => k !== keyword)
+    const newSupportingKeywords = supportingKeywords.filter((k: string) => k !== keyword)
     
     if (focusKeyword) {
       newSupportingKeywords.unshift(focusKeyword)

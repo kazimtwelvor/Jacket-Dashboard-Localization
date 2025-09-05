@@ -133,7 +133,6 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
     if (selectedMaterialCategories && selectedMaterialCategories.length > 0) {
       const currentExternalMaterial = form.getValues("specifications.externalMaterial") || []
 
-      const materialCategoriesSet = new Set(selectedMaterialCategories)
       const externalMaterialSet = new Set(currentExternalMaterial)
 
       let needsUpdate = false

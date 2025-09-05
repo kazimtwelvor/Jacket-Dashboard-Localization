@@ -54,7 +54,6 @@ export const ColorsView = ({ data }: ColorsViewProps) => {
   const router = useRouter()
   const params = useParams()
 
-  // State
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [filteredData, setFilteredData] = useState<ColorColumn[]>(data)
   const [searchQuery, setSearchQuery] = useState("")
@@ -68,34 +67,26 @@ export const ColorsView = ({ data }: ColorsViewProps) => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [bulkDeleteModalOpen, setBulkDeleteModalOpen] = useState(false)
 
-  // Calculate stats
   const totalColors = filteredData.length
 
-  // Helper function to determine if a color is light or dark
   const isLightColor = (hexColor: string) => {
-    // Remove the hash if it exists
     hexColor = hexColor.replace("#", "")
 
-    // Convert to RGB
     const r = Number.parseInt(hexColor.substr(0, 2), 16)
     const g = Number.parseInt(hexColor.substr(2, 2), 16)
     const b = Number.parseInt(hexColor.substr(4, 2), 16)
 
-    // Calculate brightness (using the formula for relative luminance)
     const brightness = (r * 299 + g * 587 + b * 114) / 1000
 
-    // Return true if the color is light (brightness > 128)
     return brightness > 128
   }
 
   const lightColors = filteredData.filter((color) => isLightColor(color.value)).length
   const darkColors = totalColors - lightColors
 
-  // Filter data based on status
   useEffect(() => {
     let result = [...data]
 
-    // Apply search filter
     if (searchQuery) {
       result = result.filter(
         (color) =>
@@ -104,14 +95,12 @@ export const ColorsView = ({ data }: ColorsViewProps) => {
       )
     }
 
-    // Apply status filter
     if (filterStatus === "light") {
       result = result.filter((color) => isLightColor(color.value))
     } else if (filterStatus === "dark") {
       result = result.filter((color) => !isLightColor(color.value))
     }
 
-    // Apply sort
     result = result.sort((a, b) => {
       if (sortField === "name") {
         return sortOrder === "asc" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
@@ -127,40 +116,34 @@ export const ColorsView = ({ data }: ColorsViewProps) => {
     setFilteredData(result)
   }, [data, searchQuery, filterStatus, sortField, sortOrder])
 
-  // Handle search
   const handleSearch = (query: string) => {
     setSearchQuery(query)
   }
 
-  // Handle sort
   const handleSort = (field: "name" | "value" | "createdAt") => {
     const newOrder = field === sortField && sortOrder === "asc" ? "desc" : "asc"
     setSortField(field)
     setSortOrder(newOrder)
   }
 
-  // Handle color selection
   const handleColorSelect = (color: ColorColumn) => {
     setSelectedColor(color)
   }
 
-  // Handle color creation
   const handleCreateColor = () => {
-    router.push(`/${params.storeId}/colors/new`)
+    router.push(`/${params?.storeId}/colors/new`)
   }
 
-  // Handle color edit
   const handleEditColor = (id: string) => {
-    router.push(`/${params.storeId}/colors/${id}`)
+    router.push(`/${params?.storeId}/colors/${id}`)
   }
 
-  // Handle color delete
   const handleDeleteColor = async () => {
     if (!selectedColor) return
 
     try {
       setIsLoading(true)
-      await axios.delete(`/api/${params.storeId}/colors/${selectedColor.id}`)
+      await axios.delete(`/api/${params?.storeId}/colors/${selectedColor.id}`)
       router.refresh()
       toast.success("Color deleted successfully.")
       setSelectedColor(null)
@@ -172,12 +155,10 @@ export const ColorsView = ({ data }: ColorsViewProps) => {
     }
   }
 
-  // Handle bulk delete
   const handleBulkDelete = async () => {
     try {
       setIsLoading(true)
-      // This would need to be implemented in the API
-      await Promise.all(selectedItems.map((id) => axios.delete(`/api/${params.storeId}/colors/${id}`)))
+      await Promise.all(selectedItems.map((id) => axios.delete(`/api/${params?.storeId}/colors/${id}`)))
       router.refresh()
       toast.success(`${selectedItems.length} colors deleted successfully.`)
       setSelectedItems([])
@@ -189,12 +170,10 @@ export const ColorsView = ({ data }: ColorsViewProps) => {
     }
   }
 
-  // Handle item selection for bulk actions
   const toggleItemSelection = (id: string) => {
     setSelectedItems((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]))
   }
 
-  // Handle select all
   const toggleSelectAll = () => {
     if (selectedItems.length === filteredData.length) {
       setSelectedItems([])
@@ -203,7 +182,6 @@ export const ColorsView = ({ data }: ColorsViewProps) => {
     }
   }
 
-  // Reset filters
   const resetFilters = () => {
     setSearchQuery("")
     setFilterStatus("all")

@@ -7,7 +7,12 @@ export async function POST(req: Request, { params }: { params: { storeId: string
     const { userId } = await auth()
     const body = await req.json()
 
-    const { title, slug, isPublished, content } = body
+    const { title, slug, isPublished, content }: {
+      title: string;
+      slug: string;
+      isPublished?: boolean;
+      content?: string;
+    } = body
 
 
     if (!userId) {

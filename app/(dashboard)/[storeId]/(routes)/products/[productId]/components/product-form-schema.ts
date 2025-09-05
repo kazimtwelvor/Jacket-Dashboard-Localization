@@ -1,18 +1,15 @@
 import * as z from "zod"
 
 export const formSchema = z.object({
-  // Basic information
   name: z.string().min(1, "Product name is required"),
   slug: z.string().optional(),
   description: z.string().min(1, "Description is required"),
-  mainImage: z.string().min(1, "Main product image is required"), // New field for main image
-  images: z.array(z.string()).default([]), // Gallery images (can be empty)
+  mainImage: z.string().min(1, "Main product image is required"),
+  images: z.array(z.string()).default([]), 
 
-  // Pricing
   regularPrice: z.string().min(1, "Regular price is required"),
   salePrice: z.string().optional(),
 
-  // Inventory
   sku: z
     .string()
     .min(1, "SKU is required")
@@ -24,7 +21,6 @@ export const formSchema = z.object({
   isFeatured: z.boolean().default(false),
   relatedProducts: z.array(z.string()).default([]),
 
-  // Size and color details
   sizeDetails: z
     .array(
       z.object({
@@ -47,7 +43,6 @@ export const formSchema = z.object({
     .optional()
     .default([]),
 
-  // Specifications - using a simpler approach to avoid validation issues
   specifications: z
     .object({
       externalMaterial: z.array(z.string()).default([]),
@@ -60,7 +55,6 @@ export const formSchema = z.object({
     })
     .default({}),
 
-  // Categories and attributes - updated to make required fields
   categories: z
     .object({
       gender: z.string().min(1, "Gender is required"),
@@ -79,7 +73,6 @@ export const formSchema = z.object({
       sizes: [],
     }),
 
-  // Additional information
   brandName: z.string().optional(),
   ratingValue: z.string().optional(),
   reviewCount: z.string().optional(),
@@ -88,7 +81,6 @@ export const formSchema = z.object({
   menuOrder: z.string().optional(),
   reviews: z.boolean().default(true),
 
-  // SEO
   seo: z
     .object({
       metaTitle: z.string().optional(),
@@ -112,21 +104,17 @@ export const formSchema = z.object({
       canonicalUrl: "",
     }),
 
-  // Updated to support multiple schemas
   schema: z.string().optional(),
   schema1: z.string().optional(),
   schema2: z.string().optional(),
   schema3: z.string().optional(),
   
-  // Temporary reviews ID for new products
   tempReviewsId: z.string().optional(),
   cachedReviews: z.array(z.any()).optional().default([]),
   
-  // Parent product flag
   isParentProduct: z.boolean().optional().default(false),
   parentProductId: z.string().optional(),
   
-  // Image metadata
   mainImageMetadata: z.object({
     altText: z.string().optional(),
     title: z.string().optional(),
@@ -143,10 +131,8 @@ export const formSchema = z.object({
   })).optional().default([]),
 })
 
-// Export the type for the form values
 export type ProductFormValues = z.infer<typeof formSchema>
 
-// Specification options for dropdown menus
 export const specificationOptions = {
   externalMaterial: ["Leather", "Cotton", "Polyester", "Nylon", "Denim", "Wool", "Suede", "Canvas", "Fleece"],
   internalMaterial: ["Viscose", "Wool", "Fur", "Polyester", "Nylon", "Cotton", "Fleece", "Sherpa"],
@@ -191,7 +177,6 @@ export const specificationOptions = {
   ],
 }
 
-// Gender options
 export const genderOptions = [
   { label: "Men", value: "men" },
   { label: "Women", value: "women" },
@@ -200,7 +185,6 @@ export const genderOptions = [
   { label: "Girls", value: "girls" },
 ]
 
-// Style options
 export const styleOptions = [
   "Bomber",
   "Puffer",

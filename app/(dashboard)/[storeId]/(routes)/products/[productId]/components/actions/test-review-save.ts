@@ -10,7 +10,6 @@ export async function testReviewSave(storeId: string, productId: string) {
       throw new Error("Unauthenticated")
     }
 
-    console.log("Testing review save for:", { storeId, productId })
 
     const product = await prismadb.product.findFirst({
       where: {
@@ -39,7 +38,6 @@ export async function testReviewSave(storeId: string, productId: string) {
       },
     })
 
-    console.log("Test review created successfully:", testReview.id)
 
     const savedReview = await prismadb.review.findUnique({
       where: {
@@ -48,7 +46,6 @@ export async function testReviewSave(storeId: string, productId: string) {
     })
 
     if (savedReview) {
-      console.log("Review verified in database:", savedReview.id)
       
       await prismadb.review.delete({
         where: {
@@ -56,7 +53,6 @@ export async function testReviewSave(storeId: string, productId: string) {
         },
       })
       
-      console.log("Test review cleaned up")
       
       return {
         success: true,
@@ -69,7 +65,6 @@ export async function testReviewSave(storeId: string, productId: string) {
       }
     }
   } catch (error) {
-    console.error("Test review save error:", error)
     return {
       success: false,
       message: error instanceof Error ? error.message : "Unknown error occurred",

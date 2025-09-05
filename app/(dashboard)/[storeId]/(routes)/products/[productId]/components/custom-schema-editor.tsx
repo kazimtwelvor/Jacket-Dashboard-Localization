@@ -52,7 +52,6 @@ interface SchemaEditorProps {
   title?: string
 }
 
-// Helper function to get availability string based on stockStatus
 const getAvailabilityString = (stockStatus?: string): string => {
   switch (stockStatus?.toLowerCase()) {
     case "instock":
@@ -66,7 +65,6 @@ const getAvailabilityString = (stockStatus?: string): string => {
   }
 }
 
-// Helper function to get product URL
 const getProductUrl = (storeId?: string, slug?: string): string => {
   if (slug) {
     return `${process.env.NEXT_PUBLIC_FRONTEND_STORE_URL || "https://yourstore.com"}/products/${slug}`
@@ -76,16 +74,13 @@ const getProductUrl = (storeId?: string, slug?: string): string => {
   }product`
 }
 
-// Helper function to get image URLs
 const getImageUrls = (images?: Array<{ id: string; url: string }>, mainImage?: string): string[] => {
   const urls: string[] = []
 
-  // Add main image if available
   if (mainImage) {
     urls.push(mainImage)
   }
 
-  // Add other images if available
   if (images && images.length > 0) {
     images.forEach((image) => {
       if (!urls.includes(image.url)) {
@@ -94,7 +89,6 @@ const getImageUrls = (images?: Array<{ id: string; url: string }>, mainImage?: s
     })
   }
 
-  // Return at least one placeholder if no images
   if (urls.length === 0) {
     urls.push("https://yourstore.com/images/product.jpg")
   }
@@ -102,7 +96,6 @@ const getImageUrls = (images?: Array<{ id: string; url: string }>, mainImage?: s
   return urls
 }
 
-// Update the schemaTemplates to use storeName as brand name
 const schemaTemplates = {
   default: (data: ProductData) => {
     const imageUrls = getImageUrls(data.images, data.mainImage)
@@ -146,7 +139,6 @@ const schemaTemplates = {
     const availability = getAvailabilityString(data.stockStatus)
     const productUrl = getProductUrl(data.storeId, data.slug)
 
-    // Extract color and material from specifications if available
     let colors: string[] = []
     let materials: string[] = []
 
@@ -164,9 +156,8 @@ const schemaTemplates = {
       }
     }
 
-    // Use material field if available
     if (data.material && Array.isArray(data.material) && data.material.length > 0) {
-      materials = [...new Set([...materials, ...data.material])]
+      materials = Array.from(new Set([...materials, ...data.material]))
     }
 
     return {
@@ -298,7 +289,7 @@ const schemaTemplates = {
       isbn: data.sku || "",
       author: {
         "@type": "Person",
-        name: "Author Name", // This would need to come from additional data
+        name: "Author Name",
       },
       publisher: {
         "@type": "Organization",
@@ -411,7 +402,6 @@ const schemaTemplates = {
   },
 }
 
-// Update the component to be more compact for multi-column layout
 export const CustomSchemaEditor: React.FC<SchemaEditorProps> = ({
   productData,
   initialSchema,
@@ -425,20 +415,16 @@ export const CustomSchemaEditor: React.FC<SchemaEditorProps> = ({
   const [isValid, setIsValid] = useState(true)
   const [validationMessage, setValidationMessage] = useState("")
 
-  // Initialize schema on component mount
   useEffect(() => {
     if (initialSchema) {
       try {
-        // Try to parse the initial schema
         const parsed = JSON.parse(initialSchema)
 
-        // Only update if the value has changed to prevent infinite loops
         if (JSON.stringify(parsed, null, 2) !== schemaText) {
           setSchemaText(JSON.stringify(parsed, null, 2))
           setEnabled(true)
         }
 
-        // Try to determine the template type
         if (parsed["@type"] === "Book") {
           setTemplate("book")
         } else if (parsed["@type"] === "FAQPage") {
@@ -457,27 +443,23 @@ export const CustomSchemaEditor: React.FC<SchemaEditorProps> = ({
           setTemplate("default")
         }
       } catch (e) {
-        // If parsing fails, generate a new schema
         if (!schemaText) {
           generateSchema("default")
           setEnabled(true)
         }
       }
     } else {
-      // If no initial schema, generate a default one
       if (!schemaText) {
         generateSchema("default")
         setEnabled(true)
       }
     }
-  }, [initialSchema]) // Only depend on initialSchema
+  }, [initialSchema])
 
-  // Validate schema whenever it changes
   useEffect(() => {
     if (schemaText) {
       validateSchema(schemaText)
 
-      // Only update parent component if schema is enabled and has changed
       if (enabled) {
         onSchemaChange(schemaText)
       } else if (onSchemaChange) {
@@ -486,7 +468,6 @@ export const CustomSchemaEditor: React.FC<SchemaEditorProps> = ({
     }
   }, [schemaText, enabled, onSchemaChange])
 
-  // Generate schema based on selected template
   const generateSchema = (templateName: keyof typeof schemaTemplates) => {
     const template = schemaTemplates[templateName]
     const schema = template(productData)
@@ -494,7 +475,6 @@ export const CustomSchemaEditor: React.FC<SchemaEditorProps> = ({
     setTemplate(templateName)
   }
 
-  // Validate the schema JSON
   const validateSchema = (text: string) => {
     try {
       if (!text.trim()) {
@@ -512,27 +492,22 @@ export const CustomSchemaEditor: React.FC<SchemaEditorProps> = ({
     }
   }
 
-  // Handle schema toggle
   const handleToggleChange = (checked: boolean) => {
     setEnabled(checked)
   }
 
-  // Handle template change
   const handleTemplateChange = (value: string) => {
     generateSchema(value as keyof typeof schemaTemplates)
   }
 
-  // Handle schema text change
   const handleSchemaTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setSchemaText(e.target.value)
   }
 
-  // Handle regenerate button click
   const handleRegenerate = () => {
     generateSchema(template)
   }
 
-  // Open Google's Rich Results Test
   const openGoogleTest = () => {
     const encodedSchema = encodeURIComponent(schemaText)
     window.open(

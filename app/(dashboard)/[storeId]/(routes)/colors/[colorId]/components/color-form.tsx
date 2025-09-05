@@ -67,11 +67,11 @@ export const ColorForm: React.FC<SettingsFromProps> = ({ initialData }) => {
   })
 
   const onCancel = () => {
-    router.push(`/${params.storeId}/attributes?tab=colors`)
+    router.push(`/${params?.storeId}/attributes?tab=colors`)
   }
 
   const onSuccess = () => {
-    router.push(`/${params.storeId}/attributes?tab=colors`)
+    router.push(`/${params?.storeId}/attributes?tab=colors`)
   }
 
   const onSubmit = async (data: ColorFormValues) => {
@@ -83,9 +83,9 @@ export const ColorForm: React.FC<SettingsFromProps> = ({ initialData }) => {
         value2: data.hasTwoColors ? data.value2 : null,
       }
       if (initialData) {
-        await axios.patch(`/api/${params.storeId}/colors/${params.colorId}`, submitData)
+        await axios.patch(`/api/${params?.storeId}/colors/${params?.colorId}`, submitData)
       } else {
-        await axios.post(`/api/${params.storeId}/colors`, submitData)
+        await axios.post(`/api/${params?.storeId}/colors`, submitData)
       }
       router.refresh()
       onSuccess()
@@ -101,7 +101,7 @@ export const ColorForm: React.FC<SettingsFromProps> = ({ initialData }) => {
   const onDelete = async () => {
     try {
       setLoading(true)
-      await axios.delete(`/api/${params.storeId}/colors/${params.colorId}`)
+      await axios.delete(`/api/${params?.storeId}/colors/${params?.colorId}`)
       router.refresh()
       onCancel()
       toast.success("Color deleted.")
@@ -151,8 +151,8 @@ export const ColorForm: React.FC<SettingsFromProps> = ({ initialData }) => {
                   <FormControl>
                     <div className="flex items-center gap-x-4">
                       <Input disabled={loading} placeholder="Color value" {...field} />
-                      <ColorDisplay 
-                        color1={field.value} 
+                      <ColorDisplay
+                        color1={field.value}
                         color2={form.watch("hasTwoColors") ? form.watch("value2") : undefined}
                         size="lg"
                       />
@@ -163,7 +163,7 @@ export const ColorForm: React.FC<SettingsFromProps> = ({ initialData }) => {
               )}
             />
           </div>
-          
+
           <div className="space-y-4">
             <FormField
               control={form.control}
@@ -183,7 +183,7 @@ export const ColorForm: React.FC<SettingsFromProps> = ({ initialData }) => {
                 </FormItem>
               )}
             />
-            
+
             {form.watch("hasTwoColors") && (
               <FormField
                 control={form.control}
@@ -200,7 +200,7 @@ export const ColorForm: React.FC<SettingsFromProps> = ({ initialData }) => {
               />
             )}
           </div>
-          
+
           <Button disabled={loading} className="ml-auto" type="submit">
             {action}
           </Button>

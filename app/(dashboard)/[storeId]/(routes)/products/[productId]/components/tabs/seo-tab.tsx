@@ -170,7 +170,7 @@ const DetailedSeoAnalysis = ({
     if (wordCount >= 300) score += 5
     if (focusKeyword && content.toLowerCase().includes(focusKeyword.toLowerCase())) score += 5
     if (focusKeyword && content.toLowerCase().indexOf(focusKeyword.toLowerCase()) < content.length * 0.1) score += 5
-    if (content.split(/\n\s*\n/).length >= 3) score += 5 // Multiple paragraphs
+    if (content.split(/\n\s*\n/).length >= 3) score += 5 
 
     totalPossiblePoints += 5
     if (allImages.length > 0) score += 5
@@ -495,7 +495,6 @@ const SchemaToggle = ({ form }: { form: any }) => {
 export const SeoTab = ({ initialData, form }: SeoTabProps) => {
   const [aiSuggestions, setAiSuggestions] = useState<string[]>([])
   const [isGeneratingSuggestions, setIsGeneratingSuggestions] = useState(false)
-  const [activeSubTab, setActiveSubTab] = useState("basic")
 
   const watchedValues = form.watch()
 
@@ -551,14 +550,14 @@ export const SeoTab = ({ initialData, form }: SeoTabProps) => {
         .replace(/\s+/g, " ")
         .trim()
         .split(" ")
-        .filter((word) => word.length > 0)
+        .filter((word: string) => word.length > 0)
 
       return words.length
     })()
 
     const readingTime = Math.max(1, Math.ceil(wordCount / 200))
 
-    const sentences = content.split(/[.!?]+/).filter((sentence) => sentence.trim().length > 0).length
+    const sentences = content.split(/[.!?]+/).filter((sentence: string) => sentence.trim().length > 0).length
 
     let readabilityScore = 0
 
@@ -792,20 +791,20 @@ export const SeoTab = ({ initialData, form }: SeoTabProps) => {
       isDiscounted: !!form.getValues("salePrice") || !!initialData?.salePrice,
       mainImage:
         form.getValues("mainImage") ||
-        (initialData?.images && initialData?.images.length > 0 ? initialData?.images[0].url : ""),
+        ((initialData as any)?.images && (initialData as any)?.images.length > 0 ? (initialData as any)?.images[0].url : ""),
       images:
         form.getValues("images") ||
-        (initialData?.images
-          ? Array.isArray(initialData.images)
-            ? initialData?.images.map((img) => (typeof img === "string" ? img : img.url))
+        ((initialData as any)?.images
+          ? Array.isArray((initialData as any).images)
+            ? (initialData as any)?.images.map((img: any) => (typeof img === "string" ? img : img.url))
             : []
           : []),
       brandName: form.getValues("brandName") || initialData?.brandName || "",
       sku: form.getValues("sku") || initialData?.sku || "",
       stockStatus: form.getValues("stockStatus") || initialData?.stockStatus || "instock",
       specifications: form.getValues("specifications") || initialData?.specifications || {},
-      material: form.getValues("categories.material") || initialData?.material || [],
-      style: form.getValues("categories.style") || initialData?.style || [],
+      material: form.getValues("categories.material") || (initialData as any)?.material || [],
+      style: form.getValues("categories.style") || (initialData as any)?.style || [],
       gender: form.getValues("categories.gender") || initialData?.gender || "",
       tags: form.getValues("tags") || initialData?.tags || [],
       ratingValue: form.getValues("ratingValue") || initialData?.ratingValue || "4.5",
@@ -814,7 +813,7 @@ export const SeoTab = ({ initialData, form }: SeoTabProps) => {
       metaTitle: form.getValues("seo.metaTitle") || initialData?.metaTitle || "",
       metaDescription: form.getValues("seo.metaDescription") || initialData?.metaDescription || "",
       storeId: initialData?.storeId,
-      categoryId: initialData?.categoryId,
+      categoryId: (initialData as any)?.categoryId,
       schema: form.getValues("schema") || initialData?.schema || "",
     }
   }, [initialData, form]) 
@@ -1080,7 +1079,7 @@ export const SeoTab = ({ initialData, form }: SeoTabProps) => {
                               .getValues("seo.metaTitle")
                               ?.toLowerCase()
                               .includes(form.getValues("seo.focusKeyword")?.toLowerCase())
-                              ? "success"
+                              ? "outline"
                               : "destructive"
                           }
                         >
@@ -1114,7 +1113,7 @@ export const SeoTab = ({ initialData, form }: SeoTabProps) => {
                               .getValues("seo.metaDescription")
                               ?.toLowerCase()
                               .includes(form.getValues("seo.focusKeyword")?.toLowerCase())
-                              ? "success"
+                              ? "outline"
                               : "destructive"
                           }
                         >
@@ -1147,7 +1146,7 @@ export const SeoTab = ({ initialData, form }: SeoTabProps) => {
                             (formDescription || initialDescription)
                               ?.toLowerCase()
                               .includes(form.getValues("seo.focusKeyword")?.toLowerCase())
-                              ? "success"
+                              ? "outline"
                               : "destructive"
                           }
                         >

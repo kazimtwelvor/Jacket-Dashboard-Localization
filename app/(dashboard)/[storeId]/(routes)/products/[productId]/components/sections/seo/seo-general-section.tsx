@@ -36,10 +36,8 @@ export const SeoGeneralSection: React.FC<SeoGeneralSectionProps> = ({ form, seoC
     }
   }
 
-  // Update the SeoGeneralSection component to use the keywords array
   const getKeywordTags = () => {
     const keywords = form.watch("seo.keywords")
-    // Make sure we always return an array
     if (!keywords) return []
     if (Array.isArray(keywords)) return keywords
     if (typeof keywords === "string") {
@@ -50,7 +48,6 @@ export const SeoGeneralSection: React.FC<SeoGeneralSectionProps> = ({ form, seoC
         return [keywords]
       }
     }
-    // If it's an object or something else unexpected, convert to string and return as single item
     return [String(keywords)]
   }
 

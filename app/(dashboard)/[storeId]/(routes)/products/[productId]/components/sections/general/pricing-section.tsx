@@ -13,7 +13,6 @@ export const PricingSection = () => {
   const form = useFormContext<ProductFormValues>()
   const [salePriceFocused, setSalePriceFocused] = useState(false)
 
-  // Function to validate sale price against regular price
   const validateSalePrice = (salePrice: string, regularPrice: string) => {
     if (!salePrice || !regularPrice) return true
 
@@ -52,7 +51,6 @@ export const PricingSection = () => {
                     className="rounded-l-none"
                     {...field}
                     onChange={(e) => {
-                      // Ensure value is not negative
                       const value = e.target.valueAsNumber
                       if (value < 0) {
                         e.target.value = "0"
@@ -61,20 +59,16 @@ export const PricingSection = () => {
                         field.onChange(e)
                       }
 
-                      // Check sale price validation on blur only to avoid infinite loops
                       const salePrice = form.getValues("salePrice")
                       if (salePrice) {
                         const isValid = validateSalePrice(salePrice, e.target.value)
                         if (!isValid) {
-                          // We'll validate this on blur of the sale price field instead
-                          // to avoid infinite loops
                         }
                       }
                     }}
                     onBlur={(e) => {
                       field.onBlur()
 
-                      // Validate sale price when regular price changes
                       const salePrice = form.getValues("salePrice")
                       if (salePrice) {
                         const isValid = validateSalePrice(salePrice, e.target.value)
@@ -123,7 +117,6 @@ export const PricingSection = () => {
                       }
                     }}
                     onChange={(e) => {
-                      // Ensure value is not negative
                       const value = e.target.valueAsNumber
                       if (value < 0) {
                         e.target.value = "0"
@@ -131,13 +124,10 @@ export const PricingSection = () => {
                       } else {
                         field.onChange(e)
                       }
-                      // We'll validate on blur instead of onChange to avoid infinite loops
                     }}
                     onBlur={(e) => {
                       setSalePriceFocused(false)
                       field.onBlur()
-
-                      // Validate on blur
                       const regularPrice = form.getValues("regularPrice")
                       if (e.target.value && regularPrice) {
                         const isValid = validateSalePrice(e.target.value, regularPrice)

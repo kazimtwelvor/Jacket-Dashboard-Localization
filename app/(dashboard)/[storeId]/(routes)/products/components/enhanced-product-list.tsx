@@ -59,7 +59,6 @@ export const EnhancedProductList = ({ products, storeId, onSelectItems, searchTe
   const [isBulkDuplicating, setIsBulkDuplicating] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   
-  // Use external search term if provided, otherwise use internal search term
   const activeSearchTerm = externalSearchTerm !== undefined ? externalSearchTerm : searchTerm
   const [sortField, setSortField] = useState<string>("name")
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
@@ -68,7 +67,6 @@ export const EnhancedProductList = ({ products, storeId, onSelectItems, searchTe
   const [expandedProductData, setExpandedProductData] = useState<{[key: string]: any}>({})
   const router = useRouter()
 
-  // Filter products based on search term
   const filteredProducts = products.filter(
     (product) =>
       product.name.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
@@ -78,7 +76,6 @@ export const EnhancedProductList = ({ products, storeId, onSelectItems, searchTe
       product.updatedByName?.toLowerCase().includes(activeSearchTerm.toLowerCase()),
   )
 
-  // Sort products
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     if (sortField === "price") {
       const priceA = Number.parseFloat(a.price.replace(/[^0-9.-]+/g, ""))

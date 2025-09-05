@@ -15,41 +15,32 @@ interface SizeSelectionSectionProps {
 }
 
 export const SizeSelectionSection: React.FC<SizeSelectionSectionProps> = ({ sizes, form }) => {
-  // Get the current selected sizes
   const selectedSizes = form.watch("categories.sizes") || []
   const [searchTerm, setSearchTerm] = useState("")
 
-  // Convert to array of string IDs for consistent comparison
   const selectedSizeIds = Array.isArray(selectedSizes)
     ? selectedSizes.map((s) => (typeof s === "object" && s !== null ? s.id : s))
     : []
 
-  // Log the selected sizes for debugging
   useEffect(() => {
     console.log("Selected sizes raw value:", selectedSizes)
     console.log("Converted to IDs for comparison:", selectedSizeIds)
   }, [selectedSizes])
 
-  // Handle size selection
   const handleSizeChange = (sizeId: string, checked: boolean) => {
     try {
-      // Create a new array to avoid mutation issues
       let updatedSizeIds = [...selectedSizeIds]
 
       if (checked) {
-        // Add the size if it's not already selected
         if (!updatedSizeIds.includes(sizeId)) {
           updatedSizeIds.push(sizeId)
         }
       } else {
-        // Remove the size if it's selected
         updatedSizeIds = updatedSizeIds.filter((id) => id !== sizeId)
       }
 
-      // Update the categories.sizes field with just the IDs
       form.setValue("categories.sizes", updatedSizeIds, { shouldValidate: true })
 
-      // Create sizeDetails array with full size objects
       const sizeDetailsArray = sizes
         .filter((size) => updatedSizeIds.includes(size.id))
         .map((size) => ({
@@ -58,7 +49,6 @@ export const SizeSelectionSection: React.FC<SizeSelectionSectionProps> = ({ size
           value: size.value,
         }))
 
-      // Update the sizeDetails field with the full objects
       form.setValue("sizeDetails", sizeDetailsArray, { shouldValidate: false })
 
       console.log("Updated size IDs:", updatedSizeIds)
@@ -68,7 +58,6 @@ export const SizeSelectionSection: React.FC<SizeSelectionSectionProps> = ({ size
     }
   }
 
-  // Handle select all and clear all
   const handleSelectAll = () => {
     const allSizeIds = sizes.map((size) => size.id)
     form.setValue("categories.sizes", allSizeIds, { shouldValidate: true })
@@ -86,7 +75,6 @@ export const SizeSelectionSection: React.FC<SizeSelectionSectionProps> = ({ size
     form.setValue("sizeDetails", [], { shouldValidate: false })
   }
 
-  // Filter sizes based on search term
   const filteredSizes = sizes.filter(
     (size) =>
       size.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -112,7 +100,6 @@ export const SizeSelectionSection: React.FC<SizeSelectionSectionProps> = ({ size
         </div>
       </div>
 
-      {/* Search input */}
       <div className="relative">
         <input
           type="text"

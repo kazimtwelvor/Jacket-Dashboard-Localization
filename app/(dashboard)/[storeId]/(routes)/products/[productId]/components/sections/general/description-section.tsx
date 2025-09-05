@@ -42,7 +42,7 @@ interface DescriptionImage {
   url: string
   link?: string
   alignment: ImageAlignment
-  size: number // Size as percentage of container width (25-100)
+  size: number 
 }
 
 export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) => {
@@ -52,49 +52,42 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [imageLink, setImageLink] = useState("")
   const [imageAlignment, setImageAlignment] = useState<ImageAlignment>("center")
-  const [imageSize, setImageSize] = useState<number>(100) // Default to 100% width
+  const [imageSize, setImageSize] = useState<number>(100)
   const [descriptionText, setDescriptionText] = useState("")
   const [descriptionImages, setDescriptionImages] = useState<DescriptionImage[]>([])
   const { toast } = useToast()
   const formRef = useRef<HTMLFormElement | null>(null)
 
-  // Function to check if generation is possible
-  const checkCanGenerate = () => {
+  const checkCanGenerate = (): boolean => {
     const formValues = form.getValues()
     const name = formValues.name
     const specs = formValues.specifications
 
-    const hasName = name && name.trim().length > 0
-    const hasColor = specs && specs.color && Array.isArray(specs.color) && specs.color.length > 0
+    const hasName = Boolean(name && name.trim().length > 0)
+    const hasColor = Boolean(specs && specs.color && Array.isArray(specs.color) && specs.color.length > 0)
 
     return hasName && hasColor
   }
 
-  // Watch for name changes
   useEffect(() => {
     const subscription = form.watch((value, { name }) => {
-      // Only run validation when relevant fields change
       if (name?.includes("name") || name?.includes("specifications")) {
         const canGen = checkCanGenerate()
         setCanGenerate(canGen)
       }
     })
 
-    // Initial check
     setCanGenerate(checkCanGenerate())
 
     return () => subscription.unsubscribe()
   }, [form])
 
-  // Initialize description text from form value
   useEffect(() => {
     const initialDescription = form.getValues("description") || ""
     setDescriptionText(initialDescription)
   }, [form])
 
-  // Function to generate description using API
   const handleGenerateDescription = async () => {
-    // Force check again before proceeding
     const canGen = checkCanGenerate()
     setCanGenerate(canGen)
 
@@ -107,7 +100,6 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
         specifications: form.getValues("specifications") || {},
       }
 
-      // Call the API route
       const response = await fetch(`/api/${window.location.pathname.split("/")[1]}/products/generate-description`, {
         method: "POST",
         headers: {
@@ -122,7 +114,6 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
 
       const data = await response.json()
 
-      // Update both the form value and our local state
       setDescriptionText(data.description)
       updateDescriptionField(data.description, descriptionImages)
 
@@ -142,12 +133,10 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
     }
   }
 
-  // Function to add selected image to description
   const addImageToDescription = () => {
     if (!selectedImage) return
 
     try {
-      // Add the image to our local state
       const newImages = [
         ...descriptionImages,
         {
@@ -160,7 +149,6 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
 
       setDescriptionImages(newImages)
 
-      // Update the form field with the combined description
       updateDescriptionField(descriptionText, newImages)
 
       toast({
@@ -176,32 +164,26 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
       })
     }
 
-    // Reset state
     setSelectedImage(null)
     setImageLink("")
     setImageAlignment("center")
     setImageSize(100)
 
-    // Close the image selector
     setShowImageSelector(false)
   }
 
-  // Function to update image alignment
   const updateImageAlignment = (index: number, alignment: ImageAlignment) => {
     try {
       console.log(`Updating image ${index} alignment to ${alignment}`)
 
-      // Create a new array to trigger a re-render
       const newImages = [...descriptionImages]
       newImages[index] = {
         ...newImages[index],
         alignment: alignment,
       }
 
-      // Update state
       setDescriptionImages(newImages)
 
-      // Update the form field with the combined description
       updateDescriptionField(descriptionText, newImages)
 
       toast({
@@ -218,22 +200,18 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
     }
   }
 
-  // Function to update image size
   const updateImageSize = (index: number, size: number) => {
     try {
       console.log(`Updating image ${index} size to ${size}%`)
 
-      // Create a new array to trigger a re-render
       const newImages = [...descriptionImages]
       newImages[index] = {
         ...newImages[index],
         size: size,
       }
 
-      // Update state
       setDescriptionImages(newImages)
 
-      // Update the form field with the combined description
       updateDescriptionField(descriptionText, newImages)
 
       toast({
@@ -250,14 +228,12 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
     }
   }
 
-  // Function to remove an image from the description
   const removeImage = (index: number) => {
     try {
       const newImages = [...descriptionImages]
       newImages.splice(index, 1)
       setDescriptionImages(newImages)
 
-      // Update the form field with the combined description
       updateDescriptionField(descriptionText, newImages)
 
       toast({
@@ -274,7 +250,6 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
     }
   }
 
-  // Function to remove all images from description
   const removeAllImages = () => {
     if (descriptionImages.length === 0) {
       toast({
@@ -288,7 +263,6 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
     try {
       setDescriptionImages([])
 
-      // Update the form field with just the text
       updateDescriptionField(descriptionText, [])
 
       toast({
@@ -305,14 +279,11 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
     }
   }
 
-  // Function to update the description field with text and images
   const updateDescriptionField = (text: string, images: DescriptionImage[]) => {
     try {
-      // Create HTML for all images
       let imagesHtml = ""
 
       images.forEach((img) => {
-        // Determine alignment styles based on the alignment property
         let containerStyle = ""
         let imgStyle = ""
 
@@ -332,11 +303,9 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
             break
         }
 
-        // Get the product title from the form
         const productTitle = form.getValues("name") || "Product"
 
         if (img.link) {
-          // Ensure the link has http:// or https:// prefix
           const formattedLink = img.link.match(/^https?:\/\//) ? img.link : `https://${img.link}`
           imagesHtml += `<div style="${containerStyle}"><a href="${formattedLink}" target="_blank" rel="noopener noreferrer"><img src="${img.url}" alt="${productTitle}" style="${imgStyle}" /></a></div>`
         } else {
@@ -344,26 +313,21 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
         }
       })
 
-      // Combine the description text with images
       const combinedDescription = text + imagesHtml
 
-      // Update the form value directly
       form.setValue("description", combinedDescription, { shouldDirty: true, shouldTouch: true })
 
-      // Log the combined description for debugging
       console.log("Updated description field with:", combinedDescription)
     } catch (error) {
       console.error("Error updating description field:", error)
     }
   }
 
-  // Handle changes to the description text
   const handleDescriptionChange = (value: string) => {
     setDescriptionText(value)
     updateDescriptionField(value, descriptionImages)
   }
 
-  // Get all product images from the form
   const getProductImages = () => {
     const mainImage = form.getValues("mainImage")
     const galleryImages = form.getValues("images") || []
@@ -372,12 +336,10 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
     return allImages
   }
 
-  // Handle image selection
   const handleImageSelect = (imageUrl: string) => {
     setSelectedImage(imageUrl)
   }
 
-  // Get size label based on percentage
   const getSizeLabel = (size: number) => {
     if (size <= 25) return "Small"
     if (size <= 50) return "Medium"
@@ -385,9 +347,7 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
     return "Full Width"
   }
 
-  // Find the closest form element
   useEffect(() => {
-    // Find the closest form element
     const findForm = () => {
       let element = document.querySelector('[name="description"]')
       while (element && element.tagName !== "FORM") {
@@ -398,7 +358,6 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
 
     formRef.current = findForm()
 
-    // Add submit event listener to ensure description is updated before submission
     const handleSubmit = () => {
       console.log("Form is being submitted, ensuring description is up to date")
       updateDescriptionField(descriptionText, descriptionImages)
@@ -687,7 +646,6 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
                 />
               </FormControl>
 
-              {/* Display images below the editor */}
               {descriptionImages.length > 0 && (
                 <div className="mt-4 border rounded-md p-4 bg-gray-50">
                   <h3 className="text-sm font-medium mb-3">Product Images</h3>
@@ -797,7 +755,6 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
                   </div>
                 </div>
               )}
-
               <FormMessage />
             </div>
           </FormItem>

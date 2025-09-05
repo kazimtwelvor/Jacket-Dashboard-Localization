@@ -45,14 +45,13 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
   storeId,
   currentProductId,
 }) => {
-  // Calculate completion percentage for variations sections
   const getCategoriesCompletion = () => {
     const gender = form.watch("categories.gender")
     const material = form.watch("categories.material") || []
     const style = form.watch("categories.style") || []
 
     let completed = 0
-    const total = 3 // Required fields: gender, material, style
+    const total = 3 
 
     if (gender) completed++
     if (material.length > 0) completed++
@@ -79,7 +78,6 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
 
   return (
     <div className="space-y-8">
-      {/* Step 1: Pricing and Inventory */}
       <div className="grid gap-8 md:grid-cols-2">
         <Card className="overflow-hidden border-2 border-primary/10 shadow-md">
           <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 pb-4">
@@ -120,7 +118,6 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
         </Card>
       </div>
 
-      {/* Step 2: Product Images */}
       <Card className="overflow-hidden border-2 border-primary/10 shadow-md">
         <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 pb-4">
           <div className="flex items-center gap-3">
@@ -138,7 +135,6 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
         </CardContent>
       </Card>
 
-      {/* Step 3: Basic Information */}
       <Card className="overflow-hidden border-2 border-primary/10 shadow-md">
         <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 pb-4">
           <div className="flex items-center gap-3">
@@ -162,7 +158,6 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
         </CardContent>
       </Card>
 
-      {/* Step 5: Product Variations - Categories & Attributes */}
       <Card className="overflow-hidden border-2 border-primary/10 shadow-md">
         <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 pb-4">
           <div className="flex items-center gap-3">
@@ -200,7 +195,6 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
         </CardContent>
       </Card>
 
-      {/* Step 6: Product Variations - Size Selection */}
       <Card className="overflow-hidden border-2 border-primary/10 shadow-md">
         <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 pb-4">
           <div className="flex items-center gap-3">
@@ -227,7 +221,6 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
         </CardContent>
       </Card>
 
-      {/* Step 7: Product Variations - Color Variations */}
       <Card className="overflow-hidden border-2 border-primary/10 shadow-md">
         <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 pb-4">
           <div className="flex items-center gap-3">
@@ -254,7 +247,6 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
         </CardContent>
       </Card>
 
-      {/* Step 8: Product Variations - Color Links */}
       <Card className="overflow-hidden border-2 border-primary/10 shadow-md">
         <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 pb-4">
           <div className="flex items-center gap-3">
@@ -272,10 +264,8 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
         </CardContent>
       </Card>
 
-      {/* Step 9: Product Description - Moved to the bottom */}
       <DescriptionSection form={form} />
       
-      {/* Step 10: Reviews Generator */}
       <Card className="overflow-hidden border-2 border-primary/10 shadow-md">
         <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 pb-4">
           <div className="flex items-center gap-3">

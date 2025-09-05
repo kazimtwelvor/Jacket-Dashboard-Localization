@@ -5,7 +5,6 @@ import { useParams } from "next/navigation"
 import axios from "axios"
 import { UseFormReturn } from "react-hook-form"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
 
 interface Gender {
   id: string
@@ -24,9 +23,7 @@ export const GenderSelector: React.FC<GenderSelectorProps> = ({ form }) => {
   useEffect(() => {
     const fetchGenders = async () => {
       try {
-        // Use the categories endpoint with gender filter
-        const response = await axios.get(`/api/${params.storeId}/categories`)
-        // Filter only gender categories
+        const response = await axios.get(`/api/${params?.storeId}/categories`)
         const genderCategories = response.data
           .filter((item: any) => item.type === "gender")
           .map((item: any) => ({
@@ -41,7 +38,6 @@ export const GenderSelector: React.FC<GenderSelectorProps> = ({ form }) => {
         ])
       } catch (error) {
         console.error("Failed to fetch genders:", error)
-        // Provide some default genders in case of error
         setGenders([
           { id: "men", name: "Men" },
           { id: "women", name: "Women" },
@@ -54,7 +50,7 @@ export const GenderSelector: React.FC<GenderSelectorProps> = ({ form }) => {
     }
     
     fetchGenders()
-  }, [params.storeId])
+  }, [params?.storeId])
   
   const selectedGenders = form.watch("genders") || []
   

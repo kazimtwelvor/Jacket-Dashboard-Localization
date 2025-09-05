@@ -1,12 +1,5 @@
-/**
- * Schema Generator Utility
- *
- * This utility generates structured data (JSON-LD) for products based on their data
- * and optional admin overrides.
- */
 
 interface SchemaGeneratorOptions {
-  // Product data
   name: string
   description: string
   price: string
@@ -19,13 +12,9 @@ interface SchemaGeneratorOptions {
   images: string[]
   mainImage?: string
   slug?: string
-
-  // Schema configuration
   useAutoSchema?: boolean
   schemaTemplate?: string
   customSchema?: string
-
-  // Additional data based on template
   material?: string[]
   color?: string[]
   gender?: string
@@ -38,27 +27,22 @@ interface SchemaGeneratorOptions {
 }
 
 export function generateProductSchema(options: SchemaGeneratorOptions): string {
-  // If using custom schema and it exists, return it
   if (!options.useAutoSchema && options.customSchema) {
     try {
-      // Validate that it's proper JSON
       JSON.parse(options.customSchema)
       return options.customSchema
     } catch (e) {
       console.error("Invalid custom schema JSON:", e)
-      // Fall back to auto-generated schema
     }
   }
 
-  // Get the base URL
   const baseUrl = typeof window !== "undefined" ? window.location.origin : ""
 
   const productUrl = options.slug
     ? `${baseUrl}/products/${options.slug}`
     : `${baseUrl}/products/${options.name?.toLowerCase().replace(/\s+/g, "-") || "product"}`
 
-  // Generate auto schema
-  const baseSchema = {
+  const baseSchema: any = {
     "@context": "https://schema.org/",
     "@type": "Product",
     name: options.name || "Product Name",
@@ -84,7 +68,6 @@ export function generateProductSchema(options: SchemaGeneratorOptions): string {
     },
   }
 
-  // Add sale price if available
   if (options.salePrice && Number.parseFloat(options.salePrice) > 0) {
     baseSchema.offers = {
       ...baseSchema.offers,
@@ -97,7 +80,6 @@ export function generateProductSchema(options: SchemaGeneratorOptions): string {
     }
   }
 
-  // Add ratings if available
   if (
     options.ratingValue &&
     options.reviewCount &&
@@ -111,8 +93,7 @@ export function generateProductSchema(options: SchemaGeneratorOptions): string {
     }
   }
 
-  // Apply template-specific properties
-  let templateSchema = { ...baseSchema }
+  let templateSchema: any = { ...baseSchema }
 
   switch (options.schemaTemplate) {
     case "clothing":
@@ -169,9 +150,7 @@ export function generateProductSchema(options: SchemaGeneratorOptions): string {
   return JSON.stringify(templateSchema, null, 2)
 }
 
-/**
- * Utility function to extract schema data from product form
- */
+
 export function extractSchemaDataFromForm(formData: any): SchemaGeneratorOptions {
   return {
     name: formData.name || "",
@@ -195,13 +174,9 @@ export function extractSchemaDataFromForm(formData: any): SchemaGeneratorOptions
   }
 }
 
-/**
- * Utility function to inject schema into HTML
- */
+
 export function injectSchemaIntoHtml(html: string, schema: string): string {
-  // Remove any existing schema
   const cleanedHtml = html.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/g, "")
 
-  // Add new schema before closing head tag
   return cleanedHtml.replace("</head>", `<script type="application/ld+json">${schema}</script></head>`)
 }

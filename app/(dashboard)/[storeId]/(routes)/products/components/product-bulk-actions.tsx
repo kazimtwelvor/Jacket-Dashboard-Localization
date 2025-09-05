@@ -28,12 +28,10 @@ export const ProductBulkActions = ({ selectedIds, storeId, onActionComplete }: P
   const [open, setOpen] = useState(false)
   const router = useRouter()
 
-  // Direct API call for bulk delete
   const handleBulkDelete = async () => {
     try {
       setLoading(true)
 
-      // Use the server action instead of direct API call
       const result = await bulkDeleteProducts(selectedIds, storeId)
 
       if (result.success) {
@@ -56,7 +54,6 @@ export const ProductBulkActions = ({ selectedIds, storeId, onActionComplete }: P
     try {
       setLoading(true)
 
-      // Use the server action instead of direct API call
       const result = await bulkUpdateProducts(selectedIds, storeId, data)
 
       if (result.success) {
@@ -78,7 +75,6 @@ export const ProductBulkActions = ({ selectedIds, storeId, onActionComplete }: P
     try {
       setLoading(true)
 
-      // Use the server action instead of direct API call
       const result = await bulkDuplicateProducts(selectedIds, storeId)
 
       if (result.success) {
@@ -132,9 +128,7 @@ export const ProductBulkActions = ({ selectedIds, storeId, onActionComplete }: P
                 <RotateCcw className="mr-2 h-4 w-4" />
                 Unarchive
               </DropdownMenuItem>
-
               <DropdownMenuSeparator />
-
               <DropdownMenuLabel>Product Actions</DropdownMenuLabel>
               <DropdownMenuItem onClick={() => handleBulkUpdate({ isFeatured: true })}>
                 <Star className="mr-2 h-4 w-4 text-yellow-500" />
@@ -148,9 +142,7 @@ export const ProductBulkActions = ({ selectedIds, storeId, onActionComplete }: P
                 <Copy className="mr-2 h-4 w-4" />
                 Duplicate
               </DropdownMenuItem>
-
               <DropdownMenuSeparator />
-
               <DropdownMenuItem onClick={() => setOpen(true)} className="text-destructive">
                 <Trash className="mr-2 h-4 w-4" />
                 Delete

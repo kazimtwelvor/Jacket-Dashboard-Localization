@@ -11,12 +11,11 @@ const TEMPLATES = [
     description: "A modern, responsive custom template for your store",
     imageUrl: "/placeholder.svg?height=300&width=400",
   },
-  // More templates can be added here
 ]
 
 export const TemplatesClient = () => {
   const params = useParams()
-  const storeId = params.storeId as string
+  const storeId = params?.storeId as string
 
   return (
     <>

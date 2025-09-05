@@ -24,7 +24,6 @@ interface TrashPageProps {
 }
 
 const TrashPage: React.FC<TrashPageProps> = async ({ params, searchParams }) => {
-  // Parse filter parameters
   const genderFilters = searchParams.gender?.split(",") || []
   const materialFilters = searchParams.material?.split(",") || []
   const styleFilters = searchParams.style?.split(",") || []
@@ -33,28 +32,23 @@ const TrashPage: React.FC<TrashPageProps> = async ({ params, searchParams }) => 
   const minPrice = searchParams.minPrice ? Number.parseFloat(searchParams.minPrice) : undefined
   const maxPrice = searchParams.maxPrice ? Number.parseFloat(searchParams.maxPrice) : undefined
 
-  // Build filter conditions for trash
   const filterConditions: any = {
     storeId: params.storeId,
-    isDeleted: true, // Only show deleted items
+    isDeleted: true, 
   }
 
-  // Category filters (gender, material, style)
   if (genderFilters.length > 0) {
     filterConditions.gender = { in: genderFilters }
   }
 
-  // Size filter
   if (sizeFilters.length > 0) {
     filterConditions.sizeId = { in: sizeFilters }
   }
 
-  // Color filter
   if (colorFilters.length > 0) {
     filterConditions.colorId = { in: colorFilters }
   }
 
-  // Price range filter
   if (minPrice !== undefined || maxPrice !== undefined) {
     filterConditions.price = {}
 
@@ -67,7 +61,6 @@ const TrashPage: React.FC<TrashPageProps> = async ({ params, searchParams }) => 
     }
   }
 
-  // Fetch deleted products with filters
   const products = await prismadb.product.findMany({
     where: filterConditions,
     include: {
@@ -81,7 +74,6 @@ const TrashPage: React.FC<TrashPageProps> = async ({ params, searchParams }) => 
     },
   })
 
-  // Fetch categories, sizes, and colors for filters
   const categories = await prismadb.category.findMany({
     where: {
       storeId: params.storeId,
@@ -109,7 +101,6 @@ const TrashPage: React.FC<TrashPageProps> = async ({ params, searchParams }) => 
     },
   })
 
-  // Format the products for the data table
   const formattedProducts = products.map((item) => ({
     id: item.id,
     name: item.name,

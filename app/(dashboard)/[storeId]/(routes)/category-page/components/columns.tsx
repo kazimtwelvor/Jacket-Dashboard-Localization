@@ -1,9 +1,7 @@
 "use client"
-
 import { ColumnDef } from "@tanstack/react-table"
 import { CellAction } from "./cell-action"
 import { Badge } from "@/components/ui/badge"
-
 export type CategoryPageColumn = {
   id: string
   name: string

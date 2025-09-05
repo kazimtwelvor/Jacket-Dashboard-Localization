@@ -16,21 +16,17 @@ interface ColorVariationsSectionProps {
 }
 
 export const ColorVariationsSection: React.FC<ColorVariationsSectionProps> = ({ form, colors }) => {
-  // Watch color specifications to sync with color variations
   const colorSpecifications = form.watch("specifications.color") || []
 
-  // Sync color specifications with color variations
   useEffect(() => {
     if (colorSpecifications && colorSpecifications.length > 0) {
       const currentColorVariations = form.getValues("categories.variationColors") || []
 
-      // Check if the arrays are different
       const colorSpecsSet = new Set(colorSpecifications)
       const colorVariationsSet = new Set(currentColorVariations)
 
       let needsUpdate = false
 
-      // Check if color specs has items not in color variations
       for (const color of colorSpecifications) {
         if (!colorVariationsSet.has(color)) {
           needsUpdate = true
@@ -38,7 +34,6 @@ export const ColorVariationsSection: React.FC<ColorVariationsSectionProps> = ({ 
         }
       }
 
-      // If they're different, update color variations based on color specs
       if (needsUpdate) {
         console.log("Syncing color variations from color specifications:", colorSpecifications)
         form.setValue("categories.variationColors", [...colorSpecifications], {
@@ -67,7 +62,6 @@ export const ColorVariationsSection: React.FC<ColorVariationsSectionProps> = ({ 
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-2">
                 {colors.map((color) => {
-                  // Ensure field.value is an array
                   const fieldValue = Array.isArray(field.value) ? field.value : []
                   const checked = fieldValue.includes(color.name)
 
@@ -81,16 +75,13 @@ export const ColorVariationsSection: React.FC<ColorVariationsSectionProps> = ({ 
                       <Checkbox
                         checked={checked}
                         onCheckedChange={(isChecked) => {
-                          // Ensure we're working with an array
                           const current = Array.isArray(field.value) ? field.value : []
                           const updated = isChecked
                             ? [...current, color.name]
                             : current.filter((value) => value !== color.name)
 
-                          // Update color variations
                           field.onChange(updated)
 
-                          // Also update color specifications
                           const currentColorSpecs = form.getValues("specifications.color") || []
                           const updatedColorSpecs = isChecked
                             ? [...currentColorSpecs, color.name]

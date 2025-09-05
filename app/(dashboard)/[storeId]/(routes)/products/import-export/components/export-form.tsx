@@ -75,7 +75,6 @@ export const ExportProductsForm: React.FC<ExportProductsFormProps> = ({ storeId,
     try {
       setIsLoading(true)
 
-      // Start the export process
       const response = await fetch(`/api/${storeId}/products/export`, {
         method: "POST",
         headers: {
@@ -90,10 +89,8 @@ export const ExportProductsForm: React.FC<ExportProductsFormProps> = ({ storeId,
         throw new Error(errorText || "Failed to start export")
       }
 
-      // Get the response as a blob instead of JSON
       const blob = await response.blob()
 
-      // Get filename from Content-Disposition header if available
       const contentDisposition = response.headers.get("Content-Disposition")
       let filename = "products_export.xlsx"
       if (contentDisposition) {
@@ -102,12 +99,10 @@ export const ExportProductsForm: React.FC<ExportProductsFormProps> = ({ storeId,
           filename = filenameMatch[1]
         }
       } else {
-        // Fallback filename based on form data
         const timestamp = new Date().toISOString().replace(/[:.]/g, "-")
         filename = `products_export_${timestamp}.${data.fileType}`
       }
 
-      // Create a download link and trigger the download
       const url = window.URL.createObjectURL(blob)
       const link = document.createElement("a")
       link.href = url

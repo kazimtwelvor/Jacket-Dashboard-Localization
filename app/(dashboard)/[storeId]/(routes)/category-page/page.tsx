@@ -25,8 +25,8 @@ export default function CategoryPage() {
     const fetchCategoryPages = async () => {
       try {
         setLoading(true)
-        let url = `/api/${params.storeId}/category-pages`
-        const params_array = ["includeAll=true"] // Admin panel needs all pages
+        let url = `/api/${params?.storeId}/category-pages`
+        const params_array = ["includeAll=true"] 
         
         if (bestFilter === "best") {
           params_array.push("isBest=true")
@@ -53,7 +53,7 @@ export default function CategoryPage() {
     }
     
     fetchCategoryPages()
-  }, [params.storeId, bestFilter, statusFilter])
+  }, [params?.storeId, bestFilter, statusFilter])
   
   return (
     <div className="flex-col">
@@ -87,7 +87,7 @@ export default function CategoryPage() {
                 </SelectContent>
               </Select>
             </div>
-            <Button onClick={() => router.push(`/${params.storeId}/category-page/new`)}>
+            <Button onClick={() => router.push(`/${params?.storeId}/category-page/new`)}>
               <Plus className="mr-2 h-4 w-4" />
               Add New
             </Button>

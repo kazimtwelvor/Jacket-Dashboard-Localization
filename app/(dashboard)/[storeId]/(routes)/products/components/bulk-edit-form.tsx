@@ -47,7 +47,6 @@ interface BulkEditFormProps {
   loading: boolean
 }
 
-// Define schema for bulk edit form
 const formSchema = z.object({
   categoryId: z.string().optional(),
   sizeId: z.string().optional(),
@@ -72,7 +71,6 @@ export const BulkEditForm = ({
   onSubmit,
   loading,
 }: BulkEditFormProps) => {
-  // Define which fields to update
   const [updateFields, setUpdateFields] = useState({
     category: false,
     size: false,
@@ -87,7 +85,6 @@ export const BulkEditForm = ({
     seo: false,
   })
 
-  // Initialize form
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -106,9 +103,7 @@ export const BulkEditForm = ({
     },
   })
 
-  // Handle form submission
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
-    // Only include fields that are marked for update
     const dataToSubmit: any = {}
 
     if (updateFields.category && values.categoryId) {
@@ -166,7 +161,6 @@ export const BulkEditForm = ({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-        {/* Category */}
         <div className="flex items-start space-x-2">
           <Checkbox
             id="update-category"
@@ -207,7 +201,6 @@ export const BulkEditForm = ({
           </div>
         </div>
 
-        {/* Size */}
         <div className="flex items-start space-x-2">
           <Checkbox
             id="update-size"
@@ -248,7 +241,6 @@ export const BulkEditForm = ({
           </div>
         </div>
 
-        {/* Color */}
         <div className="flex items-start space-x-2">
           <Checkbox
             id="update-color"
@@ -292,7 +284,6 @@ export const BulkEditForm = ({
           </div>
         </div>
 
-        {/* Product Type */}
         <div className="flex items-start space-x-2">
           <Checkbox
             id="update-product-type"
@@ -333,7 +324,6 @@ export const BulkEditForm = ({
           </div>
         </div>
 
-        {/* Price */}
         <div className="flex items-start space-x-2">
           <Checkbox
             id="update-price"
@@ -364,7 +354,6 @@ export const BulkEditForm = ({
           </div>
         </div>
 
-        {/* Sale Price */}
         <div className="flex items-start space-x-2">
           <Checkbox
             id="update-sale-price"
@@ -395,7 +384,6 @@ export const BulkEditForm = ({
           </div>
         </div>
 
-        {/* Stock Status */}
         <div className="flex items-start space-x-2">
           <Checkbox
             id="update-stock"
@@ -436,7 +424,6 @@ export const BulkEditForm = ({
           </div>
         </div>
 
-        {/* SEO */}
         <div className="flex items-start space-x-2">
           <Checkbox
             id="update-seo"
@@ -464,7 +451,6 @@ export const BulkEditForm = ({
           </div>
         </div>
 
-        {/* Featured Status */}
         <div className="flex items-start space-x-2">
           <Checkbox
             id="update-featured"
@@ -496,7 +482,6 @@ export const BulkEditForm = ({
           </div>
         </div>
 
-        {/* Published Status */}
         <div className="flex items-start space-x-2">
           <Checkbox
             id="update-published"
@@ -528,7 +513,6 @@ export const BulkEditForm = ({
           </div>
         </div>
 
-        {/* Archived Status */}
         <div className="flex items-start space-x-2">
           <Checkbox
             id="update-archived"

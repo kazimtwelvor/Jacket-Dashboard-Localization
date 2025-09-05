@@ -18,31 +18,27 @@ interface Color {
   value: string
 }
 
-// Helper function to sanitize a slug string
 const sanitizeSlug = (slugStr: string | null | undefined): string => {
   if (!slugStr || typeof slugStr !== 'string') return "";
   return slugStr
     .toLowerCase()
-    .replace(/[^\w\s-]/g, "") // Remove non-alphanumeric characters except spaces and hyphens
-    .trim()                   // Trim leading/trailing spaces
-    .replace(/\s+/g, "-")    // Replace spaces with hyphens
-    .replace(/-+/g, "-");   // Replace multiple hyphens with a single hyphen
+    .replace(/[^\w\s-]/g, "") 
+    .trim()                   
+    .replace(/\s+/g, "-")    
+    .replace(/-+/g, "-");   
 };
 
-// Helper function to generate a slug from name if the provided slug is empty
 const generateSlugFromNameIfEmpty = (slugVal: string, nameVal: string | null | undefined): string => {
     if (slugVal && slugVal.trim() !== "") {
-        return slugVal; // Already have a good slug
+        return slugVal; 
     }
-    if (!nameVal || typeof nameVal !== 'string') return ""; // Cannot generate from name
-    return sanitizeSlug(nameVal); // Generate from name
+    if (!nameVal || typeof nameVal !== 'string') return ""; 
+    return sanitizeSlug(nameVal); 
 };
 
 
-// Helper function to generate unique SKU with sequential numbering
 async function generateUniqueSku(storeId: string, manualSku: string | null): Promise<string> {
   try {
-    // If a manual SKU was provided, check if it's unique
     if (manualSku && manualSku.trim() !== "") {
       const existingProduct = await prismadb.product.findFirst({
         where: {
@@ -52,10 +48,9 @@ async function generateUniqueSku(storeId: string, manualSku: string | null): Pro
       })
 
       if (!existingProduct) {
-        return manualSku // If unique, use the manual SKU
+        return manualSku 
       }
 
-      // If not unique, append a suffix to make it unique
       let counter = 1
       let uniqueSku = `${manualSku}-${counter}`
 
@@ -76,17 +71,13 @@ async function generateUniqueSku(storeId: string, manualSku: string | null): Pro
       }
     }
 
-    // If no manual SKU or it's empty, generate an automatic one
-    // Get the store's SKU prefix
     const store = await prismadb.store.findUnique({
       where: { id: storeId },
       select: { skuPrefix: true },
     })
 
-    // Use the store's prefix or default to "SKU" if not set
     const prefix = store?.skuPrefix || "SKU"
 
-    // Find the highest existing SKU number for this prefix
     const products = await prismadb.product.findMany({
       where: {
         storeId,
@@ -99,7 +90,6 @@ async function generateUniqueSku(storeId: string, manualSku: string | null): Pro
       },
     })
 
-    // Extract numbers from existing SKUs
     let highestNumber = 0
     const regex = new RegExp(`^${prefix}-0*(\\d+)$`)
 
@@ -113,7 +103,6 @@ async function generateUniqueSku(storeId: string, manualSku: string | null): Pro
       }
     })
 
-    // Generate the next number with padding
     const nextNumber = highestNumber + 1
     const paddedNumber = nextNumber.toString().padStart(4, "0")
     const newSku = `${prefix}-${paddedNumber}`
@@ -121,16 +110,14 @@ async function generateUniqueSku(storeId: string, manualSku: string | null): Pro
     return newSku
   } catch (error) {
     console.error("Error generating SKU:", error)
-    // Fallback to timestamp-based SKU in case of errors
     const timestamp = Date.now().toString().slice(-8)
     return `SKU-${timestamp}`
   }
 }
 
-// Add this debug function at the top of the file, after the imports
 async function logFormDataContents(formData: FormData, label: string) {
   console.log(`--- ${label} - FormData Contents ---`)
-  for (const [key, value] of formData.entries()) {
+  for (const [key, value] of Array.from(formData.entries())) {
     if (typeof value === "string" && value.length > 100) {
       console.log(`${key}: ${value.substring(0, 100)}... (truncated)`)
     } else {
@@ -140,12 +127,10 @@ async function logFormDataContents(formData: FormData, label: string) {
   console.log(`--- End ${label} ---`)
 }
 
-// Modify the beginning of the createProduct function to add more debugging
 export async function createProduct(formData: FormData) {
   try {
-    // Log all form data for debugging
     console.log("--- Create Product - FormData Contents ---")
-    for (const [key, value] of formData.entries()) {
+    for (const [key, value] of Array.from(formData.entries())) {
       if (typeof value === "string" && value.length > 100) {
         console.log(`${key}: ${value.substring(0, 100)}... (truncated)`)
       } else {
@@ -157,19 +142,15 @@ export async function createProduct(formData: FormData) {
     const formDataKeys = Array.from(formData.keys())
     console.log("createProduct action called with formData keys:", formDataKeys)
 
-    // Extract and log storeId specifically
     let storeId = formData.get("storeId") as string
     console.log("StoreId from formData:", storeId)
 
     if (!storeId) {
-      // Try to extract from URL if not directly provided
-      const urlPath = formData.get("url") as string // Expecting pathname
+      const urlPath = formData.get("url") as string 
       console.log("URL path from formData:", urlPath)
 
       if (urlPath) {
         const urlParts = urlPath.split("/")
-        // Example: /0cll7xt077j7/products/new -> storeId should be 0cll7xt077j7
-        // Find the first part after the initial '/' that is not 'products', 'settings', etc. and is a valid ID format
         const potentialStoreId = urlParts.find(
           (part, index) => index === 1 && part && !["products", "settings", "api", "categories", "sizes", "colors", "billboards", "orders"].includes(part)
         );
@@ -178,31 +159,28 @@ export async function createProduct(formData: FormData) {
         if (potentialStoreId) {
           console.log(`Extracted storeId from URL path: ${potentialStoreId}`)
           storeId = potentialStoreId;
-          formData.set("storeId", potentialStoreId) // Update formData if necessary
+          formData.set("storeId", potentialStoreId) 
         }
       }
 
-      // Check again after potential extraction
       if (!formData.get("storeId")) {
         throw new Error("Store ID is required and could not be determined")
       }
     }
-     storeId = formData.get("storeId") as string; // Ensure storeId is correctly assigned
+     storeId = formData.get("storeId") as string; 
 
 
-    // Extract data from FormData
     const { userId } = await auth()
 
     if (!userId) {
       throw new Error("Unauthenticated")
     }
 
-    // Extract data from FormData
     const id = formData.get("id") as string | null
     const tempReviewsId = formData.get("tempReviewsId") as string | null
     const cachedReviewsJson = formData.get("cachedReviews") as string | null
     
-    if (!storeId) { // Double check storeId after all attempts
+    if (!storeId) { 
       throw new Error("Store ID is required")
     }
     console.log("Using storeId:", storeId)
@@ -211,23 +189,18 @@ export async function createProduct(formData: FormData) {
     const name = formData.get("name") as string
     const description = formData.get("description") as string
     
-    // Slug handling
     const submittedSlug = formData.get("slug") as string;
-    let productSlugForDb = sanitizeSlug(submittedSlug); // Sanitize submitted slug first
-    productSlugForDb = generateSlugFromNameIfEmpty(productSlugForDb, name); // Generate from name if empty
+    let productSlugForDb = sanitizeSlug(submittedSlug); 
+    productSlugForDb = generateSlugFromNameIfEmpty(productSlugForDb, name); 
     console.log("Submitted slug from form:", submittedSlug);
     console.log("Sanitized and finalized slug for DB:", productSlugForDb);
 
 
-    // Fix price parsing
     const regularPriceStr = formData.get("regularPrice") as string
     const price = regularPriceStr ? Number.parseFloat(regularPriceStr) : 0
 
     const salePriceStr = formData.get("salePrice") as string
-    // Fix: Use 0 instead of null for salePrice if it's empty or invalid
     const salePrice = salePriceStr && salePriceStr.trim() !== "" ? Number.parseFloat(salePriceStr) : 0
-
-    // Get the SKU from form data - might be empty for auto-generation
     const manualSku = formData.get("sku") as string
     const stockStatus = formData.get("stockStatus") as string
     const isArchived = submitType === "draft"
@@ -242,16 +215,12 @@ export async function createProduct(formData: FormData) {
     const relatedProductsJson = formData.get("relatedProducts") as string
     console.log("Raw relatedProducts from form:", relatedProductsJson)
 
-    // Properly handle isFeatured value, default to false if not provided or invalid
-    // Using String() to ensure we're comparing strings, as formData.get() returns strings
     const isFeaturedValue = formData.get("isFeatured")
     const isFeatured = isFeaturedValue === "true" || String(isFeaturedValue) === "true"
     
-    // Handle isParentProduct value
     const isParentProductValue = formData.get("isParentProduct")
     const isParentProduct = isParentProductValue === "true" || String(isParentProductValue) === "true"
     
-    // Handle parentProductId value
     const parentProductId = formData.get("parentProductId") as string || null
     
     console.log("isParentProduct debug:", {
@@ -270,7 +239,6 @@ export async function createProduct(formData: FormData) {
 
     const imagesJson = formData.get("images") as string
 
-    // Parse JSON strings with better error handling
     let tags = []
     try {
       if (tagsJson && tagsJson.trim() !== "") {
@@ -303,17 +271,14 @@ export async function createProduct(formData: FormData) {
       relatedProducts = []
     }
 
-    // Parse JSON strings
     const materialParsed = materialJson ? JSON.parse(materialJson) : []
     const styleParsed = styleJson ? JSON.parse(styleJson) : []
     const images = imagesJson ? JSON.parse(imagesJson) : []
-
-    // Parse SEO data directly from the seo JSON string
     const seoJson = formData.get("seo") as string
     let seoData = {
       metaTitle: "",
       metaDescription: "",
-      slug: "", // This will be updated with productSlugForDb
+      slug: "", 
       keywords: [],
       isPillarContent: false,
       noIndex: false,
@@ -327,7 +292,7 @@ export async function createProduct(formData: FormData) {
         seoData = {
           metaTitle: parsedSeo.metaTitle || name || "",
           metaDescription: parsedSeo.metaDescription || "",
-          slug: parsedSeo.slug ? sanitizeSlug(parsedSeo.slug) : productSlugForDb, // Use sanitized SEO slug or fall back to main product slug
+          slug: parsedSeo.slug ? sanitizeSlug(parsedSeo.slug) : productSlugForDb, 
           keywords: Array.isArray(parsedSeo.keywords) ? parsedSeo.keywords : [],
           isPillarContent: !!parsedSeo.isPillarContent,
           noIndex: !!parsedSeo.noIndex,
@@ -335,16 +300,16 @@ export async function createProduct(formData: FormData) {
           canonicalUrl: parsedSeo.canonicalUrl || "",
         }
       } else {
-         // If no seoJson, ensure seoData.slug is populated with the main product slug
+        
         seoData.slug = productSlugForDb;
       }
     } catch (e) {
       console.log("Error parsing SEO JSON:", e instanceof Error ? e.message : String(e))
-      // If there's an error parsing SEO JSON, still use the productSlugForDb
+      
       seoData.slug = productSlugForDb;
     }
     
-    // Ensure seoData.slug is productSlugForDb if it ended up empty
+    
     if (!seoData.slug) {
         seoData.slug = productSlugForDb;
     }
@@ -355,7 +320,6 @@ export async function createProduct(formData: FormData) {
     console.log("Final SEO slug being used for seoData:", seoData.slug)
 
 
-    // Extract brandName, ratingValue, and reviewCount with default values
     const brandName = (formData.get("brandName") as string) || "Leather Jacket By Fineyst"
     const ratingValue = (formData.get("ratingValue") as string) || "4.5"
     const reviewCount = (formData.get("reviewCount") as string) || "0"
@@ -367,27 +331,24 @@ export async function createProduct(formData: FormData) {
     })
 
     const purchaseNote = formData.get("purchaseNote") as string
-    const categoryData = formData.get("categoryData") as string | null // Can be null or empty string
+    const categoryData = formData.get("categoryData") as string | null 
 
-    // Handle colorDetails instead of colorIds
     let colorDetails = null
     const colorDetailsJson = formData.get("colorDetails") as string | null
     const colorIdsJson = formData.get("colorIds") as string | null
 
-    // Find this section where formData values are extracted
+    
     const colorLinksJson = formData.get("colorLinks") as string
     console.log("Raw colorLinks from form:", colorLinksJson)
 
-    // Extract schema data
+    
     const schema1Json = formData.get("schema1") as string
     const schema2Json = formData.get("schema2") as string
     const schema3Json = formData.get("schema3") as string
     const schemaJson = formData.get("schema") as string
 
-    // Create a combined schema object
     let combinedSchema = {}
 
-    // First check if we have a combined schema already
     if (schemaJson && schemaJson.trim() !== "") {
       try {
         combinedSchema = JSON.parse(schemaJson)
@@ -398,13 +359,10 @@ export async function createProduct(formData: FormData) {
       }
     }
 
-    // Process all schemas regardless of whether we have a combined schema
-    // Process schema1 (Product schema - always required)
     try {
       if (schema1Json && schema1Json.trim() !== "") {
         const parsedSchema1 = JSON.parse(schema1Json)
         if (parsedSchema1) {
-          // Use templateName if available, or @type, or default to "Product"
           const schemaType = parsedSchema1.templateName || parsedSchema1["@type"] || "Product"
           combinedSchema[schemaType] = parsedSchema1
           console.log(`Added schema1 as ${schemaType} to combined schema`)
@@ -414,7 +372,6 @@ export async function createProduct(formData: FormData) {
       console.log("Error processing schema1 for combined schema:", e instanceof Error ? e.message : String(e))
     }
 
-    // Process schema2
     try {
       if (schema2Json && schema2Json.trim() !== "") {
         const parsedSchema2 = JSON.parse(schema2Json)
@@ -428,7 +385,6 @@ export async function createProduct(formData: FormData) {
       console.log("Error processing schema2 for combined schema:", e instanceof Error ? e.message : String(e))
     }
 
-    // Process schema3
     try {
       if (schema3Json && schema3Json.trim() !== "") {
         const parsedSchema3 = JSON.parse(schema3Json)
@@ -442,9 +398,7 @@ export async function createProduct(formData: FormData) {
       console.log("Error processing schema3 for combined schema:", e instanceof Error ? e.message : String(e))
     }
 
-    // If still no schema data, create a default product schema
     if (Object.keys(combinedSchema).length === 0) {
-      // Create a default product schema
       combinedSchema = {
         Product: {
           "@context": "https://schema.org",
@@ -463,23 +417,15 @@ export async function createProduct(formData: FormData) {
       console.log("Created default product schema in server action")
     }
 
-    // Convert to string
     const schemaDataString = JSON.stringify(combinedSchema)
-    console.log("Final schema data:", schemaDataString.substring(0, 100) + "...")
-    console.log("Number of schemas in combined schema:", Object.keys(combinedSchema).length)
 
 
-    // Process color links with extra safety checks
     let colorLinksData = {}
     let colorLinksString = "{}"
 
     try {
       if (colorLinksJson) {
-        // Log the exact value for debugging
-        console.log(`Raw colorLinks value type: ${typeof colorLinksJson}`)
-        console.log(`Raw colorLinks value: ${colorLinksJson.substring(0, 100)}...`)
 
-        // Only try to parse if it looks like valid JSON
         if (
           typeof colorLinksJson === "string" &&
           colorLinksJson.trim().startsWith("{") &&
@@ -488,7 +434,6 @@ export async function createProduct(formData: FormData) {
           try {
             const parsedData = JSON.parse(colorLinksJson)
 
-            // Ensure it's an object
             if (typeof parsedData === "object" && parsedData !== null) {
               colorLinksData = parsedData
               colorLinksString = colorLinksJson
@@ -511,14 +456,11 @@ export async function createProduct(formData: FormData) {
       colorLinksData = {}
     }
 
-    // Save color links for all products (both parent and child)
     let colorLinksToSave = colorLinksData
 
-    // Log the final structure for verification
     console.log("Final colorLinksData structure:", JSON.stringify(colorLinksData).substring(0, 100))
     console.log("ColorLinks to save:", JSON.stringify(colorLinksToSave))
 
-    // First try to get colorDetails if it exists
     if (colorDetailsJson) {
       try {
         colorDetails = JSON.parse(colorDetailsJson)
@@ -527,12 +469,10 @@ export async function createProduct(formData: FormData) {
       }
     }
 
-    // If colorDetails is still null but we have colorIds, fetch the color details from the database
     if (!colorDetails && colorIdsJson) {
       try {
         const colorIds = JSON.parse(colorIdsJson)
         if (Array.isArray(colorIds) && colorIds.length > 0) {
-          // Fetch color details from the database
           const colorsFromDb = await prismadb.color.findMany({
             where: {
               id: {
@@ -541,7 +481,6 @@ export async function createProduct(formData: FormData) {
             },
           })
 
-          // Format the colors into the expected colorDetails format
           colorDetails = colorsFromDb.map((color) => ({
             id: color.id,
             name: color.name,
@@ -555,32 +494,26 @@ export async function createProduct(formData: FormData) {
       }
     }
 
-    // Parse sizes array - IMPORTANT: Extract only the IDs
     const sizesJson = formData.get("sizes") as string
     let sizeIds: string[] = []
-    // let sizeDetails = null // sizeDetails is now the primary way
 
-    // Add this improved section for processing sizeDetails
     const sizeDetailsJson = formData.get("sizeDetails") as string | null
-    let sizeDetailsData = null // Renamed to avoid conflict with sizeDetails variable above
+    let sizeDetailsData = null 
 
     try {
       if (sizeDetailsJson) {
-        // If we have a JSON string, parse it
         sizeDetailsData = JSON.parse(sizeDetailsJson)
         console.log("Successfully parsed sizeDetails:", sizeDetailsData)
          if (Array.isArray(sizeDetailsData)) {
             sizeIds = sizeDetailsData.map(sd => sd.id).filter(Boolean);
         }
       } else {
-        // If no sizeDetails provided directly, try to build it from sizeIds (old way)
-        const sizesJsonFallback = formData.get("sizes") as string // sizes field should contain array of IDs
+        const sizesJsonFallback = formData.get("sizes") as string 
         if (sizesJsonFallback) {
           const parsedSizeIds = JSON.parse(sizesJsonFallback)
 
           if (Array.isArray(parsedSizeIds) && parsedSizeIds.length > 0) {
              sizeIds = parsedSizeIds;
-            // Fetch size details from the database
             const sizesFromDb = await prismadb.size.findMany({
               where: {
                 id: {
@@ -589,7 +522,6 @@ export async function createProduct(formData: FormData) {
               },
             })
 
-            // Format the sizes into the expected sizeDetails format
             sizeDetailsData = sizesFromDb.map((size) => ({
               id: size.id,
               name: size.name,
@@ -602,11 +534,10 @@ export async function createProduct(formData: FormData) {
       }
     } catch (e) {
       console.log("Error processing sizeDetails:", e instanceof Error ? e.message : String(e))
-      sizeDetailsData = [] // Default to empty array instead of null
+      sizeDetailsData = [] 
     }
 
 
-    // Log the parsed data for debugging
     console.log("Parsed images", images)
     console.log("Parsed specifications:", specifications ? JSON.parse(specifications) : {})
     console.log("Parsed categories:", {
@@ -616,13 +547,12 @@ export async function createProduct(formData: FormData) {
     })
     console.log("Extracted material:", materialParsed)
     console.log("Extracted style:", styleParsed)
-    console.log("Extracted size IDs:", sizeIds) // sizeIds might be redundant if sizeDetailsData is primary
+    console.log("Extracted size IDs:", sizeIds) 
     console.log("Extracted size details data:", sizeDetailsData)
 
     console.log("Parsed SEO data (object):", seoData)
 
 
-    // Find the user in the database by their Clerk ID
     const dbUser = await prismadb.user.findUnique({
       where: {
         clerkId: userId,
@@ -633,14 +563,12 @@ export async function createProduct(formData: FormData) {
       throw new Error("User not found")
     }
 
-    // Create categoryData object from individual fields
     const categoryDataObject = {
       material: Array.isArray(materialParsed) && materialParsed.length > 0 ? materialParsed[0] : null,
       style: Array.isArray(styleParsed) && styleParsed.length > 0 ? styleParsed[0] : null,
       gender: gender || null
     }
 
-    // Find the productData object and add/update this line:
     const productData = {
       name,
       description,
@@ -648,29 +576,28 @@ export async function createProduct(formData: FormData) {
       salePrice: isNaN(salePrice) ? 0 : salePrice,
       stockStatus,
       isArchived,
-      isPublished: !isArchived, // When isArchived is true (draft), isPublished should be false
-      specifications, // This is a string already
+      isPublished: !isArchived, 
+      specifications, 
       gender,
-      categoryData: categoryDataObject, // Add the categoryData object
+      categoryData: categoryDataObject, 
       tags: Array.isArray(tags) ? tags : [],
       relatedProducts: Array.isArray(relatedProducts) ? relatedProducts : [],
       metaTitle: seoData.metaTitle,
       metaDescription: seoData.metaDescription,
-      slug: productSlugForDb, // Use the definitive product slug
+      slug: productSlugForDb, 
       keywords: Array.isArray(seoData.keywords) ? seoData.keywords : [],
       noIndex: seoData.noIndex,
-      brandName: brandName || "Leather Jacket By Fineyst", // Ensure default value
-      ratingValue: ratingValue || "4.5", // Ensure default value
-      reviewCount: reviewCount || "0", // Ensure default value
+      brandName: brandName || "Leather Jacket By Fineyst", 
+      ratingValue: ratingValue || "4.5", 
+      reviewCount: reviewCount || "0", 
       purchaseNote,
       isFeatured,
       isParentProduct,
       parentProductId,
-      colorDetails, // This should be the parsed object or from DB
-      sizeDetails: sizeDetailsData || [], // Ensure this is never null
+      colorDetails, 
+      sizeDetails: sizeDetailsData || [], 
       colorLinks: colorLinksToSave,
-      schema: schemaDataString, // Use the stringified combined schema
-      // Add creator information
+      schema: schemaDataString, 
       createdById: dbUser.id,
       createdByName: dbUser.name || "Unknown",
       createdByEmail: dbUser.email,
@@ -687,14 +614,12 @@ export async function createProduct(formData: FormData) {
 
     console.log("Final tags being saved to database:", productData.tags)
 
-    // Validate that at least one color is selected
     const selectedColors = specifications ? JSON.parse(specifications).color || [] : []
     if (!selectedColors || selectedColors.length === 0) {
       throw new Error("At least one color must be selected before saving the product")
     }
     console.log("Color validation passed:", selectedColors)
 
-    // Parse cached reviews if they exist
     let cachedReviews = null
     if (cachedReviewsJson) {
       try {
@@ -707,7 +632,6 @@ export async function createProduct(formData: FormData) {
       }
     }
 
-    // Check if user is the store owner
     const storeByUserId = await prismadb.store.findFirst({
       where: {
         id: storeId,
@@ -715,7 +639,6 @@ export async function createProduct(formData: FormData) {
       },
     })
 
-    // If not the owner, check if they are a member with appropriate permissions
     if (!storeByUserId) {
       const storeUser = await prismadb.storeUser.findFirst({
         where: {
@@ -724,85 +647,64 @@ export async function createProduct(formData: FormData) {
         },
       })
 
-      // Check if user has appropriate role (ADMIN, MANAGER, or EDITOR can manage products)
       if (!storeUser || !storeUser.role || !["ADMIN", "MANAGER", "EDITOR"].includes(storeUser.role)) {
         throw new Error("Unauthorized: Store not found or you don't have permission")
       }
     }
 
-    // If this is an update to an existing product
     if (id) {
       console.log(`Updating existing product: ${id}`)
 
       try {
-        // First, get the current product to check if SKU is being changed
         const currentProduct = await prismadb.product.findUnique({
           where: { id },
           select: {
             sku: true,
-            // Also fetch the creator information to preserve it
             createdById: true,
             createdByName: true,
             createdByEmail: true,
-            categoryData: true, // Fetch current categoryData
+            categoryData: true, 
           },
         })
 
-        let newSkuForUpdate = currentProduct?.sku; // Default to current SKU
+        let newSkuForUpdate = currentProduct?.sku; 
 
-        // If the user provided a new SKU and it's different from the current one, validate it
         if (manualSku && manualSku.trim() !== "" && currentProduct && manualSku !== currentProduct.sku) {
-          // Check if the new SKU is unique
           newSkuForUpdate = await generateUniqueSku(storeId, manualSku)
           console.log(`SKU changed from ${currentProduct.sku} to ${newSkuForUpdate}`)
         } else if (!currentProduct?.sku && manualSku && manualSku.trim() !== "") {
-           // Product exists but has no SKU, and manual SKU is provided
            newSkuForUpdate = await generateUniqueSku(storeId, manualSku);
            console.log(`Generated SKU for existing product (was empty): ${newSkuForUpdate}`);
         } else if (!currentProduct?.sku && (!manualSku || manualSku.trim() === "")) {
-            // Product exists, has no SKU, and no manual SKU provided (auto-generate)
             newSkuForUpdate = await generateUniqueSku(storeId, null);
             console.log(`Auto-generated SKU for existing product (was empty): ${newSkuForUpdate}`);
         }
 
 
-        // For updates, remove creator information from productData and only include updater information
-        // This ensures we don't overwrite who originally created the product
         const { createdById, createdByName, createdByEmail, ...dataWithoutCreator } = productData
         
         console.log('Server action - relatedProducts being updated:', dataWithoutCreator.relatedProducts)
 
-        // Update the product with all data except creator information
         const product = await prismadb.product.update({
           where: {
             id,
           },
           data: {
             ...dataWithoutCreator,
-            sku: newSkuForUpdate, // Set the determined SKU
-            // Use categoryData from productData which was built from form fields
+            sku: newSkuForUpdate, 
             categoryData: productData.categoryData, 
-            // Add updater information
             updatedById: dbUser.id,
             updatedByName: dbUser.name || "Unknown",
             updatedByEmail: dbUser.email,
           },
         })
 
-        // Delete existing product-image relationships first
         await prismadb.productImage.deleteMany({
             where: {
                 productId: id,
             },
         });
         
-        // Then, find and delete orphaned images (images not associated with any other product)
-        // This step is complex and needs careful implementation to avoid deleting shared images if that's a feature.
-        // For now, assuming images are not shared between products.
-        // A more robust solution would involve checking if an image is used by other products before deleting.
-        // For simplicity, we'll just delete images associated with this product via ProductImage then the Image itself if its URL matches one from `images`
-        
-        // Handle cached reviews for updated products - Same as new products
         if (cachedReviews && Array.isArray(cachedReviews) && cachedReviews.length > 0) {
           try {
             console.log(`Processing ${cachedReviews.length} cached reviews for updated product ${id}`)
@@ -840,12 +742,11 @@ export async function createProduct(formData: FormData) {
           console.log("No cached reviews to save for updated product")
         }
 
-        // Create new images and product-image relationships
-        for (const image of images) { // 'images' is from formData, parsed into an array of objects
+        for (const image of images) { 
           let imageUrl = ""
           let imageMetadata = {}
 
-          if (typeof image === "string") { // Should not happen if frontend sends objects
+          if (typeof image === "string") { 
             imageUrl = image
           } else if (typeof image === "object" && image !== null && (image as any).url) {
             imageUrl = (image as any).url
@@ -866,16 +767,13 @@ export async function createProduct(formData: FormData) {
             continue;
           }
 
-          // Find or create the image
-          let dbImage = await prismadb.image.findFirst({ where: { url: imageUrl } }); // Changed from findUnique
+          let dbImage = await prismadb.image.findFirst({ where: { url: imageUrl } }); 
           if (dbImage) {
-            // Optionally update metadata if it changed
              dbImage = await prismadb.image.update({ where: { id: dbImage.id }, data: { ...imageMetadata } });
           } else {
             dbImage = await prismadb.image.create({ data: { url: imageUrl, ...imageMetadata } });
           }
 
-          // Create the product-image relationship
           await prismadb.productImage.create({
             data: {
               productId: id,
@@ -884,7 +782,6 @@ export async function createProduct(formData: FormData) {
           })
         }
       } catch (error) {
-        // Handle other errors
         console.error("Error updating product:", error)
         throw error
       }
@@ -892,19 +789,16 @@ export async function createProduct(formData: FormData) {
       console.log("Creating new product")
 
       try {
-        // Generate a unique SKU for the new product - use manual SKU if provided
         const uniqueSku = await generateUniqueSku(storeId, manualSku)
         
-        // Use the categoryData from productData which was built from form fields
         const resolvedCategoryData = productData.categoryData;
         console.log('Using categoryData from productData:', resolvedCategoryData);
 
 
-        // Create new product
         const product = await prismadb.product.create({
           data: {
             ...productData,
-            sku: uniqueSku, // Use the generated SKU
+            sku: uniqueSku, 
             storeId: storeId,
             categoryData: resolvedCategoryData,
           },
@@ -912,12 +806,11 @@ export async function createProduct(formData: FormData) {
 
         console.log(`Created new product with ID: ${product.id}`)
 
-        // Create new images and product-image relationships
-        for (const image of images) { // 'images' is from formData
+        for (const image of images) { 
           let imageUrl = ""
           let imageMetadata = {}
 
-           if (typeof image === "string") { // Should not happen
+           if (typeof image === "string") { 
             imageUrl = image
           } else if (typeof image === "object" && image !== null && (image as any).url) {
             imageUrl = (image as any).url

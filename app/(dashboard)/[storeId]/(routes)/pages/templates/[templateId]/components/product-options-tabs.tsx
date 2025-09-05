@@ -50,7 +50,6 @@ export const ProductOptionsTabs: React.FC<ProductOptionsTabsProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState("backing")
 
-  // Handle keyboard navigation for tabs
   const handleKeyDown = (e: React.KeyboardEvent, tabId: string) => {
     const tabs = ["backing", "border", "thread"]
     const currentIndex = tabs.indexOf(activeTab)
@@ -123,7 +122,6 @@ export const ProductOptionsTabs: React.FC<ProductOptionsTabsProps> = ({
               <TabsTrigger value="thread">Thread Color Options</TabsTrigger>
             </TabsList>
 
-            {/* Backing Options Tab */}
             <TabsContent value="backing" className="space-y-4">
               <Card>
                 <CardHeader>
@@ -196,7 +194,6 @@ export const ProductOptionsTabs: React.FC<ProductOptionsTabsProps> = ({
               </Card>
             </TabsContent>
 
-            {/* Border Options Tab */}
             <TabsContent value="border" className="space-y-4">
               <Card>
                 <CardHeader>
@@ -269,7 +266,6 @@ export const ProductOptionsTabs: React.FC<ProductOptionsTabsProps> = ({
               </Card>
             </TabsContent>
 
-            {/* Thread Options Tab */}
             <TabsContent value="thread" className="space-y-4">
               <Card>
                 <CardHeader>
@@ -351,7 +347,6 @@ export const ProductOptionsTabs: React.FC<ProductOptionsTabsProps> = ({
 
         <div className="patch-tabs-container">
           <div className="patch-tabs-wrapper" aria-label="Patch Customization Options">
-            {/* Tabs Navigation */}
             <div className="patch-tabs-heading" role="tablist">
               <button
                 id="patch-tab-backing"
@@ -394,9 +389,7 @@ export const ProductOptionsTabs: React.FC<ProductOptionsTabsProps> = ({
               </button>
             </div>
 
-            {/* Tabs Content */}
             <div className="patch-tabs-content">
-              {/* Backing Options Tab */}
               <div
                 id="patch-content-backing"
                 role="tabpanel"
@@ -424,7 +417,6 @@ export const ProductOptionsTabs: React.FC<ProductOptionsTabsProps> = ({
                 </div>
               </div>
 
-              {/* Border Options Tab */}
               <div
                 id="patch-content-border"
                 role="tabpanel"
@@ -452,7 +444,6 @@ export const ProductOptionsTabs: React.FC<ProductOptionsTabsProps> = ({
                 </div>
               </div>
 
-              {/* Thread Color Options Tab */}
               <div
                 id="patch-content-thread"
                 role="tabpanel"

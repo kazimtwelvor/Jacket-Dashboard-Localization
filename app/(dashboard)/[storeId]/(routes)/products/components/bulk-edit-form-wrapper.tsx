@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation"
 import { toast } from "react-hot-toast"
 import type { Category, Color, Product, Size } from "@prisma/client"
 import { Check, ChevronLeft, Loader2 } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Heading } from "@/components/ui/heading"
@@ -19,8 +18,6 @@ import { useForm } from "react-hook-form"
 import * as z from "zod"
 import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
-
-// Define the form schema
 const formSchema = z.object({
   updateCategory: z.boolean().default(false),
   categoryId: z.string().optional(),
@@ -43,14 +40,12 @@ const formSchema = z.object({
   updateArchived: z.boolean().default(false),
   isArchived: z.boolean().default(false),
 })
-
 type ProductWithRelations = Product & {
   category: Category | null
   size: Size | null
   color: Color | null
   images: { url: string }[]
 }
-
 interface BulkEditFormWrapperProps {
   products: ProductWithRelations[]
   categories: Category[]
@@ -58,11 +53,9 @@ interface BulkEditFormWrapperProps {
   colors: Color[]
   storeId: string
 }
-
 export const BulkEditFormWrapper = ({ products, categories, sizes, colors, storeId }: BulkEditFormWrapperProps) => {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -81,7 +74,6 @@ export const BulkEditFormWrapper = ({ products, categories, sizes, colors, store
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      // Validate that at least one field is selected for update
       const hasUpdate =
         values.updateCategory ||
         values.updatePrice ||
@@ -98,7 +90,6 @@ export const BulkEditFormWrapper = ({ products, categories, sizes, colors, store
 
       setLoading(true)
 
-      // Build the update data object
       const updateData: Record<string, any> = {}
 
       if (values.updateCategory && values.categoryId) {
@@ -129,7 +120,6 @@ export const BulkEditFormWrapper = ({ products, categories, sizes, colors, store
         updateData.isArchived = values.isArchived
       }
 
-      // Make the API call
       const response = await fetch(`/api/${storeId}/products/bulk`, {
         method: "PATCH",
         headers: {
@@ -228,7 +218,6 @@ export const BulkEditFormWrapper = ({ products, categories, sizes, colors, store
                   <CardDescription>Select which fields to update for all selected products</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  {/* Category */}
                   <div className="space-y-4">
                     <div className="flex items-center space-x-2">
                       <FormField
@@ -281,7 +270,6 @@ export const BulkEditFormWrapper = ({ products, categories, sizes, colors, store
                     )}
                   </div>
 
-                  {/* Price */}
                   <div className="space-y-4">
                     <div className="flex items-center space-x-2">
                       <FormField
@@ -325,7 +313,6 @@ export const BulkEditFormWrapper = ({ products, categories, sizes, colors, store
                     )}
                   </div>
 
-                  {/* Size */}
                   <div className="space-y-4">
                     <div className="flex items-center space-x-2">
                       <FormField
@@ -378,7 +365,6 @@ export const BulkEditFormWrapper = ({ products, categories, sizes, colors, store
                     )}
                   </div>
 
-                  {/* Color */}
                   <div className="space-y-4">
                     <div className="flex items-center space-x-2">
                       <FormField
@@ -437,7 +423,6 @@ export const BulkEditFormWrapper = ({ products, categories, sizes, colors, store
                     )}
                   </div>
 
-                  {/* Featured Status */}
                   <div className="space-y-4">
                     <div className="flex items-center space-x-2">
                       <FormField
@@ -476,7 +461,6 @@ export const BulkEditFormWrapper = ({ products, categories, sizes, colors, store
                     )}
                   </div>
 
-                  {/* Published Status */}
                   <div className="space-y-4">
                     <div className="flex items-center space-x-2">
                       <FormField
@@ -515,7 +499,6 @@ export const BulkEditFormWrapper = ({ products, categories, sizes, colors, store
                     )}
                   </div>
 
-                  {/* Archived Status */}
                   <div className="space-y-4">
                     <div className="flex items-center space-x-2">
                       <FormField

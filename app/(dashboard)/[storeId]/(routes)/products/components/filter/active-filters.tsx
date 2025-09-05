@@ -18,17 +18,15 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = ({ categories, sizes,
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  // Get current filter values from URL
-  const currentStatus = searchParams.get("status")?.split(",") || []
-  const currentGender = searchParams.get("gender")?.split(",") || []
-  const currentMaterial = searchParams.get("material")?.split(",") || []
-  const currentStyle = searchParams.get("style")?.split(",") || []
-  const currentSize = searchParams.get("size")?.split(",") || []
-  const currentColor = searchParams.get("color")?.split(",") || []
-  const currentMinPrice = searchParams.get("minPrice")
-  const currentMaxPrice = searchParams.get("maxPrice")
+  const currentStatus = searchParams?.get("status")?.split(",") || []
+  const currentGender = searchParams?.get("gender")?.split(",") || []
+  const currentMaterial = searchParams?.get("material")?.split(",") || []
+  const currentStyle = searchParams?.get("style")?.split(",") || []
+  const currentSize = searchParams?.get("size")?.split(",") || []
+  const currentColor = searchParams?.get("color")?.split(",") || []
+  const currentMinPrice = searchParams?.get("minPrice")
+  const currentMaxPrice = searchParams?.get("maxPrice")
 
-  // Check if any filters are active
   const hasActiveFilters =
     currentStatus.length > 0 ||
     currentGender.length > 0 ||
@@ -43,7 +41,6 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = ({ categories, sizes,
     return null
   }
 
-  // Helper function to get entity name by ID
   const getCategoryName = (id: string) => {
     const category = categories.find((cat) => cat.id === id)
     return category?.name || id
@@ -59,9 +56,8 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = ({ categories, sizes,
     return color || { id, name: id, value: "#000000" }
   }
 
-  // Helper function to remove a filter
   const removeFilter = (type: string, value: string) => {
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(searchParams?.toString() || "")
 
     const currentValues = params.get(type)?.split(",") || []
     const newValues = currentValues.filter((v) => v !== value)
@@ -78,9 +74,8 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = ({ categories, sizes,
     router.push(`${window.location.pathname}${query}`)
   }
 
-  // Helper function to remove price filter
   const removePriceFilter = (type: "minPrice" | "maxPrice") => {
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(searchParams?.toString() || "")
     params.delete(type)
 
     const search = params.toString()
@@ -89,11 +84,9 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = ({ categories, sizes,
     router.push(`${window.location.pathname}${query}`)
   }
 
-  // Helper function to clear all filters
   const clearAllFilters = () => {
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(searchParams?.toString() || "")
 
-    // Remove all filter params
     params.delete("status")
     params.delete("gender")
     params.delete("material")
@@ -103,7 +96,6 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = ({ categories, sizes,
     params.delete("minPrice")
     params.delete("maxPrice")
 
-    // Keep other params like page, sort, etc.
     const search = params.toString()
     const query = search ? `?${search}` : ""
 
@@ -112,7 +104,6 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = ({ categories, sizes,
 
   return (
     <div className="flex flex-wrap gap-2 my-4">
-      {/* Status filters */}
       {currentStatus.map((status) => (
         <Badge key={`status-${status}`} variant="outline" className="flex items-center gap-1">
           Status: {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -127,7 +118,6 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = ({ categories, sizes,
         </Badge>
       ))}
 
-      {/* Gender filters */}
       {currentGender.map((id) => (
         <Badge key={`gender-${id}`} variant="outline" className="flex items-center gap-1">
           Gender: {getCategoryName(id)}
@@ -142,7 +132,6 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = ({ categories, sizes,
         </Badge>
       ))}
 
-      {/* Material filters */}
       {currentMaterial.map((id) => (
         <Badge key={`material-${id}`} variant="outline" className="flex items-center gap-1">
           Material: {getCategoryName(id)}
@@ -157,7 +146,6 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = ({ categories, sizes,
         </Badge>
       ))}
 
-      {/* Style filters */}
       {currentStyle.map((id) => (
         <Badge key={`style-${id}`} variant="outline" className="flex items-center gap-1">
           Style: {getCategoryName(id)}
@@ -172,7 +160,6 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = ({ categories, sizes,
         </Badge>
       ))}
 
-      {/* Size filters */}
       {currentSize.map((id) => (
         <Badge key={`size-${id}`} variant="outline" className="flex items-center gap-1">
           Size: {getSizeName(id)}
@@ -187,7 +174,6 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = ({ categories, sizes,
         </Badge>
       ))}
 
-      {/* Color filters */}
       {currentColor.map((id) => {
         const colorInfo = getColorInfo(id)
         return (
@@ -208,7 +194,6 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = ({ categories, sizes,
         )
       })}
 
-      {/* Price filters */}
       {currentMinPrice && (
         <Badge variant="outline" className="flex items-center gap-1">
           Min Price: ${currentMinPrice}
@@ -237,7 +222,6 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = ({ categories, sizes,
         </Badge>
       )}
 
-      {/* Clear all button */}
       <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={clearAllFilters}>
         Clear All
       </Button>

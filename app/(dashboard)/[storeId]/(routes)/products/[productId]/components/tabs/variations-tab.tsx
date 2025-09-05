@@ -32,7 +32,6 @@ interface VariationsTabProps {
 export const VariationsTab: React.FC<VariationsTabProps> = ({ form, sizes, colors, categories }) => {
   const [activeSubTab, setActiveSubTab] = useState("categories")
 
-  // Calculate completion percentage for each section
   const getCategoriesCompletion = () => {
     const gender = form.watch("categories.gender")
     const material = form.watch("categories.material") || []
@@ -40,7 +39,7 @@ export const VariationsTab: React.FC<VariationsTabProps> = ({ form, sizes, color
     const tags = form.watch("tags") || []
 
     let completed = 0
-    const total = 3 // Required fields: gender, material, style
+    const total = 3 
 
     if (gender) completed++
     if (material.length > 0) completed++
@@ -64,13 +63,11 @@ export const VariationsTab: React.FC<VariationsTabProps> = ({ form, sizes, color
     const links = form.watch("categories.colorVariationLinks") || {}
 
     if (colors.length === 0) return 0
-    if (colors.length === 1) return 100 // Only one color, no links needed
+    if (colors.length === 1) return 100 
 
     const linkCount = Object.keys(links).filter((key) => links[key]).length
     return Math.round((linkCount / colors.length) * 100)
   }
-
-  // Get overall completion
   const getOverallCompletion = () => {
     const categoriesWeight = 0.4
     const sizesWeight = 0.3
@@ -83,7 +80,6 @@ export const VariationsTab: React.FC<VariationsTabProps> = ({ form, sizes, color
     )
   }
 
-  // Check if a section has validation errors
   const hasErrors = (section: string) => {
     const errors = form.formState.errors
 
@@ -101,7 +97,6 @@ export const VariationsTab: React.FC<VariationsTabProps> = ({ form, sizes, color
 
   return (
     <div className="space-y-6">
-      {/* Overall progress */}
       <Card className="border-none shadow-sm bg-gradient-to-r from-primary/5 to-primary/10">
         <CardContent className="pt-6">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
@@ -147,7 +142,6 @@ export const VariationsTab: React.FC<VariationsTabProps> = ({ form, sizes, color
         </CardContent>
       </Card>
 
-      {/* Main content tabs */}
       <Tabs value={activeSubTab} onValueChange={setActiveSubTab} className="w-full">
         <TabsList className="w-full grid grid-cols-4 mb-6">
           <TabsTrigger value="categories" className="relative">
@@ -304,7 +298,6 @@ export const VariationsTab: React.FC<VariationsTabProps> = ({ form, sizes, color
   )
 }
 
-// Progress card component for the dashboard
 interface ProgressCardProps {
   title: string
   icon: React.ReactNode

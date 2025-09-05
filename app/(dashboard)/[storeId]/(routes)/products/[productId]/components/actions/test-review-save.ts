@@ -12,7 +12,6 @@ export async function testReviewSave(storeId: string, productId: string) {
 
     console.log("Testing review save for:", { storeId, productId })
 
-    // Check if product exists
     const product = await prismadb.product.findFirst({
       where: {
         id: productId,
@@ -26,7 +25,6 @@ export async function testReviewSave(storeId: string, productId: string) {
 
     console.log("Product found:", product.name)
 
-    // Try to create a test review
     const testReview = await prismadb.review.create({
       data: {
         storeId: storeId,
@@ -43,7 +41,6 @@ export async function testReviewSave(storeId: string, productId: string) {
 
     console.log("Test review created successfully:", testReview.id)
 
-    // Check if the review was actually saved
     const savedReview = await prismadb.review.findUnique({
       where: {
         id: testReview.id,
@@ -53,7 +50,6 @@ export async function testReviewSave(storeId: string, productId: string) {
     if (savedReview) {
       console.log("Review verified in database:", savedReview.id)
       
-      // Clean up the test review
       await prismadb.review.delete({
         where: {
           id: testReview.id,

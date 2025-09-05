@@ -5,7 +5,6 @@ import { useParams } from "next/navigation"
 import axios from "axios"
 import { UseFormReturn } from "react-hook-form"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
 
 interface Material {
   id: string
@@ -24,9 +23,7 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({ form }) => {
   useEffect(() => {
     const fetchMaterials = async () => {
       try {
-        // Use the categories endpoint with material filter
-        const response = await axios.get(`/api/${params.storeId}/categories`)
-        // Filter only material categories
+        const response = await axios.get(`/api/${params?.storeId}/categories`)
         const materialCategories = response.data
           .filter((item: any) => item.type === "material")
           .map((item: any) => ({
@@ -36,7 +33,6 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({ form }) => {
         setMaterials(materialCategories || [])
       } catch (error) {
         console.error("Failed to fetch materials:", error)
-        // Provide some default materials in case of error
         setMaterials([
           { id: "leather", name: "Leather" },
           { id: "cotton", name: "Cotton" },
@@ -49,7 +45,7 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({ form }) => {
     }
     
     fetchMaterials()
-  }, [params.storeId])
+  }, [params?.storeId])
   
   const selectedMaterials = form.watch("materials") || []
   

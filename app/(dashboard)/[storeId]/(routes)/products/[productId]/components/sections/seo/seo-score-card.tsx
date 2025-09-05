@@ -19,14 +19,12 @@ interface SeoScoreCardProps {
 export const SeoScoreCard: React.FC<SeoScoreCardProps> = ({ score, onGenerateSuggestions, isGenerating }) => {
   const [activeTab, setActiveTab] = useState("insights")
 
-  // Calculate how good the keyword is based on score
   const getKeywordCompetitiveness = (score: number) => {
     if (score < 30) return { level: "Low", badge: "text-emerald-700 bg-emerald-100" }
     if (score < 70) return { level: "Medium", badge: "text-amber-700 bg-amber-100" }
     return { level: "High", badge: "text-red-700 bg-red-100" }
   }
 
-  // Generate random search positions based on seed (score)
   const generatePosition = (base: number, variance: number) => {
     return Math.max(1, Math.round(base + ((((score * 7) % 10) - 5) / 10) * variance))
   }

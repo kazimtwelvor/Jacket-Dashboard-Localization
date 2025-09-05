@@ -20,7 +20,6 @@ import { getProductReviews } from "../../actions/get-product-reviews"
 import { testReviewSave } from "../../actions/test-review-save"
 import { getReviewCount } from "../../actions/get-review-count"
 
-// Define the review type
 interface ProductReview {
   id?: string
   text: string
@@ -47,19 +46,16 @@ export const ReviewsSection = () => {
   const productDescription = form.watch("description")
   const reviewsEnabled = form.watch("reviews")
 
-  // Get the current product ID from the URL
   const getProductId = () => {
     const pathParts = window.location.pathname.split("/")
     return pathParts[pathParts.length - 1]
   }
 
-  // Get the store ID from the URL
   const getStoreId = () => {
     const pathParts = window.location.pathname.split("/")
     return pathParts[1]
   }
 
-  // Load existing reviews and cached reviews when component mounts
   useEffect(() => {
     const loadExistingReviews = async () => {
       const productId = getProductId()
@@ -73,7 +69,6 @@ export const ReviewsSection = () => {
             setExistingReviews(result.reviews)
           }
           
-          // Restore cached reviews from localStorage if they exist
           const savedCachedReviews = localStorage.getItem(`cachedReviews_${productId}`)
           if (savedCachedReviews) {
             const parsedReviews = JSON.parse(savedCachedReviews)
@@ -86,7 +81,6 @@ export const ReviewsSection = () => {
           setIsLoadingReviews(false)
         }
       } else if (productId === "new") {
-        // For new products, restore from localStorage
         const savedCachedReviews = localStorage.getItem(`cachedReviews_new`)
         if (savedCachedReviews) {
           const parsedReviews = JSON.parse(savedCachedReviews)
@@ -98,7 +92,6 @@ export const ReviewsSection = () => {
     
     loadExistingReviews()
     
-    // Load review count
     const loadReviewCount = async () => {
       const productId = getProductId()
       const storeId = getStoreId()
@@ -136,7 +129,6 @@ export const ReviewsSection = () => {
       const productId = getProductId()
       const storeId = getStoreId()
 
-      // For existing products, cache reviews to be saved on publish
       if (productId && storeId && productId !== "new") {
         console.log(`Generating ${reviewCount} reviews for existing product ${productId} (to be saved on publish)`)
 
@@ -145,13 +137,10 @@ export const ReviewsSection = () => {
         if (result.success) {
           const newReviews = result.reviews || []
           
-          // Store reviews in form for saving on publish
           form.setValue("cachedReviews", newReviews, { shouldDirty: true, shouldValidate: false })
           
-          // Store reviews in component state for display
           setCachedReviews(newReviews)
           
-          // Persist in localStorage as backup
           localStorage.setItem(`cachedReviews_${productId}`, JSON.stringify(newReviews))
           setLastGenerationCount(result.createdCount || 0)
 
@@ -162,7 +151,6 @@ export const ReviewsSection = () => {
               : `Successfully generated ${result.createdCount} reviews. They will be saved when you publish the product.`,
           })
 
-          // Enable reviews in the form if not already enabled
           if (!reviewsEnabled) {
             form.setValue("reviews", true, { shouldDirty: true })
           }
@@ -170,9 +158,7 @@ export const ReviewsSection = () => {
           throw new Error(result.error || "Failed to generate reviews")
         }
       } 
-      // For new products, generate and store reviews temporarily
       else if (storeId) {
-        // Import dynamically to avoid server component issues
         const { generateReviewsForNewProduct } = await import("../../actions/generate-reviews-for-new-product")
         
         console.log(`Generating ${reviewCount} reviews for new product (to be saved later)`)
@@ -180,22 +166,17 @@ export const ReviewsSection = () => {
         const result = await generateReviewsForNewProduct(productName, productDescription, reviewCount, storeId)
         
         if (result.success) {
-          // Store the tempProductId and cached reviews in the form data
-          form.setValue("tempReviewsId", result.tempProductId, { shouldDirty: true, shouldValidate: false })
-          form.setValue("cachedReviews", result.reviews, { shouldDirty: true, shouldValidate: false })
+          form.setValue("tempReviewsId", result.tempProductId || undefined, { shouldDirty: true, shouldValidate: false })
+          form.setValue("cachedReviews", result.reviews || [], { shouldDirty: true, shouldValidate: false })
           
-          // Store reviews in component state for display
           setCachedReviews(result.reviews || [])
           
-          // Persist in localStorage as backup for new products
           localStorage.setItem(`cachedReviews_new`, JSON.stringify(result.reviews))
           
-          // Debug log to verify the reviews are set in the form
           console.log("Cached reviews set in form:", result.reviews)
           console.log("Form cachedReviews value:", form.getValues("cachedReviews"))
           console.log("Form tempReviewsId value:", form.getValues("tempReviewsId"))
           
-          // Enable reviews in the form
           form.setValue("reviews", true, { shouldDirty: true })
           
           setLastGenerationCount(result.count)
@@ -220,7 +201,6 @@ export const ReviewsSection = () => {
       console.error("Error generating reviews:", error)
       const errorMessage = error instanceof Error ? error.message : "An unknown error occurred"
       
-      // Check if it's a rate limit error and provide specific guidance
       if (errorMessage.includes("Rate limit") || errorMessage.includes("429")) {
         setError("Rate limit exceeded. Please wait a few minutes and try again with fewer reviews.")
         toast({

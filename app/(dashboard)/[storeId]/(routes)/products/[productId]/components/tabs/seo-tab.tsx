@@ -22,7 +22,7 @@ import { SeoSchemaSection } from "../sections/seo/seo-schema-section"
 
 interface SeoTabProps {
   initialData: Product | null
-  form: any // Accept the parent form as a prop
+  form: any 
 }
 
 const formSchema = z.object({
@@ -40,7 +40,6 @@ const formSchema = z.object({
   followLinks: z.boolean().default(true),
 })
 
-// List of power words for SEO titles
 const POWER_WORDS = [
   "amazing",
   "exclusive",
@@ -64,7 +63,6 @@ const POWER_WORDS = [
   "stunning",
 ]
 
-// Find the DetailedSeoAnalysis component and replace it with this improved version
 const DetailedSeoAnalysis = ({
   form,
   getDisplayValue,
@@ -82,12 +80,9 @@ const DetailedSeoAnalysis = ({
   const metaTitle = getDisplayValue("metaTitle")
   const metaDescription = getDisplayValue("metaDescription")
   const content = formDescription || initialDescription || ""
-  // Improved word count calculation that handles HTML content better
   const wordCount = (() => {
-    // First, strip HTML tags if present
     const textContent = content.replace(/<[^>]*>/g, " ")
 
-    // Then normalize whitespace and split by spaces
     const words = textContent
       .replace(/\s+/g, " ")
       .trim()
@@ -100,61 +95,43 @@ const DetailedSeoAnalysis = ({
   const mainImage = form.getValues("mainImage") || ""
   const allImages = [mainImage, ...productImages].filter(Boolean)
 
-  // Check if focus keyword is in title
   const keywordInTitle = focusKeyword && metaTitle.toLowerCase().includes(focusKeyword.toLowerCase())
 
-  // Check if focus keyword is at beginning of title
   const keywordAtBeginningOfTitle =
     focusKeyword && metaTitle.toLowerCase().indexOf(focusKeyword.toLowerCase()) < Math.min(10, metaTitle.length / 3)
 
-  // Check if focus keyword is in meta description
   const keywordInDescription = focusKeyword && metaDescription.toLowerCase().includes(focusKeyword.toLowerCase())
 
-  // Check if focus keyword is in URL (using the slug)
   const slug = form.getValues("seo.slug") || form.getValues("slug") || ""
   const keywordInUrl = focusKeyword && slug.toLowerCase().includes(focusKeyword.toLowerCase().replace(/\s+/g, "-"))
 
-  // Check if focus keyword appears in first 10% of content
   const keywordInFirst10Percent =
     focusKeyword && content.toLowerCase().indexOf(focusKeyword.toLowerCase()) < content.length * 0.1
 
-  // Check if focus keyword is in content
   const keywordInContent = focusKeyword && content.toLowerCase().includes(focusKeyword.toLowerCase())
 
-  // Check content length (300-400 words)
   const contentLengthGood = wordCount >= 300 && wordCount <= 1000
 
-  // Check if using product schema
   const usingProductSchema = form.getValues("seo.structuredData")
 
-  // Calculate keyword density
   const keywordDensity =
     content.length > 0 && focusKeyword
       ? (content.toLowerCase().split(focusKeyword.toLowerCase()).length - 1) / (wordCount / 100)
       : 0
 
-  // Count keyword appearances
   const keywordAppearances =
     content.length > 0 && focusKeyword ? content.toLowerCase().split(focusKeyword.toLowerCase()).length - 1 : 0
 
-  // Check URL length
   const urlLength = slug.length
   const urlLengthGood = urlLength > 0 && urlLength <= 75
 
-  // For this check, we can't know for sure if keyword was used before,
-  // but we'll assume it hasn't been for the demo
   const keywordNotUsedBefore = true
 
-  // Check if title contains power word
   const hasPowerWord = POWER_WORDS.some((word) => metaTitle.toLowerCase().includes(word.toLowerCase()))
 
-  // Check if content contains images
   const hasMediaContent = allImages.length > 0
 
-  // Calculate the actual SEO score based on real checks
   const calculateActualSeoScore = () => {
-    // Since all checks are passing, we should return 100
-    // This is a simplified version that returns 100 when all checks pass
     const allChecksPassing =
       keywordInTitle &&
       keywordInDescription &&
@@ -174,24 +151,20 @@ const DetailedSeoAnalysis = ({
       return 100
     }
 
-    // If not all checks are passing, calculate based on individual checks
     let score = 0
     let totalPossiblePoints = 0
 
-    // Title checks (20 points)
     totalPossiblePoints += 20
     if (metaTitle) score += 5
     if (metaTitle && metaTitle.length >= 30 && metaTitle.length <= 60) score += 5
     if (focusKeyword && metaTitle.toLowerCase().includes(focusKeyword.toLowerCase())) score += 5
     if (focusKeyword && metaTitle.toLowerCase().indexOf(focusKeyword.toLowerCase()) < 10) score += 5
 
-    // Description checks (20 points)
     totalPossiblePoints += 20
     if (metaDescription) score += 5
     if (metaDescription && metaDescription.length >= 70 && metaDescription.length <= 160) score += 5
     if (focusKeyword && metaDescription.toLowerCase().includes(focusKeyword.toLowerCase())) score += 10
 
-    // Content checks (25 points)
     totalPossiblePoints += 25
     if (wordCount >= 100) score += 5
     if (wordCount >= 300) score += 5
@@ -199,26 +172,21 @@ const DetailedSeoAnalysis = ({
     if (focusKeyword && content.toLowerCase().indexOf(focusKeyword.toLowerCase()) < content.length * 0.1) score += 5
     if (content.split(/\n\s*\n/).length >= 3) score += 5 // Multiple paragraphs
 
-    // Image checks (5 points)
     totalPossiblePoints += 5
     if (allImages.length > 0) score += 5
 
-    // Schema markup (15 points)
     totalPossiblePoints += 15
     if (form.getValues("seo.structuredData")) score += 15
 
-    // Keyword strategy (10 points)
     totalPossiblePoints += 10
     if (focusKeyword) score += 5
     if (keywords.length >= 3) score += 5
 
-    // Calculate percentage score
     return Math.min(100, Math.round((score / totalPossiblePoints) * 100))
   }
 
   const actualSeoScore = calculateActualSeoScore()
 
-  // Update the form's seoScore value without causing infinite loops
   React.useEffect(() => {
     const timer = setTimeout(() => {
       form.setValue("seo.seoScore", actualSeoScore, {
@@ -250,7 +218,6 @@ const DetailedSeoAnalysis = ({
             <h3 className="text-sm font-medium mb-2">Detailed SEO Analysis</h3>
 
             <div className="space-y-2">
-              {/* Focus Keyword in Title */}
               <div className="flex items-start gap-2">
                 {keywordInTitle ? (
                   <CheckCircle className="h-4 w-4 text-emerald-500 mt-0.5" />
@@ -264,7 +231,6 @@ const DetailedSeoAnalysis = ({
                 </span>
               </div>
 
-              {/* Focus Keyword in Meta Description */}
               <div className="flex items-start gap-2">
                 {keywordInDescription ? (
                   <CheckCircle className="h-4 w-4 text-emerald-500 mt-0.5" />
@@ -278,7 +244,6 @@ const DetailedSeoAnalysis = ({
                 </span>
               </div>
 
-              {/* Focus Keyword in URL */}
               <div className="flex items-start gap-2">
                 {keywordInUrl ? (
                   <CheckCircle className="h-4 w-4 text-emerald-500 mt-0.5" />
@@ -290,7 +255,6 @@ const DetailedSeoAnalysis = ({
                 </span>
               </div>
 
-              {/* Focus Keyword in first 10% of content */}
               <div className="flex items-start gap-2">
                 {keywordInFirst10Percent ? (
                   <CheckCircle className="h-4 w-4 text-emerald-500 mt-0.5" />
@@ -304,7 +268,6 @@ const DetailedSeoAnalysis = ({
                 </span>
               </div>
 
-              {/* Focus Keyword in content */}
               <div className="flex items-start gap-2">
                 {keywordInContent ? (
                   <CheckCircle className="h-4 w-4 text-emerald-500 mt-0.5" />
@@ -316,7 +279,6 @@ const DetailedSeoAnalysis = ({
                 </span>
               </div>
 
-              {/* Content length */}
               <div className="flex items-start gap-2">
                 {contentLengthGood ? (
                   <CheckCircle className="h-4 w-4 text-emerald-500 mt-0.5" />
@@ -330,7 +292,6 @@ const DetailedSeoAnalysis = ({
                 </span>
               </div>
 
-              {/* Product Schema */}
               <div className="flex items-start gap-2">
                 {usingProductSchema ? (
                   <CheckCircle className="h-4 w-4 text-emerald-500 mt-0.5" />
@@ -344,7 +305,6 @@ const DetailedSeoAnalysis = ({
                 </span>
               </div>
 
-              {/* Keyword Density */}
               <div className="flex items-start gap-2">
                 {keywordDensity > 0 ? (
                   <CheckCircle className="h-4 w-4 text-emerald-500 mt-0.5" />
@@ -358,7 +318,6 @@ const DetailedSeoAnalysis = ({
                 </span>
               </div>
 
-              {/* URL Length */}
               <div className="flex items-start gap-2">
                 {urlLengthGood ? (
                   <CheckCircle className="h-4 w-4 text-emerald-500 mt-0.5" />
@@ -372,7 +331,6 @@ const DetailedSeoAnalysis = ({
                 </span>
               </div>
 
-              {/* Focus Keyword used before */}
               <div className="flex items-start gap-2">
                 {keywordNotUsedBefore ? (
                   <CheckCircle className="h-4 w-4 text-emerald-500 mt-0.5" />
@@ -386,7 +344,6 @@ const DetailedSeoAnalysis = ({
                 </span>
               </div>
 
-              {/* Focus Keyword at beginning of title */}
               <div className="flex items-start gap-2">
                 {keywordAtBeginningOfTitle ? (
                   <CheckCircle className="h-4 w-4 text-emerald-500 mt-0.5" />
@@ -400,7 +357,6 @@ const DetailedSeoAnalysis = ({
                 </span>
               </div>
 
-              {/* Power word in title */}
               <div className="flex items-start gap-2">
                 {hasPowerWord ? (
                   <CheckCircle className="h-4 w-4 text-emerald-500 mt-0.5" />
@@ -414,7 +370,6 @@ const DetailedSeoAnalysis = ({
                 </span>
               </div>
 
-              {/* Images and videos */}
               <div className="flex items-start gap-2">
                 {hasMediaContent ? (
                   <CheckCircle className="h-4 w-4 text-emerald-500 mt-0.5" />
@@ -435,7 +390,6 @@ const DetailedSeoAnalysis = ({
   )
 }
 
-// Update the ReadabilityAnalysis component to accept props
 const ReadabilityAnalysis = ({ contentAnalysis }: { contentAnalysis: any }) => (
   <Card>
     <CardHeader className="pb-2">
@@ -490,19 +444,14 @@ const ReadabilityAnalysis = ({ contentAnalysis }: { contentAnalysis: any }) => (
   </Card>
 )
 
-// Schema Toggle component to handle the structured data enable/disable
 const SchemaToggle = ({ form }: { form: any }) => {
-  // Use local state to track the switch value
   const [isEnabled, setIsEnabled] = useState(() => {
-    // Initialize from form value, default to true for better SEO
     return form.getValues("seo.structuredData") !== false
   })
 
-  // Update form value when local state changes
   useEffect(() => {
     form.setValue("seo.structuredData", isEnabled, { shouldDirty: true })
 
-    // If enabling and schema1 doesn't exist, generate a default schema
     if (isEnabled && !form.getValues("schema1")) {
       const productName = form.getValues("name") || ""
       const productDescription = form.getValues("description") || ""
@@ -550,31 +499,11 @@ export const SeoTab = ({ initialData, form }: SeoTabProps) => {
 
   const watchedValues = form.watch()
 
-  // Add this function to ensure product data is properly passed to schema components
-  // Find the SeoTab component and add this console log at the beginning
-  // Also remove the unnecessary console logs in the SeoTab component
-  // Find and remove:
-  // useEffect(() => {
-  //   if (initialData) {
-  //     console.log("SeoTab received initialData:", {
-  //       id: initialData.id,
-  //       name: initialData.name,
-  //       price: initialData.price,
-  //       hasImages: initialData.images && initialData.images.length > 0,
-  //     })
-  //   }
-  // }, [initialData])
-
-  // Add a helper function to get the actual display value for previews and character counts
-  // Add this after the getFieldValue function:
-
   const getDisplayValue = useCallback(
     (field: string) => {
       const value = form.getValues(`seo.${field}`)
 
-      // Check if the value is empty or only whitespace
       if (!value || value.trim() === "") {
-        // Don't return fallback values when checking if a field is empty/missing
         return ""
       }
 
@@ -583,24 +512,18 @@ export const SeoTab = ({ initialData, form }: SeoTabProps) => {
     [form],
   )
 
-  // Calculate SEO score based on form values
   const seoScore = useMemo(() => {
     let score = 0
     const metaTitle = form.getValues("seo.metaTitle") || form.getValues("name") || ""
     const metaDescription = form.getValues("seo.metaDescription") || form.getValues("description") || ""
     const focusKeyword = form.getValues("seo.focusKeyword") || ""
 
-    // Adjust point distribution to total exactly 100 points
     if (metaTitle) score += metaTitle.length > 10 && metaTitle.length <= 60 ? 20 : 10
     if (metaDescription) score += metaDescription.length > 50 && metaDescription.length <= 160 ? 20 : 10
     if (focusKeyword) score += 20
     if (form.getValues("seo.additionalKeywords")?.length > 0) score += 15
     if (form.getValues("seo.structuredData")) score += 15
     if (form.getValues("seo.canonicalUrl")) score += 10
-    // Removed the images with alt text
-
-    // Update the form value when the score changes
-    // Use a timeout to avoid triggering during render
     setTimeout(() => {
       form.setValue("seo.seoScore", score, {
         shouldDirty: true,
@@ -612,27 +535,18 @@ export const SeoTab = ({ initialData, form }: SeoTabProps) => {
     return score
   }, [form, initialData])
 
-  // Replace the contentAnalysis useMemo with this improved version that properly handles the product description
-  // and provides more accurate readability metrics
 
   const contentAnalysis = useMemo(() => {
-    // Try to get the content from multiple sources
-    // 1. First check if there's a description in the form values
-    // 2. Then fall back to initialData.description
     const formDescription = form.getValues("description") || ""
     const initialDescription = initialData?.description || ""
 
-    // Use the first available description
     const content = formDescription || initialDescription
 
     const contentLength = content.length
 
-    // Improved word count calculation
     const wordCount = (() => {
-      // First, strip HTML tags if present
       const textContent = content.replace(/<[^>]*>/g, " ")
 
-      // Then normalize whitespace and split by spaces
       const words = textContent
         .replace(/\s+/g, " ")
         .trim()
@@ -642,30 +556,22 @@ export const SeoTab = ({ initialData, form }: SeoTabProps) => {
       return words.length
     })()
 
-    // Calculate reading time (200 words per minute is standard)
     const readingTime = Math.max(1, Math.ceil(wordCount / 200))
 
-    // Improved sentence detection
     const sentences = content.split(/[.!?]+/).filter((sentence) => sentence.trim().length > 0).length
 
-    // Calculate readability score (modified Flesch-Kincaid formula)
     let readabilityScore = 0
 
     if (sentences > 0 && wordCount > 0) {
-      // Average words per sentence
       const avgWordsPerSentence = wordCount / sentences
 
-      // Average syllables per word (estimated)
-      const avgSyllablesPerWord = 1.5 // Estimation for English
+      const avgSyllablesPerWord = 1.5 
 
-      // Calculate Flesch Reading Ease score (simplified)
       const fleschScore = 206.835 - 1.015 * avgWordsPerSentence - 84.6 * avgSyllablesPerWord
 
-      // Normalize to 0-100 scale
       readabilityScore = Math.min(100, Math.max(0, fleschScore * 0.8))
     }
 
-    // Generate recommendations
     const recommendations = []
     if (contentLength < 300) recommendations.push("Content is too short. Aim for at least 300 characters.")
     if (sentences > 0 && wordCount / sentences > 25)
@@ -696,26 +602,20 @@ export const SeoTab = ({ initialData, form }: SeoTabProps) => {
     }
   }, [initialData, form, seoScore, getDisplayValue])
 
-  // Add a useEffect to force re-renders when form values change (add this after the contentAnalysis useMemo):
 
-  // Force re-render when form values change
   const [, forceUpdate] = useState({})
   useEffect(() => {
     const subscription = form.watch(() => {
-      // Force component to re-render when form values change
       forceUpdate({})
     })
     return () => subscription.unsubscribe()
   }, [form])
 
-  // Add a helper function to get field values with fallback to general tab
-  // Add this after the contentAnalysis useMemo:
 
   const getFieldValue = useCallback(
     (field: string, fallback?: string) => {
       const value = form.getValues(`seo.${field}`)
 
-      // If the field is empty, use the fallback value
       if (!value || value === "") {
         if (field === "metaTitle" || field === "ogTitle" || field === "twitterTitle") {
           return initialData?.name || ""
@@ -733,7 +633,6 @@ export const SeoTab = ({ initialData, form }: SeoTabProps) => {
 
   const generateAiSuggestions = () => {
     setIsGeneratingSuggestions(true)
-    // Mock implementation
     setTimeout(() => {
       setAiSuggestions([
         "Consider adding the focus keyword near the beginning of your meta title",
@@ -758,7 +657,6 @@ export const SeoTab = ({ initialData, form }: SeoTabProps) => {
     return "Excellent"
   }
 
-  // Simple keyword tag input component
   const KeywordInput = () => {
     const keywords = form.getValues("seo.keywords") || []
     const [inputValue, setInputValue] = useState("")
@@ -766,26 +664,21 @@ export const SeoTab = ({ initialData, form }: SeoTabProps) => {
     const inputRef = useRef<HTMLInputElement>(null)
 
     React.useEffect(() => {
-      // Only run this effect if we haven't already set the focus keyword
-      // or if the keywords array has changed and we have keywords
       if ((!hasSetFocusKeywordRef.current || keywords.length > 0) && keywords.length > 0) {
         const focusKeyword = keywords[0]
         const currentFocusKeyword = form.getValues("seo.focusKeyword")
 
-        // Only update if the focus keyword has actually changed
         if (focusKeyword && focusKeyword !== currentFocusKeyword) {
-          // This ensures compatibility with any code still using focusKeyword directly
           form.setValue("seo.focusKeyword", focusKeyword, {
             shouldDirty: false,
             shouldValidate: false,
             shouldTouch: false,
           })
 
-          // Mark that we've set the focus keyword
           hasSetFocusKeywordRef.current = true
         }
       }
-    }, [keywords]) // Only depend on keywords array
+    }, [keywords]) 
 
     const addKeyword = useCallback(() => {
       if (inputValue.trim()) {
@@ -810,7 +703,7 @@ export const SeoTab = ({ initialData, form }: SeoTabProps) => {
     }
 
     const promoteToPrimary = (index: number) => {
-      if (index === 0) return // Already primary
+      if (index === 0) return 
 
       const newKeywords = [...keywords]
       const keyword = newKeywords[index]
@@ -842,7 +735,7 @@ export const SeoTab = ({ initialData, form }: SeoTabProps) => {
               }
             }}
             onBlur={(e) => {
-              // Prevent blur if clicking the Add button
+              
               if (e.relatedTarget?.textContent === 'Add') {
                 e.preventDefault()
                 requestAnimationFrame(() => {
@@ -857,7 +750,7 @@ export const SeoTab = ({ initialData, form }: SeoTabProps) => {
         </div>
 
         <div className="flex flex-wrap gap-2 mt-2">
-          {keywords.map((keyword, index) => (
+          {keywords.map((keyword: string, index: number) => (
             <Badge
               key={index}
               variant={index === 0 ? "default" : "outline"}
@@ -886,16 +779,10 @@ export const SeoTab = ({ initialData, form }: SeoTabProps) => {
     )
   }
 
-  // Add these variables to access the description from multiple sources
   const formDescription = form.getValues("description") || ""
   const initialDescription = initialData?.description || ""
 
-  // Make sure the productData object is properly constructed when passing to SeoSchemaSection
-  // Find where SeoSchemaSection is rendered and ensure it has complete product data
-  // Also fix the productData useMemo to prevent infinite loops:
-  // Replace the entire productData useMemo with this simpler version:
   const productData = useMemo(() => {
-    // Safely extract data from form or initialData
     return {
       id: initialData?.id || undefined,
       name: form.getValues("name") || initialData?.name || "",
@@ -905,12 +792,12 @@ export const SeoTab = ({ initialData, form }: SeoTabProps) => {
       isDiscounted: !!form.getValues("salePrice") || !!initialData?.salePrice,
       mainImage:
         form.getValues("mainImage") ||
-        (initialData?.images && initialData?.images.length > 0 ? initialData.images[0].url : ""),
+        (initialData?.images && initialData?.images.length > 0 ? initialData?.images[0].url : ""),
       images:
         form.getValues("images") ||
         (initialData?.images
           ? Array.isArray(initialData.images)
-            ? initialData.images.map((img) => (typeof img === "string" ? img : img.url))
+            ? initialData?.images.map((img) => (typeof img === "string" ? img : img.url))
             : []
           : []),
       brandName: form.getValues("brandName") || initialData?.brandName || "",
@@ -930,17 +817,8 @@ export const SeoTab = ({ initialData, form }: SeoTabProps) => {
       categoryId: initialData?.categoryId,
       schema: form.getValues("schema") || initialData?.schema || "",
     }
-  }, [initialData, form]) // Only depend on initialData and form, not form.getValues() results
+  }, [initialData, form]) 
 
-  // Replace the content analysis section in the SeoTab component with this:
-
-  // Add this console log before rendering SeoSchemaSection
-  // Add this console log before rendering SeoSchemaSection
-  // console.log("Passing productData to SeoSchemaSection:", {
-  //   name: productData.name,
-  //   price: productData.price,
-  //   hasImages: productData.images && productData.images.length > 0,
-  // })
 
   return (
     <div className="space-y-6">
@@ -948,7 +826,6 @@ export const SeoTab = ({ initialData, form }: SeoTabProps) => {
         <Info className="h-4 w-4" />
       </Alert>
       <div className="flex flex-col md:flex-row gap-6">
-        {/* SEO Score Card */}
         <Card className="w-full md:w-1/3">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg font-medium">Brand Name</CardTitle>
@@ -982,7 +859,6 @@ export const SeoTab = ({ initialData, form }: SeoTabProps) => {
           </CardFooter>
         </Card>
 
-        {/* Quick SEO Checklist */}
         <Card className="w-full md:w-2/3">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg font-medium">SEO Checklist</CardTitle>
@@ -1608,7 +1484,6 @@ export const SeoTab = ({ initialData, form }: SeoTabProps) => {
                   </p>
                 </div>
 
-                {/* Schema toggle component with separated state management */}
                 <SchemaToggle form={form} />
 
                 {form.watch("seo.structuredData") && (

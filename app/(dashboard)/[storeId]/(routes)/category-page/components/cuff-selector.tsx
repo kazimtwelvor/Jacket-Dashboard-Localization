@@ -19,7 +19,7 @@ export const CuffSelector = ({ form }: { form: any }) => {
         <FormItem>
           <FormLabel>Cuff Types</FormLabel>
           <div className="grid grid-cols-2 gap-2">
-            {CUFF_OPTIONS.map((cuff) => (
+            {CUFF_OPTIONS?.map((cuff) => (
               <FormField
                 key={cuff}
                 control={form.control}

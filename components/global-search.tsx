@@ -22,39 +22,39 @@ export const GlobalSearch = () => {
   const routes = [
     {
       label: "Overview",
-      route: `/${params.storeId}`,
+      route: `/${params?.storeId}`,
     },
-    {
-      label: "Billboards",
-      route: `/${params.storeId}/billboards`,
-    },
+    // {
+    //   label: "Billboards",
+    //   route: `/${params.storeId}/billboards`,
+    // },
     {
       label: "Categories",
-      route: `/${params.storeId}/categories`,
+      route: `/${params?.storeId}/categories`,
     },
     {
       label: "Sizes",
-      route: `/${params.storeId}/sizes`,
+      route: `/${params?.storeId}/sizes`,
     },
     {
       label: "Colors",
-      route: `/${params.storeId}/colors`,
+      route: `/${params?.storeId}/colors`,
     },
     {
       label: "Products",
-      route: `/${params.storeId}/products`,
+      route: `/${params?.storeId}/products`,
     },
     {
       label: "Orders",
-      route: `/${params.storeId}/orders`,
+      route: `/${params?.storeId}/orders`,
     },
     {
       label: "Pages",
-      route: `/${params.storeId}/pages`,
+      route: `/${params?.storeId}/pages`,
     },
     {
       label: "Settings",
-      route: `/${params.storeId}/settings`,
+      route: `/${params?.storeId}/settings`,
     },
   ]
 

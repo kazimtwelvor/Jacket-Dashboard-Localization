@@ -1,10 +1,8 @@
 import type React from "react"
 import { auth } from "@clerk/nextjs/server"
 import { redirect } from "next/navigation"
-
 import { TemplatesClient } from "./components/client"
 import prismadb from "@/lib/prismadb"
-
 interface TemplatesPageProps {
   params: {
     storeId: string

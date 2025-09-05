@@ -13,7 +13,6 @@ interface CoverageOptionsProps {
   onOptionImageRemove?: (index: number) => void
   isUploading?: boolean
 
-  // Specific image props for each option
   option1Image?: string
   option2Image?: string
   option3Image?: string
@@ -48,20 +47,8 @@ export const CoverageOptions: React.FC<CoverageOptionsProps> = ({
       buttonText: "FREE QUOTE",
     },
   ],
-  onMainHeadingChange = () => {},
-  onOptionChange = () => {},
-  onOptionImageChange = () => {},
-  onOptionImageRemove = () => {},
-  isUploading = false,
-  option1Image,
-  option2Image,
-  option3Image,
-  onOption1ImageChange = () => {},
-  onOption2ImageChange = () => {},
-  onOption3ImageChange = () => {},
-  onOption1ImageRemove = () => {},
-  onOption2ImageRemove = () => {},
-  onOption3ImageRemove = () => {},
+  onMainHeadingChange = () => { },
+  onOptionChange = () => { },
 }) => {
   return (
     <>
@@ -83,7 +70,6 @@ export const CoverageOptions: React.FC<CoverageOptionsProps> = ({
           )}
 
           <div className="coverage-grid">
-            {/* 50% Coverage Card */}
             <div className="coverage-card">
               <div className="coverage-image-wrapper">
                 <Image
@@ -133,7 +119,6 @@ export const CoverageOptions: React.FC<CoverageOptionsProps> = ({
               </div>
             </div>
 
-            {/* 75% Coverage Card */}
             <div className="coverage-card">
               <div className="coverage-image-wrapper">
                 <Image
@@ -183,7 +168,6 @@ export const CoverageOptions: React.FC<CoverageOptionsProps> = ({
               </div>
             </div>
 
-            {/* 100% Coverage Card */}
             <div className="coverage-card">
               <div className="coverage-image-wrapper">
                 <Image

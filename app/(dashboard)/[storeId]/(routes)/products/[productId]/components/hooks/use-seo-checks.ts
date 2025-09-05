@@ -8,10 +8,8 @@ export type SeoCheckResult = { passed: boolean; message: string }
 export type SeoCheckCategory = { name: string; checks: SeoCheckResult[]; allPassed: boolean }
 
 export const useSeoChecks = (form: UseFormReturn<ProductFormValues>) => {
-  // Add this at the beginning of the useSeoChecks function
   const prevScoreRef = useRef<number>(0)
 
-  // Listen for changes to relevant form fields
   const watchedValues = form.watch([
     "name",
     "description",
@@ -113,7 +111,6 @@ export const useSeoChecks = (form: UseFormReturn<ProductFormValues>) => {
 
     if (allImages.length === 0) return { passed: false, message: "No images added to the product" }
 
-    // No longer checking for focus keyword in image names
     return { passed: true, message: `Product has ${allImages.length} images` }
   }
 
@@ -164,13 +161,10 @@ export const useSeoChecks = (form: UseFormReturn<ProductFormValues>) => {
     const content = form.watch("description") || ""
     if (!content) return { passed: false, message: "No content set" }
 
-    // Count sentences (basic implementation)
     const sentences = content.split(/[.!?]+/).filter(Boolean).length
 
-    // Count words
     const words = content.split(/\s+/).filter(Boolean).length
 
-    // Count syllables (very basic approximation)
     const syllables = content.replace(/[^aeiouy]/gi, "").length
 
     if (sentences === 0 || words === 0)
@@ -179,7 +173,6 @@ export const useSeoChecks = (form: UseFormReturn<ProductFormValues>) => {
     const wordsPerSentence = words / sentences
     const syllablesPerWord = syllables / words
 
-    // Simplified Flesch-Kincaid readability formula
     const readabilityScore = 206.835 - 1.015 * wordsPerSentence - 84.6 * syllablesPerWord
     const normalizedScore = Math.min(100, Math.max(0, readabilityScore))
 
@@ -193,7 +186,6 @@ export const useSeoChecks = (form: UseFormReturn<ProductFormValues>) => {
     }
   }
 
-  // Replace the calculateSeoScore function with this version
   const calculateSeoScore = (checks: SeoCheckCategory[]): number => {
     let totalPossiblePoints = 0
     let earnedPoints = 0
@@ -207,11 +199,9 @@ export const useSeoChecks = (form: UseFormReturn<ProductFormValues>) => {
 
     const score = totalPossiblePoints > 0 ? Math.round((earnedPoints / totalPossiblePoints) * 100) : 0
 
-    // Only update if the score has actually changed
     if (score !== prevScoreRef.current) {
       prevScoreRef.current = score
 
-      // Use setTimeout to avoid React state update during render
       setTimeout(() => {
         form.setValue("seo.seoScore", score, {
           shouldDirty: false,
@@ -267,16 +257,12 @@ export const useSeoChecks = (form: UseFormReturn<ProductFormValues>) => {
       contentReadability: contentReadabilityChecks,
     }
 
-    // Calculate overall SEO score
     const seoScore = calculateSeoScore([
       basicSeoChecks,
       additionalChecks,
       titleReadabilityChecks,
       contentReadabilityChecks,
     ])
-
-    // Update the form value for SEO score
-    // form.setValue("seo.seoScore", seoScore, { shouldDirty: false }) // This line is replaced by the calculateSeoScore function
 
     return allChecks
   }, [watchedValues])

@@ -1,10 +1,7 @@
 "use server"
-
 import prismadb from "@/lib/prismadb"
-
 export async function saveProductAsDraft(productId: string, storeId: string) {
   try {
-    // Explicitly set isPublished to false and isArchived to false for drafts
     const product = await prismadb.product.update({
       where: {
         id: productId,
@@ -15,7 +12,6 @@ export async function saveProductAsDraft(productId: string, storeId: string) {
         isArchived: false,
       },
     })
-
     return { success: true, product }
   } catch (error) {
     console.error("Error saving product as draft:", error)

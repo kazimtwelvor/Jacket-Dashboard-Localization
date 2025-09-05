@@ -7,7 +7,6 @@ import Image from "@tiptap/extension-image"
 import Underline from "@tiptap/extension-underline"
 import TextAlign from "@tiptap/extension-text-align"
 import Link from "@tiptap/extension-link"
-import { Extension } from "@tiptap/core"
 import {
   AlignRight,
   Bold,
@@ -41,7 +40,6 @@ interface TiptapEditorRef {
   getEditor: () => any
 }
 
-// CSS for inline heading styles (add this to your global CSS or use a style tag)
 const INLINE_STYLES = `
   .tiptap-editor span.inline-heading {
     font-size: 1.1rem;
@@ -63,7 +61,6 @@ const formatContent = (content: string): string => {
 
   let cleanContent = content.trim()
 
-  // Ensure content is wrapped in paragraph if not already and doesn't start with a block element
   if (!cleanContent.match(/^<(p|h[1-6]|div|ul|ol|blockquote)/)) {
     cleanContent = `<p>${cleanContent}</p>`
   }
@@ -114,13 +111,11 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
       },
       onUpdate: ({ editor }) => {
         const html = editor.getHTML()
-        // Keep spans with classes
         onChange(html)
       },
       editable: !disabled,
     })
 
-    // Expose methods to parent component
     useImperativeHandle(ref, () => ({
       insertImage: (url: string, link?: string) => {
         if (!editor) return

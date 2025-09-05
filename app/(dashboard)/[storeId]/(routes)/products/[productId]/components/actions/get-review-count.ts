@@ -12,14 +12,12 @@ export async function getReviewCount(storeId: string, productId?: string) {
 
     console.log("Getting review count for:", { storeId, productId })
 
-    // Get total reviews for the store
     const totalReviews = await prismadb.review.count({
       where: {
         storeId: storeId,
       },
     })
 
-    // Get reviews for specific product if productId is provided
     let productReviews = 0
     if (productId && productId !== "new") {
       productReviews = await prismadb.review.count({
@@ -30,7 +28,6 @@ export async function getReviewCount(storeId: string, productId?: string) {
       })
     }
 
-    // Get some sample reviews for debugging
     const sampleReviews = await prismadb.review.findMany({
       where: {
         storeId: storeId,

@@ -39,7 +39,7 @@ export const ProductsColumnActions: React.FC<ProductsColumnActionsProps> = ({ da
   const onDelete = async () => {
     try {
       setLoading(true)
-      await axios.delete(`/api/${params.storeId}/products/${data.id}`)
+      await axios.delete(`/api/${params?.storeId}/products/${data.id}`)
       router.refresh()
       toast.success("Product deleted.")
     } catch (error) {
@@ -53,13 +53,12 @@ export const ProductsColumnActions: React.FC<ProductsColumnActionsProps> = ({ da
   const onDuplicate = async () => {
     try {
       setLoading(true)
-      const response = await axios.post(`/api/${params.storeId}/products/${data.id}/duplicate`)
+      const response = await axios.post(`/api/${params?.storeId}/products/${data.id}/duplicate`)
       router.refresh()
       toast.success("Product duplicated successfully.")
 
-      // Optionally navigate to the new product
       if (response.data?.id) {
-        router.push(`/${params.storeId}/products/${response.data.id}`)
+        router.push(`/${params?.storeId}/products/${response.data.id}`)
       }
     } catch (error) {
       console.error("Error duplicating product:", error)
@@ -81,7 +80,7 @@ export const ProductsColumnActions: React.FC<ProductsColumnActionsProps> = ({ da
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem onClick={() => router.push(`/${params.storeId}/products/${data.id}`)}>
+          <DropdownMenuItem onClick={() => router.push(`/${params?.storeId}/products/${data.id}`)}>
             <Edit className="mr-2 h-4 w-4" />
             Edit
           </DropdownMenuItem>

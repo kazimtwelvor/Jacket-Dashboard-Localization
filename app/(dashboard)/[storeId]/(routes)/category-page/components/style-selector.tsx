@@ -5,7 +5,6 @@ import { useParams } from "next/navigation"
 import axios from "axios"
 import { UseFormReturn } from "react-hook-form"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
 
 interface Style {
   id: string
@@ -24,9 +23,7 @@ export const StyleSelector: React.FC<StyleSelectorProps> = ({ form }) => {
   useEffect(() => {
     const fetchStyles = async () => {
       try {
-        // Use the categories endpoint with style filter
-        const response = await axios.get(`/api/${params.storeId}/categories`)
-        // Filter only style categories
+        const response = await axios.get(`/api/${params?.storeId}/categories`)
         const styleCategories = response.data
           .filter((item: any) => item.type === "style")
           .map((item: any) => ({
@@ -36,7 +33,6 @@ export const StyleSelector: React.FC<StyleSelectorProps> = ({ form }) => {
         setStyles(styleCategories || [])
       } catch (error) {
         console.error("Failed to fetch styles:", error)
-        // Provide some default styles in case of error
         setStyles([
           { id: "casual", name: "Casual" },
           { id: "formal", name: "Formal" },
@@ -49,7 +45,7 @@ export const StyleSelector: React.FC<StyleSelectorProps> = ({ form }) => {
     }
     
     fetchStyles()
-  }, [params.storeId])
+  }, [params?.storeId])
   
   const selectedStyles = form.watch("styles") || []
   

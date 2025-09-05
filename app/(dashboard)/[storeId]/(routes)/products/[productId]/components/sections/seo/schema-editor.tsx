@@ -70,13 +70,10 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
     WebPage: "Describes the web page content to search engines",
   }
 
-  // Parse initial schema to determine type
   useEffect(() => {
-    // Set template type if provided
     if (schemaType) {
       setSelectedTemplate(schemaType)
     }
-    // Otherwise try to determine from initial schema
     else if (initialSchema) {
       try {
         const parsed = JSON.parse(initialSchema)
@@ -84,34 +81,27 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
           setSelectedTemplate(parsed["@type"])
         }
       } catch (e) {
-        // Silent error - will use default template
       }
     }
 
-    // Set schema data from initial schema if available
     if (initialSchema && initialSchema.trim() !== "") {
       setSchemaData(initialSchema)
     }
-    // Generate schema if none exists
     else {
       const timer = setTimeout(() => generateSchema(), 0)
       return () => clearTimeout(timer)
     }
-  }, [initialSchema, schemaType]) // Remove schemaData from dependencies
+  }, [initialSchema, schemaType])
 
-  // Add this function to safely update schema data
-  const safelyUpdateSchemaData = (newSchema) => {
+  const safelyUpdateSchemaData = (newSchema: string) => {
     setSchemaData(newSchema)
     if (onSchemaChange) {
       onSchemaChange(newSchema)
 
-      // Try to parse the schema to get the type
       try {
         const parsed = JSON.parse(newSchema)
         if (parsed && parsed["@type"]) {
-          // Add templateName to make combining schemas easier
           parsed.templateName = parsed["@type"]
-          // Update with the templateName added
           onSchemaChange(JSON.stringify(parsed))
         }
       } catch (e) {
@@ -120,7 +110,6 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
     }
   }
 
-  // Generate schema based on type and product data
   const generateSchema = () => {
     console.log(`Generating schema of type: ${selectedTemplate}`)
     let schema = {}
@@ -154,10 +143,9 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
         schema = generateProductSchema()
     }
 
-    // Ensure the @type property is set correctly
     if (schema && typeof schema === "object") {
-      schema["@type"] = selectedTemplate
-      schema.templateName = selectedTemplate
+      (schema as any)["@type"] = selectedTemplate
+      (schema as any).templateName = selectedTemplate
     }
 
     const formattedSchema = JSON.stringify(schema, null, 2)
@@ -216,7 +204,6 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
     }
   }
 
-  // Generate FAQ schema
   const generateFAQSchema = () => {
     return {
       "@context": "https://schema.org",
@@ -250,7 +237,6 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
     }
   }
 
-  // Generate HowTo schema
   const generateHowToSchema = () => {
     return {
       "@context": "https://schema.org",
@@ -282,7 +268,6 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
     }
   }
 
-  // Generate Review schema
   const generateReviewSchema = () => {
     return {
       "@context": "https://schema.org",
@@ -307,7 +292,6 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
     }
   }
 
-  // Generate Article schema
   const generateArticleSchema = () => {
     return {
       "@context": "https://schema.org",
@@ -332,7 +316,6 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
     }
   }
 
-  // Generate Breadcrumb schema
   const generateBreadcrumbSchema = () => {
     return {
       "@context": "https://schema.org",
@@ -360,7 +343,6 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
     }
   }
 
-  // Generate Organization schema
   const generateOrganizationSchema = () => {
     return {
       "@context": "https://schema.org",
@@ -382,7 +364,6 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
     }
   }
 
-  // Generate WebPage schema
   const generateWebPageSchema = () => {
     return {
       "@context": "https://schema.org",
@@ -401,7 +382,6 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
     }
   }
 
-  // Validate schema JSON
   const validateSchema = () => {
     try {
       // Don't validate empty data
@@ -411,10 +391,8 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
         return false
       }
 
-      // Parse the JSON
       const parsed = JSON.parse(schemaData)
 
-      // Check for required fields based on schema type
       if (!parsed["@context"] || !parsed["@type"]) {
         setIsValid(false)
         setValidationMessage("Schema missing required fields (@context or @type)")
@@ -424,38 +402,32 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
       setIsValid(true)
       setValidationMessage("Schema is valid!")
 
-      // Only call onSchemaChange if actual validation passed
       onSchemaChange(schemaData)
       return true
     } catch (e) {
       setIsValid(false)
-      setValidationMessage(`Error: ${e.message}`)
+      setValidationMessage(`Error: ${e instanceof Error ? e.message : 'Unknown error'}`)
       return false
     }
   }
 
-  // Helper function to strip HTML tags
   const stripHtmlTags = (html: string) => {
     if (!html) return ""
     return html.replace(/<[^>]*>?/gm, "")
   }
 
-  // Handle schema type change
   const handleTemplateChange = (value: string) => {
     console.log(`Template changed from ${selectedTemplate} to ${value}`)
     setSelectedTemplate(value)
-    // Schema will be regenerated in the useEffect
   }
 
-  // Handle schema data change
   const handleSchemaDataChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value
     safelyUpdateSchemaData(newValue)
-    setIsValid(true) // Reset validation until user validates
+    setIsValid(true) 
     setValidationMessage("")
   }
 
-  // Render a simplified preview of the schema
   const renderSchemaPreview = () => {
     try {
       const schema = JSON.parse(schemaData)
@@ -495,7 +467,7 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
               <div className="space-y-2">
                 <div className="font-medium">Questions:</div>
                 <ul className="list-disc pl-5">
-                  {schema.mainEntity?.map((item, index) => (
+                  {schema.mainEntity?.map((item: any, index: number) => (
                     <li key={index}>{item.name}</li>
                   ))}
                 </ul>
@@ -509,7 +481,7 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
                 </div>
                 <div className="font-medium">Steps:</div>
                 <ol className="list-decimal pl-5">
-                  {schema.step?.map((step, index) => (
+                  {schema.step?.map((step: any, index: number) => (
                     <li key={index}>{step.name}</li>
                   ))}
                 </ol>
@@ -545,7 +517,7 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
               <div className="space-y-2">
                 <div className="font-medium">Navigation:</div>
                 <ol className="list-decimal pl-5">
-                  {schema.itemListElement?.map((item, index) => (
+                  {schema.itemListElement?.map((item: any, index: number) => (
                     <li key={index}>{item.name}</li>
                   ))}
                 </ol>
@@ -588,32 +560,25 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
     }
   }
 
-  // Update schemaData when selectedTemplate changes
   useEffect(() => {
-    // Only regenerate if the schema type has changed and we don't already have data for this type
     if (schemaData) {
       try {
         const parsed = JSON.parse(schemaData)
 
-        // If the schema type has changed, regenerate the schema
         if (parsed["@type"] !== selectedTemplate) {
-          // Generate a new schema of the selected type
           generateSchema()
         }
       } catch (e) {
         console.error("Error parsing schema data:", e)
-        // If there's an error parsing, regenerate the schema
         generateSchema()
       }
     } else {
-      // If there's no schema data, generate a new one
       generateSchema()
     }
   }, [selectedTemplate])
 
   return (
     <div className="space-y-4">
-      {/* Schema Type Selector */}
       <div className="flex flex-col space-y-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -626,7 +591,7 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
                   </div>
                 </TooltipTrigger>
                 <TooltipContent className="max-w-xs">
-                  <p>{schemaTypeDescriptions[selectedTemplate]}</p>
+                  <p>{schemaTypeDescriptions[selectedTemplate as keyof typeof schemaTypeDescriptions]}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -648,7 +613,7 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
             <SelectItem value="WebPage">Web Page</SelectItem>
           </SelectContent>
         </Select>
-        <p className="text-xs text-muted-foreground">{schemaTypeDescriptions[selectedTemplate]}</p>
+        <p className="text-xs text-muted-foreground">{schemaTypeDescriptions[selectedTemplate as keyof typeof schemaTypeDescriptions]}</p>
       </div>
 
       {/* Editor Tabs */}
@@ -707,7 +672,6 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
         </TabsContent>
       </Tabs>
 
-      {/* Help Text */}
       <div className="text-xs text-muted-foreground bg-muted/30 p-2 rounded">
         <p>
           <strong>Tip:</strong> You can switch between visual and code views to edit your schema. The visual view shows

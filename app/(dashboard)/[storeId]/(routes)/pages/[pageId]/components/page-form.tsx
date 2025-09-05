@@ -10,7 +10,6 @@ import { Trash } from "lucide-react"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-
 import { Button } from "@/components/ui/button"
 import { Heading } from "@/components/ui/heading"
 import { Separator } from "@/components/ui/separator"
@@ -19,16 +18,13 @@ import { Input } from "@/components/ui/input"
 import { AlertModal } from "@/components/modals/alert-modal"
 import { Checkbox } from "@/components/ui/checkbox"
 import { PageBuilder } from "./page-builder"
-
 const formSchema = z.object({
   title: z.string().min(1),
   slug: z.string().min(1),
   isPublished: z.boolean().default(false),
   content: z.string().optional(),
 })
-
 type PageFormValues = z.infer<typeof formSchema>
-
 interface PageFormProps {
   initialData: any | null
   categories?: any[]
@@ -43,13 +39,11 @@ export const PageForm: React.FC<PageFormProps> = ({ initialData, categories }) =
   const [pageElements, setPageElements] = useState<any[]>(initialData?.content ? JSON.parse(initialData.content) : [])
 
   useEffect(() => {
-    // Check if we're coming from a template
     const searchParams = new URLSearchParams(window.location.search)
     const isFromTemplate = searchParams.get("template") === "custom"
 
     if (isFromTemplate) {
       try {
-        // Get template elements from localStorage instead of sessionStorage
         const templateElementsJson = localStorage.getItem("templateElements")
         console.log("Template elements JSON:", templateElementsJson)
 
@@ -58,14 +52,11 @@ export const PageForm: React.FC<PageFormProps> = ({ initialData, categories }) =
           console.log("Parsed template elements:", templateElements)
 
           if (Array.isArray(templateElements) && templateElements.length > 0) {
-            // Set the elements and update the form
             setPageElements(templateElements)
             form.setValue("content", JSON.stringify(templateElements))
 
-            // Open the page builder automatically
             setShowPageBuilder(true)
 
-            // Clear the stored elements to prevent reuse
             localStorage.removeItem("templateElements")
 
             toast.success("Template loaded successfully!")
@@ -113,8 +104,9 @@ export const PageForm: React.FC<PageFormProps> = ({ initialData, categories }) =
       router.refresh()
       router.push(`/${params?.storeId}/pages`)
       toast.success(toastMessage)
-    } catch (error) {
-      toast.error("Something went wrong.")
+    } catch (error: any) {
+      const errorMessage = error.response?.data || error.message || "Something went wrong."
+      toast.error(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -127,8 +119,9 @@ export const PageForm: React.FC<PageFormProps> = ({ initialData, categories }) =
       router.refresh()
       router.push(`/${params?.storeId}/pages`)
       toast.success("Page deleted.")
-    } catch (error) {
-      toast.error("Something went wrong.")
+    } catch (error: any) {
+      const errorMessage = error.response?.data || error.message || "Something went wrong."
+      toast.error(errorMessage)
     } finally {
       setLoading(false)
       setOpen(false)

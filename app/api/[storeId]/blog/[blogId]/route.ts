@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
-
 import prismadb from "@/lib/prismadb"
 
 export async function GET(req: Request, { params }: { params: { blogId: string } }) {
@@ -22,7 +21,6 @@ export async function GET(req: Request, { params }: { params: { blogId: string }
   }
 }
 
-// Update the PATCH function to better handle image URLs in problematic steps
 export async function PATCH(req: Request, { params }: { params: { storeId: string; blogId: string } }) {
   try {
     const { userId } = await auth()
@@ -55,7 +53,55 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       return new NextResponse("Unauthorized", { status: 405 })
     }
 
-    // Log the raw body data for debugging
+    const existingBlogBySlug = await prismadb.blog.findFirst({
+      where: {
+        storeId: params.storeId,
+        content: {
+          path: ["metadata", "slug"],
+          equals: body.slug,
+        },
+        NOT: {
+          id: params.blogId,
+        },
+      },
+    })
+
+    if (existingBlogBySlug) {
+      return new NextResponse("Slug already exists", { status: 400 })
+    }
+
+    const trimmedTitle = body.title.trim()
+    const allBlogs = await prismadb.blog.findMany({
+      where: {
+        storeId: params.storeId,
+        NOT: {
+          id: params.blogId,
+        },
+      },
+      select: {
+        id: true,
+        content: true,
+      },
+    })
+
+    const existingBlogByTitle = allBlogs.find((blog) => {
+      const content = blog.content as any
+      const blogTitle = content?.metadata?.title
+      return blogTitle && blogTitle.toLowerCase().trim() === trimmedTitle.toLowerCase()
+    })
+
+    console.log("[BLOG_PATCH] Title check:", { 
+      title: trimmedTitle, 
+      storeId: params.storeId, 
+      blogId: params.blogId,
+      existingBlogByTitle: existingBlogByTitle ? { id: existingBlogByTitle.id } : null 
+    })
+
+    if (existingBlogByTitle) {
+      console.log("[BLOG_PATCH] Title already exists, returning error")
+      return new NextResponse("Title already exists", { status: 400 })
+    }
+
     console.log("[BLOG_PATCH] Raw body data for problematic steps:", {
       step8: body.guideContent?.steps?.[7],
       step9: body.guideContent?.steps?.[8],
@@ -68,28 +114,23 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       step18: body.guideContent?.steps?.[17],
     })
 
-    // Process steps to ensure all fields are preserved
     const processedSteps =
       body.guideContent?.steps
-        ?.filter((step: any) => step.isActive !== false) // Only include active steps
+        ?.filter((step: any) => step.isActive !== false) 
         .map((step: any, index: number) => {
-          // Create a base step with common fields
           const processedStep: any = {
             id: `step-${index + 1}`,
             title: step.title || "",
             subtitle: step.subtitle || "",
             content: Array.isArray(step.content) ? step.content : step.content ? [step.content] : [],
-            image: step.image || "", // Ensure image field is preserved
+            image: step.image || "",
             isActive: step.isActive !== false,
-            // Ensure button fields are preserved for all steps
             buttonText: step.buttonText || "Learn more",
             buttonLink: step.buttonLink || "",
           }
 
-          // Special handling for problematic steps (8, 9, 10, 11, 12, 13, 16, 17, 18)
           const problematicSteps = [7, 8, 9, 10, 11, 12, 15, 16, 17] // 0-indexed
 
-          // Handle images array for all steps
           if (Array.isArray(step.images)) {
             // Filter out invalid image URLs
             processedStep.images = step.images.map((img: string) => {

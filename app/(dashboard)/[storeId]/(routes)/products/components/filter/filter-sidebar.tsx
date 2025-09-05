@@ -5,7 +5,6 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { ChevronDown, ChevronUp } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -26,17 +25,15 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({ categories, sizes,
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  // Get current filter values from URL
-  const currentStatus = searchParams.get("status")?.split(",") || []
-  const currentGender = searchParams.get("gender")?.split(",") || []
-  const currentMaterial = searchParams.get("material")?.split(",") || []
-  const currentStyle = searchParams.get("style")?.split(",") || []
-  const currentSize = searchParams.get("size")?.split(",") || []
-  const currentColor = searchParams.get("color")?.split(",") || []
-  const currentMinPrice = searchParams.get("minPrice") || "0"
-  const currentMaxPrice = searchParams.get("maxPrice") || "1000"
+  const currentStatus = searchParams?.get("status")?.split(",") || []
+  const currentGender = searchParams?.get("gender")?.split(",") || []
+  const currentMaterial = searchParams?.get("material")?.split(",") || []
+  const currentStyle = searchParams?.get("style")?.split(",") || []
+  const currentSize = searchParams?.get("size")?.split(",") || []
+  const currentColor = searchParams?.get("color")?.split(",") || []
+  const currentMinPrice = searchParams?.get("minPrice") || "0"
+  const currentMaxPrice = searchParams?.get("maxPrice") || "1000"
 
-  // Local state for filter values
   const [statusFilters, setStatusFilters] = useState<string[]>(currentStatus)
   const [genderFilters, setGenderFilters] = useState<string[]>(currentGender)
   const [materialFilters, setMaterialFilters] = useState<string[]>(currentMaterial)
@@ -48,7 +45,6 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({ categories, sizes,
     Number.parseInt(currentMaxPrice),
   ])
 
-  // Accordion state
   const [expandedSections, setExpandedSections] = useState({
     status: true,
     categories: true,
@@ -57,7 +53,6 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({ categories, sizes,
     price: true,
   })
 
-  // Update local state when URL params change
   useEffect(() => {
     setStatusFilters(currentStatus)
     setGenderFilters(currentGender)
@@ -77,7 +72,6 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({ categories, sizes,
     currentMaxPrice,
   ])
 
-  // Categorize categories by type
   const genderCategories = categories.filter(
     (cat) =>
       cat.name.toLowerCase().includes("men") ||
@@ -136,51 +130,44 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({ categories, sizes,
   }
 
   const applyFilters = () => {
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(searchParams?.toString() || "")
 
-    // Update or remove status filter
     if (statusFilters.length > 0) {
       params.set("status", statusFilters.join(","))
     } else {
       params.delete("status")
     }
 
-    // Update or remove gender filter
     if (genderFilters.length > 0) {
       params.set("gender", genderFilters.join(","))
     } else {
       params.delete("gender")
     }
 
-    // Update or remove material filter
     if (materialFilters.length > 0) {
       params.set("material", materialFilters.join(","))
     } else {
       params.delete("material")
     }
 
-    // Update or remove style filter
     if (styleFilters.length > 0) {
       params.set("style", styleFilters.join(","))
     } else {
       params.delete("style")
     }
 
-    // Update or remove size filter
     if (sizeFilters.length > 0) {
       params.set("size", sizeFilters.join(","))
     } else {
       params.delete("size")
     }
 
-    // Update or remove color filter
     if (colorFilters.length > 0) {
       params.set("color", colorFilters.join(","))
     } else {
       params.delete("color")
     }
 
-    // Update or remove price range
     if (priceRange[0] > 0) {
       params.set("minPrice", priceRange[0].toString())
     } else {
@@ -193,7 +180,6 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({ categories, sizes,
       params.delete("maxPrice")
     }
 
-    // Reset to page 1 when filters change
     params.delete("page")
 
     const search = params.toString()
@@ -263,7 +249,6 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({ categories, sizes,
 
           <Separator />
 
-          {/* Categories Filter */}
           <div className="my-4">
             <div
               className="flex items-center justify-between cursor-pointer py-2"
@@ -275,7 +260,6 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({ categories, sizes,
 
             {expandedSections.categories && (
               <div className="space-y-4 ml-2 mt-1">
-                {/* Gender Categories */}
                 {genderCategories.length > 0 && (
                   <div>
                     <h4 className="text-xs font-medium text-muted-foreground mb-2">Gender</h4>
@@ -294,7 +278,6 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({ categories, sizes,
                   </div>
                 )}
 
-                {/* Material Categories */}
                 {materialCategories.length > 0 && (
                   <div>
                     <h4 className="text-xs font-medium text-muted-foreground mb-2">Material</h4>
@@ -313,7 +296,6 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({ categories, sizes,
                   </div>
                 )}
 
-                {/* Style Categories */}
                 {styleCategories.length > 0 && (
                   <div>
                     <h4 className="text-xs font-medium text-muted-foreground mb-2">Style</h4>
@@ -337,7 +319,6 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({ categories, sizes,
 
           <Separator />
 
-          {/* Sizes Filter */}
           <div className="my-4">
             <div
               className="flex items-center justify-between cursor-pointer py-2"
@@ -365,7 +346,6 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({ categories, sizes,
 
           <Separator />
 
-          {/* Colors Filter */}
           <div className="my-4">
             <div
               className="flex items-center justify-between cursor-pointer py-2"
@@ -396,7 +376,6 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({ categories, sizes,
 
           <Separator />
 
-          {/* Price Range Filter */}
           <div className="my-4">
             <div
               className="flex items-center justify-between cursor-pointer py-2"

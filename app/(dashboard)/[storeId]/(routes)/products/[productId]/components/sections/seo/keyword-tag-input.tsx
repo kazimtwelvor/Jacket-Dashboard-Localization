@@ -18,19 +18,16 @@ export const KeywordTagInput: React.FC<KeywordTagInputProps> = ({ keywords = [],
   const [keywordsList, setKeywordsList] = useState<string[]>(keywords)
   const form = useForm()
 
-  // Initialize keywords from props
   useEffect(() => {
     setKeywordsList(keywords || [])
   }, [keywords])
 
   const handleKeywordsChange = (newKeywords: string[]) => {
-    // Update the form field
     form.setValue("seo.keywords", newKeywords, {
       shouldDirty: true,
       shouldValidate: true,
     })
 
-    // Also update the top-level keywords field to ensure it's included in the submission
     form.setValue("keywords", newKeywords, {
       shouldDirty: true,
     })
@@ -38,7 +35,6 @@ export const KeywordTagInput: React.FC<KeywordTagInputProps> = ({ keywords = [],
     console.log("Keywords updated:", newKeywords)
   }
 
-  // Update parent component when keywords change
   useEffect(() => {
     onChange(keywordsList)
     handleKeywordsChange(keywordsList)
@@ -61,7 +57,7 @@ export const KeywordTagInput: React.FC<KeywordTagInputProps> = ({ keywords = [],
   }
 
   const promoteToPrimary = (index: number) => {
-    if (index === 0) return // Already primary
+    if (index === 0) return
 
     const newKeywords = [...keywordsList]
     const keyword = newKeywords[index]

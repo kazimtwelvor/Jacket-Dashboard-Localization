@@ -94,7 +94,6 @@ export const QuotationSection: React.FC<QuotationSectionProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Form submitted:", formData)
     setFormData({
       name: "",
       email: "",

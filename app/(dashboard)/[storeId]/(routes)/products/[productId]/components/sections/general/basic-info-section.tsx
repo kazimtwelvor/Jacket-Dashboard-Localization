@@ -145,7 +145,6 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
       }
 
       if (needsUpdate) {
-        console.log("Syncing external materials from material categories:", selectedMaterialCategories)
         form.setValue("specifications.externalMaterial", [...selectedMaterialCategories], {
           shouldValidate: true,
           shouldDirty: true,
@@ -170,7 +169,6 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
       }
 
       if (needsUpdate) {
-        console.log("Syncing color specifications from color variations:", selectedColorVariations)
         form.setValue("specifications.color", [...selectedColorVariations], {
           shouldValidate: true,
           shouldDirty: true,

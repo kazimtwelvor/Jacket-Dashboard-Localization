@@ -106,12 +106,10 @@ export const ImagesSection = ({ isUploading }: { isUploading: boolean }) => {
   const params = useParams()
 
   const handleMainImageMetadataChange = (metadata: any) => {
-    console.log("Main image metadata changed:", metadata)
     form.setValue("mainImageMetadata", metadata, { shouldDirty: true })
   }
 
   const handleGalleryImageMetadataChange = (metadata: any, index: number) => {
-    console.log(`Gallery image ${index} metadata changed:`, metadata)
 
     const currentMetadata = form.getValues("imagesMetadata") || []
 
@@ -125,13 +123,11 @@ export const ImagesSection = ({ isUploading }: { isUploading: boolean }) => {
   }
 
   const handleViewDetails = (imageUrl: string) => {
-    console.log("View details clicked for:", imageUrl)
 
     const isMainImage = form.getValues("mainImage") === imageUrl
 
     if (isMainImage) {
       const metadata = form.getValues("mainImageMetadata")
-      console.log("Main image metadata:", metadata)
       setSelectedImageMetadata(metadata)
     } else {
       const galleryImages = form.getValues("images") || []
@@ -140,10 +136,8 @@ export const ImagesSection = ({ isUploading }: { isUploading: boolean }) => {
       if (index !== -1) {
         const imagesMetadata = form.getValues("imagesMetadata") || []
         const metadata = imagesMetadata[index] || {}
-        console.log(`Gallery image ${index} metadata:`, metadata)
         setSelectedImageMetadata(metadata)
       } else {
-        console.log("Image not found in gallery")
         setSelectedImageMetadata(null)
       }
     }

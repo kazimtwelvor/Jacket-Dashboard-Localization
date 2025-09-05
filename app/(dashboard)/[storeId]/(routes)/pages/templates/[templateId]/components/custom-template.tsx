@@ -920,7 +920,6 @@ export const CustomTemplate: React.FC<CustomTemplateProps> = ({ isEditing = fals
 
       const pageBuilderElements = convertTemplateToPageBuilderElements(templateData)
 
-      console.log("Template elements created:", pageBuilderElements)
 
       localStorage.setItem("templateElements", JSON.stringify(pageBuilderElements))
 

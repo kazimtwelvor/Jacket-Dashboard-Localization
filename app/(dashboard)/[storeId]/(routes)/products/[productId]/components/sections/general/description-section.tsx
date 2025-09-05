@@ -173,7 +173,6 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
 
   const updateImageAlignment = (index: number, alignment: ImageAlignment) => {
     try {
-      console.log(`Updating image ${index} alignment to ${alignment}`)
 
       const newImages = [...descriptionImages]
       newImages[index] = {
@@ -201,7 +200,6 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
 
   const updateImageSize = (index: number, size: number) => {
     try {
-      console.log(`Updating image ${index} size to ${size}%`)
 
       const newImages = [...descriptionImages]
       newImages[index] = {
@@ -316,7 +314,6 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
 
       form.setValue("description", combinedDescription, { shouldDirty: true, shouldTouch: true })
 
-      console.log("Updated description field with:", combinedDescription)
     } catch (error) {
       console.error("Error updating description field:", error)
     }
@@ -358,7 +355,6 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
     formRef.current = findForm()
 
     const handleSubmit = () => {
-      console.log("Form is being submitted, ensuring description is up to date")
       updateDescriptionField(descriptionText, descriptionImages)
     }
 

@@ -45,11 +45,9 @@ export const PageForm: React.FC<PageFormProps> = ({ initialData, categories }) =
     if (isFromTemplate) {
       try {
         const templateElementsJson = localStorage.getItem("templateElements")
-        console.log("Template elements JSON:", templateElementsJson)
 
         if (templateElementsJson) {
           const templateElements = JSON.parse(templateElementsJson)
-          console.log("Parsed template elements:", templateElements)
 
           if (Array.isArray(templateElements) && templateElements.length > 0) {
             setPageElements(templateElements)

@@ -88,7 +88,6 @@ export async function generateAndSaveReviews(
         
         if (response.status === 429) {
           const waitTime = Math.pow(2, retryCount) * 1000 
-          console.log(`Rate limited, waiting ${waitTime}ms before retry ${retryCount + 1}/${maxRetries}`)
           await new Promise(resolve => setTimeout(resolve, waitTime))
           retryCount++
           continue
@@ -106,7 +105,6 @@ export async function generateAndSaveReviews(
 
     if (!response || !response.ok) {
       if (response?.status === 429) {
-        console.log("Rate limited, generating fallback reviews")
         const fallbackReviews = generateFallbackReviews(reviewCount, productName)
         
         return {

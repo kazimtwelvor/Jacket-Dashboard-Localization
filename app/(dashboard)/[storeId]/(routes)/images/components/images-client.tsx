@@ -72,7 +72,6 @@ export const ImagesClient = () => {
           url = `http://${url}`
         }
 
-        console.log(`Store URL set to: ${url}`)
         setStoreUrl(url)
 
         // Fetch images once we have the store URL
@@ -249,7 +248,6 @@ export const ImagesClient = () => {
           }
 
           const data = await response.json()
-          console.log("Upload successful:", data)
 
           // Add the new image to our local state
           newImages.push({

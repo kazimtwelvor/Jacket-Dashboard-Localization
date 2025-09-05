@@ -5,7 +5,6 @@ import prismadb from "@/lib/prismadb"
 import { ProductForm } from "./components/product-form"
 import type { Product, Image } from "../types"
 import { StoreNameProvider } from "./components/store-name-provider"
-
 interface ProductPageProps {
   params: {
     productId: string

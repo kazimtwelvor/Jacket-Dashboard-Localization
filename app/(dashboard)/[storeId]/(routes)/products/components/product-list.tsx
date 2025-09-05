@@ -100,7 +100,6 @@ export const ProductList = ({ products, storeId, onSelectItems }: ProductListPro
     })
   }
 
-  // Helper function to check if sale price is valid
   const isValidSalePrice = (price: string | undefined | null): boolean => {
     if (!price) return false
     const numericPrice = Number.parseFloat(price.replace(/[^0-9.-]+/g, ""))

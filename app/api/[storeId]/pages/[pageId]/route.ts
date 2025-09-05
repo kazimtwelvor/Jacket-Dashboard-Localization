@@ -55,6 +55,46 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       return new NextResponse("Unauthorized", { status: 403 })
     }
 
+    const existingPageBySlug = await prismadb.page.findFirst({
+      where: {
+        storeId: params.storeId,
+        slug,
+        NOT: {
+          id: params.pageId,
+        },
+      },
+    })
+
+    if (existingPageBySlug) {
+      return new NextResponse("Slug already exists", { status: 400 })
+    }
+
+    const trimmedTitle = title.trim()
+    const existingPageByTitle = await prismadb.page.findFirst({
+      where: {
+        storeId: params.storeId,
+        title: {
+          equals: trimmedTitle,
+          mode: 'insensitive'
+        },
+        NOT: {
+          id: params.pageId,
+        },
+      },
+    })
+
+    console.log("[PAGE_PATCH] Title check:", { 
+      title: trimmedTitle, 
+      storeId: params.storeId, 
+      pageId: params.pageId,
+      existingPageByTitle: existingPageByTitle ? { id: existingPageByTitle.id, title: existingPageByTitle.title } : null 
+    })
+
+    if (existingPageByTitle) {
+      console.log("[PAGE_PATCH] Title already exists, returning error")
+      return new NextResponse("Title already exists", { status: 400 })
+    }
+
     const page = await prismadb.page.update({
       where: {
         id: params.pageId,

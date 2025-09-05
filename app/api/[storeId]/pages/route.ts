@@ -9,6 +9,7 @@ export async function POST(req: Request, { params }: { params: { storeId: string
 
     const { title, slug, isPublished, content } = body
 
+
     if (!userId) {
       return new NextResponse("Unauthenticated", { status: 401 })
     }
@@ -34,6 +35,39 @@ export async function POST(req: Request, { params }: { params: { storeId: string
 
     if (!storeByUserId) {
       return new NextResponse("Unauthorized", { status: 403 })
+    }
+
+    const existingPageBySlug = await prismadb.page.findFirst({
+      where: {
+        storeId: params.storeId,
+        slug,
+      },
+    })
+
+    if (existingPageBySlug) {
+      return new NextResponse("Slug already exists", { status: 400 })
+    }
+
+    const trimmedTitle = title.trim()
+    const existingPageByTitle = await prismadb.page.findFirst({
+      where: {
+        storeId: params.storeId,
+        title: {
+          equals: trimmedTitle,
+          mode: 'insensitive'
+        },
+      },
+    })
+
+    console.log("[PAGES_POST] Title check:", { 
+      title, 
+      storeId: params.storeId, 
+      existingPageByTitle: existingPageByTitle ? { id: existingPageByTitle.id, title: existingPageByTitle.title } : null 
+    })
+
+    if (existingPageByTitle) {
+      console.log("[PAGES_POST] Title already exists, returning error")
+      return new NextResponse("Title already exists", { status: 400 })
     }
 
     const page = await prismadb.page.create({

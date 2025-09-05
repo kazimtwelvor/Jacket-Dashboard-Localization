@@ -35,10 +35,50 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       return new NextResponse("Unauthorized", { status: 405 })
     }
 
-    // Process steps to ensure all fields are preserved
+    const existingBlogBySlug = await prismadb.blog.findFirst({
+      where: {
+        storeId: params.storeId,
+        content: {
+          path: ["metadata", "slug"],
+          equals: body.slug,
+        },
+      },
+    })
+
+    if (existingBlogBySlug) {
+      return new NextResponse("Slug already exists", { status: 400 })
+    }
+
+    const trimmedTitle = body.title.trim()
+    const allBlogs = await prismadb.blog.findMany({
+      where: {
+        storeId: params.storeId,
+      },
+      select: {
+        id: true,
+        content: true,
+      },
+    })
+
+    const existingBlogByTitle = allBlogs.find((blog) => {
+      const content = blog.content as any
+      const blogTitle = content?.metadata?.title
+      return blogTitle && blogTitle.toLowerCase().trim() === trimmedTitle.toLowerCase()
+    })
+
+    console.log("[BLOG_POST] Title check:", { 
+      title: trimmedTitle, 
+      storeId: params.storeId, 
+      existingBlogByTitle: existingBlogByTitle ? { id: existingBlogByTitle.id } : null 
+    })
+
+    if (existingBlogByTitle) {
+      console.log("[BLOG_POST] Title already exists, returning error")
+      return new NextResponse("Title already exists", { status: 400 })
+    }
+
     const processedSteps =
       body.guideContent?.steps?.map((step: any, index: number) => {
-        // Create a base step with common fields
         const processedStep: any = {
           id: `step-${index + 1}`,
           title: step.title || "",
@@ -46,28 +86,26 @@ export async function POST(req: Request, { params }: { params: { storeId: string
           content: Array.isArray(step.content) ? step.content : step.content ? [step.content] : [],
           image: step.image || "",
           isActive: step.isActive !== false,
-          // Ensure button fields are preserved for all steps
           buttonText: step.buttonText || "Learn more",
           buttonLink: step.buttonLink || "",
         }
 
-        // Add step-specific fields based on step type/index
         switch (index) {
-          case 9: // Step 10 - Interactive Content
+          case 9: 
             processedStep.cards = step.cards || [
               { title: "Interactive Quizzes", description: "Engage and qualify leads" },
               { title: "ROI Calculators", description: "Demonstrate value clearly" },
               { title: "Interactive Infographics", description: "Visualize complex data" },
             ]
             break
-          case 12: // Step 13 - Content Optimization
+          case 12: 
             processedStep.cardTitles = step.cardTitles || ["Before Optimization", "After Optimization"]
             processedStep.metrics = step.metrics || {
               before: ["Low engagement rate (1.2%)", "High bounce rate (78%)", "Poor conversion (0.5%)"],
               after: ["High engagement rate (4.8%)", "Low bounce rate (32%)", "Strong conversion (2.7%)"],
             }
             break
-          case 14: // Step 15 - Content Auditing
+          case 14: 
             processedStep.images = step.images || ["", "", "", ""]
             processedStep.cardTitles = step.cardTitles || [
               "Content Inventory",
@@ -82,7 +120,7 @@ export async function POST(req: Request, { params }: { params: { storeId: string
               "Actionable insights to improve your content strategy",
             ]
             break
-          case 15: // Step 16 - Content Localization
+          case 15:
             processedStep.timelineItems = step.timelineItems || [
               {
                 title: "Market Research",
@@ -101,7 +139,7 @@ export async function POST(req: Request, { params }: { params: { storeId: string
               },
             ]
             break
-          case 16: // Step 17 - Analytics Dashboard
+          case 16:
             processedStep.metrics = step.metrics || {
               traffic: "+24%",
               engagement: "+18%",
@@ -112,7 +150,7 @@ export async function POST(req: Request, { params }: { params: { storeId: string
               trafficAnalytics: "",
             }
             break
-          case 17: // Step 18 - Content Showcase
+          case 17:
             processedStep.caseStudies = step.caseStudies || [
               {
                 title: "E-commerce Content Strategy",
@@ -149,7 +187,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
             processedStep.buttonText = step.buttonText || "View All Case Studies"
             break
           default:
-            // For other steps, preserve any custom fields they might have
             if (step.images) {
               processedStep.images = step.images
             }
@@ -159,7 +196,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
             if (step.cardDescriptions) {
               processedStep.cardDescriptions = step.cardDescriptions
             }
-            // For other steps, preserve any custom fields they might have
             Object.keys(step).forEach((key) => {
               if (!processedStep[key] && key !== "id") {
                 processedStep[key] = step[key]
@@ -169,8 +205,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
 
         return processedStep
       }) || []
-
-    // Structure all form data into a single content JSON object with section IDs
     const contentJson = {
       metadata: {
         id: "metadata-1",
@@ -206,7 +240,7 @@ export async function POST(req: Request, { params }: { params: { storeId: string
         keyTakeaways: {
           id: "section-4",
           title: body.guideContent?.keyTakeaways?.title || "Key Takeaways",
-          isActive: body.guideContent?.keyTakeaways?.isActive !== false, // Ensure isActive is included
+          isActive: body.guideContent?.keyTakeaways?.isActive !== false,
           whatYouLearned: body.guideContent?.keyTakeaways?.whatYouLearned || {
             title: "What You've Learned",
             items: [],
@@ -249,7 +283,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       },
     })
 
-    // Transform the blogs to include title and slug from content
     const formattedBlogs = blogs.map((blog) => {
       const content = blog.content as any
       return {

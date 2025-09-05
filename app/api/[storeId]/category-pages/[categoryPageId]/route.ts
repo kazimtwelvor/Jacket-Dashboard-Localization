@@ -23,30 +23,24 @@ export async function GET(
       return new NextResponse("Category page not found", { status: 404 })
     }
     
-    // Check if this is for a template by looking at the URL query params
     const { searchParams } = new URL(req.url)
     const forTemplate = searchParams.get("forTemplate") === "true"
     
-    // If this is for a template, ensure we're not returning a regular category
     if (forTemplate) {
       const name = categoryPage.name.toLowerCase();
-      // Check if this is a common material, style, or gender type
       const commonMaterials = ["cotton", "polyester", "wool", "silk", "linen", "denim", "leather", "cashmere", "nylon", "spandex"];
       const commonStyles = ["bomber", "puffer", "varsity", "letterman", "biker", "aviator", "quilted", "blazer", "cropped", "long coat", "casual", "formal"];
       const commonGenders = ["men", "women", "unisex", "boys", "girls"];
-      
       if (commonMaterials.includes(name) || commonStyles.includes(name) || commonGenders.includes(name)) {
         return new NextResponse("This is a regular category, not a category page", { status: 400 })
       }
     }
     
-    // Log keyword data
     console.log('Category Page Keywords:', {
       focusKeyword: categoryPage.focusKeyword,
       supportingKeywords: categoryPage.supportingKeywords
     });
     
-    // Add currentCategory field with the same id, name, and imageUrl
     const responseData = {
       ...categoryPage,
       currentCategory: {
@@ -68,31 +62,15 @@ export async function PATCH(
   { params }: { params: { storeId: string; categoryPageId: string } }
 ) {
   try {
-    // Extract params early to ensure they're available
     const { storeId, categoryPageId } = params;
     
     const { userId } = await auth()
     const body = await req.json()
     
-    console.log('[CATEGORY_PAGE_PATCH] Request body:', JSON.stringify(body, null, 2))
-    console.log('[CATEGORY_PAGE_PATCH] Status field:', body.status)
-    console.log('[CATEGORY_PAGE_PATCH] IsPublished field:', body.isPublished)
-    
-    // Debug logs
-    console.log('PATCH request received')
-    console.log('User ID:', userId)
-    console.log('Store ID:', storeId)
-    console.log('Category Page ID:', categoryPageId)
-    console.log('Keyword Data:', {
-      focusKeyword: body.focusKeyword,
-      supportingKeywords: body.supportingKeywords
-    })
     
     if (!userId) {
       return new NextResponse("Unauthenticated", { status: 401 })
     }
-
-    // Skip permission checks - allow any authenticated user
 
     const {
       name,
@@ -140,8 +118,7 @@ export async function PATCH(
       return new NextResponse("Category page ID is required", { status: 400 })
     }
 
-    // Check if slug is unique for this store (excluding current category page)
-    const existingCategoryPage = await prismadb.categoryPage.findFirst({
+    const existingCategoryPageBySlug = await prismadb.categoryPage.findFirst({
       where: {
         storeId: storeId,
         slug,
@@ -151,14 +128,32 @@ export async function PATCH(
       },
     })
 
-    if (existingCategoryPage) {
+    if (existingCategoryPageBySlug) {
       return new NextResponse("Slug already exists", { status: 400 })
     }
 
-    // Use the provided imageUrl
+    const trimmedName = name.trim()
+    const existingCategoryPageByName = await prismadb.categoryPage.findFirst({
+      where: {
+        storeId: storeId,
+        name: {
+          equals: trimmedName,
+          mode: 'insensitive'
+        },
+        NOT: {
+          id: categoryPageId,
+        },
+      },
+    })
+
+
+    if (existingCategoryPageByName) {
+      return new NextResponse("Name already exists", { status: 400 })
+    }
+
     const finalImageUrl = imageUrl || "";
 
-    const updateData = {
+    const updateData: any = {
       name,
       slug,
       apiSlug: apiSlug || "",
@@ -194,7 +189,6 @@ export async function PATCH(
       updateData.categoryContent = categoryContent
     }
 
-    // Handle status and isPublished fields
     if (status !== undefined && (status === "PUBLISHED" || status === "DRAFT")) {
       updateData.status = status
       updateData.isPublished = status === "PUBLISHED"
@@ -208,7 +202,6 @@ export async function PATCH(
         updateData.publishedAt = new Date()
       }
     } else {
-      // Default to DRAFT if no status is provided
       updateData.status = "DRAFT"
     }
 
@@ -219,11 +212,9 @@ export async function PATCH(
       data: updateData,
     });
     
-    // Check if this is for a template by looking at the URL query params
     const { searchParams } = new URL(req.url)
     const forTemplate = searchParams.get("forTemplate") === "true"
     
-    // Add currentCategory field with the same id, name, and imageUrl
     const responseData = {
       ...categoryPage,
       currentCategory: {
@@ -233,10 +224,8 @@ export async function PATCH(
       }
     };
     
-    // If this is for a template, ensure we're not returning a regular category
     if (forTemplate) {
       const name = categoryPage.name.toLowerCase();
-      // Check if this is a common material, style, or gender type
       const commonMaterials = ["cotton", "polyester", "wool", "silk", "linen", "denim", "leather", "cashmere", "nylon", "spandex"];
       const commonStyles = ["bomber", "puffer", "varsity", "letterman", "biker", "aviator", "quilted", "blazer", "cropped", "long coat", "casual", "formal"];
       const commonGenders = ["men", "women", "unisex", "boys", "girls"];
@@ -247,8 +236,7 @@ export async function PATCH(
     }
     
     return NextResponse.json(responseData);
-  } catch (error) {
-    console.log("[CATEGORY_PAGE_PATCH] Error:", error)
+  } catch (error: any) {
     return new NextResponse(`Internal error: ${error.message}`, { status: 500 })
   }
 }
@@ -261,12 +249,6 @@ export async function DELETE(
     const { storeId, categoryPageId } = params;
     const { userId } = await auth()
 
-    // Debug logs
-    console.log('DELETE request received')
-    console.log('User ID:', userId)
-    console.log('Store ID:', storeId)
-    console.log('Category Page ID:', categoryPageId)
-
     if (!userId) {
       return new NextResponse("Unauthenticated", { status: 401 })
     }
@@ -275,7 +257,6 @@ export async function DELETE(
       return new NextResponse("Category page ID is required", { status: 400 })
     }
 
-    // Skip permission checks - allow any authenticated user
 
     const categoryPage = await prismadb.categoryPage.delete({
       where: {
@@ -284,8 +265,7 @@ export async function DELETE(
     })
 
     return NextResponse.json(categoryPage)
-  } catch (error) {
-    console.log("[CATEGORY_PAGE_DELETE] Error:", error)
+  } catch (error: any) {
     return new NextResponse(`Internal error: ${error.message}`, { status: 500 })
   }
 }

@@ -104,8 +104,9 @@ export const PageForm: React.FC<PageFormProps> = ({ initialData, categories }) =
       router.refresh()
       router.push(`/${params?.storeId}/pages`)
       toast.success(toastMessage)
-    } catch (error) {
-      toast.error("Something went wrong.")
+    } catch (error: any) {
+      const errorMessage = error.response?.data || error.message || "Something went wrong."
+      toast.error(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -118,8 +119,9 @@ export const PageForm: React.FC<PageFormProps> = ({ initialData, categories }) =
       router.refresh()
       router.push(`/${params?.storeId}/pages`)
       toast.success("Page deleted.")
-    } catch (error) {
-      toast.error("Something went wrong.")
+    } catch (error: any) {
+      const errorMessage = error.response?.data || error.message || "Something went wrong."
+      toast.error(errorMessage)
     } finally {
       setLoading(false)
       setOpen(false)

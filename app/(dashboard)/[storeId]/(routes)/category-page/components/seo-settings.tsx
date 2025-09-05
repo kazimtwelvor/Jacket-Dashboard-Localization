@@ -13,17 +13,13 @@ import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Separator } from "@/components/ui/separator"
-import { AlertCircle, CheckCircle, Globe, Info, Lightbulb, Smartphone, Star, Twitter } from "lucide-react"
-import { KeywordTagInput } from "./keyword-tag-input"
+import { AlertCircle, CheckCircle, Globe, Info, Twitter } from "lucide-react"
 
 interface SeoSettingsProps {
   form: UseFormReturn<any>
 }
 
 const FRONTEND_STORE_URL = process.env.NEXT_PUBLIC_FRONTEND_STORE_URL || "https://yourstore.com"
-
-
-// Enhanced keyword input component for category pages
 const CategoryKeywordInput = ({ form }: { form: UseFormReturn<any> }) => {
   const keywords = form.watch("supportingKeywords") || []
   const focusKeyword = form.watch("focusKeyword") || ""
@@ -80,7 +76,7 @@ const CategoryKeywordInput = ({ form }: { form: UseFormReturn<any> }) => {
             Add
           </Button>
         </div>
-        
+
         <div className="flex flex-wrap gap-2 mt-2">
           {keywords.map((keyword: string, index: number) => (
             <Badge key={index} variant="outline" className="px-3 py-1 flex items-center gap-1">
@@ -102,7 +98,7 @@ const CategoryKeywordInput = ({ form }: { form: UseFormReturn<any> }) => {
             </Badge>
           ))}
         </div>
-        
+
         <FormDescription className="mt-1">
           Additional keywords that support your focus keyword.
         </FormDescription>
@@ -111,24 +107,22 @@ const CategoryKeywordInput = ({ form }: { form: UseFormReturn<any> }) => {
   )
 }
 
-// SEO Analysis component for category pages
 const CategorySeoAnalysis = ({ form }: { form: UseFormReturn<any> }) => {
   const seoTitle = form.watch("seoTitle") || ""
   const seoDescription = form.watch("seoDescription") || ""
   const focusKeyword = form.watch("focusKeyword") || ""
   const description = form.watch("description") || ""
   const name = form.watch("name") || ""
-  
+
   const displayTitle = seoTitle || name
   const displayDescription = seoDescription || description
-  
-  // SEO checks
+
   const keywordInTitle = focusKeyword && displayTitle.toLowerCase().includes(focusKeyword.toLowerCase())
   const keywordInDescription = focusKeyword && displayDescription.toLowerCase().includes(focusKeyword.toLowerCase())
   const titleLengthGood = displayTitle.length >= 30 && displayTitle.length <= 60
   const descriptionLengthGood = displayDescription.length >= 120 && displayDescription.length <= 160
   const hasDescription = description.length > 100
-  
+
   const seoScore = useMemo(() => {
     let score = 0
     if (displayTitle && titleLengthGood) score += 20
@@ -214,17 +208,16 @@ const CategorySeoAnalysis = ({ form }: { form: UseFormReturn<any> }) => {
   )
 }
 
-// Search preview component
 const SearchPreview = ({ form }: { form: UseFormReturn<any> }) => {
   const seoTitle = form.watch("seoTitle") || ""
   const seoDescription = form.watch("seoDescription") || ""
   const name = form.watch("name") || ""
   const description = form.watch("description") || ""
   const slug = form.watch("slug") || ""
-  
+
   const displayTitle = seoTitle || name || "Category Page Title"
   const displayDescription = seoDescription || description || "Category page description will appear here."
-  
+
   return (
     <Card>
       <CardHeader>
@@ -250,7 +243,7 @@ const SearchPreview = ({ form }: { form: UseFormReturn<any> }) => {
 
 export const SeoSettings: React.FC<SeoSettingsProps> = ({ form }) => {
   const [activeTab, setActiveTab] = useState("basic")
-  
+
   const getDisplayValue = useCallback(
     (field: string) => {
       const value = form.watch(field)
@@ -293,15 +286,14 @@ export const SeoSettings: React.FC<SeoSettingsProps> = ({ form }) => {
                     <FormLabel>SEO Title</FormLabel>
                     <div className="relative">
                       <FormControl>
-                        <Input 
+                        <Input
                           placeholder={`Custom SEO title (defaults to: ${form.watch("name") || "Category Name"})`}
                           {...field}
                           className={field.value && field.value.length > 60 ? "border-destructive" : ""}
                         />
                       </FormControl>
-                      <span className={`absolute right-3 top-2.5 text-xs ${
-                        (field.value || "").length > 60 ? "text-destructive" : "text-muted-foreground"
-                      }`}>
+                      <span className={`absolute right-3 top-2.5 text-xs ${(field.value || "").length > 60 ? "text-destructive" : "text-muted-foreground"
+                        }`}>
                         {(field.value || "").length}/60
                       </span>
                     </div>
@@ -312,7 +304,7 @@ export const SeoSettings: React.FC<SeoSettingsProps> = ({ form }) => {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="seoDescription"
@@ -328,9 +320,8 @@ export const SeoSettings: React.FC<SeoSettingsProps> = ({ form }) => {
                           rows={4}
                         />
                       </FormControl>
-                      <span className={`absolute right-3 bottom-3 text-xs ${
-                        (field.value || "").length > 160 ? "text-destructive" : "text-muted-foreground"
-                      }`}>
+                      <span className={`absolute right-3 bottom-3 text-xs ${(field.value || "").length > 160 ? "text-destructive" : "text-muted-foreground"
+                        }`}>
                         {(field.value || "").length}/160
                       </span>
                     </div>
@@ -341,7 +332,7 @@ export const SeoSettings: React.FC<SeoSettingsProps> = ({ form }) => {
                   </FormItem>
                 )}
               />
-              
+
               <div className="space-y-4">
                 <FormLabel>Keywords</FormLabel>
                 <CategoryKeywordInput form={form} />
@@ -366,7 +357,7 @@ export const SeoSettings: React.FC<SeoSettingsProps> = ({ form }) => {
                 <h3 className="text-base font-medium flex items-center gap-2">
                   <Globe className="h-4 w-4" /> Open Graph (Facebook, LinkedIn)
                 </h3>
-                
+
                 <FormField
                   control={form.control}
                   name="ogTitle"
@@ -381,9 +372,8 @@ export const SeoSettings: React.FC<SeoSettingsProps> = ({ form }) => {
                             className={field.value && field.value.length > 60 ? "border-destructive" : ""}
                           />
                         </FormControl>
-                        <span className={`absolute right-3 top-2.5 text-xs ${
-                          (field.value || "").length > 60 ? "text-destructive" : "text-muted-foreground"
-                        }`}>
+                        <span className={`absolute right-3 top-2.5 text-xs ${(field.value || "").length > 60 ? "text-destructive" : "text-muted-foreground"
+                          }`}>
                           {(field.value || "").length}/60
                         </span>
                       </div>
@@ -410,9 +400,8 @@ export const SeoSettings: React.FC<SeoSettingsProps> = ({ form }) => {
                             rows={4}
                           />
                         </FormControl>
-                        <span className={`absolute right-3 bottom-3 text-xs ${
-                          (field.value || "").length > 160 ? "text-destructive" : "text-muted-foreground"
-                        }`}>
+                        <span className={`absolute right-3 bottom-3 text-xs ${(field.value || "").length > 160 ? "text-destructive" : "text-muted-foreground"
+                          }`}>
                           {(field.value || "").length}/160
                         </span>
                       </div>
@@ -431,7 +420,7 @@ export const SeoSettings: React.FC<SeoSettingsProps> = ({ form }) => {
                 <h3 className="text-base font-medium flex items-center gap-2">
                   <Twitter className="h-4 w-4" /> Twitter Card
                 </h3>
-                
+
                 <FormField
                   control={form.control}
                   name="twitterTitle"
@@ -446,9 +435,8 @@ export const SeoSettings: React.FC<SeoSettingsProps> = ({ form }) => {
                             className={field.value && field.value.length > 60 ? "border-destructive" : ""}
                           />
                         </FormControl>
-                        <span className={`absolute right-3 top-2.5 text-xs ${
-                          (field.value || "").length > 60 ? "text-destructive" : "text-muted-foreground"
-                        }`}>
+                        <span className={`absolute right-3 top-2.5 text-xs ${(field.value || "").length > 60 ? "text-destructive" : "text-muted-foreground"
+                          }`}>
                           {(field.value || "").length}/60
                         </span>
                       </div>
@@ -475,9 +463,8 @@ export const SeoSettings: React.FC<SeoSettingsProps> = ({ form }) => {
                             rows={4}
                           />
                         </FormControl>
-                        <span className={`absolute right-3 bottom-3 text-xs ${
-                          (field.value || "").length > 160 ? "text-destructive" : "text-muted-foreground"
-                        }`}>
+                        <span className={`absolute right-3 bottom-3 text-xs ${(field.value || "").length > 160 ? "text-destructive" : "text-muted-foreground"
+                          }`}>
                           {(field.value || "").length}/160
                         </span>
                       </div>
@@ -627,7 +614,7 @@ export const SeoSettings: React.FC<SeoSettingsProps> = ({ form }) => {
                     name="customSchema"
                     render={({ field }) => {
                       const [jsonError, setJsonError] = useState("")
-                      
+
                       const validateJson = (value: string) => {
                         if (!value.trim()) {
                           setJsonError("")
@@ -640,7 +627,7 @@ export const SeoSettings: React.FC<SeoSettingsProps> = ({ form }) => {
                           setJsonError("Invalid JSON format")
                         }
                       }
-                      
+
                       return (
                         <FormItem>
                           <FormLabel>Custom Schema JSON-LD</FormLabel>
@@ -705,36 +692,36 @@ export const SeoSettings: React.FC<SeoSettingsProps> = ({ form }) => {
                   <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-4 rounded-md">
                     <h4 className="font-medium text-blue-800 dark:text-blue-400 mb-2">Auto-Generated Schema Preview</h4>
                     <pre className="text-xs text-blue-700 dark:text-blue-300 overflow-x-auto">
-{JSON.stringify({
-  "@context": "https://schema.org",
-  "@type": form.watch("schemaType") || "CollectionPage",
-  "name": form.watch("name") || "Category Name",
-  "description": form.watch("description") || "Category description",
-  "url": `${FRONTEND_STORE_URL}/category/${form.watch("slug") || "category-slug"}`,
-  "image": form.watch("imageUrl") || "",
-  "mainEntity": {
-    "@type": "ItemList",
-    "name": `${form.watch("name") || "Category Name"} Products`,
-    "description": `Browse our collection of ${form.watch("name") || "category"} products`
-  },
-  "breadcrumb": {
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Home",
-        "item": FRONTEND_STORE_URL
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "name": form.watch("name") || "Category",
-        "item": `${FRONTEND_STORE_URL}/category/${form.watch("slug") || "category-slug"}`
-      }
-    ]
-  }
-}, null, 2)}
+                      {JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": form.watch("schemaType") || "CollectionPage",
+                        "name": form.watch("name") || "Category Name",
+                        "description": form.watch("description") || "Category description",
+                        "url": `${FRONTEND_STORE_URL}/category/${form.watch("slug") || "category-slug"}`,
+                        "image": form.watch("imageUrl") || "",
+                        "mainEntity": {
+                          "@type": "ItemList",
+                          "name": `${form.watch("name") || "Category Name"} Products`,
+                          "description": `Browse our collection of ${form.watch("name") || "category"} products`
+                        },
+                        "breadcrumb": {
+                          "@type": "BreadcrumbList",
+                          "itemListElement": [
+                            {
+                              "@type": "ListItem",
+                              "position": 1,
+                              "name": "Home",
+                              "item": FRONTEND_STORE_URL
+                            },
+                            {
+                              "@type": "ListItem",
+                              "position": 2,
+                              "name": form.watch("name") || "Category",
+                              "item": `${FRONTEND_STORE_URL}/category/${form.watch("slug") || "category-slug"}`
+                            }
+                          ]
+                        }
+                      }, null, 2)}
                     </pre>
                   </div>
                 </div>
@@ -745,7 +732,7 @@ export const SeoSettings: React.FC<SeoSettingsProps> = ({ form }) => {
 
         <TabsContent value="preview" className="space-y-6">
           <SearchPreview form={form} />
-          
+
           <Card>
             <CardHeader>
               <CardTitle>SEO Recommendations</CardTitle>

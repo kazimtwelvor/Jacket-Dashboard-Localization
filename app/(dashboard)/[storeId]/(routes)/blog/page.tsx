@@ -13,12 +13,11 @@ const BlogsPage = async ({ params }: { params: { storeId: string } }) => {
     },
   })
 
-  // Transform the data to match the expected format in columns.tsx
   const formattedBlogs = blogs.map((item) => ({
     id: item.id,
-    title: item.content.metadata?.title || "Untitled",
-    slug: item.content.metadata?.slug || "",
-    isPublished: item.content.metadata?.isPublished || false,
+    title: item.content?.metadata?.title || "Untitled",
+    slug: item.content?.metadata?.slug || "",
+    isPublished: item.content?.metadata?.isPublished || false,
     createdAt: format(item.createdAt, "MMMM do, yyyy"),
   }))
 

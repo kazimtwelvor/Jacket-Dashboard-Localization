@@ -15,7 +15,7 @@ export const ApiSlugDisplay = ({ apiSlug }: ApiSlugDisplayProps) => {
   const [copied, setCopied] = useState(false)
   const params = useParams()
   
-  const baseApiUrl = `/api/${params.storeId}/products`
+  const baseApiUrl = `/api/${params?.storeId}/products`
   const fullApiUrl = `${baseApiUrl}?${apiSlug}`
   
   const handleCopy = (text: string) => {

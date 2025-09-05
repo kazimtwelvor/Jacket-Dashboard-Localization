@@ -21,7 +21,6 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Checkbox } from "@/components/ui/checkbox"
 import ImageUpload from "@/components/ui/image-upload"
 import { MaterialSelector } from "./material-selector"
 import { StyleSelector } from "./style-selector"
@@ -141,13 +140,11 @@ export const CategoryPageForm: React.FC<CategoryPageFormProps> = ({ initialData 
     }
   })
   
-  // No need to clear imageUrl when other categories are selected
 
   const onSubmit = async (data: CategoryPageFormValues, action: 'save' | 'publish' = 'save') => {
     try {
       setLoading(true)
       
-      // Generate apiSlug from selected filters
       const queryParams = [];
       
       if (data.materials && data.materials.length > 0) {
@@ -218,45 +215,43 @@ export const CategoryPageForm: React.FC<CategoryPageFormProps> = ({ initialData 
         isPublished: status === 'PUBLISHED',
       }
       
-      console.log('Submitting form data:', JSON.stringify(formData));
-      console.log('Action type:', action);
-      console.log('Status being sent:', formData.status);
       
       if (initialData && initialData.id) {
         console.log('Updating category page with ID:', initialData.id);
         try {
-          const updateUrl = `/api/${params.storeId}/category-pages/${initialData.id}`;
+          const updateUrl = `/api/${params?.storeId}/category-pages/${initialData.id}`;
           console.log('Update URL:', updateUrl);
           const response = await axios.patch(updateUrl, formData);
           console.log('Update response:', response.data);
           toast.success(status === 'PUBLISHED' ? "Category page published successfully" : "Category page updated successfully");
-        } catch (updateError) {
+        } catch (updateError: any) {
           console.error('Update error details:', {
-            status: updateError.response?.status,
-            data: updateError.response?.data,
-            message: updateError.message
+            status: updateError?.response?.status,
+            data: updateError?.response?.data,
+            message: updateError?.message
           });
           throw updateError;
         }
       } else {
         try {
-          const response = await axios.post(`/api/${params.storeId}/category-pages`, formData);
+          const response = await axios.post(`/api/${params?.storeId}/category-pages`, formData);
           console.log('Create response:', response.data);
           toast.success(status === 'PUBLISHED' ? "Category page published successfully" : "Category page created successfully");
-        } catch (createError) {
+        } catch (createError: any) {
           console.error('Create error details:', {
-            status: createError.response?.status,
-            data: createError.response?.data,
-            message: createError.message
+            status: createError?.response?.status,
+            data: createError?.response?.data,
+            message: createError?.message
           });
           throw createError;
         }
       }
       router.refresh()
-      router.push(`/${params.storeId}/category-page`) 
-    } catch (error) {
+      router.push(`/${params?.storeId}/category-page`) 
+    } catch (error: any) {
       console.error("Error saving category page:", error)
-      toast.error("Failed to save category page")
+      const errorMessage = error.response?.data || error.message || "Failed to save category page"
+      toast.error(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -269,6 +264,7 @@ export const CategoryPageForm: React.FC<CategoryPageFormProps> = ({ initialData 
   const handlePublish = () => {
     form.handleSubmit((data) => onSubmit(data, 'publish'))()
   }
+
   const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     const slug = value
@@ -279,7 +275,7 @@ export const CategoryPageForm: React.FC<CategoryPageFormProps> = ({ initialData 
   }
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit((data) => onSubmit(data, 'save'))} className="space-y-8">
         <Tabs defaultValue="general" className="w-full">
           <TabsList className="grid grid-cols-4 w-full">
             <TabsTrigger value="general">General</TabsTrigger>
@@ -305,7 +301,6 @@ export const CategoryPageForm: React.FC<CategoryPageFormProps> = ({ initialData 
                           {...field} 
                           onChange={(e) => {
                             field.onChange(e)
-                            // Auto-generate slug if slug is empty
                             if (!form.getValues("slug")) {
                               handleSlugChange(e)
                             }
@@ -360,7 +355,6 @@ export const CategoryPageForm: React.FC<CategoryPageFormProps> = ({ initialData 
                     </FormItem>
                   )}
                 />
-                
                 <FormField
                   control={form.control}
                   name="imageUrl"
@@ -421,8 +415,7 @@ export const CategoryPageForm: React.FC<CategoryPageFormProps> = ({ initialData 
               </CardContent>
             </Card>
             
-            {/* API Slug Display */}
-            <ApiSlugDisplay apiSlug={form.watch("apiSlug")} />
+            <ApiSlugDisplay apiSlug={form.watch("apiSlug") || ""} />
           </TabsContent>
           
           <TabsContent value="seo" className="space-y-4 pt-4">

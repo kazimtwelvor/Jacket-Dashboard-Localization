@@ -13,17 +13,11 @@ interface KeywordTagInputProps {
 export const KeywordTagInput: React.FC<KeywordTagInputProps> = ({ form }) => {
   const [inputValue, setInputValue] = useState("")
   
-  // Get keywords from form - for display purposes only
   const focusKeyword = form.watch("focusKeyword") || ""
   const supportingKeywords = form.watch("supportingKeywords") || []
   
-  // Log keyword data
-  console.log('KeywordTagInput - Current Keywords:', {
-    focusKeyword,
-    supportingKeywords
-  })
+
   
-  // Combine keywords for display
   const allKeywords = focusKeyword ? [focusKeyword, ...supportingKeywords] : [...supportingKeywords]
   
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -32,16 +26,12 @@ export const KeywordTagInput: React.FC<KeywordTagInputProps> = ({ form }) => {
       
       const newKeyword = inputValue.trim()
       
-      // If no focus keyword exists, set this as focus keyword
       if (!focusKeyword) {
-        console.log('Setting focus keyword:', newKeyword)
         form.setValue("focusKeyword", newKeyword, {
           shouldValidate: true,
           shouldDirty: true,
         })
       } else if (!supportingKeywords.includes(newKeyword) && newKeyword !== focusKeyword) {
-        // Otherwise add as supporting keyword if not duplicate
-        console.log('Adding supporting keyword:', newKeyword)
         form.setValue("supportingKeywords", [...supportingKeywords, newKeyword], {
           shouldValidate: true,
           shouldDirty: true,
@@ -55,7 +45,6 @@ export const KeywordTagInput: React.FC<KeywordTagInputProps> = ({ form }) => {
   const removeKeyword = (keyword: string) => {
     console.log('Removing keyword:', keyword)
     
-    // If it's the focus keyword
     if (keyword === focusKeyword) {
       console.log('Removing focus keyword')
       form.setValue("focusKeyword", "", {
@@ -63,7 +52,6 @@ export const KeywordTagInput: React.FC<KeywordTagInputProps> = ({ form }) => {
         shouldDirty: true,
       })
       
-      // If we have supporting keywords, promote the first one to focus
       if (supportingKeywords.length > 0) {
         const [newFocus, ...restKeywords] = supportingKeywords
         console.log('Promoting supporting keyword to focus:', newFocus)
@@ -77,8 +65,6 @@ export const KeywordTagInput: React.FC<KeywordTagInputProps> = ({ form }) => {
         })
       }
     } else {
-      // It's a supporting keyword
-      console.log('Removing supporting keyword')
       form.setValue(
         "supportingKeywords",
         supportingKeywords.filter(k => k !== keyword),
@@ -91,23 +77,19 @@ export const KeywordTagInput: React.FC<KeywordTagInputProps> = ({ form }) => {
   }
 
   const promoteToPrimary = (keyword: string) => {
-    if (keyword === focusKeyword) return // Already primary
+    if (keyword === focusKeyword) return 
     
-    // Remove from supporting keywords
     const newSupportingKeywords = supportingKeywords.filter(k => k !== keyword)
     
-    // Add current focus keyword to supporting if it exists
     if (focusKeyword) {
       newSupportingKeywords.unshift(focusKeyword)
     }
     
-    // Set new focus keyword
     form.setValue("focusKeyword", keyword, {
       shouldValidate: true,
       shouldDirty: true,
     })
     
-    // Update supporting keywords
     form.setValue("supportingKeywords", newSupportingKeywords, {
       shouldValidate: true,
       shouldDirty: true,

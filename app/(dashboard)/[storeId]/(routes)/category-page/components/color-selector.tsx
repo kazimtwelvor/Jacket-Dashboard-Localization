@@ -5,7 +5,6 @@ import { useParams } from "next/navigation"
 import axios from "axios"
 import { UseFormReturn } from "react-hook-form"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
 
 interface Color {
   id: string
@@ -25,11 +24,10 @@ export const ColorSelector: React.FC<ColorSelectorProps> = ({ form }) => {
   useEffect(() => {
     const fetchColors = async () => {
       try {
-        const response = await axios.get(`/api/${params.storeId}/colors`)
+        const response = await axios.get(`/api/${params?.storeId}/colors`)
         setColors(response.data || [])
       } catch (error) {
         console.error("Failed to fetch colors:", error)
-        // Provide some default colors in case of error
         setColors([
           { id: "black", name: "Black", value: "#000000" },
           { id: "white", name: "White", value: "#FFFFFF" },
@@ -42,7 +40,7 @@ export const ColorSelector: React.FC<ColorSelectorProps> = ({ form }) => {
     }
     
     fetchColors()
-  }, [params.storeId])
+  }, [params?.storeId])
   
   const selectedColors = form.watch("colors") || []
   

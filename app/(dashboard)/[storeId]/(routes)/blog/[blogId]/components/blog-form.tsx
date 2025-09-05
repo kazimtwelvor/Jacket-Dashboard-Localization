@@ -620,7 +620,8 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
       router.push(`/${params.storeId}/blog`)
       toast.success(toastMessage)
     } catch (error: any) {
-      toast.error("Something went wrong.")
+      const errorMessage = error.response?.data || error.message || "Something went wrong."
+      toast.error(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -634,7 +635,8 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
       router.push(`/${params.storeId}/blog`)
       toast.success("Blog post deleted.")
     } catch (error: any) {
-      toast.error("Something went wrong.")
+      const errorMessage = error.response?.data || error.message || "Something went wrong."
+      toast.error(errorMessage)
     } finally {
       setLoading(false)
       setOpen(false)
@@ -830,9 +832,10 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
         await axios.post(`/api/${params.storeId}/blog`, data)
         toast.success("Blog post created.")
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Save error:", error)
-      toast.error("Failed to save blog post.")
+      const errorMessage = error.response?.data || error.message || "Failed to save blog post."
+      toast.error(errorMessage)
     } finally {
       setLoading(false)
     }

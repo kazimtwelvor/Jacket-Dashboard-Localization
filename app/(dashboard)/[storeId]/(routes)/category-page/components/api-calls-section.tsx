@@ -21,40 +21,40 @@ export const ApiCallsSection = () => {
     {
       id: "get-all",
       title: "Get All Category Pages",
-      endpoint: `/api/${params.storeId}/category-pages`,
+      endpoint: `/api/${params?.storeId}/category-pages`,
       method: "GET",
       description: "Fetch all category pages for this store",
-      code: `fetch('/api/${params.storeId}/category-pages')
+      code: `fetch('/api/${params?.storeId}/category-pages')
   .then(response => response.json())
   .then(data => console.log(data))`
     },
     {
       id: "get-one",
       title: "Get Category Page by ID",
-      endpoint: `/api/${params.storeId}/category-pages/{id}`,
+      endpoint: `/api/${params?.storeId}/category-pages/{id}`,
       method: "GET",
       description: "Fetch a specific category page by ID",
-      code: `fetch('/api/${params.storeId}/category-pages/{id}')
+      code: `fetch('/api/${params?.storeId}/category-pages/{id}')
   .then(response => response.json())
   .then(data => console.log(data))`
     },
     {
       id: "get-by-slug",
       title: "Get Category Page by Slug",
-      endpoint: `/api/${params.storeId}/category-pages?slug={slug}`,
+      endpoint: `/api/${params?.storeId}/category-pages?slug={slug}`,
       method: "GET",
       description: "Fetch a category page by its slug",
-      code: `fetch('/api/${params.storeId}/category-pages?slug=your-slug')
+      code: `fetch('/api/${params?.storeId}/category-pages?slug=your-slug')
   .then(response => response.json())
   .then(data => console.log(data))`
     },
     {
       id: "get-products",
       title: "Get Products by Category Filters",
-      endpoint: `/api/${params.storeId}/products?{apiSlug}`,
+      endpoint: `/api/${params?.storeId}/products?{apiSlug}`,
       method: "GET",
       description: "Fetch products using category page filters",
-      code: `fetch('/api/${params.storeId}/products?materials=leather&colors=black')
+      code: `fetch('/api/${params?.storeId}/products?materials=leather&colors=black')
   .then(response => response.json())
   .then(data => console.log(data))`
     }

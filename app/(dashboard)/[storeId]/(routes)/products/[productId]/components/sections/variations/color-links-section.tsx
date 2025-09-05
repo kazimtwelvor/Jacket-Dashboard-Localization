@@ -31,11 +31,7 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
   const [copiedColor, setCopiedColor] = useState<string | null>(null)
   const selectedColors = form.watch("specifications.color") || []
   const variationColors = form.watch("categories.variationColors") || []
-  
-  // Use whichever has colors - prioritize specifications.color, fallback to variationColors
   const displayColors = selectedColors.length > 0 ? selectedColors : variationColors
-  
-  // State declarations
   const [colorLinks, setColorLinks] = useState<Record<string, string>>({})
   const [products, setProducts] = useState<Product[]>([])
   const [searchTerms, setSearchTerms] = useState<Record<string, string>>({})
@@ -43,84 +39,56 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
   const dropdownRefs = useRef<Record<string, HTMLDivElement | null>>({})
   const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({})
   const [parentProducts, setParentProducts] = useState<Product[]>([])
-  const [parentSearchTerm, setParentSearchTerm] = useState<string>("")  
+  const [parentSearchTerm, setParentSearchTerm] = useState<string>("")
   const [selectedParentProduct, setSelectedParentProduct] = useState<Product | null>(null)
 
-  // Debug logging
-  useEffect(() => {
-    console.log("ColorLinksSection - selectedColors:", selectedColors)
-    console.log("ColorLinksSection - variationColors:", variationColors)
-    console.log("ColorLinksSection - displayColors:", displayColors)
-    console.log("🔥 CHECKBOX DEBUG - isParentProduct from form:", form.getValues("isParentProduct"))
-    console.log("🔥 CHECKBOX DEBUG - initialData.isParentProduct:", initialData?.isParentProduct)
-  }, [selectedColors, variationColors, displayColors, form, initialData])
-  
-  // Force update checkbox state from form values
+
   useEffect(() => {
     const currentValue = form.getValues("isParentProduct")
     const parentProductIdValue = form.getValues("parentProductId")
-    
-    console.log("=== PARENT PRODUCT DEBUG ===")
-    console.log("Current isParentProduct value:", currentValue)
-    console.log("Current parentProductId value:", parentProductIdValue)
-    console.log("InitialData isParentProduct:", initialData?.isParentProduct)
-    console.log("InitialData parentProductId:", initialData?.parentProductId)
-    console.log("InitialData full object:", initialData)
-    console.log("=== END DEBUG ===")
-    
-    // Force set form values from initialData
+
     if (initialData) {
       if (currentValue === undefined && initialData.isParentProduct !== undefined) {
         console.log("Setting isParentProduct from initialData:", initialData.isParentProduct)
         form.setValue("isParentProduct", Boolean(initialData.isParentProduct), { shouldDirty: false })
       }
-      
+
       if (!parentProductIdValue && initialData.parentProductId) {
         console.log("Setting parentProductId from initialData:", initialData.parentProductId)
         form.setValue("parentProductId", initialData.parentProductId, { shouldDirty: false })
       }
     }
-    
-    // Set selected parent product if parentProductId exists
+
     if (parentProductIdValue && !selectedParentProduct) {
-      console.log("Found parentProductId, searching for parent product:", parentProductIdValue)
-      // Find the parent product from the fetched products
       const foundParent = products.find(p => p.id === parentProductIdValue)
       if (foundParent) {
         console.log("Found parent product:", foundParent)
         setSelectedParentProduct(foundParent)
-        // Fetch parent color links
         fetchParentColorLinks(parentProductIdValue)
       }
     }
   }, [form, initialData, products, selectedParentProduct])
 
-  // Load parent product when initialData has parentProductId
   useEffect(() => {
     if (initialData?.parentProductId && !selectedParentProduct && storeId) {
-      console.log("🔥 Loading parent product from initialData:", initialData.parentProductId)
-      // Fetch the parent product details
       fetch(`/api/${storeId}/parent-products?search=`)
         .then(res => res.json())
         .then(data => {
           const foundParent = data.find((p: Product) => p.id === initialData.parentProductId)
           if (foundParent) {
-            console.log("🔥 Found parent product from API:", foundParent)
             setSelectedParentProduct(foundParent)
             fetchParentColorLinks(initialData.parentProductId)
           } else {
-            console.log("🔥 Parent product not found in API response")
           }
         })
         .catch(error => {
-          console.error("🔥 Error loading parent product:", error)
         })
     }
   }, [initialData, selectedParentProduct, storeId])
 
   useEffect(() => {
     if (!storeId) return
-    
+
     fetch(`/api/${storeId}/products?admin=true&includeArchived=true`)
       .then(res => res.json())
       .then(data => {
@@ -132,10 +100,9 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
       .catch(console.error)
   }, [storeId, currentProductId])
 
-  // Fetch parent products when search term changes
   useEffect(() => {
     if (!storeId) return
-    
+
     const searchParentProducts = async () => {
       try {
         const response = await fetch(`/api/${storeId}/parent-products?search=${encodeURIComponent(parentSearchTerm)}`)
@@ -152,7 +119,6 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // Add small delay to prevent immediate closure
       setTimeout(() => {
         Object.keys(showDropdown).forEach(color => {
           if (showDropdown[color] && dropdownRefs.current[color] && !dropdownRefs.current[color]?.contains(event.target as Node)) {
@@ -163,10 +129,10 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
     }
 
     const handleScroll = (event: Event) => {
-      const isScrollingInsideDropdown = Object.values(dropdownRefs.current).some(ref => 
+      const isScrollingInsideDropdown = Object.values(dropdownRefs.current).some(ref =>
         ref && ref.contains(event.target as Node)
       )
-      
+
       if (!isScrollingInsideDropdown) {
         setShowDropdown({})
       }
@@ -196,39 +162,29 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
   const getFilteredProducts = (color: string) => {
     const term = searchTerms[color] || ""
     if (!term) return products.slice(0, 10)
-    
-    return products.filter(p => 
+
+    return products.filter(p =>
       p.name?.toLowerCase().includes(term.toLowerCase()) ||
       p.sku?.toLowerCase().includes(term.toLowerCase())
     ).slice(0, 10)
   }
 
-  // Fetch parent product's color links
   const fetchParentColorLinks = async (parentProductId: string) => {
     try {
-      console.log("🔥 Fetching parent color links for:", parentProductId)
       const response = await fetch(`/api/${storeId}/parent-color-links?parentProductId=${parentProductId}`)
       const data = await response.json()
-      console.log("🔥 Parent color links API response:", data)
       if (data.colorLinks) {
-        console.log("🔥 Setting color links:", data.colorLinks)
         setColorLinks(data.colorLinks)
         form.setValue("categories.colorVariationLinks", data.colorLinks, { shouldDirty: true })
-        
-        // Also update the color variations to include parent colors
+
         const parentColors = Object.keys(data.colorLinks)
-        console.log("🔥 Parent colors:", parentColors)
-        
-        // Update both specifications.color and categories.variationColors
+
         form.setValue("specifications.color", parentColors, { shouldDirty: true })
         form.setValue("categories.variationColors", parentColors, { shouldDirty: true })
-        
-        console.log("🔥 Color links and colors set in form and state")
+
       } else {
-        console.log("🔥 No color links found in response")
       }
     } catch (error) {
-      console.error("🔥 Error fetching parent color links:", error)
     }
   }
 
@@ -264,7 +220,7 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
       <p className="text-sm text-muted-foreground mb-4">
         Search and select products or enter URLs manually for each color variation.
       </p>
-      
+
       <FormField
         control={form.control}
         name="isParentProduct"
@@ -288,8 +244,7 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
           </FormItem>
         )}
       />
-      
-      {/* Parent Product Search - Only show when checkbox is NOT checked */}
+
       {!form.watch("isParentProduct") && (
         <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-900/20 rounded-md border">
           <h4 className="text-sm font-medium mb-3">Select Parent Product</h4>
@@ -306,8 +261,8 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
                 <Search className="h-4 w-4" />
               </Button>
               {showDropdown['parent'] && typeof window !== 'undefined' && createPortal(
-                <div 
-                  className="fixed w-96 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-[9999]" 
+                <div
+                  className="fixed w-96 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-[9999]"
                   style={{
                     maxHeight: '300px',
                     top: buttonRefs.current['parent'] ? buttonRefs.current['parent']!.getBoundingClientRect().bottom + 8 : 0,
@@ -411,12 +366,10 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
                       e.stopPropagation()
                       setSelectedParentProduct(null)
                       form.setValue("parentProductId", "", { shouldDirty: true })
-                      // Clear inherited color links and colors
                       form.setValue("categories.colorVariationLinks", {}, { shouldDirty: true })
                       form.setValue("specifications.color", [], { shouldDirty: true })
                       form.setValue("categories.variationColors", [], { shouldDirty: true })
                       setColorLinks({})
-                      console.log("🔥 Removed parent product and cleared color data")
                     }}
                     className="p-1 hover:bg-red-100 rounded text-red-600 hover:text-red-800 transition-colors"
                   >
@@ -459,8 +412,8 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
                         <Search className="h-4 w-4" />
                       </Button>
                       {showDropdown[color] && typeof window !== 'undefined' && createPortal(
-                        <div 
-                          className="fixed w-96 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-[9999]" 
+                        <div
+                          className="fixed w-96 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-[9999]"
                           style={{
                             maxHeight: '300px',
                             top: buttonRefs.current[color] ? buttonRefs.current[color]!.getBoundingClientRect().bottom + 8 : 0,

@@ -29,7 +29,6 @@ export const CategoriesAttributesSection: React.FC<CategoriesAttributesSectionPr
   const [styleSearch, setStyleSearch] = useState("")
   const [materialSearch, setMaterialSearch] = useState("")
 
-  // Default options if categories are not provided
   const defaultGenderOptions = ["Men", "Women", "Unisex", "Boys", "Girls"]
   const defaultMaterialOptions = [
     "Cotton",
@@ -61,7 +60,6 @@ export const CategoriesAttributesSection: React.FC<CategoriesAttributesSectionPr
     "Formal",
   ]
 
-  // Use provided categories or fall back to defaults
   const genderOptions = categories?.genderCategories?.length
     ? categories.genderCategories.map((cat) => cat.name)
     : defaultGenderOptions
@@ -74,19 +72,16 @@ export const CategoriesAttributesSection: React.FC<CategoriesAttributesSectionPr
     ? categories.styleCategories.map((cat) => cat.name)
     : defaultStyleOptions
 
-  // Log the available options for debugging
   useEffect(() => {
     console.log("Available gender options:", genderOptions)
     console.log("Available material options:", materialOptions)
     console.log("Available style options:", styleOptions)
   }, [genderOptions, materialOptions, styleOptions])
 
-  // Filter materials based on search
   const filteredMaterials = materialOptions.filter((material) =>
     material.toLowerCase().includes(materialSearch.toLowerCase()),
   )
 
-  // Filter styles based on search
   const filteredStyles = styleOptions.filter((style) => style.toLowerCase().includes(styleSearch.toLowerCase()))
 
   const addTag = () => {
@@ -109,7 +104,6 @@ export const CategoriesAttributesSection: React.FC<CategoriesAttributesSectionPr
     }
   }
 
-  // Helper function to toggle material selection
   const toggleMaterial = (material: string) => {
     const currentMaterials = form.watch("categories.material") || []
     const isSelected = currentMaterials.includes(material)
@@ -121,7 +115,6 @@ export const CategoriesAttributesSection: React.FC<CategoriesAttributesSectionPr
     form.setValue("categories.material", updatedMaterials)
   }
 
-  // Helper function to toggle style selection
   const toggleStyle = (style: string) => {
     const currentStyles = form.watch("categories.style") || []
     const isSelected = currentStyles.includes(style)
@@ -133,7 +126,6 @@ export const CategoriesAttributesSection: React.FC<CategoriesAttributesSectionPr
 
   return (
     <div className="space-y-6">
-      {/* Gender Selection */}
       <Card>
         <CardContent className="pt-6">
           <div className="space-y-4">
@@ -174,7 +166,6 @@ export const CategoriesAttributesSection: React.FC<CategoriesAttributesSectionPr
         </CardContent>
       </Card>
 
-      {/* Material Selection */}
       <Card>
         <CardContent className="pt-6">
           <div className="space-y-4">
@@ -183,7 +174,6 @@ export const CategoriesAttributesSection: React.FC<CategoriesAttributesSectionPr
               <p className="text-sm text-muted-foreground mb-3">Select all materials used in this product</p>
             </div>
 
-            {/* Material search */}
             <div className="relative w-full mb-4">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -204,7 +194,6 @@ export const CategoriesAttributesSection: React.FC<CategoriesAttributesSectionPr
               )}
             </div>
 
-            {/* Material selection buttons */}
             <div className="flex flex-wrap gap-2 mb-3">
               <Button
                 type="button"
@@ -253,7 +242,6 @@ export const CategoriesAttributesSection: React.FC<CategoriesAttributesSectionPr
               )}
             </div>
 
-            {/* Selected materials count */}
             {(form.watch("categories.material") || []).length > 0 && (
               <div className="mt-2 text-sm text-muted-foreground">
                 <Badge variant="outline">{(form.watch("categories.material") || []).length} materials selected</Badge>
@@ -267,7 +255,6 @@ export const CategoriesAttributesSection: React.FC<CategoriesAttributesSectionPr
         </CardContent>
       </Card>
 
-      {/* Style Selection */}
       <Card>
         <CardContent className="pt-6">
           <div className="space-y-4">
@@ -276,7 +263,6 @@ export const CategoriesAttributesSection: React.FC<CategoriesAttributesSectionPr
               <p className="text-sm text-muted-foreground mb-3">Select all styles that apply to this product</p>
             </div>
 
-            {/* Style search */}
             <div className="relative w-full mb-4">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -297,7 +283,6 @@ export const CategoriesAttributesSection: React.FC<CategoriesAttributesSectionPr
               )}
             </div>
 
-            {/* Style selection buttons */}
             <div className="flex flex-wrap gap-2 mb-3">
               <Button type="button" variant="outline" size="sm" onClick={() => form.setValue("categories.style", [])}>
                 Clear All
@@ -341,7 +326,6 @@ export const CategoriesAttributesSection: React.FC<CategoriesAttributesSectionPr
               )}
             </div>
 
-            {/* Selected styles count */}
             {(form.watch("categories.style") || []).length > 0 && (
               <div className="mt-2 text-sm text-muted-foreground">
                 <Badge variant="outline">{(form.watch("categories.style") || []).length} styles selected</Badge>
@@ -355,7 +339,6 @@ export const CategoriesAttributesSection: React.FC<CategoriesAttributesSectionPr
         </CardContent>
       </Card>
 
-      {/* Tags */}
       <Card>
         <CardContent className="pt-6">
           <div className="space-y-4">

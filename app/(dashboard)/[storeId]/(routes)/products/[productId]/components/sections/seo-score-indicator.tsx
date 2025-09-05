@@ -10,7 +10,6 @@ export const SeoScoreIndicator = () => {
   const form = useFormContext()
   const [score, setScore] = useState(0)
 
-  // Watch for changes to the SEO score in the form
   useEffect(() => {
     const subscription = form.watch((value, { name }) => {
       if (name === "seo.seoScore" || name === undefined) {
@@ -18,34 +17,29 @@ export const SeoScoreIndicator = () => {
       }
     })
 
-    // Set initial score
     setScore(form.getValues("seo.seoScore") || 0)
 
     return () => subscription.unsubscribe()
   }, [form])
 
-  // Get the appropriate color based on the score
   const getScoreColor = (score: number) => {
     if (score < 40) return "text-red-500"
     if (score < 70) return "text-amber-500"
     return "text-emerald-500"
   }
 
-  // Get the descriptive text based on the score
   const getScoreText = (score: number) => {
     if (score < 40) return "Poor"
     if (score < 70) return "Good"
     return "Excellent"
   }
 
-  // Get the appropriate icon based on the score
   const ScoreIcon = ({ score }: { score: number }) => {
     if (score < 40) return <XCircle className="w-6 h-6 text-red-500" />
     if (score < 70) return <AlertTriangle className="w-6 h-6 text-amber-500" />
     return <CheckCircle className="w-6 h-6 text-emerald-500" />
   }
 
-  // Get the progress bar color based on the score
   const getProgressColor = (score: number) => {
     if (score < 40) return "bg-red-500"
     if (score < 70) return "bg-amber-500"

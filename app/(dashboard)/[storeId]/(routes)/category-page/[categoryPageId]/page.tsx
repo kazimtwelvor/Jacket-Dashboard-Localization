@@ -16,7 +16,7 @@ export default function EditCategoryPage() {
   useEffect(() => {
     const fetchCategoryPage = async () => {
       try {
-        const response = await axios.get(`/api/${params.storeId}/category-pages/${params.categoryPageId}`)
+        const response = await axios.get(`/api/${params?.storeId}/category-pages/${params?.categoryPageId}`)
         
         const data = response.data
         

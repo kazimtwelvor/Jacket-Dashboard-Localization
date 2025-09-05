@@ -13,7 +13,7 @@ interface ColorGridProps {
   onDelete: (id: string) => void
 }
 
-export const ColorGrid = ({ data, onSelect, selectedItems, onToggleSelect, onEdit, onDelete }: ColorGridProps) => {
+export const ColorGrid = ({ data, onSelect, selectedItems, onToggleSelect }: ColorGridProps) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {data.map((color) => (

@@ -41,7 +41,6 @@ export const StepSixSocialMedia = ({
   // Direct image upload handler
   const handleImageUpload = (index: number, url: string) => {
     try {
-      console.log(`StepSixSocialMedia: Uploading image at index ${index}:`, url)
 
       // Update local state
       const newImages = [...localImages]
@@ -52,7 +51,6 @@ export const StepSixSocialMedia = ({
       onSaveImage(`guideContent.steps.${stepIndex}.images.${index}`, url)
 
       // Then update the entire array
-      console.log(`StepSixSocialMedia: Updating entire images array:`, newImages)
 
       // Use a direct approach to update the array in the form
       const arrayPath = `guideContent.steps.${stepIndex}.images`
@@ -61,7 +59,6 @@ export const StepSixSocialMedia = ({
       toast.success(`Image ${index + 1} updated successfully`)
       setIsEditing(null)
     } catch (error) {
-      console.error("Error uploading image:", error)
       toast.error("Failed to upload image")
     }
   }
@@ -80,7 +77,6 @@ export const StepSixSocialMedia = ({
       toast.success(`Image ${index + 1} removed`)
       setIsEditing(null)
     } catch (error) {
-      console.error("Error removing image:", error)
       toast.error("Failed to remove image")
     }
   }

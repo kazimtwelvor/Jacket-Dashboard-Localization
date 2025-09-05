@@ -24,16 +24,13 @@ export default function EditCategoryPage() {
         data.supportingKeywords = data.supportingKeywords || []
         
         if (data.categoryContent) {
-          console.log('Original categoryContent type:', typeof data.categoryContent);
           if (typeof data.categoryContent !== 'string') {
             data.categoryContent = JSON.stringify(data.categoryContent);
-            console.log('Converted categoryContent to string');
           }
         }
         
         data.apiSlug = data.apiSlug || "";
         
-        console.log('Setting category page data:', JSON.stringify(data));
         setCategoryPage(data)
       } catch (error) {
         toast.error("Failed to load category page")

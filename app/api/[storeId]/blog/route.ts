@@ -66,14 +66,9 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       return blogTitle && blogTitle.toLowerCase().trim() === trimmedTitle.toLowerCase()
     })
 
-    console.log("[BLOG_POST] Title check:", { 
-      title: trimmedTitle, 
-      storeId: params.storeId, 
-      existingBlogByTitle: existingBlogByTitle ? { id: existingBlogByTitle.id } : null 
-    })
+
 
     if (existingBlogByTitle) {
-      console.log("[BLOG_POST] Title already exists, returning error")
       return new NextResponse("Title already exists", { status: 400 })
     }
 
@@ -263,7 +258,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
 
     return NextResponse.json(blog)
   } catch (error) {
-    console.log("[BLOG_POST]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }
@@ -297,7 +291,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
 
     return NextResponse.json(formattedBlogs)
   } catch (error) {
-    console.log("[BLOGS_GET]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

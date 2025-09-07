@@ -71,7 +71,6 @@ export async function bulkDeleteProducts(productIds: string[], storeId: string) 
     revalidatePath(`/${storeId}/products`)
     return { success: true }
   } catch (error) {
-    console.error("[BULK_DELETE_PRODUCTS]", error)
     throw new Error("Failed to delete products")
   }
 }
@@ -114,7 +113,6 @@ export async function bulkUpdateProducts(productIds: string[], storeId: string, 
     revalidatePath(`/${storeId}/products`)
     return { success: true }
   } catch (error) {
-    console.error("[BULK_UPDATE_PRODUCTS]", error)
     throw new Error("Failed to update products")
   }
 }
@@ -204,7 +202,6 @@ export async function bulkDuplicateProducts(productIds: string[], storeId: strin
     revalidatePath(`/${storeId}/products`)
     return { success: true }
   } catch (error) {
-    console.error("[BULK_DUPLICATE_PRODUCTS]", error)
     throw new Error("Failed to duplicate products")
   }
 }

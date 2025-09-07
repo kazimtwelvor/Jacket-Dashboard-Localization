@@ -208,7 +208,6 @@ export async function GET(
 
     return NextResponse.json(responseData, { headers: corsHeaders })
   } catch (error: any) {
-    console.log("[CATEGORY_PAGES_GET]", error)
     return new NextResponse("Internal error", { status: 500, headers: corsHeaders })
   }
 }

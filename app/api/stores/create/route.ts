@@ -27,14 +27,10 @@ export async function POST(req: Request) {
     const body = await req.json()
     const validatedData = storeSchema.parse(body)
 
-    console.log("[STORES_POST] Starting store creation process...")
 
-    // Create store with transaction - increased timeout to 30 seconds
     const result = await db.$transaction(
       async (tx) => {
         try {
-          console.log("[STORES_POST] Creating new store...")
-          // Create the store
           const newStore = await tx.store.create({
             data: {
               name: validatedData.name,
@@ -42,9 +38,7 @@ export async function POST(req: Request) {
               url: `${process.env.NEXT_PUBLIC_APP_URL}/store/${validatedData.name.toLowerCase().replace(/\s+/g, "-")}`,
             },
           })
-          console.log("[STORES_POST] Store created successfully:", newStore.id)
 
-          console.log("[STORES_POST] Creating default billboard...")
           // Create default billboard
           const billboard = await tx.billboard.create({
             data: {
@@ -53,7 +47,6 @@ export async function POST(req: Request) {
               storeId: newStore.id,
             },
           })
-          console.log("[STORES_POST] Billboard created successfully:", billboard.id)
 
           // Define default categories - reduced number for faster creation
           const defaultCategories = [
@@ -93,7 +86,6 @@ export async function POST(req: Request) {
             { name: "XL", value: "XL" },
           ]
 
-          console.log("[STORES_POST] Creating default categories...")
           // Process in smaller batches instead of all at once
           const createCategories = async () => {
             const results = []
@@ -112,7 +104,6 @@ export async function POST(req: Request) {
             return results
           }
 
-          console.log("[STORES_POST] Creating default colors...")
           const createColors = async () => {
             const results = []
             for (const color of defaultColors) {
@@ -128,7 +119,6 @@ export async function POST(req: Request) {
             return results
           }
 
-          console.log("[STORES_POST] Creating default sizes...")
           const createSizes = async () => {
             const results = []
             for (const size of defaultSizes) {
@@ -149,9 +139,6 @@ export async function POST(req: Request) {
           const colors = await createColors()
           const sizes = await createSizes()
 
-          console.log("[STORES_POST] Created categories:", categories.length)
-          console.log("[STORES_POST] Created colors:", colors.length)
-          console.log("[STORES_POST] Created sizes:", sizes.length)
 
           // Verify all creations
           const [createdCategories, createdColors, createdSizes, createdBillboard] = await Promise.all([
@@ -176,7 +163,6 @@ export async function POST(req: Request) {
             )
           }
 
-          console.log("[STORES_POST] All default data created successfully")
           return {
             ...newStore,
             _counts: {
@@ -186,7 +172,6 @@ export async function POST(req: Request) {
             },
           }
         } catch (error) {
-          console.error("[STORES_POST] Transaction error:", error)
           throw error // This will trigger a rollback
         }
       },
@@ -195,10 +180,8 @@ export async function POST(req: Request) {
       },
     )
 
-    console.log("[STORES_POST] Store creation completed successfully with counts:", result._counts)
     return NextResponse.json(result)
   } catch (error) {
-    console.error("[STORES_POST] Error:", error)
     if (error instanceof z.ZodError) {
       return new NextResponse(JSON.stringify(error.errors), { status: 400 })
     }

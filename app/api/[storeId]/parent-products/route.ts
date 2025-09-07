@@ -67,7 +67,6 @@ export async function GET(
 
     return NextResponse.json(formattedProducts)
   } catch (error) {
-    console.log("[PARENT_PRODUCTS_GET]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

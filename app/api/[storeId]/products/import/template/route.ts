@@ -149,7 +149,6 @@ export async function GET(req: NextRequest, { params }: { params: { storeId: str
       },
     })
   } catch (error) {
-    console.error("[TEMPLATE_DOWNLOAD]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

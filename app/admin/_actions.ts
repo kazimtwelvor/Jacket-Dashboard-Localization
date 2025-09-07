@@ -24,7 +24,6 @@ export async function setRole(formData: FormData) {
     revalidatePath("/admin")
     return { success: true, message: `Role updated to ${role}` }
   } catch (err) {
-    console.error("Error setting role:", err)
     return { success: false, message: "Failed to update role" }
   }
 }
@@ -47,7 +46,6 @@ export async function removeRole(formData: FormData) {
     revalidatePath("/admin")
     return { success: true, message: "Role removed successfully" }
   } catch (err) {
-    console.error("Error removing role:", err)
     return { success: false, message: "Failed to remove role" }
   }
 }

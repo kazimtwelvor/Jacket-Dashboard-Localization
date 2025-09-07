@@ -1,140 +1,4 @@
-// import { NextResponse } from "next/server"
-// import { auth } from "@clerk/nextjs/server"
 
-// import prismadb from "@/lib/prismadb"
-
-// export async function GET(req: Request, { params }: { params: { storeId: string; accountId: string } }) {
-//   try {
-//     if (!params.accountId) {
-//       return new NextResponse("Account ID is required", { status: 400 })
-//     }
-
-//     const stripeAccount = await prismadb.stripeAccount.findUnique({
-//       where: {
-//         id: params.accountId,
-//       },
-//     })
-
-//     return NextResponse.json(stripeAccount)
-//   } catch (error) {
-//     console.log("[STRIPE_ACCOUNT_GET]", error)
-//     return new NextResponse("Internal error", { status: 500 })
-//   }
-// }
-
-// export async function PATCH(req: Request, { params }: { params: { storeId: string; accountId: string } }) {
-//   try {
-//     const { userId } = await auth()
-//     const body = await req.json()
-
-//     const { name, publishableKey, secretKey, webhookSecret, isEnabled, isTestMode, isDefault } = body
-
-//     if (!userId) {
-//       return new NextResponse("Unauthenticated", { status: 401 })
-//     }
-
-//     if (!params.accountId) {
-//       return new NextResponse("Account ID is required", { status: 400 })
-//     }
-
-//     if (!name) {
-//       return new NextResponse("Account name is required", { status: 400 })
-//     }
-
-//     if (!publishableKey) {
-//       return new NextResponse("Publishable key is required", { status: 400 })
-//     }
-
-//     if (!secretKey) {
-//       return new NextResponse("Secret key is required", { status: 400 })
-//     }
-
-//     // Check if the user has permission to update this store
-//     const storeByUserId = await prismadb.store.findFirst({
-//       where: {
-//         id: params.storeId,
-//         userId,
-//       },
-//     })
-
-//     if (!storeByUserId) {
-//       return new NextResponse("Unauthorized", { status: 403 })
-//     }
-
-//     // If this account is set as default, unset any other default accounts
-//     if (isDefault) {
-//       await prismadb.stripeAccount.updateMany({
-//         where: {
-//           storeId: params.storeId,
-//           isDefault: true,
-//           id: {
-//             not: params.accountId,
-//           },
-//         },
-//         data: {
-//           isDefault: false,
-//         },
-//       })
-//     }
-
-//     const stripeAccount = await prismadb.stripeAccount.update({
-//       where: {
-//         id: params.accountId,
-//       },
-//       data: {
-//         name,
-//         publishableKey,
-//         secretKey,
-//         webhookSecret: webhookSecret || "",
-//         isEnabled,
-//         isTestMode,
-//         isDefault,
-//       },
-//     })
-
-//     return NextResponse.json(stripeAccount)
-//   } catch (error) {
-//     console.log("[STRIPE_ACCOUNT_PATCH]", error)
-//     return new NextResponse("Internal error", { status: 500 })
-//   }
-// }
-
-// export async function DELETE(req: Request, { params }: { params: { storeId: string; accountId: string } }) {
-//   try {
-//     const { userId } = await auth()
-
-//     if (!userId) {
-//       return new NextResponse("Unauthenticated", { status: 401 })
-//     }
-
-//     if (!params.accountId) {
-//       return new NextResponse("Account ID is required", { status: 400 })
-//     }
-
-//     // Check if the user has permission to update this store
-//     const storeByUserId = await prismadb.store.findFirst({
-//       where: {
-//         id: params.storeId,
-//         userId,
-//       },
-//     })
-
-//     if (!storeByUserId) {
-//       return new NextResponse("Unauthorized", { status: 403 })
-//     }
-
-//     const stripeAccount = await prismadb.stripeAccount.delete({
-//       where: {
-//         id: params.accountId,
-//       },
-//     })
-
-//     return NextResponse.json(stripeAccount)
-//   } catch (error) {
-//     console.log("[STRIPE_ACCOUNT_DELETE]", error)
-//     return new NextResponse("Internal error", { status: 500 })
-//   }
-// }
 import { NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 
@@ -159,7 +23,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string;
 
     return NextResponse.json(stripeAccount)
   } catch (error) {
-    console.log("[STRIPE_ACCOUNT_GET]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }
@@ -228,7 +91,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
 
     return NextResponse.json(stripeAccount)
   } catch (error) {
-    console.log("[STRIPE_ACCOUNT_PATCH]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }
@@ -300,7 +162,6 @@ export async function DELETE(req: Request, { params }: { params: { storeId: stri
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.log("[STRIPE_ACCOUNT_DELETE]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

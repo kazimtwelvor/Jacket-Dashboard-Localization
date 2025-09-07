@@ -18,7 +18,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ colorId:
 
     return NextResponse.json(color)
   } catch (err) {
-    console.log("[COLOR_GET]", err)
     return new NextResponse("Internal error", { status: 500 })
   }
 }
@@ -71,7 +70,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
 
     return NextResponse.json(color)
   } catch (err) {
-    console.log("[COLOR_PATCH]", err)
     return new NextResponse("Internal error", { status: 500 })
   }
 }
@@ -110,7 +108,6 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ store
 
     return NextResponse.json(color)
   } catch (err) {
-    console.log("[COLOR_DELETE]", err)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

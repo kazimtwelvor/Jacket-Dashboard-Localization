@@ -50,7 +50,6 @@ export default function StoreSwitcher({ className, items = [], ...props }: Store
           setMemberStores(data)
         }
       } catch (error) {
-        console.error("Failed to fetch member stores:", error)
       } finally {
         setLoading(false)
       }

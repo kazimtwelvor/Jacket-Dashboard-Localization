@@ -139,7 +139,6 @@ export const BulkEditFormWrapper = ({ products, categories, sizes, colors, store
       router.push(`/${storeId}/products`)
       toast.success(`${products.length} products updated successfully`)
     } catch (error) {
-      console.error("Error updating products:", error)
       toast.error("Something went wrong")
     } finally {
       setLoading(false)

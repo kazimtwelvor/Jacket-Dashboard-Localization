@@ -17,7 +17,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string;
 
     return NextResponse.json(image)
   } catch (error) {
-    console.log("[IMAGE_GET]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }
@@ -65,7 +64,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
 
     return NextResponse.json(image)
   } catch (error) {
-    console.log("[IMAGE_PATCH]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }
@@ -116,7 +114,6 @@ export async function DELETE(req: Request, { params }: { params: { storeId: stri
 
     return NextResponse.json(image)
   } catch (error) {
-    console.log("[IMAGE_DELETE]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

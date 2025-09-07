@@ -114,7 +114,6 @@ export const verifyJWT = async (token: string): Promise<JWTPayload | null> => {
     const decoded = jwt.verify(token, jwtSecret) as JWTPayload
     return decoded
   } catch (error) {
-    console.error("[JWT_VERIFICATION_ERROR]", error)
     return null
   }
 }

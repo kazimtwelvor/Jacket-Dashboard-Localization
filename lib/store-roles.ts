@@ -74,7 +74,6 @@ export const checkUserStoreAccess = async (clerkUserId: string, storeId: string)
 
     return !!storeUser
   } catch (error) {
-    console.error("Error checking store access:", error)
     return false
   }
 }
@@ -114,7 +113,6 @@ export const checkUserPermission = async (clerkUserId: string, storeId: string, 
     const userRole = storeUser.role
     return rolePermissions[userRole].includes(permission)
   } catch (error) {
-    console.error("Error checking permission:", error)
     return false
   }
 }
@@ -147,7 +145,6 @@ export const getUserStoreRole = async (clerkUserId: string, storeId: string) => 
 
     return storeUser.role
   } catch (error) {
-    console.error("Error getting user role:", error)
     return null
   }
 }
@@ -203,7 +200,6 @@ export const canManageUser = async (managerClerkId: string, targetUserId: string
     // Check if manager's role is higher in hierarchy than target's role
     return roleHierarchy[managerStoreUser.role] > roleHierarchy[targetStoreUser.role]
   } catch (error) {
-    console.error("Error checking user management permission:", error)
     return false
   }
 }

@@ -58,7 +58,6 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ orders })
   } catch (error) {
-    console.error("[ORDERS_GET]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

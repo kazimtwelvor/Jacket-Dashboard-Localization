@@ -45,11 +45,9 @@ export const PageForm: React.FC<PageFormProps> = ({ initialData, categories }) =
     if (isFromTemplate) {
       try {
         const templateElementsJson = localStorage.getItem("templateElements")
-        console.log("Template elements JSON:", templateElementsJson)
 
         if (templateElementsJson) {
           const templateElements = JSON.parse(templateElementsJson)
-          console.log("Parsed template elements:", templateElements)
 
           if (Array.isArray(templateElements) && templateElements.length > 0) {
             setPageElements(templateElements)
@@ -61,14 +59,11 @@ export const PageForm: React.FC<PageFormProps> = ({ initialData, categories }) =
 
             toast.success("Template loaded successfully!")
           } else {
-            console.error("Template elements are empty or not an array")
             toast.error("Template elements could not be loaded properly")
           }
         } else {
-          console.error("No template elements found in localStorage")
         }
       } catch (error) {
-        console.error("Error loading template elements:", error)
         toast.error("Error loading template")
       }
     }

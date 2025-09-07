@@ -40,10 +40,8 @@ export const ContactFormNew = () => {
       if (response.ok) {
         router.back()
       } else {
-        console.error('Failed to create contact form')
       }
     } catch (error) {
-      console.error('Error creating contact form:', error)
     }
   }
 

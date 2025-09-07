@@ -32,7 +32,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
 
     return NextResponse.json(recaptchaSettings)
   } catch (error) {
-    console.log("[RECAPTCHA_PUBLIC_GET]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

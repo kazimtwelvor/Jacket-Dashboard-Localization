@@ -36,7 +36,6 @@ async function getImagesFromDirectory(dir: string, baseUrl = ""): Promise<any[]>
 
     return images
   } catch (error) {
-    console.error(`Error reading directory ${dir}:`, error)
     return []
   }
 }
@@ -58,7 +57,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
 
     return NextResponse.json({ images })
   } catch (error) {
-    console.error("Error fetching images:", error)
     return NextResponse.json({ error: "Failed to fetch images" }, { status: 500 })
   }
 }

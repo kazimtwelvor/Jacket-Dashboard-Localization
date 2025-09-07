@@ -7,12 +7,10 @@ export function initializeEmailWorker() {
   if (process.env.NODE_ENV === "production" || process.env.ENABLE_EMAIL_WORKER === "true") {
     if (!worker) {
       worker = startEmailWorker()
-      console.log("Email worker initialized")
     }
     return worker
   }
 
-  console.log("Email worker not started (not in production)")
   return null
 }
 
@@ -25,6 +23,5 @@ export function stopEmailWorker() {
   if (worker) {
     worker.close()
     worker = null
-    console.log("Email worker stopped")
   }
 }

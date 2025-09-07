@@ -127,7 +127,6 @@ IMPORTANT: The final word count MUST be MAXIMUM 200 words. Please check your wor
 
       if (!response.ok) {
         const errorData = await response.json()
-        console.log("Gemini API error:", errorData)
         throw new Error(`API call failed: ${response.statusText}`)
       }
 
@@ -165,15 +164,12 @@ IMPORTANT: The final word count MUST be MAXIMUM 200 words. Please check your wor
         .replace(/<[^>]*>/g, "")
         .split(/\s+/)
         .filter(Boolean).length
-      console.log(`Generated description word count: ${wordCount}`)
 
       return NextResponse.json({ description, wordCount })
     } catch (error) {
-      console.error("Error calling Gemini API:", error)
       return new NextResponse("Failed to generate description", { status: 500 })
     }
   } catch (error) {
-    console.error("[PRODUCT_DESCRIPTION_ERROR]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }
@@ -342,115 +338,3 @@ function selectAppropriateKeywords(jacketType: string, specifications: any) {
   }
 }
 
-// import { NextResponse } from "next/server"
-// import { auth } from "@clerk/nextjs/server"
-
-// export async function POST(req: Request, { params }: { params: { storeId: string } }) {
-//   try {
-//     // Get the request body
-//     const body = await req.json()
-//     console.log("FULL REQUEST BODY:", JSON.stringify(body, null, 2))
-
-//     // Extract the available data
-//     const { name, specifications } = body
-
-//     // Check authentication and parameters
-//     const { userId } = await auth()
-//     if (!userId) {
-//       return new NextResponse("Unauthenticated", { status: 401 })
-//     }
-
-//     const storeId = params?.storeId
-//     if (!storeId) {
-//       return new NextResponse("Store ID is required", { status: 400 })
-//     }
-
-//     if (!process.env.GEMINI_API_KEY) {
-//       return new NextResponse("GEMINI_API_KEY is not configured", { status: 500 })
-//     }
-
-//     // Create a simple, direct prompt that focuses on the available specifications
-//     const prompt = `
-//     Create a product description for a "${name}" with the following specifications:
-
-//     - External Material: ${specifications?.externalMaterial?.join(", ") || "Not specified"}
-//     - Internal Material: ${specifications?.internalMaterial?.join(", ") || "Not specified"}
-//     - Collar: ${specifications?.collar?.join(", ") || "Not specified"}
-//     - Closure: ${specifications?.closure?.join(", ") || "Not specified"}
-//     - Cuffs: ${specifications?.cuffs?.join(", ") || "Not specified"}
-//     - Pockets: ${specifications?.pockets?.join(", ") || "Not specified"}
-//     - Color: ${specifications?.color?.join(", ") || "Not specified"}
-
-//     The description should:
-//     1. Be 150-200 words maximum
-//     2. Highlight the premium quality of the materials
-//     3. Emphasize the design features (collar, cuffs, closure)
-//     4. Mention the color and how it enhances the style
-//     5. Include proper HTML formatting with paragraphs (<p>) and emphasis (<strong>) where appropriate
-//     6. NOT include any gender-specific language (don't use terms like "men's", "women's", or "unisex")
-//     7. Focus on the product's features and benefits
-
-//     Format the description with proper HTML tags:
-//     - Use <p> for paragraphs
-//     - Use <strong> for important points
-//     - Use <h2> for any subheadings (if needed)
-
-//     DO NOT wrap your response in markdown code blocks. Provide the raw HTML content only.
-//     `
-
-//     try {
-//       // Call the Gemini API with a simplified approach
-//       const response = await fetch(
-//         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-//         {
-//           method: "POST",
-//           headers: { "Content-Type": "application/json" },
-//           body: JSON.stringify({
-//             contents: [{ parts: [{ text: prompt }] }],
-//             generationConfig: {
-//               temperature: 0.7,
-//               maxOutputTokens: 1024,
-//             },
-//           }),
-//         },
-//       )
-
-//       if (!response.ok) {
-//         const errorData = await response.json()
-//         console.log("Gemini API error:", errorData)
-//         throw new Error(`API call failed: ${response.statusText}`)
-//       }
-
-//       const data = await response.json()
-
-//       // Extract the generated text
-//       if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
-//         throw new Error("Unexpected API response format")
-//       }
-
-//       let description = data.candidates[0].content.parts[0].text
-
-//       // Remove any markdown code block syntax if present
-//       if (description.startsWith("```") && description.endsWith("```")) {
-//         description = description.replace(/^```(?:html)?\s*\n?/, "").replace(/\n?```$/, "")
-//       }
-
-//       // Count words
-//       const wordCount = description
-//         .replace(/<[^>]*>/g, "")
-//         .split(/\s+/)
-//         .filter(Boolean).length
-
-//       console.log("GENERATED DESCRIPTION:", description)
-//       console.log(`Word count: ${wordCount}`)
-
-//       return NextResponse.json({ description, wordCount })
-//     } catch (error) {
-//       console.error("Error generating description:", error)
-//       return NextResponse.json({ error: "Failed to generate description" }, { status: 500 })
-//     }
-//   } catch (error) {
-//     console.error("[PRODUCT_DESCRIPTION_ERROR]", error)
-//     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
-//   }
-// }

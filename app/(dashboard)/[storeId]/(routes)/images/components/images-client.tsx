@@ -72,13 +72,11 @@ export const ImagesClient = () => {
           url = `http://${url}`
         }
 
-        console.log(`Store URL set to: ${url}`)
         setStoreUrl(url)
 
         // Fetch images once we have the store URL
         fetchImages(url)
       } catch (error) {
-        console.error("Error fetching store URL:", error)
         toast.error("Failed to fetch store URL. Using default.")
         setStoreUrl("http://localhost:3001") // Fallback
         fetchImages("http://localhost:3001")
@@ -116,7 +114,6 @@ export const ImagesClient = () => {
 
       setImages(enhancedImages)
     } catch (error) {
-      console.error("Error fetching images:", error)
       toast.error("Failed to fetch images. Please try again.")
     } finally {
       setIsLoading(false)
@@ -172,7 +169,6 @@ export const ImagesClient = () => {
       setIsDetailSidebarOpen(false)
       toast.success("Image deleted successfully")
     } catch (error) {
-      console.error("Error deleting image:", error)
       toast.error("Failed to delete image")
     }
   }
@@ -196,7 +192,6 @@ export const ImagesClient = () => {
       setSelectedImages([])
       setIsDeleteModalOpen(false)
     } catch (error) {
-      console.error("Error deleting images:", error)
       toast.error("Failed to delete images")
     }
   }
@@ -244,12 +239,10 @@ export const ImagesClient = () => {
 
           if (!response.ok) {
             const errorData = await response.json().catch(() => null)
-            console.error(`Upload failed for ${file.name}:`, response.status, errorData)
             continue
           }
 
           const data = await response.json()
-          console.log("Upload successful:", data)
 
           // Add the new image to our local state
           newImages.push({
@@ -265,7 +258,6 @@ export const ImagesClient = () => {
 
           successCount++
         } catch (fileError) {
-          console.error(`Error uploading ${file.name}:`, fileError)
         }
       }
 
@@ -280,7 +272,6 @@ export const ImagesClient = () => {
         setActiveTab("browse") // Switch to browse tab after upload
       }
     } catch (error) {
-      console.error("Error in batch upload:", error)
       toast.error(`Upload failed: ${error instanceof Error ? error.message : "Unknown error"}`)
     } finally {
       setIsUploading(false)

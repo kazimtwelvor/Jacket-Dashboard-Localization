@@ -71,7 +71,6 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ initialData, billboa
 
   // Add a useEffect to log the current form values for debugging
   useEffect(() => {
-    console.log("Current type value:", form.getValues("type"))
   }, [form.watch("type")])
 
   // Generate slug from name

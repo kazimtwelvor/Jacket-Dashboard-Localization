@@ -96,29 +96,23 @@ export const BlogGuideContent: React.FC<BlogGuideContentProps> = ({
   // Update the handleSaveImage function to add better error handling and logging
   const handleSaveImage = (field: string, url: string) => {
     try {
-      console.log(`BlogGuideContent: Saving image for field ${field}:`, url)
 
       // Special handling for specific steps
       if (field.includes("steps.1.image")) {
-        console.log("Step 2 image update detected:", url)
       }
       if (field.includes("steps.2.image")) {
-        console.log("Step 3 image update detected:", url)
       }
       if (field.includes("steps.5.images")) {
-        console.log("Step 6 social media image update detected:", url)
       }
 
       // Make sure we're not passing a field name as a URL
       if (url && url.startsWith("guideContent.steps.")) {
-        console.error("Invalid URL detected (field name):", url)
         toast.error("Invalid image URL")
         return
       }
 
       // Ensure the URL is valid before saving
       if (url && !url.startsWith("http") && !url.startsWith("/")) {
-        console.error("Invalid URL format:", url)
         toast.error("Invalid image URL format")
         return
       }
@@ -126,7 +120,6 @@ export const BlogGuideContent: React.FC<BlogGuideContentProps> = ({
       onSaveImage(field, url)
       toast.success("Image updated successfully")
     } catch (error) {
-      console.error("Error saving image:", error)
       toast.error("Failed to save image")
     }
   }

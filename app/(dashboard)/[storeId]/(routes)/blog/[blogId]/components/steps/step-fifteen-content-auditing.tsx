@@ -53,10 +53,8 @@ export const StepFifteenContentAuditing: React.FC<StepFifteenContentAuditingProp
     const handleImageChange = (url: string) => {
       try {
         setIsLoading(true)
-        console.log(`Step 15: Direct image upload for card ${index}:`, url)
 
         if (!url) {
-          console.log("Empty URL received, skipping")
           return
         }
 
@@ -73,12 +71,10 @@ export const StepFifteenContentAuditing: React.FC<StepFifteenContentAuditingProp
         updatedImages[index] = url
 
         // Save the entire array directly
-        console.log(`Step 15: Saving images array:`, updatedImages)
         onSaveImage(`guideContent.steps.${stepIndex}.images`, updatedImages)
 
         toast.success("Image saved")
       } catch (error) {
-        console.error("Error saving image:", error)
         toast.error("Failed to save image")
       } finally {
         setIsLoading(false)
@@ -105,7 +101,6 @@ export const StepFifteenContentAuditing: React.FC<StepFifteenContentAuditingProp
 
         toast.success("Image removed")
       } catch (error) {
-        console.error("Error removing image:", error)
         toast.error("Failed to remove image")
       } finally {
         setIsEditing(false)

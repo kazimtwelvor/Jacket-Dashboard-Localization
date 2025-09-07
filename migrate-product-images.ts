@@ -13,11 +13,9 @@ async function migrateProductImages() {
       },
     });
 
-    console.log(`Found ${products.length} products to migrate.`);
 
     for (let i = 0; i < products.length; i++) {
       const product = products[i];
-      console.log(`Migrating product ${i + 1}/${products.length}: ${product.id}`);
 
       for (let j = 0; j < product.oldImages.length; j++) {
         const oldImage = product.oldImages[j];
@@ -49,9 +47,7 @@ async function migrateProductImages() {
       }
     }
 
-    console.log('Migration completed successfully!');
   } catch (error) {
-    console.error('Migration failed:', error);
     process.exit(1);
   } finally {
     await prisma.$disconnect();

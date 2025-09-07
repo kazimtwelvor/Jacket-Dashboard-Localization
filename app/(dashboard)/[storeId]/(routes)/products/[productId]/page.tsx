@@ -123,29 +123,24 @@ const ProductPage: React.FC<ProductPageProps> = async ({ params }) => {
             if (!product.colorLinks) return undefined
 
             if (typeof product.colorLinks === "object" && product.colorLinks !== null) {
-              console.log("Using colorLinks as object:", product.colorLinks)
               return product.colorLinks
             }
 
             if (typeof product.colorLinks === "string") {
               if (product.colorLinks === "[object Object]") {
-                console.log("Found '[object Object]' string in page.tsx, using empty object")
                 return {}
               }
 
               try {
                 const parsed = JSON.parse(product.colorLinks)
-                console.log("Parsed colorLinks in page.tsx:", parsed)
                 return parsed
               } catch (e) {
-                console.error("Error parsing colorLinks in page.tsx:", e)
                 return {}
               }
             }
 
             return {}
           } catch (error) {
-            console.error("Error processing colorLinks in page.tsx:", error)
             return {}
           }
         })(),
@@ -170,7 +165,6 @@ const ProductPage: React.FC<ProductPageProps> = async ({ params }) => {
     : null
 
   if (product && product.schema) {
-    console.log("Schema data from database:", product.schema)
   }
 
   const categories = await prismadb.category.findMany({

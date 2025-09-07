@@ -33,7 +33,6 @@ export const StepSeventeenAnalyticsDashboard: React.FC<StepSeventeenAnalyticsDas
 }) => {
   // Function to handle image save with direct URL
   const handleSaveImage = (index: number, url: string) => {
-    console.log(`Saving image at index ${index}:`, url)
     onSaveImage(`guideContent.steps.${stepIndex}.images.${index}`, url)
   }
 

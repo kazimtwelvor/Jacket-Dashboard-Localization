@@ -30,12 +30,10 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         if (response.ok) {
           const { url } = await response.json()
           setFrontendUrl(url)
-          console.log("Frontend URL loaded:", url)
         } else {
           console.warn("Failed to load frontend URL from API")
         }
       } catch (error) {
-        console.error("Error fetching frontend URL:", error)
       }
     }
 
@@ -60,7 +58,6 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
-        console.error("Error moving product to trash:", errorData)
         throw new Error("Failed to move product to trash")
       }
 
@@ -70,7 +67,6 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         description: "Product moved to trash successfully.",
       })
     } catch (error) {
-      console.error("Error in onDelete:", error)
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",

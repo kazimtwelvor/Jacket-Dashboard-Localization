@@ -37,7 +37,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
 
     return NextResponse.json({ success: isValid })
   } catch (error) {
-    console.error("[RECAPTCHA_VERIFY_ERROR]", error)
     return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 })
   }
 }

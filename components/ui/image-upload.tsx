@@ -92,10 +92,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
           url = `http://${url}`
         }
 
-        console.log(`Store URL set to: ${url}`)
         setStoreUrl(url)
       } catch (error) {
-        console.error("Error fetching store URL:", error)
         toast.error("Failed to fetch store URL. Using default.")
         setStoreUrl("http://localhost:3001") // Fallback
       }
@@ -143,19 +141,16 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
           if (!response.ok) {
             const errorData = await response.json().catch(() => null)
-            console.error(`Upload failed for ${file.name}:`, response.status, errorData)
             continue
           }
 
           const data = await response.json()
-          console.log("Upload successful:", data)
 
           // Use the full URL for the image
           const imageUrl = data.url.startsWith("http") ? data.url : `${baseUrl}${data.url}`
           uploadedUrls.push(imageUrl)
           successCount++
         } catch (fileError) {
-          console.error(`Error uploading ${file.name}:`, fileError)
         }
       }
 
@@ -177,7 +172,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
       // Close the gallery modal if it's open
       setIsGalleryOpen(false)
     } catch (error) {
-      console.error("Error in batch upload:", error)
       toast.error(`Upload failed: ${error instanceof Error ? error.message : "Unknown error"}`)
     } finally {
       setIsUploading(false)
@@ -255,7 +249,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     return null
   }
 
-  // Extract filename from URL for display
   const getFilenameFromUrl = (url: string) => {
     const parts = url.split("/")
     return parts[parts.length - 1]
@@ -265,14 +258,10 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     setSelectedImage(imageUrl)
     setShowImageDetails(true)
 
-    // If this is the main image, pass the main image metadata
     if (value.length === 1 && value[0] === imageUrl && metadata) {
-      console.log("Viewing main image details with metadata:", metadata)
     } else if (value.length > 1) {
-      // For gallery images, find the index and get metadata from imagesMetadata array
       const index = value.indexOf(imageUrl)
       if (index !== -1 && onMetadataChange) {
-        console.log(`Viewing gallery image ${index} details`)
       }
     }
   }

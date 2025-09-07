@@ -26,7 +26,6 @@ export const StepTwelveVisualStorytelling: React.FC<StepTwelveVisualStorytelling
 }) => {
   // Helper function to handle image save with direct URL
   const handleSaveImage = (index: number, url: string) => {
-    console.log(`Saving image for step ${stepIndex}, image index ${index}:`, url)
     onSaveImage(`guideContent.steps.${stepIndex}.images.${index}`, url)
   }
 

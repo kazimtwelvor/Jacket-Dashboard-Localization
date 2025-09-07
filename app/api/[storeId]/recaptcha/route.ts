@@ -17,7 +17,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
 
     return NextResponse.json(recaptchaSettings)
   } catch (error) {
-    console.log("[RECAPTCHA_GET]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }
@@ -45,7 +44,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       return new NextResponse("Secret key is required", { status: 400 })
     }
 
-    // Check if the store exists and user has access
     const storeByUserId = await prismadb.store.findFirst({
       where: {
         id: params.storeId,
@@ -57,7 +55,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       return new NextResponse("Unauthorized", { status: 403 })
     }
 
-    // Create new reCAPTCHA settings
     const recaptchaSettings = await prismadb.recaptchaSettings.create({
       data: {
         storeId: params.storeId,
@@ -73,7 +70,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
 
     return NextResponse.json(recaptchaSettings)
   } catch (error) {
-    console.log("[RECAPTCHA_POST]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }
@@ -101,7 +97,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       return new NextResponse("Secret key is required", { status: 400 })
     }
 
-    // Check if the store exists and user has access
     const storeByUserId = await prismadb.store.findFirst({
       where: {
         id: params.storeId,
@@ -113,7 +108,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       return new NextResponse("Unauthorized", { status: 403 })
     }
 
-    // Find existing settings or create new ones
     const existingSettings = await prismadb.recaptchaSettings.findFirst({
       where: {
         storeId: params.storeId,
@@ -121,7 +115,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
     })
 
     if (existingSettings) {
-      // Update existing settings
       const updatedSettings = await prismadb.recaptchaSettings.update({
         where: {
           id: existingSettings.id,
@@ -138,7 +131,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       })
       return NextResponse.json(updatedSettings)
     } else {
-      // Create new settings if none exist
       const newSettings = await prismadb.recaptchaSettings.create({
         data: {
           storeId: params.storeId,
@@ -154,7 +146,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       return NextResponse.json(newSettings)
     }
   } catch (error) {
-    console.log("[RECAPTCHA_PATCH]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

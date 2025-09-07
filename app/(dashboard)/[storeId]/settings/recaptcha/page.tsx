@@ -30,7 +30,6 @@ export default async function RecaptchaPage({
     const userRole = await getUserStoreRole(userId, params.storeId)
 
     if (userRole !== "ADMIN") {
-      console.log("Access denied: User is not the store owner or admin")
       redirect("/")
     }
   }

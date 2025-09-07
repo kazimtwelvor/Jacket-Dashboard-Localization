@@ -55,7 +55,6 @@ export const ProductReviewCard: React.FC<ProductReviewCardProps> = ({ productNam
   const openReviewModal = (review: ReviewColumn) => {
     // Force a copy of the review object to ensure it's not affected by reference issues
     const reviewCopy = JSON.parse(JSON.stringify(review))
-    console.log("Opening modal with review:", reviewCopy)
     setSelectedReview(reviewCopy)
     setIsModalOpen(true)
   }

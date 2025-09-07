@@ -62,7 +62,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
 
     return NextResponse.json(membersWithUserData)
   } catch (error) {
-    console.log("[STORE_MEMBERS_GET]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }
@@ -153,7 +152,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
 
     return NextResponse.json({ member, status: "added" })
   } catch (error) {
-    console.log("[STORE_MEMBERS_POST]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

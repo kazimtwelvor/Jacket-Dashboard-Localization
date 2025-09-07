@@ -139,7 +139,6 @@ export async function POST(req: Request) {
       )
       // await Promise.race([sendWelcomeEmail(), timeoutPromise]) ← if you implement email sending
     } catch (emailError) {
-      console.error("[WELCOME_EMAIL_ERROR]", emailError)
     }
 
     return new NextResponse(
@@ -153,7 +152,6 @@ export async function POST(req: Request) {
       }
     )
   } catch (error) {
-    console.error("[REGISTER_ERROR]", error)
     return new NextResponse(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
       headers: corsHeaders,

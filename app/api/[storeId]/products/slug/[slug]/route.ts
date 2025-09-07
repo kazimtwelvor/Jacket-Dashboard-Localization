@@ -24,7 +24,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string;
 
     return NextResponse.json(product)
   } catch (error) {
-    console.log("[PRODUCT_SLUG_GET]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

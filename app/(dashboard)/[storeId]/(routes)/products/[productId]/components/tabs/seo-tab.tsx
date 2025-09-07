@@ -76,7 +76,6 @@ const DetailedSeoAnalysis = ({
 }) => {
   const keywords = form.getValues("seo.keywords") || []
   const focusKeyword = keywords.length > 0 ? keywords[0] : form.getValues("seo.focusKeyword") || ""
-  console.log("Using focus keyword:", focusKeyword, "from keywords:", keywords)
   const metaTitle = getDisplayValue("metaTitle")
   const metaDescription = getDisplayValue("metaDescription")
   const content = formDescription || initialDescription || ""
@@ -476,7 +475,6 @@ const SchemaToggle = ({ form }: { form: any }) => {
       try {
         form.setValue("schema1", JSON.stringify(defaultSchema, null, 2), { shouldDirty: false })
       } catch (e) {
-        console.error("Error setting default schema:", e)
       }
     }
   }, [isEnabled, form])

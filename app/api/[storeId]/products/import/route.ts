@@ -14,7 +14,6 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
 
     const storeId = params.storeId
 
-    // Check if the store belongs to the user
     const store = await prismadb.store.findFirst({
       where: {
         id: storeId,
@@ -26,7 +25,6 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
       return new NextResponse("Unauthorized", { status: 405 })
     }
 
-    // Parse the multipart form data
     const formData = await req.formData()
     const file = formData.get("file") as File
 
@@ -38,7 +36,6 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
     const createMissing = formData.get("createMissing") === "true"
     const validateOnly = formData.get("validateOnly") === "true"
 
-    // Get file extension
     const fileName = file.name
     const fileExtension = fileName.split(".").pop()?.toLowerCase()
 
@@ -46,59 +43,47 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
       return new NextResponse("Invalid file format. Only XLSX and CSV files are supported.", { status: 400 })
     }
 
-    // Read file content
     const fileBuffer = await file.arrayBuffer()
     const workbook = XLSX.read(fileBuffer, { type: "array" })
 
-    // Get the first worksheet
     const worksheet = workbook.Sheets[workbook.SheetNames[0]]
 
-    // Convert to JSON
     const jsonData = XLSX.utils.sheet_to_json(worksheet)
 
     if (jsonData.length === 0) {
       return new NextResponse("File contains no data", { status: 400 })
     }
 
-    // Validate the data structure
     const validationErrors: any[] = []
     const validRows: any[] = []
 
-    // Required fields for validation
     const requiredFields = ["name", "sku", "price"]
 
-    // Validate each row
     jsonData.forEach((row: any, index) => {
       const rowErrors: string[] = []
 
-      // Check required fields
       requiredFields.forEach((field) => {
         if (row[field] === undefined || row[field] === null || row[field] === "") {
           rowErrors.push(`Missing required field: ${field}`)
         }
       })
 
-      // Validate price format
       if (row.price && isNaN(Number(row.price))) {
         rowErrors.push("Price must be a number")
       }
 
-      // Validate salePrice format if present
       if (row.salePrice && isNaN(Number(row.salePrice))) {
         rowErrors.push("Sale price must be a number")
       }
 
-      // Validate originalPrice format if present
       if (row.originalPrice && isNaN(Number(row.originalPrice))) {
         rowErrors.push("Original price must be a number")
       }
 
-      // Validate SKU format (alphanumeric with optional hyphens and underscores)
       if (row.sku && !/^[a-zA-Z0-9-_]+$/.test(row.sku)) {
         rowErrors.push("SKU must contain only letters, numbers, hyphens, and underscores")
       }
 
-      // Validate boolean fields
       const booleanFields = [
         "isPublished",
         "isArchived",
@@ -122,7 +107,7 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
 
       if (rowErrors.length > 0) {
         validationErrors.push({
-          row: index + 2, // +2 because index is 0-based and we need to account for header row
+          row: index + 2, 
           sku: row.sku || `Row ${index + 2}`,
           errors: rowErrors,
         })
@@ -131,18 +116,13 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
       }
     })
 
-    // If validation only, return validation results
     if (validateOnly) {
-      // Generate error log if there are errors
       let errorLogUrl = null
 
       if (validationErrors.length > 0) {
-        // In a real implementation, you would save this to a file storage service
-        // For this example, we'll just return the validation errors
         errorLogUrl = `/api/${storeId}/products/import/errors?timestamp=${Date.now()}`
       }
 
-      // Create import log
       const importLog = await prismadb.importLog.create({
         data: {
           storeId,
@@ -166,12 +146,9 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
       })
     }
 
-    // If there are validation errors and we're not just validating, return error
     if (validationErrors.length > 0) {
-      // Generate error log
       const errorLogUrl = `/api/${storeId}/products/import/errors?timestamp=${Date.now()}`
 
-      // Create import log
       const importLog = await prismadb.importLog.create({
         data: {
           storeId,
@@ -206,11 +183,8 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
       errors: [] as any[],
     }
 
-    // For large imports, we would process this asynchronously
-    // For this example, we'll process it synchronously
     for (const row of validRows) {
       try {
-        // Check if product exists by SKU
         const existingProduct = await prismadb.product.findFirst({
           where: {
             storeId,
@@ -222,30 +196,24 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
         })
 
         if (existingProduct) {
-          // Update existing product if allowed
           if (updateExisting) {
-            // Prepare update data
             const updateData: any = {
               name: row.name,
               price: Number.parseFloat(row.price),
             }
 
-            // Process boolean fields
             const processBooleanField = (value: any) => {
               if (value === undefined || value === null || value === "") return undefined
               return ["Yes", "yes", "true", "TRUE"].includes(String(value))
             }
 
-            // Optional fields - Basic info
             if (row.description !== undefined) updateData.description = row.description
             if (row.isPublished !== undefined) updateData.isPublished = processBooleanField(row.isPublished)
             if (row.isArchived !== undefined) updateData.isArchived = processBooleanField(row.isArchived)
             if (row.isFeatured !== undefined) updateData.isFeatured = processBooleanField(row.isFeatured)
             if (row.isDeleted !== undefined) updateData.isDeleted = processBooleanField(row.isDeleted)
 
-            // Category
             if (row.categoryId) {
-              // Verify the category exists
               const categoryExists = await prismadb.category.findFirst({
                 where: {
                   id: row.categoryId,
@@ -257,7 +225,6 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
                 updateData.categoryId = row.categoryId
               }
             } else if (row.categoryName) {
-              // Try to find category by name
               const category = await prismadb.category.findFirst({
                 where: {
                   name: row.categoryName,
@@ -270,7 +237,6 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
               }
             }
 
-            // Pricing
             if (row.salePrice !== undefined) {
               updateData.salePrice = row.salePrice ? Number.parseFloat(row.salePrice) : null
             }
@@ -279,18 +245,14 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
             }
             if (row.isDiscounted !== undefined) updateData.isDiscounted = processBooleanField(row.isDiscounted)
 
-            // Inventory
             if (row.stockStatus !== undefined) updateData.stockStatus = row.stockStatus
 
-            // Product details
             if (row.purchaseNote !== undefined) updateData.purchaseNote = row.purchaseNote
             if (row.productType !== undefined) updateData.productType = row.productType
             if (row.isVirtual !== undefined) updateData.isVirtual = processBooleanField(row.isVirtual)
             if (row.isDownloadable !== undefined) updateData.isDownloadable = processBooleanField(row.isDownloadable)
 
-            // Process JSON fields
             try {
-              // Color details
               if (row.colorDetailsJSON) {
                 updateData.colorDetails = JSON.parse(row.colorDetailsJSON)
               } else if (row.colors && row.colorValues) {
@@ -307,7 +269,6 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
                 }))
               }
 
-              // Size details
               if (row.sizeDetailsJSON) {
                 updateData.sizeDetails = JSON.parse(row.sizeDetailsJSON)
               } else if (row.sizes && row.sizeValues) {
@@ -324,22 +285,17 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
                 }))
               }
 
-              // Color links
               if (row.colorLinks) {
                 updateData.colorLinks = typeof row.colorLinks === "string" ? JSON.parse(row.colorLinks) : row.colorLinks
               }
 
-              // Specifications
               if (row.specifications) {
                 updateData.specifications =
                   typeof row.specifications === "string" ? JSON.parse(row.specifications) : row.specifications
               }
             } catch (jsonError) {
-              console.error("Error parsing JSON fields:", jsonError)
-              // Continue with the update even if JSON parsing fails
             }
 
-            // Process array fields
             if (row.material)
               updateData.material = String(row.material)
                 .split(",")
@@ -357,7 +313,6 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
                 .split(",")
                 .map((item: string) => item.trim())
 
-            // SEO fields
             if (row.metaTitle !== undefined) updateData.metaTitle = row.metaTitle
             if (row.metaDescription !== undefined) updateData.metaDescription = row.metaDescription
             if (row.slug !== undefined) updateData.slug = row.slug
@@ -368,22 +323,15 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
             if (row.schema !== undefined) updateData.schema = row.schema
             if (row.gender !== undefined) updateData.gender = row.gender
 
-            // Handle images from the export format
             if (row.imageDetailsJSON) {
               try {
                 const imageDetails = JSON.parse(row.imageDetailsJSON)
 
-                // Process images if needed - this would require more complex handling
-                // For now, we'll just note that we have the image data
-                console.log(`Product ${row.sku} has ${imageDetails.length} images`)
 
-                // In a real implementation, you would create or update images based on the details
               } catch (e) {
-                console.error("Error parsing image details:", e)
               }
             }
 
-            // Update the product
             await prismadb.product.update({
               where: {
                 id: existingProduct.id,
@@ -393,7 +341,6 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
 
             importResults.successCount++
           } else {
-            // Skip existing products if not updating
             importResults.errorCount++
             importResults.errors.push({
               row: validRows.indexOf(row) + 2,
@@ -402,12 +349,9 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
             })
           }
         } else {
-          // Create new product if allowed
           if (createMissing) {
-            // Find or create category
             let categoryId = null
             if (row.categoryId) {
-              // Verify the category exists
               const categoryExists = await prismadb.category.findFirst({
                 where: {
                   id: row.categoryId,
@@ -419,7 +363,6 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
                 categoryId = row.categoryId
               }
             } else if (row.categoryName) {
-              // Try to find category by name
               const category = await prismadb.category.findFirst({
                 where: {
                   name: row.categoryName,
@@ -430,7 +373,6 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
               if (category) {
                 categoryId = category.id
               } else {
-                // Create new category with a slug
                 const slug = row.categoryName
                   .toLowerCase()
                   .replace(/[^a-z0-9]+/g, "-")
@@ -446,8 +388,6 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
                   })
                   categoryId = newCategory.id
                 } catch (categoryError) {
-                  console.error("Error creating category:", categoryError)
-                  // If we can't create a category, we'll use the default one or fail
                   const defaultCategory = await prismadb.category.findFirst({
                     where: {
                       storeId,
@@ -462,7 +402,6 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
                 }
               }
             } else {
-              // If no category specified, try to use a default one
               const defaultCategory = await prismadb.category.findFirst({
                 where: {
                   storeId,
@@ -476,13 +415,11 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
               }
             }
 
-            // Process boolean fields
             const processBooleanField = (value: any) => {
               if (value === undefined || value === null || value === "") return false
               return ["Yes", "yes", "true", "TRUE"].includes(String(value))
             }
 
-            // Prepare color details
             let colorDetails = []
             try {
               if (row.colorDetailsJSON) {
@@ -501,10 +438,8 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
                 }))
               }
             } catch (e) {
-              console.error("Error parsing color details:", e)
             }
 
-            // Prepare size details
             let sizeDetails = []
             try {
               if (row.sizeDetailsJSON) {
@@ -523,20 +458,16 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
                 }))
               }
             } catch (e) {
-              console.error("Error parsing size details:", e)
             }
 
-            // Prepare color links
             let colorLinks = {}
             try {
               if (row.colorLinks) {
                 colorLinks = typeof row.colorLinks === "string" ? JSON.parse(row.colorLinks) : row.colorLinks
               }
             } catch (e) {
-              console.error("Error parsing color links:", e)
             }
 
-            // Prepare specifications
             let specifications = {}
             try {
               if (row.specifications) {
@@ -544,10 +475,8 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
                   typeof row.specifications === "string" ? JSON.parse(row.specifications) : row.specifications
               }
             } catch (e) {
-              console.error("Error parsing specifications:", e)
             }
 
-            // Process array fields
             const material = row.material
               ? String(row.material)
                   .split(",")
@@ -569,10 +498,9 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
                   .map((item: string) => item.trim())
               : []
 
-            // Create the product
             const newProduct = await prismadb.product.create({
               data: {
-                id: row.id || undefined, // Use the original ID if provided
+                id: row.id || undefined, 
                 name: row.name,
                 sku: row.sku,
                 price: Number.parseFloat(row.price),
@@ -611,24 +539,17 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
               },
             })
 
-            // Handle images from the export format
             if (row.imageDetailsJSON) {
               try {
                 const imageDetails = JSON.parse(row.imageDetailsJSON)
 
-                // Process images if needed - this would require more complex handling
-                // For now, we'll just note that we have the image data
-                console.log(`New product ${row.sku} has ${imageDetails.length} images`)
 
-                // In a real implementation, you would create images based on the details
               } catch (e) {
-                console.error("Error parsing image details:", e)
               }
             }
 
             importResults.successCount++
           } else {
-            // Skip creating new products if not allowed
             importResults.errorCount++
             importResults.errors.push({
               row: validRows.indexOf(row) + 2,
@@ -638,7 +559,6 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
           }
         }
       } catch (error) {
-        console.error(`Error processing row with SKU ${row.sku}:`, error)
         importResults.errorCount++
         importResults.errors.push({
           row: validRows.indexOf(row) + 2,
@@ -648,14 +568,11 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
       }
     }
 
-    // Generate error log if there are errors
     let errorLogUrl = null
     if (importResults.errors.length > 0) {
-      // In a real implementation, you would save this to a file storage service
       errorLogUrl = `/api/${storeId}/products/import/errors?timestamp=${Date.now()}`
     }
 
-    // Create import log
     const importLog = await prismadb.importLog.create({
       data: {
         storeId,
@@ -675,7 +592,6 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
       errorLogUrl,
     })
   } catch (error) {
-    console.error("[PRODUCTS_IMPORT]", error)
     return new NextResponse(`Internal error: ${error instanceof Error ? error.message : "Unknown error"}`, {
       status: 500,
     })

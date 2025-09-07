@@ -16,7 +16,6 @@ export async function GET(req: Request, { params }: { params: { pageId: string }
 
     return NextResponse.json(page)
   } catch (error) {
-    console.log("[PAGE_GET]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }
@@ -83,15 +82,9 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       },
     })
 
-    console.log("[PAGE_PATCH] Title check:", { 
-      title: trimmedTitle, 
-      storeId: params.storeId, 
-      pageId: params.pageId,
-      existingPageByTitle: existingPageByTitle ? { id: existingPageByTitle.id, title: existingPageByTitle.title } : null 
-    })
+ 
 
     if (existingPageByTitle) {
-      console.log("[PAGE_PATCH] Title already exists, returning error")
       return new NextResponse("Title already exists", { status: 400 })
     }
 
@@ -109,7 +102,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
 
     return NextResponse.json(page)
   } catch (error) {
-    console.log("[PAGE_PATCH]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }
@@ -145,7 +137,6 @@ export async function DELETE(req: Request, { params }: { params: { storeId: stri
 
     return NextResponse.json(page)
   } catch (error) {
-    console.log("[PAGE_DELETE]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

@@ -36,7 +36,6 @@ export async function GET(req: Request) {
       user: safeUser,
     })
   } catch (error) {
-    console.error("[GET_USER_ERROR]", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
@@ -85,7 +84,6 @@ export async function PATCH(req: Request) {
       message: "Profile updated successfully",
     })
   } catch (error) {
-    console.error("[UPDATE_USER_ERROR]", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

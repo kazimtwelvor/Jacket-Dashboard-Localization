@@ -34,18 +34,15 @@ export const StandaloneBulkActions: React.FC<StandaloneBulkActionsProps> = ({
     }
 
     if (!storeId) {
-      console.error("Store ID is missing")
       toast.error("Store ID is missing. Please refresh the page and try again.")
       return
     }
 
     try {
       const url = `/${storeId}/products/bulk-edit?ids=${selectedRows.join(",")}`
-      console.log("Navigating to:", url)
 
       window.location.href = url
     } catch (error) {
-      console.error("Navigation error:", error)
       toast.error("Navigation failed. Please try again.")
     }
   }
@@ -63,7 +60,6 @@ export const StandaloneBulkActions: React.FC<StandaloneBulkActionsProps> = ({
       router.refresh()
       if (onClearSelection) onClearSelection()
     } catch (error) {
-      console.error("Error duplicating products:", error)
       toast.error("Failed to duplicate products")
     } finally {
       setIsDuplicating(false)
@@ -83,7 +79,6 @@ export const StandaloneBulkActions: React.FC<StandaloneBulkActionsProps> = ({
       router.refresh()
       if (onClearSelection) onClearSelection()
     } catch (error) {
-      console.error("Error deleting products:", error)
       toast.error("Failed to delete products")
     } finally {
       setIsDeleting(false)

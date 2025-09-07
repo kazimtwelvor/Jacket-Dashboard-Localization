@@ -48,7 +48,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ storeId
 
     return NextResponse.json(color)
   } catch (err) {
-    console.log(`[COLORS_POST] ${err}`)
     return new NextResponse(`Internal error`, { status: 500 })
   }
 }
@@ -69,7 +68,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ storeId:
 
     return NextResponse.json(colors)
   } catch (err) {
-    console.log(`[COLORS_GET] ${err}`)
     return new NextResponse(`Internal error`, { status: 500 })
   }
 }

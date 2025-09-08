@@ -253,7 +253,6 @@ export const validateReviewHelpfulness = () => [
     .withMessage('Voter name must be between 1 and 100 characters')
 ];
 
-// Review Filter validation
 export const validateReviewFilter = () => [
   query('storeId')
     .optional()
@@ -281,7 +280,6 @@ export const validateReviewFilter = () => [
     .withMessage('Sort by must be one of: newest, oldest, highest_rating, lowest_rating, most_helpful')
 ];
 
-// Review Analytics validation
 export const validateReviewAnalytics = () => [
   query('storeId')
     .optional()

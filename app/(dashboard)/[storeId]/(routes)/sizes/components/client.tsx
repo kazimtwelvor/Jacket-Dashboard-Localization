@@ -29,7 +29,6 @@ export const SizesClient: React.FC<SizesClientProps> = ({ data }) => {
   const [filterType, setFilterType] = useState("all")
   const [sortBy, setSortBy] = useState("createdAt")
 
-  // Filter and sort data
   const filteredData = data
     .filter((size) => {
       if (searchQuery) {
@@ -59,7 +58,6 @@ export const SizesClient: React.FC<SizesClientProps> = ({ data }) => {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     })
 
-  // Calculate stats
   const totalSizes = data.length
   const commonSizes = data.filter((size) => ["S", "M", "L", "XL", "XXL"].includes(size.value)).length
   const specialSizes = totalSizes - commonSizes

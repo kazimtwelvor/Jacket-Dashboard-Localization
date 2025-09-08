@@ -58,19 +58,14 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   const storeId = params.storeId as string
   const [showImageDetails, setShowImageDetails] = useState(false)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
-
-  // Use either the props or local state for detail modal
   const effectiveSelectedImage = selectedImageForDetail || localSelectedImageForDetail
   const effectiveIsDetailModalOpen = isDetailModalOpen !== undefined ? isDetailModalOpen : localIsDetailModalOpen
   const effectiveSetIsDetailModalOpen = setIsDetailModalOpen || setLocalIsDetailModalOpen
-
-  // Fetch the store URL from the database
   useEffect(() => {
     const fetchStoreUrl = async () => {
       try {
         if (!storeId) return
 
-        // Force a fresh fetch by adding a cache-busting parameter
         const response = await fetch(`/api/stores/${storeId}?t=${Date.now()}`, {
           cache: "no-store",
           headers: {
@@ -83,11 +78,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         }
 
         const storeData = await response.json()
-
-        // Validate and format the URL from the database
         let url = storeData.url || "http://localhost:3001"
-
-        // Make sure the URL has a protocol
         if (url && !url.startsWith("http://") && !url.startsWith("https://")) {
           url = `http://${url}`
         }
@@ -108,7 +99,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     setIsMounted(true)
   }, [])
 
-  // Update the onUpload function to use the store URL directly
   const onUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return
     if (!storeUrl) {
@@ -128,7 +118,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
           const formData = new FormData()
           formData.append("file", file)
 
-          // Format the URL properly - ensure it doesn't have trailing slashes
           const baseUrl = storeUrl.endsWith("/") ? storeUrl.slice(0, -1) : storeUrl
           const uploadUrl = `${baseUrl}/api/upload`
 
@@ -146,7 +135,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
           const data = await response.json()
 
-          // Use the full URL for the image
           const imageUrl = data.url.startsWith("http") ? data.url : `${baseUrl}${data.url}`
           uploadedUrls.push(imageUrl)
           successCount++
@@ -154,28 +142,23 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         }
       }
 
-      // Handle multiple uploads at once
       if (uploadedUrls.length > 0) {
         if (multiple && onMultipleSelect) {
           onMultipleSelect(uploadedUrls)
         } else if (uploadedUrls.length === 1) {
-          // For single image upload
           onChange(uploadedUrls[0])
         }
       }
 
-      // Show consolidated success message
       if (successCount > 0) {
         toast.success(`Successfully uploaded ${successCount} image${successCount > 1 ? "s" : ""}`)
       }
 
-      // Close the gallery modal if it's open
       setIsGalleryOpen(false)
     } catch (error) {
       toast.error(`Upload failed: ${error instanceof Error ? error.message : "Unknown error"}`)
     } finally {
       setIsUploading(false)
-      // Reset the file input
       if (e.target) {
         e.target.value = ""
       }
@@ -192,10 +175,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
   const handleViewDetails = (imageUrl: string) => {
     if (onViewDetails) {
-      // Use the parent component's handler if provided
       onViewDetails(imageUrl)
     } else {
-      // Otherwise use local state
       setLocalSelectedImageForDetail(imageUrl)
       setLocalIsDetailModalOpen(true)
     }
@@ -203,7 +184,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
   const handleDeleteImage = async (imageUrl: string) => {
     if (onDeleteImage) {
-      // Use the parent component's handler if provided
       onDeleteImage(imageUrl)
     } else {
       // Default behavior
@@ -212,21 +192,16 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     }
   }
 
-  // Update the handleGallerySelect function to ensure URLs are valid
   const handleGallerySelect = (selectedUrl: string | string[]) => {
     if (Array.isArray(selectedUrl)) {
-      // Multiple images selected
       if (multiple && onMultipleSelect) {
-        // Ensure all URLs are absolute and valid
         const absoluteUrls = selectedUrl.map((url) => {
           if (url.startsWith("http")) return url
           const baseUrl = storeUrl?.endsWith("/") ? storeUrl.slice(0, -1) : storeUrl || ""
           return url.startsWith("/") ? `${baseUrl}${url}` : `${baseUrl}/${url}`
         })
-        // Use the dedicated handler for multiple images
         onMultipleSelect(absoluteUrls)
       } else if (selectedUrl.length > 0) {
-        // Fallback to using the first image if multiple selection isn't supported
         let url = selectedUrl[0]
         if (!url.startsWith("http") && storeUrl) {
           const baseUrl = storeUrl.endsWith("/") ? storeUrl.slice(0, -1) : storeUrl
@@ -235,7 +210,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         onChange(url)
       }
     } else {
-      // Single image selected - ensure URL is absolute and valid
       let url = selectedUrl
       if (!url.startsWith("http") && storeUrl) {
         const baseUrl = storeUrl.endsWith("/") ? storeUrl.slice(0, -1) : storeUrl

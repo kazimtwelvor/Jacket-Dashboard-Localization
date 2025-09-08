@@ -3,7 +3,6 @@ import { auth } from "@clerk/nextjs/server"
 import { NextResponse } from "next/server"
 import { checkRole } from "@/utils/roles"
 
-// PATCH to update a member's role
 export async function PATCH(req: Request, { params }: { params: { storeId: string; memberId: string } }) {
   try {
     const { userId } = await auth()
@@ -19,7 +18,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       return new NextResponse("Role is required", { status: 400 })
     }
 
-    // Check if user is a manager of the store or an admin
     const isAdmin = await checkRole("admin")
     const isManager = await prismadb.storeMember.findFirst({
       where: {
@@ -33,7 +31,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       return new NextResponse("Only store managers or admins can update member roles", { status: 403 })
     }
 
-    // Update member role
     const member = await prismadb.storeMember.update({
       where: {
         id: memberId,
@@ -50,7 +47,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
   }
 }
 
-// DELETE to remove a member from a store
 export async function DELETE(req: Request, { params }: { params: { storeId: string; memberId: string } }) {
   try {
     const { userId } = await auth()
@@ -61,7 +57,6 @@ export async function DELETE(req: Request, { params }: { params: { storeId: stri
     }
 
 
-    // Check if user is a manager of the store or an admin
     const isAdmin = await checkRole("admin")
     const isManager = await prismadb.storeMember.findFirst({
       where: {
@@ -75,7 +70,6 @@ export async function DELETE(req: Request, { params }: { params: { storeId: stri
       return new NextResponse("Only store managers or admins can remove members", { status: 403 })
     }
 
-    // Get the member to check if they're the last manager
     const member = await prismadb.storeMember.findUnique({
       where: {
         id: memberId,
@@ -87,7 +81,6 @@ export async function DELETE(req: Request, { params }: { params: { storeId: stri
     }
 
     if (member.role === "manager") {
-      // Count managers to ensure we're not removing the last one
       const managerCount = await prismadb.storeMember.count({
         where: {
           storeId,
@@ -100,7 +93,6 @@ export async function DELETE(req: Request, { params }: { params: { storeId: stri
       }
     }
 
-    // Remove member
     await prismadb.storeMember.delete({
       where: {
         id: memberId,

@@ -26,7 +26,7 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
         slug: slug,
         storeId: params.storeId,
         id: {
-          not: productId || undefined, // Exclude current product when editing
+          not: productId || undefined, 
         },
         isDeleted: false,
       },

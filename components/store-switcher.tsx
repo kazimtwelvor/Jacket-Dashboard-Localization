@@ -40,7 +40,6 @@ export default function StoreSwitcher({ className, items = [], ...props }: Store
 
   const [open, setOpen] = useState(false)
 
-  // Fetch stores where user is a member
   useEffect(() => {
     const fetchMemberStores = async () => {
       try {
@@ -58,7 +57,6 @@ export default function StoreSwitcher({ className, items = [], ...props }: Store
     fetchMemberStores()
   }, [params?.storeId]) // Re-fetch when store ID changes
 
-  // Combine owned stores and member stores
   const formattedItems = [
     ...items.map((item) => ({
       id: item.id,
@@ -67,7 +65,6 @@ export default function StoreSwitcher({ className, items = [], ...props }: Store
     })),
     ...memberStores.filter(
       (store) =>
-        // Filter out stores that are already in the items array
         !items.some((item) => item.id === store.id),
     ),
   ]

@@ -27,7 +27,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       return new NextResponse("Store ID is required", { status: 400 })
     }
 
-    // Check if user has permission to invite users to this store
     const store = await prismadb.store.findFirst({
       where: {
         id: storeId,
@@ -39,7 +38,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       return new NextResponse("Unauthorized", { status: 403 })
     }
 
-    // Check if user is already a member of the store
     const existingUser = await prismadb.user.findUnique({
       where: { email },
     })
@@ -57,7 +55,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       }
     }
 
-    // Check if there's already a pending invitation
     const existingInvitation = await prismadb.invitation.findFirst({
       where: {
         storeId: storeId,
@@ -76,14 +73,10 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       )
     }
 
-    // Generate a unique token
     const token = crypto.randomBytes(32).toString("hex")
-
-    // Set expiration date (48 hours from now)
     const expiresDate = new Date()
     expiresDate.setHours(expiresDate.getHours() + 48)
 
-    // Create the invitation
     const invitation = await prismadb.invitation.create({
       data: {
         storeId: storeId,
@@ -117,7 +110,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       return new NextResponse("Store ID is required", { status: 400 })
     }
 
-    // Check if user has permission to view invitations
     const store = await prismadb.store.findFirst({
       where: {
         id: storeId,
@@ -129,7 +121,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       return new NextResponse("Unauthorized", { status: 403 })
     }
 
-    // Get all pending invitations
     const invitations = await prismadb.invitation.findMany({
       where: {
         storeId: storeId,

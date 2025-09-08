@@ -29,7 +29,6 @@ export const CategoriesClient: React.FC<CategoriesClientProps> = ({ data }) => {
   const [filterType, setFilterType] = useState("all")
   const [sortBy, setSortBy] = useState("createdAt")
 
-  // Filter and sort data
   const filteredData = data
     .filter((category) => {
       if (searchQuery) {
@@ -56,11 +55,9 @@ export const CategoriesClient: React.FC<CategoriesClientProps> = ({ data }) => {
       if (sortBy === "billboard") {
         return (a.billboardLabel || "").localeCompare(b.billboardLabel || "")
       }
-      // Default sort by date
-      return 0 // Since we're using formatted date strings, we can't directly compare them
+      return 0 
     })
 
-  // Calculate stats
   const totalCategories = data.length
   const withBillboard = data.filter((category) => category.billboardLabel).length
   const withoutBillboard = totalCategories - withBillboard

@@ -11,7 +11,6 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Check if the userRole model exists in prismadb
     if (!prismadb.userRole) {
       return NextResponse.json({
         userId,
@@ -22,18 +21,14 @@ export async function GET() {
     }
 
     try {
-      // Get all user roles for this user
       const userRoles = await prismadb.userRole.findMany({
         where: {
           userId,
         },
       })
 
-      // Check if user is a super admin in any store
       const superAdminRole = userRoles.find((role) => role.role === Role.SUPER_ADMIN)
       const isSuperAdmin = !!superAdminRole
-
-      // Check if user is an admin in any store
       const adminRole = userRoles.find((role) => role.role === Role.ADMIN)
       const isAdmin = !!adminRole
 

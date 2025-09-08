@@ -54,7 +54,6 @@ export const SizeCard: React.FC<SizeCardProps> = ({ size, onClick }) => {
     setOpen(true)
   }
 
-  // Determine if this is a common size
   const isCommonSize = ["S", "M", "L", "XL", "XXL", "XXXL", "4XL", "5XL"].includes(size.value)
 
   return (

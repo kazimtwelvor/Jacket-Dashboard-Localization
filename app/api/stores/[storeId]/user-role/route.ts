@@ -12,7 +12,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       return new NextResponse("Unauthorized", { status: 401 })
     }
 
-    // If a specific userId is requested, check if the current user is an admin
     if (requestedUserId && requestedUserId !== userId) {
       const currentUserStore = await prismadb.storeUser.findFirst({
         where: {
@@ -26,7 +25,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       }
     }
 
-    // Get the role for the requested user or the current user
     const storeUser = await prismadb.storeUser.findFirst({
       where: {
         userId: requestedUserId || userId,

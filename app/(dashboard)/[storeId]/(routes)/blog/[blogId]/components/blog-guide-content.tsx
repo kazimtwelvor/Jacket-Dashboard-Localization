@@ -23,7 +23,6 @@ import { StepFifteenContentAuditing } from "./steps/step-fifteen-content-auditin
 import { StepSixteenContentLocalization } from "./steps/step-sixteen-content-localization"
 import { StepSeventeenAnalyticsDashboard } from "./steps/step-seventeen-analytics-dashboard"
 import { StepEighteenContentShowcase } from "./steps/step-eighteen-content-showcase"
-// Add a new import for the text editor modal
 import { TextEditorModal } from "./text-editor-modal"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -73,7 +72,6 @@ interface BlogGuideContentProps {
   onToggleKeyTakeaways?: (value: boolean) => void
 }
 
-// Update the component to include state for the text editor modal
 export const BlogGuideContent: React.FC<BlogGuideContentProps> = ({
   title,
   steps,
@@ -83,21 +81,17 @@ export const BlogGuideContent: React.FC<BlogGuideContentProps> = ({
   onToggleStep,
   onToggleKeyTakeaways,
 }) => {
-  // Add state for the text editor modal
   const [textEditorOpen, setTextEditorOpen] = useState(false)
   const [currentEditStep, setCurrentEditStep] = useState<{ index: number; type: "step" | "keyTakeaways" } | null>(null)
 
-  // Helper function to open the text editor for a specific step
   const openTextEditor = (index: number, type: "step" | "keyTakeaways" = "step") => {
     setCurrentEditStep({ index, type })
     setTextEditorOpen(true)
   }
 
-  // Update the handleSaveImage function to add better error handling and logging
   const handleSaveImage = (field: string, url: string) => {
     try {
 
-      // Special handling for specific steps
       if (field.includes("steps.1.image")) {
       }
       if (field.includes("steps.2.image")) {
@@ -105,13 +99,11 @@ export const BlogGuideContent: React.FC<BlogGuideContentProps> = ({
       if (field.includes("steps.5.images")) {
       }
 
-      // Make sure we're not passing a field name as a URL
       if (url && url.startsWith("guideContent.steps.")) {
         toast.error("Invalid image URL")
         return
       }
 
-      // Ensure the URL is valid before saving
       if (url && !url.startsWith("http") && !url.startsWith("/")) {
         toast.error("Invalid image URL format")
         return
@@ -124,9 +116,8 @@ export const BlogGuideContent: React.FC<BlogGuideContentProps> = ({
     }
   }
 
-  // Helper function to render step with toggle
   const renderStepWithToggle = (index: number, stepComponent: React.ReactNode) => {
-    const isActive = steps[index]?.isActive !== false // Default to true if undefined
+    const isActive = steps[index]?.isActive !== false 
 
     return (
       <div className="mb-12 relative">
@@ -153,9 +144,7 @@ export const BlogGuideContent: React.FC<BlogGuideContentProps> = ({
     )
   }
 
-  // Ensure step 6 has valid images array
   const step6Images = steps[5]?.images || ["", "", ""]
-  // Filter out any invalid values
   const validStep6Images = step6Images.map((img) =>
     img && img !== "undefined" && !img.startsWith("guideContent.steps.") ? img : "",
   )
@@ -171,7 +160,6 @@ export const BlogGuideContent: React.FC<BlogGuideContentProps> = ({
         />
       </h2>
 
-      {/* Step 1: Content Strategy */}
       {renderStepWithToggle(
         0,
         <StepOneContentStrategy
@@ -186,7 +174,6 @@ export const BlogGuideContent: React.FC<BlogGuideContentProps> = ({
         />,
       )}
 
-      {/* Step 2: Content Creation */}
       {renderStepWithToggle(
         1,
         <StepTwoContentCreation
@@ -201,7 +188,6 @@ export const BlogGuideContent: React.FC<BlogGuideContentProps> = ({
         />,
       )}
 
-      {/* Step 3: Link Acquisition */}
       {renderStepWithToggle(
         2,
         <StepThreeLinkAcquisition
@@ -216,7 +202,6 @@ export const BlogGuideContent: React.FC<BlogGuideContentProps> = ({
         />,
       )}
 
-      {/* Step 4: SEO Consulting */}
       {renderStepWithToggle(
         3,
         <StepFourSeoConsulting
@@ -231,7 +216,6 @@ export const BlogGuideContent: React.FC<BlogGuideContentProps> = ({
         />,
       )}
 
-      {/* Step 5: Content Analytics */}
       {renderStepWithToggle(
         4,
         <StepFiveContentAnalytics
@@ -246,7 +230,6 @@ export const BlogGuideContent: React.FC<BlogGuideContentProps> = ({
         />,
       )}
 
-      {/* Step 6: Social Media */}
       {renderStepWithToggle(
         5,
         <StepSixSocialMedia
@@ -261,7 +244,6 @@ export const BlogGuideContent: React.FC<BlogGuideContentProps> = ({
         />,
       )}
 
-      {/* Step 7: Email Marketing */}
       {renderStepWithToggle(
         6,
         <StepSevenEmailMarketing
@@ -276,7 +258,6 @@ export const BlogGuideContent: React.FC<BlogGuideContentProps> = ({
         />,
       )}
 
-      {/* Step 8: Content Distribution */}
       {renderStepWithToggle(
         7,
         <StepEightContentDistribution
@@ -291,7 +272,6 @@ export const BlogGuideContent: React.FC<BlogGuideContentProps> = ({
         />,
       )}
 
-      {/* Step 9: Video Marketing */}
       {renderStepWithToggle(
         8,
         <StepNineVideoMarketing
@@ -306,7 +286,6 @@ export const BlogGuideContent: React.FC<BlogGuideContentProps> = ({
         />,
       )}
 
-      {/* Step 10: Interactive Content */}
       {renderStepWithToggle(
         9,
         <StepTenInteractiveContent
@@ -323,7 +302,6 @@ export const BlogGuideContent: React.FC<BlogGuideContentProps> = ({
         />,
       )}
 
-      {/* Step 11: Content Personalization */}
       {renderStepWithToggle(
         10,
         <StepElevenContentPersonalization
@@ -339,7 +317,6 @@ export const BlogGuideContent: React.FC<BlogGuideContentProps> = ({
         />,
       )}
 
-      {/* Step 12: Visual Storytelling */}
       {renderStepWithToggle(
         11,
         <StepTwelveVisualStorytelling
@@ -355,7 +332,6 @@ export const BlogGuideContent: React.FC<BlogGuideContentProps> = ({
         />,
       )}
 
-      {/* Step 13: Content Optimization */}
       {renderStepWithToggle(
         12,
         <StepThirteenContentOptimization
@@ -371,7 +347,6 @@ export const BlogGuideContent: React.FC<BlogGuideContentProps> = ({
         />,
       )}
 
-      {/* Step 14: 3D Image Experience */}
       {renderStepWithToggle(
         13,
         <StepFourteen3DImageExperience
@@ -387,7 +362,6 @@ export const BlogGuideContent: React.FC<BlogGuideContentProps> = ({
         />,
       )}
 
-      {/* Step 15: Content Auditing */}
       {renderStepWithToggle(
         14,
         <StepFifteenContentAuditing
@@ -404,7 +378,6 @@ export const BlogGuideContent: React.FC<BlogGuideContentProps> = ({
         />,
       )}
 
-      {/* Step 16: Content Localization */}
       {renderStepWithToggle(
         15,
         <StepSixteenContentLocalization
@@ -420,7 +393,6 @@ export const BlogGuideContent: React.FC<BlogGuideContentProps> = ({
         />,
       )}
 
-      {/* Step 17: Analytics Dashboard */}
       {renderStepWithToggle(
         16,
         <StepSeventeenAnalyticsDashboard
@@ -436,7 +408,6 @@ export const BlogGuideContent: React.FC<BlogGuideContentProps> = ({
         />,
       )}
 
-      {/* Step 18: Content Showcase */}
       {renderStepWithToggle(
         17,
         <StepEighteenContentShowcase
@@ -452,7 +423,6 @@ export const BlogGuideContent: React.FC<BlogGuideContentProps> = ({
         />,
       )}
 
-      {/* Key Takeaways */}
       <div className="mb-12 relative">
         <div className="absolute top-0 right-0 flex items-center space-x-2 z-10">
           <Button variant="outline" size="sm" onClick={() => openTextEditor(0, "keyTakeaways")} className="mr-2">
@@ -482,7 +452,6 @@ export const BlogGuideContent: React.FC<BlogGuideContentProps> = ({
         )}
       </div>
 
-      {/* Text Editor Modal */}
       {textEditorOpen && currentEditStep && (
         <TextEditorModal
           isOpen={textEditorOpen}
@@ -493,28 +462,23 @@ export const BlogGuideContent: React.FC<BlogGuideContentProps> = ({
           type={currentEditStep.type}
           onSave={(data) => {
             if (currentEditStep.type === "step") {
-              // Save step data
               onSaveText(`guideContent.steps.${currentEditStep.index}.title`, data.title || "")
               onSaveText(`guideContent.steps.${currentEditStep.index}.subtitle`, data.subtitle || "")
 
-              // Save each paragraph
               if (data.content) {
                 data.content.forEach((paragraph, idx) => {
                   onSaveText(`guideContent.steps.${currentEditStep.index}.content.${idx}`, paragraph)
                 })
               }
             } else if (currentEditStep.type === "keyTakeaways") {
-              // Save key takeaways data
               onSaveText("guideContent.keyTakeaways.title", data.title || "")
 
-              // Save what you learned items
               if (data.whatYouLearned?.items) {
                 data.whatYouLearned.items.forEach((item, idx) => {
                   onSaveText(`guideContent.keyTakeaways.whatYouLearned.items.${idx}`, item)
                 })
               }
 
-              // Save next steps
               if (data.nextSteps) {
                 onSaveText("guideContent.keyTakeaways.nextSteps.description", data.nextSteps.description || "")
 

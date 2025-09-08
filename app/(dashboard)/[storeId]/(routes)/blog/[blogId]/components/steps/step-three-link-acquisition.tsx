@@ -9,7 +9,7 @@ interface StepThreeLinkAcquisitionProps {
   onSaveText: (field: string, value: string) => void
   onSaveImage?: (field: string, url: string) => void
   stepIndex: number
-  openTextEditor?: () => void // Add this prop
+  openTextEditor?: () => void 
 }
 
 export const StepThreeLinkAcquisition = ({

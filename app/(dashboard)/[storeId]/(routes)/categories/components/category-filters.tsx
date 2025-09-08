@@ -31,15 +31,10 @@ export const CategoryFilters = ({ isOpen, onClose, data, onApply }: CategoryFilt
   const [isBest, setIsBest] = useState<boolean | null>(null)
   const [dateRange, setDateRange] = useState<[number, number]>([0, 100])
 
-  // Calculate max product count for slider
   const maxProductCount = Math.max(...data.map((category) => category.productCount), 10)
-
-  // Calculate date range
   const dates = data.map((category) => new Date(category.createdAt).getTime())
   const minDate = Math.min(...dates)
   const maxDate = Math.max(...dates)
-
-  // Count how many filters are applied
   const getAppliedFiltersCount = () => {
     let count = 0
     if (productStatus !== "all") count++
@@ -58,23 +53,17 @@ export const CategoryFilters = ({ isOpen, onClose, data, onApply }: CategoryFilt
   const handleApply = () => {
     let filtered = [...data]
 
-    // Filter by product status
     if (productStatus === "with-products") {
       filtered = filtered.filter((category) => category.productCount > 0)
     } else if (productStatus === "without-products") {
       filtered = filtered.filter((category) => category.productCount === 0)
     }
-
-    // Filter by product count range
     if (minProducts) {
       filtered = filtered.filter((category) => category.productCount >= Number.parseInt(minProducts))
     }
-
     if (maxProducts) {
       filtered = filtered.filter((category) => category.productCount <= Number.parseInt(maxProducts))
     }
-
-    // Filter by active status
     if (showActive && !showInactive) {
       filtered = filtered.filter((category) => category.isActive !== false)
     } else if (!showActive && showInactive) {
@@ -83,28 +72,24 @@ export const CategoryFilters = ({ isOpen, onClose, data, onApply }: CategoryFilt
       filtered = []
     }
 
-    // Filter by billboard
     if (hasBillboard === true) {
       filtered = filtered.filter((category) => category.billboardLabel && category.billboardLabel.length > 0)
     } else if (hasBillboard === false) {
       filtered = filtered.filter((category) => !category.billboardLabel || category.billboardLabel.length === 0)
     }
 
-    // Filter by image
     if (hasImage === true) {
       filtered = filtered.filter((category) => category.imageUrl && category.imageUrl.length > 0)
     } else if (hasImage === false) {
       filtered = filtered.filter((category) => !category.imageUrl || category.imageUrl.length === 0)
     }
 
-    // Filter by isBest
     if (isBest === true) {
       filtered = filtered.filter((category) => category.isBest === true)
     } else if (isBest === false) {
       filtered = filtered.filter((category) => category.isBest !== true)
     }
 
-    // Filter by date range
     if (dateRange[0] > 0 || dateRange[1] < 100) {
       const rangeStart = minDate + (maxDate - minDate) * (dateRange[0] / 100)
       const rangeEnd = minDate + (maxDate - minDate) * (dateRange[1] / 100)
@@ -131,7 +116,6 @@ export const CategoryFilters = ({ isOpen, onClose, data, onApply }: CategoryFilt
     onApply(data)
   }
 
-  // Format date for display
   const formatDate = (percent: number) => {
     const timestamp = minDate + (maxDate - minDate) * (percent / 100)
     return new Date(timestamp).toLocaleDateString("en-US", {

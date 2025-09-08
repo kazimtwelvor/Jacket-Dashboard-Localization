@@ -51,7 +51,6 @@ export const OrderConfirmationEmail = ({
 }: OrderConfirmationProps) => {
   const previewText = `Order Confirmation #${orderNumber}`
 
-  // Format currency
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -188,7 +187,6 @@ export const OrderConfirmationEmail = ({
   )
 }
 
-// Styles
 const paragraphStyle = {
   fontSize: "16px",
   lineHeight: "24px",

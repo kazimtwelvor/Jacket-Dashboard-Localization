@@ -44,7 +44,6 @@ export const ImagesClient = () => {
   const [selectedImages, setSelectedImages] = useState<string[]>([])
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
-  // Fetch the store URL from the database
   useEffect(() => {
     const fetchStoreUrl = async () => {
       try {
@@ -64,21 +63,18 @@ export const ImagesClient = () => {
 
         const storeData = await response.json()
 
-        // Validate and format the URL from the database
         let url = storeData.url || "http://localhost:3001"
 
-        // Make sure the URL has a protocol
         if (url && !url.startsWith("http://") && !url.startsWith("https://")) {
           url = `http://${url}`
         }
 
         setStoreUrl(url)
 
-        // Fetch images once we have the store URL
         fetchImages(url)
       } catch (error) {
         toast.error("Failed to fetch store URL. Using default.")
-        setStoreUrl("http://localhost:3001") // Fallback
+        setStoreUrl("http://localhost:3001") 
         fetchImages("http://localhost:3001")
       } finally {
         setIsLoading(false)
@@ -104,7 +100,6 @@ export const ImagesClient = () => {
 
       const data = await response.json()
 
-      // Add mock data for demonstration
       const enhancedImages = (data.images || []).map((img: GalleryImage) => ({
         ...img,
         uploadedBy: "Admin User",
@@ -146,7 +141,7 @@ export const ImagesClient = () => {
   }
 
   const handleViewDetails = (imageUrl: string, e: React.MouseEvent) => {
-    e.stopPropagation() // Prevent triggering select
+    e.stopPropagation() 
     const baseUrl = storeUrl?.endsWith("/") ? storeUrl.slice(0, -1) : storeUrl
     const fullUrl = `${baseUrl}${imageUrl}`
     setSelectedImage(fullUrl)
@@ -155,10 +150,8 @@ export const ImagesClient = () => {
 
   const handleDeleteImage = async (imageUrl: string) => {
     try {
-      // Mock API call
       await new Promise((resolve) => setTimeout(resolve, 500))
 
-      // Update local state
       const updatedImages = images.filter((img) => {
         const baseUrl = storeUrl?.endsWith("/") ? storeUrl.slice(0, -1) : storeUrl
         const fullUrl = `${baseUrl}${img.url}`
@@ -177,10 +170,8 @@ export const ImagesClient = () => {
     if (selectedImages.length === 0) return
 
     try {
-      // In a real implementation, you would call your API to delete the images
       await new Promise((resolve) => setTimeout(resolve, 500))
 
-      // Update local state by removing selected images
       const updatedImages = images.filter((img) => {
         const baseUrl = storeUrl?.endsWith("/") ? storeUrl.slice(0, -1) : storeUrl
         const fullUrl = `${baseUrl}${img.url}`
@@ -198,10 +189,8 @@ export const ImagesClient = () => {
 
   const toggleSelectAll = () => {
     if (selectedImages.length === filteredImages.length) {
-      // Deselect all
       setSelectedImages([])
     } else {
-      // Select all
       const baseUrl = storeUrl?.endsWith("/") ? storeUrl.slice(0, -1) : storeUrl
       setSelectedImages(filteredImages.map((img) => `${baseUrl}${img.url}`))
     }
@@ -226,7 +215,6 @@ export const ImagesClient = () => {
           const formData = new FormData()
           formData.append("file", file)
 
-          // Format the URL properly - ensure it doesn't have trailing slashes
           const baseUrl = storeUrl.endsWith("/") ? storeUrl.slice(0, -1) : storeUrl
           const uploadUrl = `${baseUrl}/api/upload`
 
@@ -244,7 +232,6 @@ export const ImagesClient = () => {
 
           const data = await response.json()
 
-          // Add the new image to our local state
           newImages.push({
             name: file.name,
             url: data.url,
@@ -253,7 +240,7 @@ export const ImagesClient = () => {
             lastModified: new Date().toISOString(),
             uploadedBy: "Current User",
             uploadedOn: new Date().toISOString(),
-            dimensions: { width: 1920, height: 1080 }, // Mock dimensions
+            dimensions: { width: 1920, height: 1080 }, 
           })
 
           successCount++
@@ -261,21 +248,18 @@ export const ImagesClient = () => {
         }
       }
 
-      // Update images state with new uploads
       if (newImages.length > 0) {
         setImages((prev) => [...newImages, ...prev])
       }
 
-      // Show consolidated success message
       if (successCount > 0) {
         toast.success(`Successfully uploaded ${successCount} image${successCount > 1 ? "s" : ""}`)
-        setActiveTab("browse") // Switch to browse tab after upload
+        setActiveTab("browse") 
       }
     } catch (error) {
       toast.error(`Upload failed: ${error instanceof Error ? error.message : "Unknown error"}`)
     } finally {
       setIsUploading(false)
-      // Reset the file input
       if (e.target) {
         e.target.value = ""
       }
@@ -364,7 +348,7 @@ export const ImagesClient = () => {
                             checked={isSelected}
                             className={`h-5 w-5 ${isSelected ? "bg-primary border-primary" : "bg-white/80"}`}
                             onClick={(e) => {
-                              e.stopPropagation() // Prevent opening sidebar when checkbox is clicked
+                              e.stopPropagation() 
                               handleImageSelect(fullUrl)
                             }}
                             onCheckedChange={() => handleImageSelect(fullUrl)}
@@ -435,7 +419,6 @@ export const ImagesClient = () => {
         </TabsContent>
       </Tabs>
 
-      {/* Image Detail Sidebar */}
       <ImageDetailSidebar
         isOpen={isDetailSidebarOpen}
         onClose={() => setIsDetailSidebarOpen(false)}
@@ -444,7 +427,6 @@ export const ImagesClient = () => {
         onDelete={handleDeleteImage}
       />
 
-      {/* Delete Confirmation Modal */}
       <AlertModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}

@@ -34,10 +34,8 @@ export default function StoreSwitcher({ className, items = [] }: StoreSwitcherPr
   const [open, setOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
 
-  // Get current store ID from params
   const currentStoreId = params?.storeId ? String(params.storeId) : null
 
-  // Find current store from items
   const currentStore = items.find((item) => item.id === currentStoreId)
 
   useEffect(() => {
@@ -48,7 +46,6 @@ export default function StoreSwitcher({ className, items = [] }: StoreSwitcherPr
     return null
   }
 
-  // Separate owned and member stores
   const ownedStores = items.filter((store) => !store.role || store.role === "Owner")
   const memberStores = items.filter((store) => store.role && store.role !== "Owner")
 

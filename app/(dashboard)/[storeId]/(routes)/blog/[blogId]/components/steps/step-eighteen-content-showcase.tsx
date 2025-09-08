@@ -34,17 +34,14 @@ export const StepEighteenContentShowcase: React.FC<StepEighteenContentShowcasePr
   stepIndex,
   openTextEditor,
 }) => {
-  // Function to handle saving images directly
   const handleSaveImage = (index: number, url: string) => {
     onSaveImage(`guideContent.steps.${stepIndex}.images.${index}`, url)
   }
 
-  // Function to handle saving text for image labels
   const handleSaveLabel = (index: number, value: string) => {
     onSaveText(`guideContent.steps.${stepIndex}.imageLabels.${index}`, value)
   }
 
-  // Function to handle saving other text elements
   const handleSaveText = (field: string, value: string) => {
     onSaveText(`guideContent.steps.${stepIndex}.${field}`, value)
   }
@@ -73,7 +70,6 @@ export const StepEighteenContentShowcase: React.FC<StepEighteenContentShowcasePr
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 auto-rows-[200px]">
-        {/* Large featured item */}
         <div className="col-span-2 row-span-2 group relative rounded-xl overflow-hidden shadow-lg">
           <EditableImage
             field={`guideContent.steps.${stepIndex}.images.0`}
@@ -127,7 +123,6 @@ export const StepEighteenContentShowcase: React.FC<StepEighteenContentShowcasePr
           </div>
         </div>
 
-        {/* Regular items */}
         {[1, 2, 3, 4].map((index) => (
           <div key={index} className="group relative rounded-xl overflow-hidden shadow-md">
             <EditableImage

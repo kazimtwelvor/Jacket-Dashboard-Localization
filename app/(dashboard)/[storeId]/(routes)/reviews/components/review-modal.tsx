@@ -38,7 +38,6 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
   const [currentReview, setCurrentReview] = useState<ReviewColumn | null>(null)
   const params = useParams()
 
-  // Update current review when props change
   useEffect(() => {
     if (review) {
       const index = allReviews.findIndex(r => r.id === review.id)
@@ -52,10 +51,8 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
       setCurrentReview(allReviews[0])
     }
     
-    // Debug the review data
   }, [review, allReviews, isOpen])
 
-  // Update current review when index changes
   useEffect(() => {
     if (allReviews.length > 0 && currentIndex >= 0 && currentIndex < allReviews.length) {
       setCurrentReview(allReviews[currentIndex])

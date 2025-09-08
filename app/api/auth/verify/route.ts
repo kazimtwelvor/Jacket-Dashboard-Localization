@@ -17,8 +17,6 @@ export async function POST(req: Request) {
     }
 
     const { token, storeId } = validationResult.data
-
-    // Find user by verification token
     const user = await prismadb.storeUser.findFirst({
       where: {
         verifyToken: token,
@@ -30,7 +28,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid verification token" }, { status: 400 })
     }
 
-    // Mark user as verified
     await prismadb.storeUser.update({
       where: { id: user.id },
       data: {

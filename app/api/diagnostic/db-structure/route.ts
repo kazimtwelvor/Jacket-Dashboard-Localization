@@ -2,7 +2,6 @@ import { auth } from "@clerk/nextjs/server"
 import { NextResponse } from "next/server"
 import prismadb from "@/lib/prismadb"
 
-// Force dynamic rendering and disable caching
 export const dynamic = "force-dynamic"
 export const fetchCache = "force-no-store"
 export const revalidate = 0
@@ -15,7 +14,6 @@ export async function GET() {
       return new NextResponse("Unauthorized", { status: 401 })
     }
 
-    // Find the user in the database by their Clerk ID
     const dbUser = await prismadb.user.findFirst({
       where: {
         clerkId: userId,
@@ -26,7 +24,6 @@ export async function GET() {
       return new NextResponse("User not found", { status: 404 })
     }
 
-    // Get all stores where user is owner
     const ownedStores = await prismadb.store.findMany({
       where: {
         userId: dbUser.id,
@@ -38,7 +35,6 @@ export async function GET() {
       },
     })
 
-    // Get all store memberships
     const storeUsers = await prismadb.storeUser.findMany({
       where: {
         userId: dbUser.id,
@@ -54,7 +50,6 @@ export async function GET() {
       },
     })
 
-    // Format the response
     const diagnosticData = {
       user: {
         id: dbUser.id,
@@ -75,7 +70,6 @@ export async function GET() {
       })),
     }
 
-    // Set cache headers to prevent stale data
     const headers = new Headers()
     headers.set("Cache-Control", "no-cache, no-store, must-revalidate")
     headers.set("Pragma", "no-cache")

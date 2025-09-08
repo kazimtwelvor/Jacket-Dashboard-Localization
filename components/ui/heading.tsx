@@ -1,5 +1,4 @@
 import type React from "react"
-// Manually Created
 
 interface HeadingProps {
   title: string

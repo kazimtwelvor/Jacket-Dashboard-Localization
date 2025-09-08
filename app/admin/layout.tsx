@@ -8,19 +8,14 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode
 }) {
-  // Check if user is authorized
   const { userId } = await auth()
 
   if (!userId) {
     redirect("/sign-in")
   }
-
   try {
     const user = await clerkClient.users.getUser(userId)
     const userRole = user.publicMetadata.role as string
-
-
-    // Allow both admin and super_admin roles
     if (userRole !== "admin" && userRole !== "super_admin") {
       redirect("/")
     }

@@ -20,11 +20,8 @@ export async function POST(req: Request) {
       return new NextResponse("Name is required", { status: 400 })
     }
 
-    // Check if user has admin role (only admins can create stores)
     const { sessionClaims } = await auth()
     const userRole = sessionClaims?.metadata?.role as string | undefined
-
-    // Check if user's email is in the SUPER_USER_EMAILS list
     const { user } = await auth() as any;
     const userEmail = user?.emailAddresses?.[0]?.emailAddress
     const superUserEmails = process.env.SUPER_USER_EMAILS?.split(",") || []
@@ -34,15 +31,11 @@ export async function POST(req: Request) {
       return new NextResponse("Only administrators can create stores", { status: 403 })
     }
 
-    // First, ensure the user exists in the database
     let dbUser = await db.user.findUnique({
       where: { clerkId: userId },
     })
 
-    // If user doesn't exist, create them
     if (!dbUser) {
-      // Generate a random password since we're using Clerk for auth
-      // but our schema requires a password field
       const randomPassword = crypto.randomBytes(16).toString("hex")
 
       dbUser = await db.user.create({
@@ -55,13 +48,11 @@ export async function POST(req: Request) {
       })
     }
 
-    // Create the store with the database user ID
     const store = await db.store.create({
       data: {
         name,
         userId,
         url: name.toLowerCase().replace(/\s+/g, "-"), // Generate a URL slug from the store name
-        // Create a Member record instead of StoreUser
         members: {
           create: {
             userId: dbUser.id, // Use the database user ID here

@@ -29,10 +29,8 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({ data }) => {
   const [sortBy, setSortBy] = useState("createdAt")
   const [categoryType, setCategoryType] = useState<"all" | "material" | "style" | "gender">("all")
 
-  // Filter and sort data
   const filteredData = data
     .filter((category) => {
-      // Filter by search query
       if (searchQuery) {
         return (
           category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -42,13 +40,6 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({ data }) => {
       return true
     })
     .filter((category) => {
-      // Filter by category attributes - removed product count filters since categoryId is removed
-      // if (filterType === "with-products") {
-      //   return category.productCount > 0
-      // }
-      // if (filterType === "without-products") {
-      //   return category.productCount === 0
-      // }
       if (filterType === "with-billboard") {
         return category.billboardLabel
       }
@@ -58,7 +49,6 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({ data }) => {
       return true
     })
     .filter((category) => {
-      // Filter by category type
       if (categoryType !== "all") {
         return category.type === categoryType
       }
@@ -71,22 +61,13 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({ data }) => {
       if (sortBy === "billboard") {
         return (a.billboardLabel || "").localeCompare(b.billboardLabel || "")
       }
-      // Removed product count sorting since categoryId is removed
-      // if (sortBy === "products") {
-      //   return b.productCount - a.productCount
-      // }
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     })
 
-  // Calculate stats
   const totalCategories = data.length
-  // Removed product count stats since categoryId is removed
-  // const withProducts = data.filter((category) => category.productCount > 0).length
-  // const withoutProducts = totalCategories - withProducts
   const withBillboard = data.filter((category) => category.billboardLabel).length
   const withoutBillboard = totalCategories - withBillboard
 
-  // Calculate type stats
   const materialCategories = data.filter((category) => category.type === "material").length
   const styleCategories = data.filter((category) => category.type === "style").length
   const genderCategories = data.filter((category) => category.type === "gender").length

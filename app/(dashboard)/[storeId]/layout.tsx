@@ -18,8 +18,7 @@ export default async function DashboardLayout({ children, params }: DashboardLay
     redirect("/sign-in")
   }
 
-  // In Next.js App Router, we need to be careful with dynamic params
-  // Let's extract the storeId safely
+  
   const storeId = String(params?.storeId || "")
 
   if (!storeId) {
@@ -27,7 +26,6 @@ export default async function DashboardLayout({ children, params }: DashboardLay
   }
 
   try {
-    // Find the user in the database by their Clerk ID
     const dbUser = await prismadb.user.findFirst({
       where: {
         clerkId: userId,
@@ -39,7 +37,6 @@ export default async function DashboardLayout({ children, params }: DashboardLay
       redirect("/")
     }
 
-    // Check if user has access to this store (either as owner or member)
     const store = await prismadb.store.findFirst({
       where: {
         id: storeId,
@@ -47,29 +44,24 @@ export default async function DashboardLayout({ children, params }: DashboardLay
       },
     })
 
-    // Convert Decimal to number to avoid serialization issues
     const serializedStore = store
       ? {
           ...store,
-          // Convert Decimal to number
           taxRate: store.taxRate ? Number.parseFloat(store.taxRate.toString()) : null,
         }
       : null
 
-    // If user is not the owner, check if they are a member
     if (!serializedStore) {
-      // Check if user is a member of this store
       const storeMember = await prismadb.storeUser.findFirst({
         where: {
           storeId: storeId,
-          userId: dbUser.id, // Use the database user ID, not the Clerk ID
+          userId: dbUser.id, 
         },
         include: {
-          store: true, // Include the store details
+          store: true, 
         },
       })
 
-      // If user is not a member either, redirect to home
       if (!storeMember) {
         redirect("/")
       }
@@ -81,20 +73,17 @@ export default async function DashboardLayout({ children, params }: DashboardLay
       })
     }
 
-    // Get all stores owned by the user
     const ownedStores = await prismadb.store.findMany({
       where: {
         userId,
       },
     })
 
-    // Convert Decimal to number in all stores
     const serializedOwnedStores = ownedStores.map((store) => ({
       ...store,
       taxRate: store.taxRate ? Number.parseFloat(store.taxRate.toString()) : null,
     }))
 
-    // Get all stores where the user is a member
     const memberStores = await prismadb.storeUser.findMany({
       where: {
         userId: dbUser.id,
@@ -104,14 +93,12 @@ export default async function DashboardLayout({ children, params }: DashboardLay
       },
     })
 
-    // Convert member stores to the same format as owned stores
     const serializedMemberStores = memberStores.map((membership) => ({
       ...membership.store,
       taxRate: membership.store.taxRate ? Number.parseFloat(membership.store.taxRate.toString()) : null,
       role: membership.role,
     }))
 
-    // Combine owned and member stores, avoiding duplicates
     const allStores = [
       ...serializedOwnedStores,
       ...serializedMemberStores.filter(

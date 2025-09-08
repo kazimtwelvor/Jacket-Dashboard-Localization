@@ -18,7 +18,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
 
     const storeId = params.storeId
 
-    // Check if the SKU already exists in this store
     const existingProduct = await prismadb.product.findFirst({
       where: {
         storeId,
@@ -27,17 +26,13 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
     })
 
     if (existingProduct) {
-      // SKU exists, generate a unique alternative
-      // Get the store's SKU prefix
       const store = await prismadb.store.findUnique({
         where: { id: storeId },
         select: { skuPrefix: true },
       })
 
-      // Use the store's prefix or default to "SKU" if not set
       const prefix = store?.skuPrefix || "SKU"
 
-      // Try to use the provided SKU with a suffix
       let counter = 1
       let uniqueSku = `${sku}-${counter}`
 

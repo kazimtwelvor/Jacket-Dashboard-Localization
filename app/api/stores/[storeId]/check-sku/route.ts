@@ -21,7 +21,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       return new NextResponse("SKU is required", { status: 400 })
     }
 
-    // Check if store exists and belongs to user
     const storeByUserId = await prismadb.store.findFirst({
       where: {
         id: storeId,
@@ -33,7 +32,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       return new NextResponse("Unauthorized", { status: 403 })
     }
 
-    // Check if SKU already exists in this store
     const existingProduct = await prismadb.product.findFirst({
       where: {
         storeId: storeId,
@@ -41,12 +39,9 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       },
     })
 
-    // If SKU exists, generate a unique version by adding a suffix
     let uniqueSku = sku
     const isUnique = !existingProduct
-
     if (existingProduct) {
-      // Find all SKUs that start with the base SKU and have a numeric suffix
       const similarSkus = await prismadb.product.findMany({
         where: {
           storeId: storeId,
@@ -59,10 +54,8 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
         },
       })
 
-      // Extract the highest suffix number
       let maxSuffix = 0
       for (const product of similarSkus) {
-        // Add null check for product.sku
         if (product.sku) {
           const suffixMatch = product.sku.match(new RegExp(`^${sku.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}-([0-9]+)$`))
           if (suffixMatch && suffixMatch[1]) {
@@ -74,7 +67,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
         }
       }
 
-      // Generate a new unique SKU with the next suffix number
       uniqueSku = `${sku}-${maxSuffix + 1}`
     }
 

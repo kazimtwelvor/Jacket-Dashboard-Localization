@@ -42,7 +42,6 @@ export function MultiSelect({
           onChange(selected.slice(0, -1))
         }
       }
-      // This is not a default behavior of the <input /> field
       if (e.key === "Escape") {
         input.blur()
       }

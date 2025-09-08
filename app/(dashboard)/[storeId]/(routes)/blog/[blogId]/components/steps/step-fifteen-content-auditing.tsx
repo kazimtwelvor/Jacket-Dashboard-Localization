@@ -37,10 +37,7 @@ export const StepFifteenContentAuditing: React.FC<StepFifteenContentAuditingProp
   stepIndex,
   openTextEditor,
 }) => {
-  // Create direct image upload components for each card
-  // This completely bypasses the EditableImage component
 
-  // Create a component for each card image
   const CardImage = ({ index, imageUrl }: { index: number; imageUrl: string }) => {
     const [isEditing, setIsEditing] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
@@ -58,19 +55,15 @@ export const StepFifteenContentAuditing: React.FC<StepFifteenContentAuditingProp
           return
         }
 
-        // Update local state
         setCurrentUrl(url)
 
-        // Create a copy of the images array
         const updatedImages = [...images]
         while (updatedImages.length < 4) {
           updatedImages.push("")
         }
 
-        // Update the specific index
         updatedImages[index] = url
 
-        // Save the entire array directly
         onSaveImage(`guideContent.steps.${stepIndex}.images`, updatedImages)
 
         toast.success("Image saved")
@@ -84,19 +77,15 @@ export const StepFifteenContentAuditing: React.FC<StepFifteenContentAuditingProp
 
     const handleImageRemove = () => {
       try {
-        // Create a copy of the images array
         const updatedImages = [...images]
         while (updatedImages.length < 4) {
           updatedImages.push("")
         }
 
-        // Update the specific index to empty string
         updatedImages[index] = ""
 
-        // Save the entire array
         onSaveImage(`guideContent.steps.${stepIndex}.images`, updatedImages)
 
-        // Update local state
         setCurrentUrl("")
 
         toast.success("Image removed")
@@ -130,7 +119,6 @@ export const StepFifteenContentAuditing: React.FC<StepFifteenContentAuditingProp
       )
     }
 
-    // Check if we have a valid image URL
     const hasValidImage = currentUrl && currentUrl !== "undefined"
 
     return (
@@ -155,7 +143,6 @@ export const StepFifteenContentAuditing: React.FC<StepFifteenContentAuditingProp
             </div>
           </div>
         )}
-        {/* This overlay should not block clicks */}
         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 flex items-center justify-center transition-all pointer-events-none">
           <Edit2 className="text-white opacity-0 group-hover:opacity-100 h-8 w-8" />
         </div>
@@ -174,7 +161,6 @@ export const StepFifteenContentAuditing: React.FC<StepFifteenContentAuditingProp
       </div>
 
       <div className="relative h-[500px]">
-        {/* Floating card 1 */}
         <div className="absolute top-0 left-[10%] w-64 bg-white rounded-lg shadow-lg p-4 transform hover:-translate-y-2 transition-transform duration-300">
           <div className="h-40 relative rounded-md overflow-hidden mb-3">
             <CardImage index={0} imageUrl={images[0] || ""} />
@@ -183,7 +169,6 @@ export const StepFifteenContentAuditing: React.FC<StepFifteenContentAuditingProp
           <p className="text-sm text-gray-600">{cardDescriptions[0]}</p>
         </div>
 
-        {/* Floating card 2 */}
         <div className="absolute top-[15%] right-[15%] w-64 bg-white rounded-lg shadow-lg p-4 transform hover:-translate-y-2 transition-transform duration-300">
           <div className="h-40 relative rounded-md overflow-hidden mb-3">
             <CardImage index={1} imageUrl={images[1] || ""} />
@@ -192,7 +177,6 @@ export const StepFifteenContentAuditing: React.FC<StepFifteenContentAuditingProp
           <p className="text-sm text-gray-600">{cardDescriptions[1]}</p>
         </div>
 
-        {/* Floating card 3 */}
         <div className="absolute bottom-[10%] left-[20%] w-64 bg-white rounded-lg shadow-lg p-4 transform hover:-translate-y-2 transition-transform duration-300">
           <div className="h-40 relative rounded-md overflow-hidden mb-3">
             <CardImage index={2} imageUrl={images[2] || ""} />
@@ -201,7 +185,6 @@ export const StepFifteenContentAuditing: React.FC<StepFifteenContentAuditingProp
           <p className="text-sm text-gray-600">{cardDescriptions[2]}</p>
         </div>
 
-        {/* Floating card 4 */}
         <div className="absolute bottom-[20%] right-[10%] w-64 bg-white rounded-lg shadow-lg p-4 transform hover:-translate-y-2 transition-transform duration-300">
           <div className="h-40 relative rounded-md overflow-hidden mb-3">
             <CardImage index={3} imageUrl={images[3] || ""} />
@@ -210,7 +193,6 @@ export const StepFifteenContentAuditing: React.FC<StepFifteenContentAuditingProp
           <p className="text-sm text-gray-600">{cardDescriptions[3]}</p>
         </div>
 
-        {/* Center element */}
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full bg-[#FF6C1A] flex items-center justify-center text-white font-bold text-xl shadow-lg">
           Audit Process
         </div>

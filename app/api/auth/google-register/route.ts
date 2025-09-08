@@ -34,7 +34,6 @@ export async function POST(req: Request) {
 
     const { email, name, googleId, picture, storeId } = validationResult.data;
 
-    // Check if store exists
     const storeExists = await prismadb.store.findUnique({
       where: { id: storeId },
     });
@@ -46,7 +45,6 @@ export async function POST(req: Request) {
       });
     }
 
-    // Check if user already exists
     const existingUser = await prismadb.storeUser.findFirst({
       where: {
         email,
@@ -55,7 +53,6 @@ export async function POST(req: Request) {
     });
 
     if (existingUser) {
-      // User exists, generate token and return
       const jwtSecret = process.env.JWT_SECRET;
       if (!jwtSecret) {
         return new NextResponse(JSON.stringify({ error: "JWT secret not configured" }), {
@@ -89,7 +86,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Create new user
     const newUser = await prismadb.storeUser.create({
       data: {
         name,

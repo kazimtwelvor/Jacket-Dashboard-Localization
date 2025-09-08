@@ -18,7 +18,6 @@ export default async function DashboardLayout({
     redirect("/sign-in")
   }
 
-  // Fetch the store but serialize Decimal fields to strings
   const storeData = await db.store.findFirst({
     where: {
       id: params.storeId,
@@ -39,14 +38,11 @@ export default async function DashboardLayout({
     redirect("/")
   }
 
-  // Serialize the store data to handle Decimal fields
   const store = {
     ...storeData,
     taxRate: storeData.taxRate ? Number.parseFloat(storeData.taxRate.toString()) : 0,
-    // Convert any other Decimal fields as needed
   }
 
-  // Fetch all stores for the sidebar but serialize Decimal fields
   const storesData = await db.store.findMany({
     where: {
       OR: [
@@ -62,11 +58,9 @@ export default async function DashboardLayout({
     },
   })
 
-  // Serialize all stores
   const stores = storesData.map((store) => ({
     ...store,
     taxRate: store.taxRate ? Number.parseFloat(store.taxRate.toString()) : 0,
-    // Convert any other Decimal fields as needed
   }))
 
   return (

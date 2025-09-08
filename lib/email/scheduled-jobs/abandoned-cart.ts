@@ -4,12 +4,10 @@ import prismadb from "@/lib/prismadb"
 import { emailLogger } from "../logger"
 import { sendAbandonedCartEmail } from "@/app/api/email/advanced-actions"
 
-// Create scheduler for abandoned cart jobs
 const abandonedCartScheduler = new QueueScheduler(QUEUE_NAMES.ABANDONED_CART_CHECK, {
   connection: redisConnection,
 })
 
-// Create queue for abandoned cart check jobs
 const abandonedCartQueue = new Queue(QUEUE_NAMES.ABANDONED_CART_CHECK, {
   connection: redisConnection,
   defaultJobOptions: {
@@ -21,19 +19,14 @@ const abandonedCartQueue = new Queue(QUEUE_NAMES.ABANDONED_CART_CHECK, {
   },
 })
 
-/**
- * Schedule a job to check for abandoned carts
- */
+
 export async function scheduleAbandonedCartCheck(interval = 60 * 60 * 1000) {
-  // Default: every hour
   try {
-    // Remove any existing repeat jobs
     const repeatableJobs = await abandonedCartQueue.getRepeatableJobs()
     for (const job of repeatableJobs) {
       await abandonedCartQueue.removeRepeatableByKey(job.key)
     }
 
-    // Add new repeatable job
     await abandonedCartQueue.add(
       "check-abandoned-carts",
       {},
@@ -60,13 +53,9 @@ export async function scheduleAbandonedCartCheck(interval = 60 * 60 * 1000) {
   }
 }
 
-/**
- * Process to check for abandoned carts
- */
+
 export async function processAbandonedCartCheck() {
   try {
-    // Find carts that have been abandoned for more than 4 hours but less than 24 hours
-    // and haven't had an email sent yet
     const abandonedCarts = await prismadb.cart.findMany({
       where: {
         updatedAt: {
@@ -91,9 +80,7 @@ export async function processAbandonedCartCheck() {
       metadata: { count: abandonedCarts.length },
     })
 
-    // Send emails for each abandoned cart
     const emailPromises = abandonedCarts.map(async (cart) => {
-      // Determine if we should include a discount (e.g., for carts with higher value)
       const cartValue = cart.items.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0)
       const includeDiscount = cartValue > 100 // Only include discount for carts worth more than $100
 
@@ -104,7 +91,6 @@ export async function processAbandonedCartCheck() {
         expiryHours: 24,
       })
 
-      // Mark cart as having received an email
       await prismadb.cart.update({
         where: { id: cart.id },
         data: { emailSent: true },
@@ -125,9 +111,6 @@ export async function processAbandonedCartCheck() {
   }
 }
 
-/**
- * Start the abandoned cart worker
- */
 export function startAbandonedCartWorker() {
   const worker = new Worker(
     QUEUE_NAMES.ABANDONED_CART_CHECK,
@@ -155,11 +138,9 @@ export function startAbandonedCartWorker() {
     })
   })
 
-  // Schedule the job to run every hour
   scheduleAbandonedCartCheck()
 
   return worker
 }
 
-// Import Worker at the top of the file
 import { Worker } from "bullmq"

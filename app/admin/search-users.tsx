@@ -17,23 +17,19 @@ export function SearchUsers() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Create new URLSearchParams object
     const params = new URLSearchParams(searchParams)
 
-    // Set or remove search param
     if (searchTerm) {
       params.set("search", searchTerm)
     } else {
       params.delete("search")
     }
 
-    // Keep the tab param if it exists
     const tab = searchParams.get("tab")
     if (tab) {
       params.set("tab", tab)
     }
 
-    // Navigate with updated params
     router.push(`${pathname}?${params.toString()}`)
   }
 

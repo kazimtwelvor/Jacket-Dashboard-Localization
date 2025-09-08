@@ -6,7 +6,6 @@ import { NextResponse } from "next/server"
 
 export async function GET(req: Request, { params }: { params: Promise<{ storeId: string }> | { storeId: string } }) {
   try {
-    // Await params if it's a Promise
     const resolvedParams = params instanceof Promise ? await params : params
     const { storeId } = resolvedParams
 
@@ -18,7 +17,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ storeId:
       where: {
         id: storeId,
       },
-      // Make sure to select all fields including url
       select: {
         id: true,
         name: true,
@@ -36,12 +34,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ storeId:
   }
 }
 
-// For Next.js App Router, we need to use Promise<{ storeId: string }> for params
 export async function PATCH(req: Request, { params }: { params: Promise<{ storeId: string }> | { storeId: string } }) {
   try {
     const { userId } = await auth()
 
-    // Await params if it's a Promise
     const resolvedParams = params instanceof Promise ? await params : params
     const { storeId } = resolvedParams
 
@@ -61,7 +57,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
       return new NextResponse("Store id is required", { status: 400 })
     }
 
-    // Only include fields that exist in the schema
     const store = await prismadb.store.updateMany({
       where: {
         id: storeId,
@@ -84,7 +79,6 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ store
   try {
     const { userId } = await auth()
 
-    // Await params if it's a Promise
     const resolvedParams = params instanceof Promise ? await params : params
     const { storeId } = resolvedParams
 

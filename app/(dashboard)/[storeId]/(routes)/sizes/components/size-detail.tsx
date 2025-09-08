@@ -23,7 +23,6 @@ export const SizeDetail = ({ size, onClose, onEdit, onDelete }: SizeDetailProps)
     navigator.clipboard.writeText(text)
   }
 
-  // Determine if this is a common size
   const isCommonSize = ["S", "M", "L", "XL", "XXL", "XXXL", "4XL", "5XL"].includes(size.value)
 
   return (

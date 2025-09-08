@@ -37,7 +37,7 @@ const formSchema = z.object({
   instagramUrl: z.string().optional(),
   twitterUrl: z.string().optional(),
   skuPrefix: z.string().optional(),
-  url: z.string().optional(), // Add URL field to the form schema
+  url: z.string().optional(), 
 })
 
 type SettingsFormValues = z.infer<typeof formSchema>
@@ -71,7 +71,7 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
       instagramUrl: initialData?.instagram || "",
       twitterUrl: initialData?.twitter || "",
       skuPrefix: initialData?.skuPrefix || "",
-      url: initialData?.url || "", // Initialize URL field with data from database
+      url: initialData?.url || "", 
     },
   })
 

@@ -77,7 +77,6 @@ export const ImageDetailSidebar: React.FC<ImageDetailSidebarProps> = ({
   const [error, setError] = useState<string | null>(null)
   const [imageId, setImageId] = useState<string | null>(null)
 
-  // Create default metadata
   const createDefaultMetadata = (url: string) => {
     const filename = url.split("/").pop() || "image"
     return {
@@ -121,10 +120,8 @@ export const ImageDetailSidebar: React.FC<ImageDetailSidebarProps> = ({
       return uuidMatch[0]
     }
 
-    // Try to extract from path segments
     const urlParts = storeUrl.split("/").filter(Boolean) // Remove empty segments
 
-    // Look for segments after known markers
     const markers = ["dashboard", "store", "admin"]
     for (let i = 0; i < urlParts.length; i++) {
       if (markers.includes(urlParts[i]) && i + 1 < urlParts.length) {
@@ -132,7 +129,6 @@ export const ImageDetailSidebar: React.FC<ImageDetailSidebarProps> = ({
       }
     }
 
-    // If we have at least 2 segments, the second one might be the storeId
     if (urlParts.length >= 2 && !markers.includes(urlParts[0])) {
       return urlParts[1]
     }
@@ -140,7 +136,6 @@ export const ImageDetailSidebar: React.FC<ImageDetailSidebarProps> = ({
     return null
   }
 
-  // Fetch image metadata when the imageUrl changes
   useEffect(() => {
     const fetchImageMetadata = async () => {
       if (!imageUrl) return
@@ -149,7 +144,6 @@ export const ImageDetailSidebar: React.FC<ImageDetailSidebarProps> = ({
       setError(null)
 
       try {
-        // If initialMetadata is provided, use it instead of fetching
         if (
           initialMetadata &&
           (initialMetadata.altText ||
@@ -173,13 +167,10 @@ export const ImageDetailSidebar: React.FC<ImageDetailSidebarProps> = ({
           return
         }
 
-        // Always fetch fresh data from the server, bypassing cache
         const storeId = getStoreId()
 
         if (storeId) {
-          // Add a timestamp to prevent caching
           const timestamp = new Date().getTime()
-          // Use the direct API endpoint with storeId
           const apiUrl = `/api/${storeId}/images/metadata?url=${encodeURIComponent(imageUrl)}&t=${timestamp}`
 
           try {
@@ -187,7 +178,6 @@ export const ImageDetailSidebar: React.FC<ImageDetailSidebarProps> = ({
               method: "GET",
               headers: {
                 "Content-Type": "application/json",
-                // Add cache control to prevent caching
                 "Cache-Control": "no-cache, no-store, must-revalidate",
                 Pragma: "no-cache",
                 Expires: "0",
@@ -209,7 +199,6 @@ export const ImageDetailSidebar: React.FC<ImageDetailSidebarProps> = ({
                   excludeFromSitemap: data.excludeFromSitemap || false,
                 })
 
-                // Store the image ID if available
                 if (data.imageId) {
                   setImageId(data.imageId)
                 }
@@ -264,7 +253,6 @@ export const ImageDetailSidebar: React.FC<ImageDetailSidebarProps> = ({
     }
   }, [imageUrl, storeUrl, isOpen, params, initialMetadata])
 
-  // Update the handleSave function to ensure metadata is properly saved
   const handleSave = async () => {
     if (!imageUrl) return
 
@@ -281,16 +269,13 @@ export const ImageDetailSidebar: React.FC<ImageDetailSidebarProps> = ({
         imageId: imageId, // Include the image ID if available
       }
 
-      // Call onMetadataChange if provided
       if (onMetadataChange) {
         onMetadataChange(seoData)
       }
 
-      // Try to save to the server
       const storeId = getStoreId()
 
       if (storeId) {
-        // Use the direct API endpoint with storeId
         const apiUrl = `/api/${storeId}/images/metadata/save`
 
         try {
@@ -306,15 +291,12 @@ export const ImageDetailSidebar: React.FC<ImageDetailSidebarProps> = ({
           if (response.ok) {
             const savedData = await response.json()
 
-            // Update the imageId if it was returned
             if (savedData.id && (!imageId || imageId !== savedData.id)) {
               setImageId(savedData.id)
 
-              // Update the metadata with the new ID
               updatedMetadata.imageId = savedData.id
             }
 
-            // Update local state with the saved data
             setMetadata({
               ...updatedMetadata,
               altText: seoData.altText,
@@ -352,7 +334,6 @@ export const ImageDetailSidebar: React.FC<ImageDetailSidebarProps> = ({
   const handleGenerateAlt = () => {
     if (!metadata?.name) return
 
-    // Generate a more descriptive alt text based on filename
     const generatedAlt = metadata.name
       .replace(/\.[^/.]+$/, "") // Remove file extension
       .replace(/-/g, " ") // Replace hyphens with spaces
@@ -390,7 +371,6 @@ export const ImageDetailSidebar: React.FC<ImageDetailSidebarProps> = ({
 
   const handleDelete = () => {
     if (imageUrl && confirm("Are you sure you want to delete this image? This action cannot be undone.")) {
-      // Remove from cache when deleted
       metadataCache.delete(imageUrl)
       onDelete(imageUrl)
       onClose()

@@ -34,60 +34,47 @@ export const StepElevenContentPersonalization: React.FC<StepElevenContentPersona
   stepIndex,
   openTextEditor,
 }) => {
-  // State for editing the button link
   const [isEditingLink, setIsEditingLink] = useState(false)
   const [localButtonLink, setLocalButtonLink] = useState(buttonLink || "")
 
-  // Track the current image locally
   const [currentImage, setCurrentImage] = useState(image || "")
 
-  // Update local state when prop changes
   useEffect(() => {
     setCurrentImage(image || "")
   }, [image])
 
-  // Create a handler function for saving the image directly
   const handleSaveImage = (field: string, url: string) => {
     try {
-      // Don't use the field parameter, use our hardcoded path instead
       if (!url) {
         return
       }
 
-      // Validate URL
       if (url.includes("guideContent.steps.") || url === "undefined") {
         toast.error("Invalid image URL")
         return
       }
 
 
-      // Update local state
       setCurrentImage(url)
 
-      // Save to parent component with correct field path
       onSaveImage(`guideContent.steps.${stepIndex}.image`, url)
     } catch (error) {
       toast.error("Failed to save image")
     }
   }
 
-  // Format URL to ensure it has a protocol
   const formatUrl = (url: string): string => {
     if (!url) return ""
 
-    // Remove any leading/trailing whitespace
     url = url.trim()
 
-    // Check if the URL already has a protocol
     if (url.match(/^(https?:\/\/|mailto:|tel:)/i)) {
       return url
     }
 
-    // Add https:// protocol if missing
     return `https://${url}`
   }
 
-  // Handle saving the button link
   const handleSaveButtonLink = () => {
     const formattedUrl = formatUrl(localButtonLink)
     const fieldPath = `guideContent.steps.${stepIndex}.buttonLink`
@@ -96,19 +83,16 @@ export const StepElevenContentPersonalization: React.FC<StepElevenContentPersona
     setIsEditingLink(false)
   }
 
-  // Handle canceling the button link edit
   const handleCancelLinkEdit = () => {
     setLocalButtonLink(buttonLink || "")
     setIsEditingLink(false)
   }
 
-  // Get the display URL for the UI
   const getDisplayUrl = (url: string): string => {
     if (!url) return "No link set"
     return url.replace(/^https?:\/\//i, "")
   }
 
-  // Get the full URL for the href
   const getFullUrl = (url: string): string => {
     if (!url) return "#"
     return url
@@ -116,9 +100,7 @@ export const StepElevenContentPersonalization: React.FC<StepElevenContentPersona
 
   return (
     <div className="animate-fade-in mb-12">
-      {/* Main container with relative positioning */}
       <div className="relative h-[400px] rounded-xl overflow-hidden">
-        {/* Image container - explicitly set to fill the entire space and be clickable */}
         <div className="absolute inset-0 w-full h-full">
           <EditableImage
             field={`guideContent.steps.${stepIndex}.image`}
@@ -131,17 +113,14 @@ export const StepElevenContentPersonalization: React.FC<StepElevenContentPersona
           />
         </div>
 
-        {/* Gradient overlay - non-blocking */}
         {currentImage && (
           <div className="absolute inset-0 pointer-events-none bg-gradient-to-r from-[#0A2463]/80 to-transparent"></div>
         )}
 
-        {/* Content overlay - positioned to not block the image clicks */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="h-full flex items-center">
             <div className="max-w-lg p-8">
               <div className="border-l-4 border-[#FF6C1A] pl-4 mb-4">
-                {/* Title - clickable for editing */}
                 <div className="text-2xl font-bold text-white mb-4 pointer-events-auto">
                   <EditableText
                     field={`guideContent.steps.${stepIndex}.title`}
@@ -152,7 +131,6 @@ export const StepElevenContentPersonalization: React.FC<StepElevenContentPersona
                   />
                 </div>
 
-                {/* Subtitle - clickable for editing */}
                 <div className="text-white mb-4 pointer-events-auto">
                   <EditableText
                     field={`guideContent.steps.${stepIndex}.subtitle`}
@@ -163,7 +141,6 @@ export const StepElevenContentPersonalization: React.FC<StepElevenContentPersona
                   />
                 </div>
 
-                {/* Content - clickable for editing */}
                 {content && content[0] && (
                   <div className="text-white/90 mb-6 pointer-events-auto">
                     <EditableText
@@ -177,7 +154,6 @@ export const StepElevenContentPersonalization: React.FC<StepElevenContentPersona
                   </div>
                 )}
 
-                {/* Button with link - clickable */}
                 <div className="pointer-events-auto relative inline-flex items-center">
                   <a
                     href={getFullUrl(buttonLink)}
@@ -186,7 +162,7 @@ export const StepElevenContentPersonalization: React.FC<StepElevenContentPersona
                     className={`inline-block bg-[#FF6C1A] hover:bg-[#FF8C4A] text-white px-6 py-2 rounded-full transition-colors ${!buttonLink ? "pointer-events-none" : ""}`}
                     onClick={(e) => {
                       if (!buttonLink) e.preventDefault()
-                      e.stopPropagation() // Prevent click from reaching the image
+                      e.stopPropagation() 
                     }}
                   >
                     <EditableText
@@ -199,13 +175,12 @@ export const StepElevenContentPersonalization: React.FC<StepElevenContentPersona
                     />
                   </a>
 
-                  {/* Link edit button - now positioned right next to the button */}
                   <Button
                     size="sm"
                     variant="ghost"
                     className="ml-2 text-white bg-gray-800/50 hover:bg-gray-800/70 h-7 w-7 p-0 rounded-full"
                     onClick={(e) => {
-                      e.stopPropagation() // Prevent click from reaching the image
+                      e.stopPropagation() 
                       setIsEditingLink(true)
                     }}
                     type="button"
@@ -214,11 +189,10 @@ export const StepElevenContentPersonalization: React.FC<StepElevenContentPersona
                     <LinkIcon className="h-4 w-4" />
                   </Button>
 
-                  {/* Link edit modal */}
                   {isEditingLink && (
                     <div
                       className="absolute top-full left-0 mt-2 p-3 bg-gray-800 rounded-md shadow-lg z-50 w-full max-w-md"
-                      onClick={(e) => e.stopPropagation()} // Prevent click from reaching the image
+                      onClick={(e) => e.stopPropagation()} 
                     >
                       <div className="text-white text-sm mb-2">Button Link URL:</div>
                       <div className="flex items-center gap-2">
@@ -227,13 +201,13 @@ export const StepElevenContentPersonalization: React.FC<StepElevenContentPersona
                           onChange={(e) => setLocalButtonLink(e.target.value)}
                           placeholder="google.com"
                           className="bg-gray-700 text-white border-gray-600"
-                          onClick={(e) => e.stopPropagation()} // Prevent click from reaching the image
+                          onClick={(e) => e.stopPropagation()} 
                         />
                         <Button
                           size="sm"
                           className="bg-green-600 hover:bg-green-700 h-8 w-8 p-0"
                           onClick={(e) => {
-                            e.stopPropagation() // Prevent click from reaching the image
+                            e.stopPropagation() 
                             handleSaveButtonLink()
                           }}
                         >
@@ -243,7 +217,7 @@ export const StepElevenContentPersonalization: React.FC<StepElevenContentPersona
                           size="sm"
                           className="bg-red-600 hover:bg-red-700 h-8 w-8 p-0"
                           onClick={(e) => {
-                            e.stopPropagation() // Prevent click from reaching the image
+                            e.stopPropagation()
                             handleCancelLinkEdit()
                           }}
                         >

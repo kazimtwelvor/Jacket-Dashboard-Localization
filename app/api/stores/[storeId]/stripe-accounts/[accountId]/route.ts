@@ -46,7 +46,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       return new NextResponse("Account ID is required", { status: 400 })
     }
 
-    // Check if the user has permission to update this store
     const storeByUserId = await prismadb.store.findFirst({
       where: {
         id: params.storeId,
@@ -58,7 +57,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       return new NextResponse("Unauthorized", { status: 403 })
     }
 
-    // If this account is set as default, unset any other default accounts
     if (isDefault) {
       await prismadb.stripeAccount.updateMany({
         where: {
@@ -111,7 +109,6 @@ export async function DELETE(req: Request, { params }: { params: { storeId: stri
       return new NextResponse("Account ID is required", { status: 400 })
     }
 
-    // Check if the user has permission to update this store
     const storeByUserId = await prismadb.store.findFirst({
       where: {
         id: params.storeId,
@@ -123,21 +120,18 @@ export async function DELETE(req: Request, { params }: { params: { storeId: stri
       return new NextResponse("Unauthorized", { status: 403 })
     }
 
-    // Check if this is the default account
     const account = await prismadb.stripeAccount.findUnique({
       where: {
         id: params.accountId,
       },
     })
 
-    // Delete the account
     await prismadb.stripeAccount.delete({
       where: {
         id: params.accountId,
       },
     })
 
-    // If this was the default account, set another account as default if available
     if (account?.isDefault) {
       const nextAccount = await prismadb.stripeAccount.findFirst({
         where: {

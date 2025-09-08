@@ -48,7 +48,6 @@ export const AcceptInvitationForm = () => {
 
       toast.success("Invitation accepted successfully!")
 
-      // If we have a storeId in the response, redirect to that store
       if (response.data.storeId) {
         router.push(`/${response.data.storeId}`)
       } else {

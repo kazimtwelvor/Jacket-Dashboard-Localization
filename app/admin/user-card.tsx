@@ -8,7 +8,6 @@ import { useState } from "react"
 import { updateUserRole } from "./actions"
 import { toast } from "@/components/ui/use-toast"
 
-// Define a type for our serialized user
 interface SerializedUser {
   id: string
   firstName: string

@@ -14,7 +14,6 @@ export async function GET() {
       return new NextResponse("Unauthorized", { status: 401 })
     }
 
-    // Find the user in the database by their Clerk ID
     const dbUser = await prismadb.user.findFirst({
       where: {
         clerkId: userId,
@@ -26,7 +25,6 @@ export async function GET() {
       return NextResponse.json([])
     }
 
-    // Find all stores where the user is a member
     const storeUsers = await prismadb.storeUser.findMany({
       where: {
         userId: dbUser.id,
@@ -37,11 +35,9 @@ export async function GET() {
     })
 
 
-    // Log each store for debugging
     storeUsers.forEach((su, index) => {
     })
 
-    // Format the response with consistent property names
     const memberStores = storeUsers.map((su) => ({
       id: su.store.id,
       name: su.store.name,
@@ -51,7 +47,6 @@ export async function GET() {
     }))
 
 
-    // Set cache headers to prevent stale data
     const headers = new Headers()
     headers.set("Cache-Control", "no-cache, no-store, must-revalidate")
     headers.set("Pragma", "no-cache")

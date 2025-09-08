@@ -48,7 +48,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
       return new NextResponse("Billboard id is required", { status: 400 })
     }
 
-    // Check if user has access to this store
     const storeByUserId = await prismadb.store.findFirst({
       where: {
         id: storeId,
@@ -100,7 +99,6 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ store
       return new NextResponse("Billboard id is required", { status: 400 })
     }
 
-    // Check if user has access to this store
     const storeByUserId = await prismadb.store.findFirst({
       where: {
         id: storeId,

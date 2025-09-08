@@ -588,7 +588,6 @@ export const CustomTemplate: React.FC<CustomTemplateProps> = ({ isEditing = fals
     },
   ])
 
-  // FAQ handlers
   const handleAddFAQ = (faq: any) => {
     setFaqs((prevFaqs) => [...prevFaqs, faq])
   }

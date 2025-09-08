@@ -71,7 +71,6 @@ export const RecaptchaForm: React.FC<RecaptchaFormProps> = ({ initialData, store
     try {
       setLoading(true)
 
-      // Convert threshold to number if present
       const formattedData = {
         ...data,
         threshold: data.threshold ? Number.parseFloat(data.threshold) : undefined,

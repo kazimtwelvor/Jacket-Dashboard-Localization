@@ -27,7 +27,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       return new NextResponse("Store ID is required", { status: 400 })
     }
 
-    // Get query parameters for filtering
     const { searchParams } = new URL(req.url)
     const productId = searchParams.get("productId")
     const ratingParam = searchParams.get("rating")

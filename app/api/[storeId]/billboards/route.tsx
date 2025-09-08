@@ -28,7 +28,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ storeId
       return new NextResponse("Store Id is required", { status: 400 })
     }
 
-    // Check if user has access to this store
     const storeByUserId = await prismadb.store.findFirst({
       where: {
         id: storeId,
@@ -52,7 +51,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ storeId
       return new NextResponse("Unauthorized", { status: 403 })
     }
 
-    // Store the full URL if it's from our local storage
     const fullImageUrl = imageUrl.startsWith("/uploads") ? `http://localhost:3001${imageUrl}` : imageUrl
 
     const billboard = await prismadb.billboard.create({

@@ -48,7 +48,6 @@ export const StepSixteenContentLocalization: React.FC<StepSixteenContentLocaliza
   stepIndex,
   openTextEditor,
 }) => {
-  // Handler for saving images directly
   const handleSaveImage = (index: number, url: string) => {
     onSaveImage(`guideContent.steps.${stepIndex}.images.${index}`, url)
   }

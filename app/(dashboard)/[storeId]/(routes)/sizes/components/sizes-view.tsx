@@ -54,7 +54,6 @@ export const SizesView = ({ data }: SizesViewProps) => {
   const router = useRouter()
   const params = useParams()
 
-  // State
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [filteredData, setFilteredData] = useState<SizeColumn[]>(data)
   const [searchQuery, setSearchQuery] = useState("")
@@ -68,18 +67,13 @@ export const SizesView = ({ data }: SizesViewProps) => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [bulkDeleteModalOpen, setBulkDeleteModalOpen] = useState(false)
 
-  // Calculate stats
   const totalSizes = filteredData.length
   const commonSizes = filteredData.filter((size) =>
     ["S", "M", "L", "XL", "XXL", "XXXL", "4XL", "5XL"].includes(size.value),
   ).length
   const specialSizes = totalSizes - commonSizes
-
-  // Filter data based on status
   useEffect(() => {
     let result = [...data]
-
-    // Apply search filter
     if (searchQuery) {
       result = result.filter(
         (size) =>
@@ -87,15 +81,12 @@ export const SizesView = ({ data }: SizesViewProps) => {
           size.value.toLowerCase().includes(searchQuery.toLowerCase()),
       )
     }
-
-    // Apply status filter
     if (filterStatus === "common") {
       result = result.filter((size) => ["S", "M", "L", "XL", "XXL", "XXXL", "4XL", "5XL"].includes(size.value))
     } else if (filterStatus === "special") {
       result = result.filter((size) => !["S", "M", "L", "XL", "XXL", "XXXL", "4XL", "5XL"].includes(size.value))
     }
 
-    // Apply sort
     result = result.sort((a, b) => {
       if (sortField === "name") {
         return sortOrder === "asc" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
@@ -111,34 +102,28 @@ export const SizesView = ({ data }: SizesViewProps) => {
     setFilteredData(result)
   }, [data, searchQuery, filterStatus, sortField, sortOrder])
 
-  // Handle search
   const handleSearch = (query: string) => {
     setSearchQuery(query)
   }
 
-  // Handle sort
   const handleSort = (field: "name" | "value" | "createdAt") => {
     const newOrder = field === sortField && sortOrder === "asc" ? "desc" : "asc"
     setSortField(field)
     setSortOrder(newOrder)
   }
 
-  // Handle size selection
   const handleSizeSelect = (size: SizeColumn) => {
     setSelectedSize(size)
   }
 
-  // Handle size creation
   const handleCreateSize = () => {
     router.push(`/${params.storeId}/sizes/new`)
   }
 
-  // Handle size edit
   const handleEditSize = (id: string) => {
     router.push(`/${params.storeId}/sizes/${id}`)
   }
 
-  // Handle size delete
   const handleDeleteSize = async () => {
     if (!selectedSize) return
 
@@ -156,11 +141,9 @@ export const SizesView = ({ data }: SizesViewProps) => {
     }
   }
 
-  // Handle bulk delete
   const handleBulkDelete = async () => {
     try {
       setIsLoading(true)
-      // This would need to be implemented in the API
       await Promise.all(selectedItems.map((id) => axios.delete(`/api/${params.storeId}/sizes/${id}`)))
       router.refresh()
       toast.success(`${selectedItems.length} sizes deleted successfully.`)
@@ -173,12 +156,10 @@ export const SizesView = ({ data }: SizesViewProps) => {
     }
   }
 
-  // Handle item selection for bulk actions
   const toggleItemSelection = (id: string) => {
     setSelectedItems((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]))
   }
 
-  // Handle select all
   const toggleSelectAll = () => {
     if (selectedItems.length === filteredData.length) {
       setSelectedItems([])
@@ -187,7 +168,6 @@ export const SizesView = ({ data }: SizesViewProps) => {
     }
   }
 
-  // Reset filters
   const resetFilters = () => {
     setSearchQuery("")
     setFilterStatus("all")

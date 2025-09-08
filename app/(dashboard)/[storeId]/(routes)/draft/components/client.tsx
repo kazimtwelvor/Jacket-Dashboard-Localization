@@ -229,7 +229,6 @@ const ProductsView: React.FC<ProductsViewProps> = ({
     )
   }
 
-  // Reset to first page when filters change
   React.useEffect(() => {
     setCurrentPage(1)
   }, [searchTerm, categoryFilter, colorFilter, materialFilter, styleFilter, genderFilter, priceFilter, dateFilter, creatorFilter, statusFilter])

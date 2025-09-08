@@ -16,17 +16,14 @@ export function SearchForm({ defaultValue = "" }: { defaultValue?: string }) {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Create new URLSearchParams object
     const params = new URLSearchParams(searchParams)
 
-    // Set or remove search param
     if (searchTerm) {
       params.set("search", searchTerm)
     } else {
       params.delete("search")
     }
 
-    // Navigate with updated params
     router.push(`/admin?${params.toString()}`)
   }
 

@@ -56,7 +56,6 @@ export const StoreModal = () => {
 
       const response = await axios.post("/api/stores/create", values)
 
-      // This will refresh the page to show the new store
       window.location.assign(`/${response.data.id}`)
     } catch (error: any) {
       setError(error.response?.data || "Something went wrong")

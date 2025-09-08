@@ -1,14 +1,11 @@
 import { Resend } from "resend"
 import type { JSX } from "react"
 
-// Initialize Resend with API key
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-// Email sender configuration
 const DEFAULT_FROM_EMAIL = process.env.DEFAULT_FROM_EMAIL || "noreply@yourdomain.com"
 const DEFAULT_REPLY_TO = process.env.DEFAULT_REPLY_TO || "support@yourdomain.com"
 
-// Types for email sending
 export interface EmailPayload {
   to: string | string[]
   subject: string
@@ -24,7 +21,6 @@ export interface EmailPayload {
   }[]
 }
 
-// Function to send email using Resend
 export async function sendEmail({
   to,
   subject,
@@ -57,11 +53,9 @@ export async function sendEmail({
   }
 }
 
-// Function to validate email address format
 export function isValidEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   return emailRegex.test(email)
 }
 
-// Export the Resend instance for direct access if needed
 export { resend }

@@ -14,7 +14,6 @@ import prismadb from "@/lib/prismadb"
 import Link from "next/link"
 import type { Decimal } from "@prisma/client/runtime/library"
 
-// Define extended types to include properties that might exist
 interface OrderItem {
   id: string
   orderId: string
@@ -65,14 +64,12 @@ interface DashboardPageProps {
 const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
   const { storeId } = await params
 
-  // Fetch store information
   const store = await prismadb.store.findFirst({
     where: {
       id: storeId,
     },
   })
 
-  // Fetch all orders
   const orders = (await prismadb.order.findMany({
     where: {
       storeId,
@@ -89,10 +86,8 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
     },
   })) as unknown as ExtendedOrder[]
 
-  // Fetch paid orders for revenue calculation
   const paidOrders = orders.filter((order) => order.isPaid)
 
-  // Fetch products with sales data
   const products = await prismadb.product.findMany({
     where: {
       storeId,
@@ -105,7 +100,6 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
     },
   })
 
-  // Fetch reviews
   const reviews = (await prismadb.review.findMany({
     where: {
       storeId,
@@ -119,7 +113,6 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
     take: 4,
   })) as unknown as Review[]
 
-  // Calculate total revenue from paid orders
   const totalRevenue = paidOrders.reduce((total, order) => {
     return (
       total +
@@ -131,7 +124,6 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
     )
   }, 0)
 
-  // Calculate sales statistics
   const salesData = {
     totalRevenue,
     totalOrders: orders.length,
@@ -145,7 +137,6 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
         : "N/A",
   }
 
-  // Calculate monthly revenue and orders for the past 6 months
   const monthlyData = [
     { name: "Jan", total: 0, orders: 0 },
     { name: "Feb", total: 0, orders: 0 },
@@ -155,20 +146,15 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
     { name: "Jun", total: 0, orders: 0 },
   ]
 
-  // Calculate percentage changes compared to previous month
   const currentMonthRevenue = monthlyData[5]?.total || 0
-  const previousMonthRevenue = monthlyData[4]?.total || 1 // Avoid division by zero
+  const previousMonthRevenue = monthlyData[4]?.total || 1 
   const revenueChange = ((currentMonthRevenue - previousMonthRevenue) / previousMonthRevenue) * 100
 
-  // Calculate order change percentage
   const currentMonthOrders = 0
-  const previousMonthOrders = 1 // Avoid division by zero
+  const previousMonthOrders = 1 
   const ordersChange = ((currentMonthOrders - previousMonthOrders) / previousMonthOrders) * 100
 
-  // Calculate product change percentage
-  const productsChange = 0 // Default to 0 if no historical data
-
-  // Get top selling products based on order count
+  const productsChange = 0 
   const productSalesMap = new Map()
 
   paidOrders.forEach((order) => {
@@ -182,7 +168,6 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
     })
   })
 
-  // Sort products by sales count
   const topSellingProducts = products
     .map((product) => ({
       id: product.id,
@@ -195,7 +180,6 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
     .sort((a, b) => b.salesCount - a.salesCount)
     .slice(0, 5)
 
-  // Format recent orders for display
   const recentOrders = orders.slice(0, 5).map((order) => ({
     id: order.id,
     customerName: order.user?.name || `Customer #${order.id.substring(0, 8)}`,
@@ -209,13 +193,12 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
     email: order.user?.email || order.phone || "No contact info",
   }))
 
-  // Format reviews for the RecentReviews component
   const formattedReviews = reviews.map((review) => ({
     id: review.id,
     userName: review.userName || "Anonymous",
     rating: review.rating,
     comment: review.comment,
-    title: review.title || undefined, // Convert null to undefined
+    title: review.title || undefined, 
     createdAt: review.createdAt,
     product: {
       name: review.product.name,
@@ -239,7 +222,6 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
 
         <Separator />
 
-        {/* Stats Overview */}
         <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -329,10 +311,8 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
           </Card>
         </div>
 
-        {/* Quick Actions */}
         <QuickActions storeId={storeId} />
 
-        {/* Charts and Recent Activity */}
         <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-7">
           <Card className="col-span-full lg:col-span-4">
             <CardHeader>
@@ -362,7 +342,6 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
           </Card>
         </div>
 
-        {/* Products and Reviews */}
         <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-7">
           <Card className="col-span-full lg:col-span-4">
             <CardHeader>

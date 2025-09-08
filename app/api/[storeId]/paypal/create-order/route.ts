@@ -22,7 +22,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       return new NextResponse("Items are required", { status: 400 })
     }
 
-    // Fetch products from database to get accurate prices
     const productIds = items.map((item: any) => item.id)
     const products = await prismadb.product.findMany({
       where: {
@@ -33,17 +32,16 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       },
     })
 
-    // Calculate order total
     let orderTotal = 0
     const purchaseUnits = [
       {
         amount: {
           currency_code: "USD",
-          value: "0", // Will be updated below
+          value: "0", 
           breakdown: {
             item_total: {
               currency_code: "USD",
-              value: "0", // Will be updated below
+              value: "0", 
             },
           },
         },
@@ -51,7 +49,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       },
     ]
 
-    // Create line items for PayPal
     items.forEach((item: any) => {
       const product = products.find((p) => p.id === item.id)
       if (!product) return
@@ -71,11 +68,9 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       })
     })
 
-    // Update totals
     purchaseUnits[0].amount.value = orderTotal.toFixed(2)
     purchaseUnits[0].amount.breakdown.item_total.value = orderTotal.toFixed(2)
 
-    // Create PayPal order
     const paypalClient = await getPayPalClient(storeId)
     const request = new paypal.orders.OrdersCreateRequest()
     request.headers["prefer"] = "return=representation"
@@ -97,7 +92,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       return new NextResponse("Failed to create PayPal order", { status: 500 })
     }
 
-    // Create a pending order in our database
     const order = await prismadb.order.create({
       data: {
         storeId,

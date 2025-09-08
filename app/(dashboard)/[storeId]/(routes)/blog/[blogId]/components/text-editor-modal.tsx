@@ -33,7 +33,6 @@ import {
   Strikethrough,
 } from "lucide-react"
 
-// Import TipTap editor components
 import { EditorContent, useEditor } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import UnderlineExtension from "@tiptap/extension-underline"
@@ -87,7 +86,6 @@ interface TextEditorModalProps {
   onSave: (data: any) => void
 }
 
-// Menu button component for editor toolbar
 const MenuButton = ({
   onClick,
   isActive = false,
@@ -134,20 +132,16 @@ export const TextEditorModal: React.FC<TextEditorModalProps> = ({
   const [videoUrl, setVideoUrl] = useState("")
   const linkUrlRef = useRef<HTMLInputElement>(null)
 
-  // Convert array of paragraphs to HTML for editor
   const contentToHtml = useCallback((paragraphs: string[] | undefined) => {
     if (!paragraphs || paragraphs.length === 0) return ""
 
-    // Check if content already has HTML tags
     if (paragraphs[0].trim().startsWith("<")) {
       return paragraphs.join("")
     }
     return paragraphs.map((p) => `<p>${p}</p>`).join("")
   }, [])
 
-  // Convert HTML from editor back to array of paragraphs
   const htmlToContent = useCallback((html: string): string[] => {
-    // If the content is already rich HTML, just return it as a single item
     if (
       html.includes("<h1>") ||
       html.includes("<ul>") ||
@@ -162,7 +156,6 @@ export const TextEditorModal: React.FC<TextEditorModalProps> = ({
       return [html]
     }
 
-    // Otherwise, split by paragraphs
     const tempDiv = document.createElement("div")
     tempDiv.innerHTML = html
     const paragraphs = tempDiv.querySelectorAll("p")
@@ -174,7 +167,6 @@ export const TextEditorModal: React.FC<TextEditorModalProps> = ({
     return Array.from(paragraphs).map((p) => p.innerHTML)
   }, [])
 
-  // Initialize TipTap editor for content
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -231,7 +223,6 @@ export const TextEditorModal: React.FC<TextEditorModalProps> = ({
     },
   })
 
-  // Initialize form data when modal opens
   useEffect(() => {
     if (type === "step" && stepData) {
       setFormData({
@@ -240,7 +231,6 @@ export const TextEditorModal: React.FC<TextEditorModalProps> = ({
         content: [...(stepData.content || [])],
       })
 
-      // Set editor content
       if (editor) {
         const html = contentToHtml(stepData.content)
         editor.commands.setContent(html)
@@ -267,7 +257,6 @@ export const TextEditorModal: React.FC<TextEditorModalProps> = ({
       const newData = { ...prev }
       let current = newData
 
-      // Navigate to the nested property
       for (let i = 0; i < keys.length - 1; i++) {
         if (!current[keys[i]]) {
           current[keys[i]] = {}
@@ -275,7 +264,6 @@ export const TextEditorModal: React.FC<TextEditorModalProps> = ({
         current = current[keys[i]]
       }
 
-      // Set the value
       current[keys[keys.length - 1]] = value
       return newData
     })
@@ -287,7 +275,6 @@ export const TextEditorModal: React.FC<TextEditorModalProps> = ({
       const newData = { ...prev }
       let current = newData
 
-      // Navigate to the nested property
       for (let i = 0; i < keys.length; i++) {
         if (!current[keys[i]]) {
           current[keys[i]] = []
@@ -295,7 +282,6 @@ export const TextEditorModal: React.FC<TextEditorModalProps> = ({
         current = current[keys[i]]
       }
 
-      // Set the value at the specified index
       current[index] = value
       return newData
     })
@@ -307,7 +293,6 @@ export const TextEditorModal: React.FC<TextEditorModalProps> = ({
       const newData = { ...prev }
       let current = newData
 
-      // Navigate to the nested property
       for (let i = 0; i < keys.length; i++) {
         if (!current[keys[i]]) {
           current[keys[i]] = []
@@ -315,7 +300,6 @@ export const TextEditorModal: React.FC<TextEditorModalProps> = ({
         current = current[keys[i]]
       }
 
-      // Add a new item
       current.push(defaultValue)
       return newData
     })
@@ -327,15 +311,13 @@ export const TextEditorModal: React.FC<TextEditorModalProps> = ({
       const newData = { ...prev }
       let current = newData
 
-      // Navigate to the nested property
       for (let i = 0; i < keys.length; i++) {
         if (!current[keys[i]]) {
-          return prev // If path doesn't exist, return unchanged
+          return prev 
         }
         current = current[keys[i]]
       }
 
-      // Remove the item at the specified index
       if (Array.isArray(current) && index >= 0 && index < current.length) {
         current.splice(index, 1)
       }
@@ -346,7 +328,6 @@ export const TextEditorModal: React.FC<TextEditorModalProps> = ({
 
   const handleSave = () => {
     if (type === "step" && editor) {
-      // Update content from editor
       const contentArray = htmlToContent(editorContent || editor.getHTML())
       const updatedFormData = {
         ...formData,
@@ -358,22 +339,18 @@ export const TextEditorModal: React.FC<TextEditorModalProps> = ({
     }
   }
 
-  // Editor toolbar actions
   const setLink = useCallback(() => {
     if (!editor) return
 
     const url = linkUrlRef.current?.value || ""
 
-    // cancelled
     if (url === "") {
       editor.chain().focus().extendMarkRange("link").unsetLink().run()
       return
     }
 
-    // update link
     editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run()
 
-    // Close dialog
     setShowLinkDialog(false)
   }, [editor])
 
@@ -390,7 +367,6 @@ export const TextEditorModal: React.FC<TextEditorModalProps> = ({
         })
         .run()
 
-      // Reset and close dialog
       setImageUrl("")
       setImageAlt("")
       setShowImageDialog(false)
@@ -405,7 +381,6 @@ export const TextEditorModal: React.FC<TextEditorModalProps> = ({
         src: videoUrl,
       })
 
-      // Reset and close dialog
       setVideoUrl("")
       setShowVideoDialog(false)
     }
@@ -457,9 +432,7 @@ export const TextEditorModal: React.FC<TextEditorModalProps> = ({
             <TabsContent value="editor" className="space-y-4">
               {editor && (
                 <>
-                  {/* Editor Toolbar */}
                   <div className="border rounded-t-md p-1 bg-muted/20 flex flex-wrap gap-1 items-center">
-                    {/* Text Formatting */}
                     <MenuButton
                       onClick={() => editor.chain().focus().toggleBold().run()}
                       isActive={editor.isActive("bold")}
@@ -502,7 +475,6 @@ export const TextEditorModal: React.FC<TextEditorModalProps> = ({
 
                     <div className="w-px h-6 bg-border mx-1"></div>
 
-                    {/* Headings */}
                     <MenuButton
                       onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
                       isActive={editor.isActive("heading", { level: 1 })}
@@ -529,7 +501,6 @@ export const TextEditorModal: React.FC<TextEditorModalProps> = ({
 
                     <div className="w-px h-6 bg-border mx-1"></div>
 
-                    {/* Lists */}
                     <MenuButton
                       onClick={() => editor.chain().focus().toggleBulletList().run()}
                       isActive={editor.isActive("bulletList")}
@@ -556,7 +527,6 @@ export const TextEditorModal: React.FC<TextEditorModalProps> = ({
 
                     <div className="w-px h-6 bg-border mx-1"></div>
 
-                    {/* Alignment */}
                     <MenuButton
                       onClick={() => editor.chain().focus().setTextAlign("left").run()}
                       isActive={editor.isActive({ textAlign: "left" })}
@@ -583,7 +553,6 @@ export const TextEditorModal: React.FC<TextEditorModalProps> = ({
 
                     <div className="w-px h-6 bg-border mx-1"></div>
 
-                    {/* Media */}
                     <MenuButton onClick={() => setShowLinkDialog(true)} title="Insert Link">
                       <LinkIcon className="h-4 w-4" />
                     </MenuButton>
@@ -602,7 +571,6 @@ export const TextEditorModal: React.FC<TextEditorModalProps> = ({
 
                     <div className="w-px h-6 bg-border mx-1"></div>
 
-                    {/* Undo/Redo */}
                     <MenuButton
                       onClick={() => editor.chain().focus().undo().run()}
                       disabled={!editor.can().undo()}
@@ -620,7 +588,6 @@ export const TextEditorModal: React.FC<TextEditorModalProps> = ({
                     </MenuButton>
                   </div>
 
-                  {/* Editor Content */}
                   <div className="border rounded-b-md min-h-[300px] p-4">
                     <EditorContent editor={editor} className="prose prose-sm max-w-none min-h-[250px]" />
                   </div>
@@ -772,7 +739,6 @@ export const TextEditorModal: React.FC<TextEditorModalProps> = ({
         </DialogFooter>
       </DialogContent>
 
-      {/* Link Dialog */}
       {showLinkDialog && (
         <Dialog open={showLinkDialog} onOpenChange={setShowLinkDialog}>
           <DialogContent className="sm:max-w-md">
@@ -802,7 +768,6 @@ export const TextEditorModal: React.FC<TextEditorModalProps> = ({
         </Dialog>
       )}
 
-      {/* Image Dialog */}
       {showImageDialog && (
         <Dialog open={showImageDialog} onOpenChange={setShowImageDialog}>
           <DialogContent className="sm:max-w-md">
@@ -843,7 +808,6 @@ export const TextEditorModal: React.FC<TextEditorModalProps> = ({
         </Dialog>
       )}
 
-      {/* Video Dialog */}
       {showVideoDialog && (
         <Dialog open={showVideoDialog} onOpenChange={setShowVideoDialog}>
           <DialogContent className="sm:max-w-md">

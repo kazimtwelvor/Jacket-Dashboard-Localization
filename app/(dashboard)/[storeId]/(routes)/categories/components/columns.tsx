@@ -53,7 +53,6 @@ export const columns: ColumnDef<CategoryColumn>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      // Defensive check for row.original
       if (!row || !row.original) {
         return null
       }

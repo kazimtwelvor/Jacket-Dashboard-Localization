@@ -11,7 +11,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       return new NextResponse("Unauthenticated", { status: 401 })
     }
 
-    // Check if user has permission to view invitations
     const storeUser = await db.storeUser.findFirst({
       where: {
         storeId,

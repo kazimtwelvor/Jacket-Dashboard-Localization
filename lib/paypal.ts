@@ -2,7 +2,6 @@ import checkoutNodeJssdk from "@paypal/checkout-server-sdk"
 import prismadb from "@/lib/prismadb"
 
 export const getPayPalClient = async (storeId: string) => {
-  // Get store settings from database
   const store = await prismadb.store.findUnique({
     where: {
       id: storeId,

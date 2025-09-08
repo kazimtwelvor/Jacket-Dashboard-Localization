@@ -13,7 +13,6 @@ const MembersPage = async ({ params }: { params: { storeId: string } }) => {
     redirect("/sign-in")
   }
 
-  // Check if user is the owner
   const store = await prismadb.store.findFirst({
     where: {
       id: params.storeId,
@@ -23,7 +22,6 @@ const MembersPage = async ({ params }: { params: { storeId: string } }) => {
 
   const isOwner = !!store
 
-  // If not the owner, check if they have ADMIN role
   if (!store) {
     const userRole = await getUserStoreRole(userId, params.storeId)
 
@@ -32,7 +30,6 @@ const MembersPage = async ({ params }: { params: { storeId: string } }) => {
     }
   }
 
-  // Fetch all store users (members)
   const storeUsers = await prismadb.storeUser.findMany({
     where: {
       storeId: params.storeId,
@@ -45,7 +42,6 @@ const MembersPage = async ({ params }: { params: { storeId: string } }) => {
     },
   })
 
-  // Fetch all pending invitations
   const invitations = await prismadb.invitation.findMany({
     where: {
       storeId: params.storeId,
@@ -56,7 +52,6 @@ const MembersPage = async ({ params }: { params: { storeId: string } }) => {
     },
   })
 
-  // Format members data for the client
   const formattedMembers = storeUsers.map((storeUser) => ({
     id: storeUser.id,
     userId: storeUser.userId,

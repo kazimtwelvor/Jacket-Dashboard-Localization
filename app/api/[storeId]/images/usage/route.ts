@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server"
 import prismadb from "@/lib/prismadb"
 
-// Get usage statistics for images
 export async function GET(req: Request, { params }: { params: { storeId: string } }) {
   try {
     const { storeId } = params
@@ -13,7 +12,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
     }
 
     if (imageId) {
-      // Get products using a specific image
       const productImages = await prismadb.productImage.findMany({
         where: {
           imageId: imageId,
@@ -34,7 +32,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
         products: productImages.map((pi) => pi.product),
       })
     } else {
-      // Get usage counts for all images
       const imageCounts = await prismadb.$queryRaw`
         SELECT i.id, i.url, COUNT(pi.imageId) as usageCount
         FROM "Image" i

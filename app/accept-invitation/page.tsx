@@ -1,233 +1,3 @@
-// // "use client"
-
-// // import type React from "react"
-
-// // import { useState } from "react"
-// // import { useRouter } from "next/navigation"
-// // import { useUser } from "@clerk/nextjs"
-// // import { toast } from "react-hot-toast"
-
-// // import { Button } from "@/components/ui/button"
-// // import { Input } from "@/components/ui/input"
-// // import { Heading } from "@/components/ui/heading"
-// // import { Separator } from "@/components/ui/separator"
-
-// // export default function AcceptInvitationPage() {
-// //   const router = useRouter()
-// //   const { user, isLoaded } = useUser()
-// //   const [token, setToken] = useState("")
-// //   const [loading, setLoading] = useState(false)
-
-// //   const onSubmit = async (e: React.FormEvent) => {
-// //     e.preventDefault()
-
-// //     if (!token.trim()) {
-// //       toast.error("Please enter an invitation token")
-// //       return
-// //     }
-
-// //     try {
-// //       setLoading(true)
-
-// //       const response = await fetch("/api/invitations/accept", {
-// //         method: "POST",
-// //         headers: {
-// //           "Content-Type": "application/json",
-// //         },
-// //         body: JSON.stringify({ token }),
-// //       })
-
-// //       const data = await response.json()
-
-// //       if (!response.ok) {
-// //         throw new Error(data.message || "Failed to accept invitation")
-// //       }
-
-// //       toast.success("Invitation accepted successfully")
-// //       router.push(`/${data.storeId}`)
-// //       router.refresh()
-// //     } catch (error: any) {
-// //       toast.error(error.message || "Something went wrong")
-// //     } finally {
-// //       setLoading(false)
-// //     }
-// //   }
-
-// //   if (!isLoaded) {
-// //     return <div className="flex items-center justify-center h-screen">Loading...</div>
-// //   }
-
-// //   if (!user) {
-// //     return (
-// //       <div className="flex flex-col items-center justify-center h-screen">
-// //         <Heading title="Sign In Required" description="Please sign in to accept an invitation" />
-// //         <Button className="mt-4" onClick={() => router.push("/sign-in")}>
-// //           Sign In
-// //         </Button>
-// //       </div>
-// //     )
-// //   }
-
-// //   return (
-// //     <div className="flex flex-col items-center justify-center h-screen p-4">
-// //       <div className="w-full max-w-md space-y-4">
-// //         <Heading title="Accept Invitation" description="Enter your invitation token to join a store" />
-// //         <Separator />
-
-// //         <div className="space-y-4">
-// //           <div>
-// //             <p className="text-sm text-muted-foreground mb-2">
-// //               Signed in as: <span className="font-medium">{user.primaryEmailAddress?.emailAddress}</span>
-// //             </p>
-// //             <p className="text-sm text-muted-foreground">
-// //               Make sure you're signed in with the email address that received the invitation.
-// //             </p>
-// //           </div>
-
-// //           <form onSubmit={onSubmit} className="space-y-4">
-// //             <Input
-// //               placeholder="Enter invitation token"
-// //               value={token}
-// //               onChange={(e) => setToken(e.target.value)}
-// //               disabled={loading}
-// //             />
-// //             <Button type="submit" className="w-full" disabled={loading}>
-// //               {loading ? "Processing..." : "Accept Invitation"}
-// //             </Button>
-// //           </form>
-// //         </div>
-// //       </div>
-// //     </div>
-// //   )
-// // }
-
-// "use client"
-
-// import type React from "react"
-
-// import { useState, useEffect } from "react"
-// import { useRouter, useSearchParams } from "next/navigation"
-// import { useUser } from "@clerk/nextjs"
-// import { toast } from "react-hot-toast"
-
-// import { Button } from "@/components/ui/button"
-// import { Input } from "@/components/ui/input"
-// import { Heading } from "@/components/ui/heading"
-// import { Separator } from "@/components/ui/separator"
-
-// export default function AcceptInvitationPage() {
-//   const router = useRouter()
-//   const searchParams = useSearchParams()
-//   const { user, isLoaded } = useUser()
-//   const [token, setToken] = useState("")
-//   const [loading, setLoading] = useState(false)
-//   const [processingToken, setProcessingToken] = useState(false)
-
-//   // Get token from URL if available
-//   useEffect(() => {
-//     const tokenFromUrl = searchParams?.get("token")
-//     if (tokenFromUrl) {
-//       setToken(tokenFromUrl)
-//       // Auto-submit if we have a token and user is loaded
-//       if (isLoaded && user) {
-//         handleSubmitToken(tokenFromUrl)
-//       }
-//     }
-//   }, [searchParams, isLoaded, user])
-
-//   const handleSubmitToken = async (tokenToSubmit: string) => {
-//     if (!tokenToSubmit.trim()) {
-//       toast.error("Please enter an invitation token")
-//       return
-//     }
-
-//     if (processingToken) return // Prevent multiple submissions
-
-//     try {
-//       setProcessingToken(true)
-//       setLoading(true)
-
-//       const response = await fetch("/api/invitations/accept", {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify({ token: tokenToSubmit }),
-//       })
-
-//       const data = await response.json()
-
-//       if (!response.ok) {
-//         throw new Error(data.message || "Failed to accept invitation")
-//       }
-
-//       toast.success("Invitation accepted successfully")
-
-//       // Use a slight delay before redirecting to ensure toast is shown
-//       setTimeout(() => {
-//         router.push(`/${data.storeId}`)
-//         router.refresh()
-//       }, 1000)
-//     } catch (error: any) {
-//       toast.error(error.message || "Something went wrong")
-//     } finally {
-//       setLoading(false)
-//       setProcessingToken(false)
-//     }
-//   }
-
-//   const onSubmit = async (e: React.FormEvent) => {
-//     e.preventDefault()
-//     await handleSubmitToken(token)
-//   }
-
-//   if (!isLoaded) {
-//     return <div className="flex items-center justify-center h-screen">Loading...</div>
-//   }
-
-//   if (!user) {
-//     return (
-//       <div className="flex flex-col items-center justify-center h-screen">
-//         <Heading title="Sign In Required" description="Please sign in to accept an invitation" />
-//         <Button className="mt-4" onClick={() => router.push("/sign-in")}>
-//           Sign In
-//         </Button>
-//       </div>
-//     )
-//   }
-
-//   return (
-//     <div className="flex flex-col items-center justify-center h-screen p-4">
-//       <div className="w-full max-w-md space-y-4">
-//         <Heading title="Accept Invitation" description="Enter your invitation token to join a store" />
-//         <Separator />
-
-//         <div className="space-y-4">
-//           <div>
-//             <p className="text-sm text-muted-foreground mb-2">
-//               Signed in as: <span className="font-medium">{user.primaryEmailAddress?.emailAddress}</span>
-//             </p>
-//             <p className="text-sm text-muted-foreground">
-//               Make sure you're signed in with the email address that received the invitation.
-//             </p>
-//           </div>
-
-//           <form onSubmit={onSubmit} className="space-y-4">
-//             <Input
-//               placeholder="Enter invitation token"
-//               value={token}
-//               onChange={(e) => setToken(e.target.value)}
-//               disabled={loading}
-//             />
-//             <Button type="submit" className="w-full" disabled={loading}>
-//               {loading ? "Processing..." : "Accept Invitation"}
-//             </Button>
-//           </form>
-//         </div>
-//       </div>
-//     </div>
-//   )
-// }
 
 "use client"
 
@@ -258,12 +28,10 @@ export default function AcceptInvitationPage() {
     setMounted(true)
   }, [])
 
-  // Get token from URL if available
   useEffect(() => {
     const tokenFromUrl = searchParams?.get("token")
     if (tokenFromUrl) {
       setToken(tokenFromUrl)
-      // Auto-submit if we have a token and user is loaded
       if (isLoaded && user) {
         handleSubmitToken(tokenFromUrl)
       }
@@ -276,7 +44,7 @@ export default function AcceptInvitationPage() {
       return
     }
 
-    if (processingToken) return // Prevent multiple submissions
+    if (processingToken) return 
 
     try {
       setProcessingToken(true)
@@ -298,7 +66,6 @@ export default function AcceptInvitationPage() {
 
       toast.success("Invitation accepted successfully")
 
-      // Use a slight delay before redirecting to ensure toast is shown
       setTimeout(() => {
         router.push(`/${data.storeId}`)
         router.refresh()
@@ -338,13 +105,11 @@ export default function AcceptInvitationPage() {
   if (!user) {
     return (
       <div className="min-h-screen bg-[#0a1122] flex items-center justify-center p-4 relative overflow-hidden">
-        {/* Background elements */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#0a1122] via-[#0c1529] to-[#0a1122] opacity-80"></div>
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
           <div className="absolute top-10 left-10 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl"></div>
           <div className="absolute bottom-10 right-10 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl"></div>
 
-          {/* Animated stars */}
           {[...Array(20)].map((_, i) => (
             <motion.div
               key={i}
@@ -400,16 +165,11 @@ export default function AcceptInvitationPage() {
 
   return (
     <div className="min-h-screen bg-[#0a1122] flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Animated background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#0a1122] via-[#0c1529] to-[#0a1122] opacity-80"></div>
-
-      {/* Decorative elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-10 left-10 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl"></div>
         <div className="absolute bottom-10 right-10 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl"></div>
         <div className="absolute top-1/2 left-1/4 w-40 h-40 bg-indigo-400/5 rounded-full blur-3xl"></div>
-
-        {/* Animated particles */}
         <div className="stars">
           {[...Array(30)].map((_, i) => (
             <motion.div
@@ -434,8 +194,6 @@ export default function AcceptInvitationPage() {
             />
           ))}
         </div>
-
-        {/* Floating elements */}
         <motion.div
           className="absolute top-20 right-[20%] w-12 h-12 rounded-full bg-blue-500/5 backdrop-blur-md"
           animate={{

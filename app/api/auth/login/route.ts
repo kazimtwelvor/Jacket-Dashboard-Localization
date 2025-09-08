@@ -35,7 +35,6 @@ export async function POST(req: Request) {
 
     const { email, password, storeId, recaptchaToken } = validationResult.data
 
-    // Check if store exists
     const storeExists = await prismadb.store.findUnique({
       where: { id: storeId },
     })
@@ -47,7 +46,6 @@ export async function POST(req: Request) {
       })
     }
 
-    // Check if reCAPTCHA is enabled for this store
     const recaptchaSettings = await prismadb.recaptchaSettings.findFirst({
       where: { storeId, enabled: true, enabledOnLogin: true },
     })
@@ -80,7 +78,6 @@ export async function POST(req: Request) {
       }
     }
 
-    // Find user by email and store
     const user = await prismadb.storeUser.findFirst({
       where: {
         email,
@@ -148,7 +145,6 @@ export async function POST(req: Request) {
   }
 }
 
-// Handle preflight requests
 export async function OPTIONS() {
   return new NextResponse(null, {
     status: 204,

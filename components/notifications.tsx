@@ -9,7 +9,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 export const Notifications = () => {
   const [isOpen, setIsOpen] = useState(false)
 
-  // This would typically come from an API or real-time service
   const notifications = [
     {
       id: "1",

@@ -112,10 +112,9 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
             buttonLink: step.buttonLink || "",
           }
 
-          const problematicSteps = [7, 8, 9, 10, 11, 12, 15, 16, 17] // 0-indexed
+          const problematicSteps = [7, 8, 9, 10, 11, 12, 15, 16, 17] 
 
           if (Array.isArray(step.images)) {
-            // Filter out invalid image URLs
             processedStep.images = step.images.map((img: string) => {
               if (img && img !== "undefined" && !img.startsWith("guideContent.steps.")) {
                 return img
@@ -130,7 +129,7 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
           }
 
           switch (index) {
-            case 7: // Step 8 - Content Distribution
+            case 7: 
               processedStep.cardTitles = step.cardTitles || ["Social Media", "Email Marketing", "Content Syndication"]
               processedStep.cardDescriptions = step.cardDescriptions || [
                 "Reach your audience where they are",
@@ -138,12 +137,12 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
                 "Expand your reach",
               ]
               break
-            case 8: // Step 9 - Video Marketing
+            case 8: 
               if (!processedStep.image && processedStep.images && processedStep.images[0]) {
                 processedStep.image = processedStep.images[0]
               }
               break
-            case 9: // Step 10 - Interactive Content
+            case 9:
               processedStep.cardTitles = step.cardTitles || [
                 "Interactive Quizzes",
                 "ROI Calculators",
@@ -155,12 +154,12 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
                 "Visualize complex data",
               ]
               break
-            case 10: // Step 11 - Content Personalization
+            case 10: 
               if (!processedStep.image && processedStep.images && processedStep.images[0]) {
                 processedStep.image = processedStep.images[0]
               }
               break
-            case 11: // Step 12 - Visual Storytelling
+            case 11: 
               processedStep.imageLabels = step.imageLabels || [
                 "Brand Storytelling",
                 "Data Visualization",
@@ -169,14 +168,14 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
                 "Photography",
               ]
               break
-            case 12: // Step 13 - Content Optimization
+            case 12: 
               processedStep.cardTitles = step.cardTitles || ["Before Optimization", "After Optimization"]
               processedStep.metrics = step.metrics || {
                 before: ["Low engagement rate (1.2%)", "High bounce rate (78%)", "Poor conversion (0.5%)"],
                 after: ["High engagement rate (4.8%)", "Low bounce rate (32%)", "Strong conversion (2.7%)"],
               }
               break
-            case 15: // Step 16 - Content Localization
+            case 15:
               processedStep.timelineItems = step.timelineItems || [
                 {
                   title: "Market Research",
@@ -195,13 +194,13 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
                 },
               ]
               break
-            case 16: // Step 17 - Analytics Dashboard
+            case 16: 
               processedStep.metrics = step.metrics || {
                 titles: ["Traffic", "Engagement", "Conversions"],
                 values: ["+24%", "+18%", "+32%"],
               }
               break
-            case 17: // Step 18 - Content Showcase
+            case 17: 
               processedStep.imageLabels = step.imageLabels || [
                 "E-commerce Content Strategy",
                 "SaaS Blog Strategy",

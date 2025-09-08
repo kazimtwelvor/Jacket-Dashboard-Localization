@@ -16,9 +16,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
     const skip = (page - 1) * limit
 
     const isAdmin = searchParams.get("admin") === "true"
-    
-
-
     const colors = searchParams.get("colors")
     const materials = searchParams.get("materials")
     const styles = searchParams.get("styles")

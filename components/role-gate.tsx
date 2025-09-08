@@ -20,10 +20,8 @@ export function RoleGate({ children, allowedRoles }: RoleGateProps) {
       return
     }
 
-    // Get user role from session claims
     const userRole = sessionClaims?.metadata?.role as string | undefined
 
-    // Check if user has an allowed role
     if (userRole && allowedRoles.includes(userRole)) {
       setCanAccess(true)
     } else {
@@ -31,9 +29,6 @@ export function RoleGate({ children, allowedRoles }: RoleGateProps) {
     }
   }, [isLoaded, userId, sessionClaims, allowedRoles])
 
-  // Don't render anything while loading
   if (!isLoaded) return null
-
-  // Only render children if user has access
   return canAccess ? <>{children}</> : null
 }

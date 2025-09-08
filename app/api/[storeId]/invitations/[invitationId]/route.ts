@@ -11,7 +11,6 @@ export async function DELETE(req: Request, { params }: { params: { storeId: stri
       return new NextResponse("Unauthorized", { status: 401 })
     }
 
-    // Check if store exists and user has access
     const storeByOwner = await prismadb.store.findFirst({
       where: {
         id: params.storeId,
@@ -19,7 +18,6 @@ export async function DELETE(req: Request, { params }: { params: { storeId: stri
       },
     })
 
-    // If not owner, check if user is an admin member
     const storeMember = !storeByOwner
       ? await prismadb.storeMember.findFirst({
           where: {
@@ -33,8 +31,6 @@ export async function DELETE(req: Request, { params }: { params: { storeId: stri
     if (!storeByOwner && !storeMember) {
       return new NextResponse("Unauthorized", { status: 403 })
     }
-
-    // Check if invitation exists
     const invitation = await prismadb.invitation.findUnique({
       where: {
         id: params.invitationId,
@@ -45,8 +41,6 @@ export async function DELETE(req: Request, { params }: { params: { storeId: stri
     if (!invitation) {
       return new NextResponse("Invitation not found", { status: 404 })
     }
-
-    // Delete the invitation
     await prismadb.invitation.delete({
       where: {
         id: params.invitationId,

@@ -4,7 +4,6 @@ import { NextResponse } from "next/server"
 import { checkRole } from "@/utils/roles"
 import { clerkClient } from "@clerk/nextjs/server"
 
-// GET all members of a store
 export async function GET(req: Request, { params }: { params: { storeId: string } }) {
   try {
     const { userId } = await auth()
@@ -15,7 +14,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
 
     const { storeId } = params
 
-    // Check if user is a member of the store or an admin
     const isAdmin = await checkRole("admin")
     const isMember = await prismadb.storeMember.findFirst({
       where: {
@@ -28,7 +26,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       return new NextResponse("Unauthorized", { status: 403 })
     }
 
-    // Get all members of the store
     const members = await prismadb.storeMember.findMany({
       where: {
         storeId,
@@ -38,12 +35,10 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       },
     })
 
-    // Get user details from Clerk for each member
     const client = await clerkClient()
     const userIds = members.map((member) => member.userId)
     const users = await client.users.getUserList({ userId: userIds })
 
-    // Combine member data with user data
     const membersWithUserData = members.map((member) => {
       const user = users.find((u) => u.id === member.userId)
       return {
@@ -66,7 +61,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
   }
 }
 
-// POST to add a new member to a store
 export async function POST(req: Request, { params }: { params: { storeId: string } }) {
   try {
     const { userId } = await auth()
@@ -86,7 +80,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       return new NextResponse("Role is required", { status: 400 })
     }
 
-    // Check if user is a manager of the store or an admin
     const isAdmin = await checkRole("admin")
     const isManager = await prismadb.storeMember.findFirst({
       where: {
@@ -100,14 +93,12 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       return new NextResponse("Only store managers or admins can add members", { status: 403 })
     }
 
-    // Find the user by email
     const client = await clerkClient()
     const users = await client.users.getUserList({
       emailAddress: [email],
     })
 
     if (users.length === 0) {
-      // User not found, create an invitation
       const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
       const expires = new Date()
       expires.setDate(expires.getDate() + 7) // Expires in 7 days
@@ -122,14 +113,11 @@ export async function POST(req: Request, { params }: { params: { storeId: string
         },
       })
 
-      // TODO: Send invitation email
-
       return NextResponse.json({ invitation, status: "invited" })
     }
 
     const userToAdd = users[0]
 
-    // Check if user is already a member
     const existingMember = await prismadb.storeMember.findFirst({
       where: {
         storeId,
@@ -141,7 +129,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       return new NextResponse("User is already a member of this store", { status: 400 })
     }
 
-    // Add user as a member
     const member = await prismadb.storeMember.create({
       data: {
         storeId,

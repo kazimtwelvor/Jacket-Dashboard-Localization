@@ -58,7 +58,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       }
     })
     
-    console.log(`Retrieved ${allProducts.length} products before additional filtering (trash: ${trash})`)
     
     let filteredProducts = [...allProducts]
     

@@ -239,12 +239,12 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
         </CardContent>
       </Card>
 
-      <div className="rounded-lg border-2 border-primary/10 p-6 bg-gradient-to-r from-white to-primary/5">
+      <div className="rounded-lg border-2 border-primary/10 p-6 bg-gradient-to-r from-background to-primary/5 dark:from-background dark:to-primary/10">
         <div className="flex items-center gap-2 mb-4">
-          <h3 className="text-lg font-bold">
+          <h3 className="text-lg font-bold text-foreground">
             Product Specifications <span className="text-red-500">*</span>
           </h3>
-          <Badge variant="outline" className="font-normal">
+          <Badge variant="outline" className="font-normal bg-background text-foreground border-border">
             Step 2
           </Badge>
         </div>
@@ -255,7 +255,7 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
           render={() => (
             <FormItem>
               <div className="grid md:grid-cols-2 gap-6">
-                <div className="rounded-lg border p-6 max-h-[600px] overflow-y-auto bg-white">
+                <div className="rounded-lg border p-6 max-h-[600px] overflow-y-auto bg-card">
                   <div className="mb-6">
                     <h4 className="text-sm font-medium mb-3 flex items-center">
                       External Material
@@ -422,7 +422,7 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
                       Auto-formatted
                     </Badge>
                   </div>
-                  <div className="border rounded-md p-4 bg-white min-h-[600px] whitespace-pre-line">
+                  <div className="border rounded-md p-4 bg-card min-h-[600px] whitespace-pre-line text-foreground">
                     {getFormattedSpecifications()}
                   </div>
                 </div>

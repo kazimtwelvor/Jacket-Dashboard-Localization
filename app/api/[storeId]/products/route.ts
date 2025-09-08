@@ -19,23 +19,20 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
     // Check if this is an admin request
     const isAdmin = searchParams.get("admin") === "true"
     
-    // Build the base where clause
-    const baseWhereClause = {
-      storeId: storeId,
-      isDeleted: false,
-      // For admin requests, show all products; for public, only published
-      ...(isAdmin ? {} : { isPublished: true, isArchived: false }),
-    }
-
-    // Get filter parameters
     const colors = searchParams.get("colors")
     const materials = searchParams.get("materials")
     const styles = searchParams.get("styles")
     const genders = searchParams.get("genders")
+    const search = searchParams.get("search")
+    const trash = searchParams.get("trash") === "true"
     
-    console.log("Requested filters:", { colors, materials, styles, genders })
+    const baseWhereClause = {
+      storeId: storeId,
+      ...(trash ? { isDeleted: true } : { isDeleted: false }),
+      ...(isAdmin ? {} : { isPublished: true, isArchived: false }),
+    }
     
-    // Get all products with full data
+    
     const allProducts = await prismadb.product.findMany({
       where: baseWhereClause,
       include: {
@@ -61,19 +58,112 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       }
     })
     
-    console.log(`Retrieved ${allProducts.length} published products before additional filtering`)
+    console.log(`Retrieved ${allProducts.length} products before additional filtering (trash: ${trash})`)
     
-    // Filter products manually based on the query parameters
     let filteredProducts = [...allProducts]
     
-    // Filter by colors if specified
+    if (search && search.trim()) {
+      const searchLower = search.toLowerCase().trim()
+      filteredProducts = filteredProducts.filter(product => {
+        const nameMatch = product.name.toLowerCase().includes(searchLower)
+        const skuMatch = product.sku?.toLowerCase().includes(searchLower) || false
+        const descriptionMatch = product.description?.toLowerCase().includes(searchLower) || false
+        
+        const createdByNameMatch = product.createdByName?.toLowerCase().includes(searchLower) || false
+        const updatedByNameMatch = product.updatedByName?.toLowerCase().includes(searchLower) || false
+        
+        const priceMatch = product.price.toString().includes(searchLower)
+        const salePriceMatch = product.salePrice?.toString().includes(searchLower) || false
+        
+        const stockStatusMatch = product.stockStatus?.toLowerCase().includes(searchLower) || false
+        
+        let categoryMatch = false
+        if (product.categoryData) {
+          let categoryData = product.categoryData
+          if (typeof categoryData === 'string') {
+            try {
+              categoryData = JSON.parse(categoryData)
+            } catch (e) {
+            }
+          }
+          if (typeof categoryData === 'object' && categoryData !== null) {
+            const material = (categoryData as any).material?.toString().toLowerCase() || ''
+            const style = (categoryData as any).style?.toString().toLowerCase() || ''
+            const gender = (categoryData as any).gender?.toString().toLowerCase() || ''
+            categoryMatch = material.includes(searchLower) || style.includes(searchLower) || gender.includes(searchLower)
+          }
+        }
+        
+        let colorsMatch = false
+        if (product.colorDetails) {
+          let colorData = product.colorDetails
+          if (typeof colorData === 'string') {
+            try {
+              colorData = JSON.parse(colorData)
+            } catch (e) {
+            }
+          }
+          if (Array.isArray(colorData)) {
+            colorsMatch = colorData.some(color => 
+              color && typeof color === 'object' && color !== null && 'name' in color && 
+              typeof color.name === 'string' && color.name.toLowerCase().includes(searchLower)
+            )
+          }
+        }
+        
+        let sizesMatch = false
+        if (product.sizeDetails) {
+          let sizeData = product.sizeDetails
+          if (typeof sizeData === 'string') {
+            try {
+              sizeData = JSON.parse(sizeData)
+            } catch (e) {
+            }
+          }
+          if (Array.isArray(sizeData)) {
+            sizesMatch = sizeData.some(size => 
+              size && typeof size === 'object' && size !== null && 'name' in size && 
+              typeof size.name === 'string' && size.name.toLowerCase().includes(searchLower)
+            )
+          }
+        }
+        
+        const statusMatch = 
+          (product.isPublished && 'published'.includes(searchLower)) ||
+          (product.isArchived && 'archived'.includes(searchLower)) ||
+          (product.isFeatured && 'featured'.includes(searchLower))
+        
+        const deletedAtMatch = trash && product.deletedAt ? 
+          new Date(product.deletedAt).toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          }).toLowerCase().includes(searchLower) : false
+        
+        return (
+          nameMatch ||
+          skuMatch ||
+          descriptionMatch ||
+          createdByNameMatch ||
+          updatedByNameMatch ||
+          priceMatch ||
+          salePriceMatch ||
+          stockStatusMatch ||
+          categoryMatch ||
+          colorsMatch ||
+          sizesMatch ||
+          statusMatch ||
+          deletedAtMatch
+        )
+      })
+      
+    }
+    
     if (colors) {
       const colorsList = colors.toLowerCase().split(',')
       filteredProducts = filteredProducts.filter(product => {
-        // Skip products without colorDetails
         if (!product.colorDetails) return false
         
-        // Parse colorDetails if it's a string
         let colorData = product.colorDetails
         if (typeof colorData === 'string') {
           try {
@@ -83,10 +173,10 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
           }
         }
         
-        // Check if any color matches
         if (Array.isArray(colorData)) {
           return colorData.some(color => 
-            color && color.name && colorsList.includes(color.name.toLowerCase())
+            color && typeof color === 'object' && color !== null && 'name' in color && 
+            typeof color.name === 'string' && colorsList.includes(color.name.toLowerCase())
           )
         }
         
@@ -96,7 +186,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       console.log(`After color filtering: ${filteredProducts.length} products`)
     }
     
-    // Filter by materials if specified
     if (materials) {
       const materialsList = materials.toLowerCase().split(',')
       filteredProducts = filteredProducts.filter(product => {
@@ -111,16 +200,15 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
           }
         }
         
-        const productMaterial = categoryData.material
+        const productMaterial = (categoryData as any).material
         if (!productMaterial) return false
         
-        return materialsList.includes(productMaterial.toLowerCase())
+        return materialsList.includes(productMaterial.toString().toLowerCase())
       })
       
       console.log(`After material filtering: ${filteredProducts.length} products`)
     }
     
-    // Filter by styles if specified
     if (styles) {
       const stylesList = styles.toLowerCase().split(',')
       filteredProducts = filteredProducts.filter(product => {
@@ -135,16 +223,15 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
           }
         }
         
-        const productStyle = categoryData.style
+        const productStyle = (categoryData as any).style
         if (!productStyle) return false
         
-        return stylesList.includes(productStyle.toLowerCase())
+        return stylesList.includes(productStyle.toString().toLowerCase())
       })
       
       console.log(`After style filtering: ${filteredProducts.length} products`)
     }
     
-    // Filter by genders if specified
     if (genders) {
       const gendersList = genders.toLowerCase().split(',')
       filteredProducts = filteredProducts.filter(product => {
@@ -159,20 +246,18 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
           }
         }
         
-        const productGender = categoryData.gender
+        const productGender = (categoryData as any).gender
         if (!productGender) return false
         
-        return gendersList.includes(productGender.toLowerCase())
+        return gendersList.includes(productGender.toString().toLowerCase())
       })
       
       console.log(`After gender filtering: ${filteredProducts.length} products`)
     }
     
-    // Apply pagination
     const totalProducts = filteredProducts.length
     const paginatedProducts = filteredProducts.slice(skip, skip + limit)
     
-    // Format the response with full product data
     const serializedProducts = paginatedProducts.map(product => ({
       ...product,
       price: product.price.toString(),
@@ -197,7 +282,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       })),
     }))
 
-    // Calculate pagination info
     const totalPages = Math.ceil(totalProducts / limit)
     const hasNextPage = page < totalPages
     const hasPreviousPage = page > 1
@@ -215,6 +299,7 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
     })
   } catch (err) {
     console.error(`[PRODUCTS_GET] Error:`, err)
-    return new NextResponse(`Internal error: ${err.message}`, { status: 500, headers: corsHeaders })
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred'
+    return new NextResponse(`Internal error: ${errorMessage}`, { status: 500, headers: corsHeaders })
   }
 }

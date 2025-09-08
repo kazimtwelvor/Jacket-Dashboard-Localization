@@ -58,7 +58,6 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
   const [editorMode, setEditorMode] = useState<string>("visual")
   const [validationMessage, setValidationMessage] = useState<string>("")
 
-  // Schema type descriptions
   const schemaTypeDescriptions = {
     Product: "Provides detailed product information to search engines",
     FAQPage: "Displays frequently asked questions in search results",
@@ -88,10 +87,14 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
       setSchemaData(initialSchema)
     }
     else {
-      const timer = setTimeout(() => generateSchema(), 0)
+      const timer = setTimeout(() => {
+        if (selectedTemplate && typeof selectedTemplate === 'string') {
+          generateSchema()
+        }
+      }, 0)
       return () => clearTimeout(timer)
     }
-  }, [initialSchema, schemaType])
+  }, [initialSchema, schemaType, selectedTemplate])
 
   const safelyUpdateSchemaData = (newSchema: string) => {
     setSchemaData(newSchema)
@@ -111,8 +114,10 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
 
   const generateSchema = () => {
     let schema = {}
+    
+    const templateType = typeof selectedTemplate === 'string' ? selectedTemplate : 'Product'
 
-    switch (selectedTemplate) {
+    switch (templateType) {
       case "Product":
         schema = generateProductSchema()
         break
@@ -142,8 +147,9 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
     }
 
     if (schema && typeof schema === "object") {
-      (schema as any)["@type"] = selectedTemplate
-      (schema as any).templateName = selectedTemplate
+      const schemaObj = schema as Record<string, any>
+      schemaObj["@type"] = templateType
+      schemaObj.templateName = templateType
     }
 
     const formattedSchema = JSON.stringify(schema, null, 2)
@@ -153,16 +159,13 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
 
   }
 
-  // Generate Product schema
   const generateProductSchema = () => {
-    // Safely access images with fallbacks
     const images = Array.isArray(productData.images)
       ? productData.images.map((img) => (typeof img === "object" && img.url ? img.url : img)).filter(Boolean)
       : []
 
     const mainImage = productData.mainImage || (images.length > 0 ? images[0] : "")
 
-    // Get current form values from the product data
     const name = productData.name || ""
     const description = stripHtmlTags(productData.description || "")
     const sku = productData.sku || ""
@@ -381,7 +384,6 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
 
   const validateSchema = () => {
     try {
-      // Don't validate empty data
       if (!schemaData.trim()) {
         setIsValid(false)
         setValidationMessage("Schema is empty")

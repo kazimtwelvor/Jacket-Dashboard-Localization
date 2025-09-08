@@ -619,7 +619,7 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
                 <Button
                   type="button"
                   variant="outline"
-                  className="flex items-center gap-2 text-red-600 border-red-200 hover:bg-red-50"
+                  className="flex items-center gap-2 text-red-600 border-red-200 hover:bg-red-50 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-950"
                   onClick={removeAllImages}
                 >
                   <ImageIcon className="h-5 w-5" />

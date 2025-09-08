@@ -432,7 +432,7 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
 
       return (
         <div className="space-y-4">
-          <div className="p-4 border rounded-md bg-white">
+          <div className="p-4 border rounded-md bg-background dark:bg-gray-800">
             <h3 className="font-medium mb-2">Schema Type: {schema["@type"]}</h3>
 
             {schema["@type"] === "Product" && (
@@ -610,7 +610,7 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
             <SelectItem value="WebPage">Web Page</SelectItem>
           </SelectContent>
         </Select>
-        <p className="text-xs text-muted-foreground">{schemaTypeDescriptions[selectedTemplate as keyof typeof schemaTypeDescriptions]}</p>
+        <p className="text-xs text-gray-600 dark:text-gray-300">{schemaTypeDescriptions[selectedTemplate as keyof typeof schemaTypeDescriptions]}</p>
       </div>
 
       {/* Editor Tabs */}
@@ -669,7 +669,7 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
         </TabsContent>
       </Tabs>
 
-      <div className="text-xs text-muted-foreground bg-muted/30 p-2 rounded">
+      <div className="text-xs text-gray-600 dark:text-gray-300 bg-muted/30 p-2 rounded">
         <p>
           <strong>Tip:</strong> You can switch between visual and code views to edit your schema. The visual view shows
           a simplified preview, while the code view allows direct JSON editing.

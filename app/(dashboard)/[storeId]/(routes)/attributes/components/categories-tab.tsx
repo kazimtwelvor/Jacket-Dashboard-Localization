@@ -97,16 +97,16 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({ data }) => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card
-          className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:shadow-md transition-all cursor-pointer"
+          className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200 dark:border-blue-700 hover:shadow-md transition-all cursor-pointer"
           onClick={() => setCategoryType(categoryType === "material" ? "all" : "material")}
         >
           <CardContent className="p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="bg-blue-100 p-2 rounded-full">
-                <Palette className="h-5 w-5 text-blue-600" />
+              <div className="bg-blue-100 dark:bg-blue-800 p-2 rounded-full">
+                <Palette className="h-5 w-5 text-blue-600 dark:text-blue-300" />
               </div>
               <div>
-                <h3 className="font-medium">Material</h3>
+                <h3 className="font-medium text-gray-900 dark:text-gray-100">Material</h3>
                 <p className="text-xs text-muted-foreground">Cotton, wool, leather, etc.</p>
               </div>
             </div>
@@ -120,16 +120,16 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({ data }) => {
         </Card>
 
         <Card
-          className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:shadow-md transition-all cursor-pointer"
+          className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 border-purple-200 dark:border-purple-700 hover:shadow-md transition-all cursor-pointer"
           onClick={() => setCategoryType(categoryType === "style" ? "all" : "style")}
         >
           <CardContent className="p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="bg-purple-100 p-2 rounded-full">
-                <Tag className="h-5 w-5 text-purple-600" />
+              <div className="bg-purple-100 dark:bg-purple-800 p-2 rounded-full">
+                <Tag className="h-5 w-5 text-purple-600 dark:text-purple-300" />
               </div>
               <div>
-                <h3 className="font-medium">Style</h3>
+                <h3 className="font-medium text-gray-900 dark:text-gray-100">Style</h3>
                 <p className="text-xs text-muted-foreground">Casual, formal, sporty, etc.</p>
               </div>
             </div>
@@ -143,16 +143,16 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({ data }) => {
         </Card>
 
         <Card
-          className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:shadow-md transition-all cursor-pointer"
+          className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-green-200 dark:border-green-700 hover:shadow-md transition-all cursor-pointer"
           onClick={() => setCategoryType(categoryType === "gender" ? "all" : "gender")}
         >
           <CardContent className="p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="bg-green-100 p-2 rounded-full">
-                <Shirt className="h-5 w-5 text-green-600" />
+              <div className="bg-green-100 dark:bg-green-800 p-2 rounded-full">
+                <Shirt className="h-5 w-5 text-green-600 dark:text-green-300" />
               </div>
               <div>
-                <h3 className="font-medium">Gender</h3>
+                <h3 className="font-medium text-gray-900 dark:text-gray-100">Gender</h3>
                 <p className="text-xs text-muted-foreground">Men, women, unisex, etc.</p>
               </div>
             </div>

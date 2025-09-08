@@ -12,7 +12,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       return NextResponse.json({ success: false, error: "Token is required" }, { status: 400 })
     }
 
-    // Get reCAPTCHA settings from database
     const recaptchaSettings = await prismadb.recaptchaSettings.findFirst({
       where: {
         storeId,
@@ -27,7 +26,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       return NextResponse.json({ success: true })
     }
 
-    // Verify the token based on the reCAPTCHA version
     let isValid = false
     if (recaptchaSettings.version === "v3") {
       isValid = await verifyRecaptchaV3(token, recaptchaSettings.secretKey, recaptchaSettings.threshold || 0.5)

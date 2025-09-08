@@ -19,11 +19,9 @@ export function RoleFilter() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  // Get current role filter
   const role = searchParams.get("role")
   const view = searchParams.get("view") || "grid"
 
-  // Create a new search params object and merge with existing
   const createQueryString = useCallback(
     (name: string, value: string) => {
       const params = new URLSearchParams(searchParams.toString())
@@ -39,14 +37,11 @@ export function RoleFilter() {
     [searchParams],
   )
 
-  // Handle role selection
   const handleRoleSelect = (selectedRole: string) => {
-    // If clicking the already selected role, clear the filter
     const newRole = role === selectedRole ? "" : selectedRole
     router.push(`/admin?${createQueryString("role", newRole)}`)
   }
 
-  // Get active filter label and icon
   const getActiveFilterInfo = () => {
     switch (role) {
       case "super_admin":

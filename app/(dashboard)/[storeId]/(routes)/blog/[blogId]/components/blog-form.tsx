@@ -17,13 +17,11 @@ import { Separator } from "@/components/ui/separator"
 import { Heading } from "@/components/ui/heading"
 import { AlertModal } from "@/components/modals/alert-modal"
 
-// Import our custom components
 import { BlogHeroSection } from "./blog-hero-section"
 import { BlogContentSection } from "./blog-content-section"
 import { BlogSettings } from "./blog-settings"
 import { BlogGuideContent } from "./blog-guide-content"
 
-// Update the form schema to include isActive field for steps and keyTakeaways
 const formSchema = z.object({
   title: z.string().min(1),
   slug: z.string().min(1),
@@ -94,7 +92,7 @@ const formSchema = z.object({
             cardTitles: z.array(z.string()).optional(),
             cardDescriptions: z.array(z.string()).optional(),
             buttonText: z.string().optional(),
-            isActive: z.boolean().default(true), // Add isActive field with default true
+            isActive: z.boolean().default(true), 
             timelineItems: z
               .array(
                 z.object({
@@ -117,7 +115,7 @@ const formSchema = z.object({
       keyTakeaways: z
         .object({
           title: z.string().default("Key Takeaways"),
-          isActive: z.boolean().default(true), // Add isActive field with default true
+          isActive: z.boolean().default(true), 
           whatYouLearned: z
             .object({
               title: z.string().default("What You've Learned"),
@@ -159,7 +157,7 @@ const formSchema = z.object({
         })
         .default({
           title: "Key Takeaways",
-          isActive: true, // Add default value
+          isActive: true,
           whatYouLearned: {
             title: "What You've Learned",
             items: [
@@ -204,7 +202,6 @@ const formSchema = z.object({
 
 type BlogFormValues = z.infer<typeof formSchema>
 
-// Update the BlogFormProps interface to include isActive fields
 interface BlogFormProps {
   initialData: {
     id?: string
@@ -247,7 +244,7 @@ interface BlogFormProps {
         cardTitles?: string[]
         cardDescriptions?: string[]
         buttonText?: string
-        isActive?: boolean // Add isActive field
+        isActive?: boolean
         timelineItems?: {
           title: string
           description: string
@@ -261,7 +258,7 @@ interface BlogFormProps {
       }[]
       keyTakeaways?: {
         title?: string
-        isActive?: boolean // Add isActive field
+        isActive?: boolean
         whatYouLearned?: {
           title?: string
           items?: string[]
@@ -276,7 +273,6 @@ interface BlogFormProps {
   } | null
 }
 
-// Update the BlogForm component to pass the toggle handlers to BlogGuideContent
 export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
   const params = useParams()
   const router = useRouter()
@@ -572,7 +568,6 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
     },
   })
 
-  // Initialize step 6 images array if it doesn't exist
   useEffect(() => {
     const step6 = form.getValues("guideContent.steps.5")
     if (step6 && (!step6.images || !Array.isArray(step6.images))) {
@@ -583,7 +578,6 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
     }
   }, [form])
 
-  // Add a handler for toggle changes
   const handleToggleStep = useCallback(
     (index: number, value: boolean) => {
       const steps = [...form.getValues("guideContent.steps")]
@@ -593,7 +587,6 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
     [form],
   )
 
-  // Handler for key takeaways toggle
   const handleToggleKeyTakeaways = useCallback(
     (value: boolean) => {
       form.setValue("guideContent.keyTakeaways.isActive", value, { shouldValidate: true })
@@ -643,10 +636,8 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
     }
   }
 
-  // Handler for text field changes - completely rewritten to avoid auto-save
   const handleSaveText = useCallback(
     (field: string, value: string) => {
-      // Just update the form value without triggering validation or submission
       form.setValue(field as any, value, {
         shouldValidate: false,
         shouldDirty: false,
@@ -656,16 +647,13 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
     [form],
   )
 
-  // Update the handleSaveImage function to fix the issues with specific steps
   const handleSaveImage = useCallback(
     (field: string, url: string) => {
 
-      // CRITICAL: Validate URL to prevent field paths being saved as URLs
       if (!url) {
         return
       }
 
-      // Check for invalid URLs - field paths, undefined, or non-URL strings
       if (
         url.startsWith("guideContent.") ||
         url === "undefined" ||
@@ -678,10 +666,8 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
       }
 
       try {
-        // Special handling for step 15 (Content Auditing)
         if (field.includes("guideContent.steps.14.images")) {
 
-          // If we're receiving an array directly, use it
           if (Array.isArray(url)) {
             form.setValue("guideContent.steps.14.images", url, {
               shouldValidate: false,
@@ -691,24 +677,19 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
             return
           }
 
-          // Otherwise, extract the index and update the array
           const imageMatch = field.match(/images\.(\d+)/)
           if (imageMatch && imageMatch[1]) {
             const imageIndex = Number.parseInt(imageMatch[1], 10)
 
-            // Get current images array or initialize it
             const currentStep = form.getValues("guideContent.steps.14") || {}
             const currentImages = Array.isArray(currentStep.images) ? [...currentStep.images] : ["", "", "", ""]
 
-            // Ensure the array is large enough
             while (currentImages.length <= imageIndex) {
               currentImages.push("")
             }
 
-            // Update the specific index
             currentImages[imageIndex] = url
 
-            // Update the entire step with the new images array
             const updatedStep = { ...currentStep, images: currentImages }
             form.setValue("guideContent.steps.14", updatedStep, {
               shouldValidate: false,
@@ -730,18 +711,14 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
           if (imageMatch && imageMatch[1]) {
             const imageIndex = Number.parseInt(imageMatch[1], 10)
 
-            // Get current images array or initialize it
             const currentImages = Array.isArray(currentStep.images) ? [...currentStep.images] : []
 
-            // Ensure the array is large enough
             while (currentImages.length <= imageIndex) {
               currentImages.push("")
             }
 
-            // Update the specific index
             currentImages[imageIndex] = url
 
-            // Update the entire step with the new images array
             const updatedStep = { ...currentStep, images: currentImages }
             form.setValue(currentStepPath as any, updatedStep, {
               shouldValidate: false,
@@ -749,7 +726,6 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
               shouldTouch: true,
             })
           }
-          // Handle single image field
           else if (field.includes(".image")) {
             const updatedStep = { ...currentStep, image: url }
             form.setValue(currentStepPath as any, updatedStep, {
@@ -758,7 +734,6 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
               shouldTouch: true,
             })
           }
-          // Fallback for any other field
           else {
             form.setValue(field as any, url, {
               shouldValidate: false,
@@ -767,7 +742,6 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
             })
           }
         }
-        // Handle non-step fields
         else {
           form.setValue(field as any, url, {
             shouldValidate: false,
@@ -783,7 +757,6 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
     [form],
   )
 
-  // Handler for publish status change
   const handlePublishChange = useCallback(
     (value: boolean) => {
       form.setValue("isPublished", value, {
@@ -795,13 +768,11 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
     [form],
   )
 
-  // Manual save button handler
   const handleManualSave = async () => {
     try {
       setLoading(true)
       const data = form.getValues()
 
-      // Log the specific step 15 data
       if (data.guideContent?.steps?.[14]) {
         console.log("Step 15 data before save:", {
           title: data.guideContent.steps[14].title,
@@ -848,14 +819,12 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
       <Form {...form}>
         <form
           onSubmit={(e) => {
-            // Always prevent default form submission
             e.preventDefault()
             e.stopPropagation()
             return false
           }}
           className="space-y-8 w-full mt-6"
         >
-          {/* Settings Section */}
           <BlogSettings
             slug={form.watch("slug")}
             isPublished={form.watch("isPublished")}
@@ -865,14 +834,12 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
             onPublishChange={handlePublishChange}
           />
 
-          {/* Live Editor */}
           <div className="border rounded-md overflow-hidden bg-white shadow-sm">
             <div className="p-4 bg-gray-50 border-b flex justify-between items-center">
               <h3 className="font-medium">Blog Editor</h3>
               <div className="text-sm text-gray-500">Click on any element to edit</div>
             </div>
             <div className="overflow-auto">
-              {/* Blog Hero Section */}
               <BlogHeroSection
                 title={form.watch("title")}
                 author={form.watch("author")}
@@ -885,7 +852,6 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
                 onSaveImage={handleSaveImage}
               />
 
-              {/* Content Section */}
               <main className="container mx-auto px-4 py-8 max-w-5xl">
                 <BlogContentSection
                   title={form.watch("contentSection.title")}
@@ -899,7 +865,6 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
                   onSaveImage={handleSaveImage}
                 />
 
-                {/* Guide Content Section */}
                 <BlogGuideContent
                   title={form.watch("guideContent.title")}
                   steps={form.watch("guideContent.steps")}

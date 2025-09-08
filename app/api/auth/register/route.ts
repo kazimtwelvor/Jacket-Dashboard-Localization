@@ -50,7 +50,6 @@ export async function POST(req: Request) {
       recaptchaToken,
     } = validationResult.data
 
-    // Check if store exists
     const storeExists = await prismadb.store.findUnique({
       where: { id: storeId },
     })
@@ -62,7 +61,6 @@ export async function POST(req: Request) {
       })
     }
 
-    // Check if reCAPTCHA is enabled
     const recaptchaSettings = await prismadb.recaptchaSettings.findFirst({
       where: { storeId, enabled: true, enabledOnRegister: true },
     })
@@ -94,7 +92,6 @@ export async function POST(req: Request) {
       }
     }
 
-    // Check if user already exists
     const existingUser = await prismadb.storeUser.findFirst({
       where: {
         email,
@@ -109,10 +106,7 @@ export async function POST(req: Request) {
       })
     }
 
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10)
-
-    // Create user
     const newUser = await prismadb.storeUser.create({
       data: {
         name,
@@ -129,15 +123,12 @@ export async function POST(req: Request) {
       },
     })
 
-    // Remove sensitive fields
     const { passwordHash, resetToken, ...safeUser } = newUser
 
-    // Send welcome email (optional)
     try {
       const timeoutPromise = new Promise((_, reject) =>
         setTimeout(() => reject(new Error("Email sending timed out")), 2000)
       )
-      // await Promise.race([sendWelcomeEmail(), timeoutPromise]) ← if you implement email sending
     } catch (emailError) {
     }
 
@@ -159,7 +150,6 @@ export async function POST(req: Request) {
   }
 }
 
-// Handle preflight CORS requests
 export async function OPTIONS() {
   return new NextResponse(null, {
     status: 204,

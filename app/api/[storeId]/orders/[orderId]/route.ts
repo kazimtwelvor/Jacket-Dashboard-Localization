@@ -36,7 +36,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ storeId:
       },
     })
 
-    // Convert Decimal fields to numbers for client compatibility
     const serializedOrder = order ? {
       ...order,
       shippingCost: Number(order.shippingCost),
@@ -106,7 +105,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
       return new NextResponse("Order ID is required", { status: 400 })
     }
 
-    // Validate customer exists if customerId is provided
     let finalUserId = null
     if (customerId) {
       const existingUser = await prismadb.user.findUnique({
@@ -118,7 +116,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
       }
     }
 
-    // Check if user has access to this store
     const storeByUserId = await prismadb.store.findFirst({
       where: {
         id: storeId,
@@ -126,7 +123,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
       },
     })
 
-    // If user is not the owner, check if they are a member with appropriate permissions
     if (!storeByUserId) {
       const dbUser = await prismadb.user.findFirst({
         where: {
@@ -150,7 +146,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
       }
     }
 
-    // Update the order with all provided fields
     let order = await prismadb.order.update({
       where: {
         id: orderId,
@@ -205,16 +200,13 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
       },
     })
 
-    // Handle order items update if provided
     if (orderItems && Array.isArray(orderItems)) {
-      // Delete existing order items
       await prismadb.orderItem.deleteMany({
         where: {
           orderId: orderId,
         },
       })
 
-      // Create new order items
       if (orderItems.length > 0) {
         await prismadb.orderItem.createMany({
           data: orderItems.map((item: any) => ({
@@ -235,7 +227,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
         })
       }
 
-      // Fetch updated order with items
       const updatedOrder = await prismadb.order.findUnique({
         where: { id: orderId },
         include: {
@@ -254,7 +245,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
       order = updatedOrder || order
     }
 
-    // Convert Decimal fields to numbers for client compatibility
     const serializedOrder = {
       ...order,
       shippingCost: Number(order.shippingCost),
@@ -289,7 +279,6 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ store
       return new NextResponse("Order ID is required", { status: 400 })
     }
 
-    // Check if user has access to this store
     const storeByUserId = await prismadb.store.findFirst({
       where: {
         id: storeId,
@@ -297,7 +286,6 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ store
       },
     })
 
-    // If user is not the owner, check if they are a member with appropriate permissions
     if (!storeByUserId) {
       const dbUser = await prismadb.user.findFirst({
         where: {
@@ -321,14 +309,12 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ store
       }
     }
 
-    // First delete all order items
     await prismadb.orderItem.deleteMany({
       where: {
         orderId: orderId,
       },
     })
 
-    // Then delete the order
     const order = await prismadb.order.delete({
       where: {
         id: orderId,

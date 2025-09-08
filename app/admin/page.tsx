@@ -15,7 +15,6 @@ export default async function AdminPage({
 }: {
   searchParams: { search?: string; role?: string; view?: string }
 }) {
-  // Check if user is authorized
   const { userId } = await auth()
 
   if (!userId) {
@@ -26,21 +25,16 @@ export default async function AdminPage({
   const userRole = user.publicMetadata.role as string
 
 
-  // Allow both admin and super_admin roles
   if (userRole !== "admin" && userRole !== "super_admin") {
     redirect("/")
   }
 
-  // Safely access search params with fallback
   const query = searchParams?.search || ""
   const roleFilter = searchParams?.role || ""
   const viewMode = searchParams?.view || "grid"
 
-  // Fetch all users based on search query
   let users = []
   try {
-    // Set a high limit to fetch all users (Clerk has a max limit of 500 per request)
-    // For most applications, this should be sufficient
     const MAX_USERS = 500
 
     users = query
@@ -57,7 +51,6 @@ export default async function AdminPage({
     users = []
   }
 
-  // Serialize users to avoid passing complex objects to client components
   const serializedUsers = users.map((user) => ({
     id: user.id,
     firstName: user.firstName || "",
@@ -69,10 +62,7 @@ export default async function AdminPage({
     lastSignInAt: user.lastSignInAt,
   }))
 
-  // Apply role filtering if specified
   const filteredUsers = roleFilter ? serializedUsers.filter((user) => user.role === roleFilter) : serializedUsers
-
-  // Count roles for statistics
   const roleCount = {
     admin: serializedUsers.filter((u) => u.role === "admin").length,
     superAdmin: serializedUsers.filter((u) => u.role === "super_admin").length,
@@ -80,7 +70,6 @@ export default async function AdminPage({
     user: serializedUsers.filter((u) => u.role === "user" || !u.role).length,
   }
 
-  // Get role filter label for display
   const getRoleFilterLabel = () => {
     switch (roleFilter) {
       case "super_admin":
@@ -96,20 +85,16 @@ export default async function AdminPage({
     }
   }
 
-  // Calculate active users (signed in within last 30 days)
   const thirtyDaysAgo = new Date()
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
   const activeUsers = serializedUsers.filter((u) => u.lastSignInAt && new Date(u.lastSignInAt) > thirtyDaysAgo).length
 
-  // Build query string helper
   const buildQueryString = (params: Record<string, string>) => {
     const urlParams = new URLSearchParams()
 
-    // Keep existing params
     if (query) urlParams.set("search", query)
     if (roleFilter) urlParams.set("role", roleFilter)
 
-    // Add new params
     for (const [key, value] of Object.entries(params)) {
       if (value) {
         urlParams.set(key, value)
@@ -124,7 +109,6 @@ export default async function AdminPage({
 
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-6 -mx-6 -mt-6 mb-8 border-b">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -141,7 +125,6 @@ export default async function AdminPage({
       </div>
 
       <div className="max-w-7xl mx-auto">
-        {/* Stats Cards */}
         <div className="grid gap-4 md:grid-cols-4">
           <Card className="bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -191,7 +174,6 @@ export default async function AdminPage({
           </Card>
         </div>
 
-        {/* Filter Status */}
         {(query || roleFilter) && (
           <div className="bg-white dark:bg-slate-900 border rounded-lg p-4 mt-6 flex items-center justify-between shadow-sm">
             <div>
@@ -211,7 +193,6 @@ export default async function AdminPage({
           </div>
         )}
 
-        {/* View Tabs */}
         <Tabs defaultValue={viewMode} className="mt-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">User Accounts</h2>
@@ -226,7 +207,6 @@ export default async function AdminPage({
           </div>
 
           <TabsContent value="grid" className="mt-0">
-            {/* User Cards Grid */}
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               <Suspense fallback={<div className="col-span-full text-center py-10">Loading users...</div>}>
                 {filteredUsers.length > 0 ? (
@@ -246,7 +226,6 @@ export default async function AdminPage({
           </TabsContent>
 
           <TabsContent value="compact" className="mt-0">
-            {/* Compact Table View */}
             <div className="bg-white dark:bg-slate-900 rounded-lg border shadow-sm overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
@@ -334,7 +313,6 @@ export default async function AdminPage({
           </TabsContent>
         </Tabs>
 
-        {/* Results Summary */}
         <div className="text-sm text-muted-foreground text-center mt-6">
           {filteredUsers.length === serializedUsers.length ? (
             <>

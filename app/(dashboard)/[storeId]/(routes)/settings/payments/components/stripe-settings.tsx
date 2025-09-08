@@ -14,7 +14,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
-// Update the StripeAccount interface to match exactly what comes from the API
 interface StripeAccount {
   id: string
   name: string
@@ -35,7 +34,6 @@ interface StripeSettingsProps {
 }
 
 export const StripeSettings: React.FC<StripeSettingsProps> = ({ form, loading }) => {
-  // Update the state variables to include webhookSecret and editing state
   const [newAccount, setNewAccount] = useState(false)
   const [editingAccountId, setEditingAccountId] = useState<string | null>(null)
   const [accountName, setAccountName] = useState("")
@@ -47,7 +45,6 @@ export const StripeSettings: React.FC<StripeSettingsProps> = ({ form, loading })
   const [error, setError] = useState<string | null>(null)
   const [debugMode, setDebugMode] = useState(false)
 
-  // Reset form fields
   const resetFormFields = () => {
     setAccountName("")
     setPublishableKey("")
@@ -57,7 +54,6 @@ export const StripeSettings: React.FC<StripeSettingsProps> = ({ form, loading })
     setEditingAccountId(null)
   }
 
-  // Handle starting the edit process for an account
   const handleEditAccount = (account: StripeAccount) => {
     setEditingAccountId(account.id)
     setAccountName(account.name)
@@ -67,7 +63,6 @@ export const StripeSettings: React.FC<StripeSettingsProps> = ({ form, loading })
     setNewAccount(false)
   }
 
-  // Handle adding a new account
   const handleAddAccount = async () => {
     if (!accountName || !publishableKey || !secretKey) return
 
@@ -75,7 +70,6 @@ export const StripeSettings: React.FC<StripeSettingsProps> = ({ form, loading })
       setIsLoading(true)
       setError(null)
 
-      // First create the account in the database
       const response = await fetch(`/api/stores/${form.getValues("storeId")}/stripe-accounts`, {
         method: "POST",
         headers: {
@@ -88,7 +82,7 @@ export const StripeSettings: React.FC<StripeSettingsProps> = ({ form, loading })
           webhookSecret: webhookSecret || "",
           isEnabled: true,
           isTestMode: form.getValues("stripeTestMode") || false,
-          isDefault: accounts.length === 0, // Make default if it's the first account
+          isDefault: accounts.length === 0, 
         }),
       })
 
@@ -98,11 +92,9 @@ export const StripeSettings: React.FC<StripeSettingsProps> = ({ form, loading })
 
       const savedAccount = await response.json()
 
-      // Update our local accounts state
       const newAccounts = [...accounts, savedAccount]
       setAccounts(newAccounts)
 
-      // If this is the first account, also set the main stripe keys for backward compatibility
       if (accounts.length === 0) {
         form.setValue("stripePublishableKey", publishableKey)
         form.setValue("stripeSecretKey", secretKey)
@@ -111,7 +103,6 @@ export const StripeSettings: React.FC<StripeSettingsProps> = ({ form, loading })
 
       form.setValue("stripeEnabled", true)
 
-      // Reset form
       resetFormFields()
     } catch (error) {
       setError("Failed to save Stripe account. Please try again.")
@@ -120,7 +111,6 @@ export const StripeSettings: React.FC<StripeSettingsProps> = ({ form, loading })
     }
   }
 
-  // Handle editing an account
   const handleSaveEdit = async () => {
     if (!accountName || !publishableKey || !secretKey || !editingAccountId) return
 
@@ -128,7 +118,6 @@ export const StripeSettings: React.FC<StripeSettingsProps> = ({ form, loading })
       setIsLoading(true)
       setError(null)
 
-      // First update the account in the database
       const response = await fetch(`/api/stores/${form.getValues("storeId")}/stripe-accounts/${editingAccountId}`, {
         method: "PATCH",
         headers: {
@@ -151,7 +140,6 @@ export const StripeSettings: React.FC<StripeSettingsProps> = ({ form, loading })
 
       const updatedAccount = await response.json()
 
-      // Update our local accounts state
       const updatedAccounts = accounts.map((account) => {
         if (account.id === editingAccountId) {
           return {
@@ -167,7 +155,6 @@ export const StripeSettings: React.FC<StripeSettingsProps> = ({ form, loading })
 
       setAccounts(updatedAccounts)
 
-      // If this is the active account, update the main stripe keys
       const editedAccount = accounts.find((acc) => acc.id === editingAccountId)
       if (editedAccount?.isDefault) {
         form.setValue("stripePublishableKey", publishableKey)
@@ -183,13 +170,11 @@ export const StripeSettings: React.FC<StripeSettingsProps> = ({ form, loading })
     }
   }
 
-  // Handle setting an account as active/default
   const handleToggleActive = async (id: string) => {
     try {
       setIsLoading(true)
       setError(null)
 
-      // First update the account in the database to set it as default
       const response = await fetch(`/api/stores/${form.getValues("storeId")}/stripe-accounts/${id}`, {
         method: "PATCH",
         headers: {
@@ -210,7 +195,6 @@ export const StripeSettings: React.FC<StripeSettingsProps> = ({ form, loading })
         throw new Error("Failed to update Stripe account")
       }
 
-      // Update our local accounts state
       const updatedAccounts = accounts.map((account) => ({
         ...account,
         isDefault: account.id === id,
@@ -218,7 +202,6 @@ export const StripeSettings: React.FC<StripeSettingsProps> = ({ form, loading })
 
       setAccounts(updatedAccounts)
 
-      // Also update the main stripe keys for backward compatibility
       const activeAccount = updatedAccounts.find((account) => account.isDefault)
       if (activeAccount) {
         form.setValue("stripePublishableKey", activeAccount.publishableKey)
@@ -232,13 +215,11 @@ export const StripeSettings: React.FC<StripeSettingsProps> = ({ form, loading })
     }
   }
 
-  // Handle removing an account
   const handleRemoveAccount = async (id: string) => {
     try {
       setIsLoading(true)
       setError(null)
 
-      // First delete the account from the database
       const response = await fetch(`/api/stores/${form.getValues("storeId")}/stripe-accounts/${id}`, {
         method: "DELETE",
       })
@@ -247,14 +228,11 @@ export const StripeSettings: React.FC<StripeSettingsProps> = ({ form, loading })
         throw new Error("Failed to delete Stripe account")
       }
 
-      // Update our local accounts state
       const filteredAccounts = accounts.filter((account) => account.id !== id)
 
-      // If we removed the default account, make the first remaining one default
       if (filteredAccounts.length > 0 && !filteredAccounts.some((account) => account.isDefault)) {
         filteredAccounts[0].isDefault = true
 
-        // Also update this account in the database to set it as default
         await fetch(`/api/stores/${form.getValues("storeId")}/stripe-accounts/${filteredAccounts[0].id}`, {
           method: "PATCH",
           headers: {
@@ -274,7 +252,6 @@ export const StripeSettings: React.FC<StripeSettingsProps> = ({ form, loading })
 
       setAccounts(filteredAccounts)
 
-      // Update main stripe keys
       const defaultAccount = filteredAccounts.find((account) => account.isDefault)
       if (defaultAccount) {
         form.setValue("stripePublishableKey", defaultAccount.publishableKey)
@@ -293,7 +270,6 @@ export const StripeSettings: React.FC<StripeSettingsProps> = ({ form, loading })
     }
   }
 
-  // Load accounts from the API
   useEffect(() => {
     const loadAccounts = async () => {
       try {
@@ -306,7 +282,6 @@ export const StripeSettings: React.FC<StripeSettingsProps> = ({ form, loading })
           return
         }
 
-        // Direct HTTP request to get payment settings
         const response = await fetch(`/api/stores/${storeId}/payment-settings`, {
           cache: "no-store",
           headers: {
@@ -320,17 +295,14 @@ export const StripeSettings: React.FC<StripeSettingsProps> = ({ form, loading })
 
         const settings = await response.json()
 
-        // Check if accounts array exists and has items
         let currentAccounts: StripeAccount[] = []
 
         if (settings?.stripeAccounts && Array.isArray(settings.stripeAccounts) && settings.stripeAccounts.length > 0) {
           currentAccounts = settings.stripeAccounts
 
-          // For debugging: log each account ID
           settings.stripeAccounts.forEach((account: any, index: number) => {
           })
         }
-        // Fallback to creating a default account from the main settings if needed
         else if (settings?.stripePublishableKey && settings?.stripeSecretKey) {
           currentAccounts = [
             {
@@ -379,7 +351,6 @@ export const StripeSettings: React.FC<StripeSettingsProps> = ({ form, loading })
           </Alert>
         )}
 
-        {/* Debug Button */}
         <Button
           variant="outline"
           size="sm"
@@ -435,7 +406,6 @@ export const StripeSettings: React.FC<StripeSettingsProps> = ({ form, loading })
         )}
       />
 
-      {/* Stripe Accounts List */}
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <h4 className="text-md font-medium">Stripe Accounts ({accounts.length})</h4>
@@ -467,7 +437,6 @@ export const StripeSettings: React.FC<StripeSettingsProps> = ({ form, loading })
           </div>
         )}
 
-        {/* Display Stripe Accounts */}
         {!isLoading && accounts.length > 0 && (
           <ScrollArea className="h-[300px]">
             <div className="space-y-3">
@@ -532,7 +501,6 @@ export const StripeSettings: React.FC<StripeSettingsProps> = ({ form, loading })
           </ScrollArea>
         )}
 
-        {/* New Account Form */}
         {newAccount && (
           <Card>
             <CardHeader className="p-4 pb-2">
@@ -597,7 +565,6 @@ export const StripeSettings: React.FC<StripeSettingsProps> = ({ form, loading })
           </Card>
         )}
 
-        {/* Edit Account Form */}
         {editingAccountId !== null && (
           <Card className="border border-amber-300">
             <CardHeader className="p-4 pb-2">

@@ -11,15 +11,12 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
     const { storeId } = params
     const { searchParams } = new URL(req.url)
 
-    // Pagination parameters
     const page = Number.parseInt(searchParams.get("page") || "1")
     const limit = Number.parseInt(searchParams.get("limit") || "28")
     const skip = (page - 1) * limit
 
-    // Check if this is an admin request
     const isAdmin = searchParams.get("admin") === "true"
     
-    // Build the base where clause
     const baseWhereClause = {
       storeId: storeId,
       isDeleted: false,

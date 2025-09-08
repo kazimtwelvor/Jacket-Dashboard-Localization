@@ -2,7 +2,6 @@ import { NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import prismadb from "@/lib/prismadb"
 
-// Get a specific image
 export async function GET(req: Request, { params }: { params: { storeId: string; imageId: string } }) {
   try {
     if (!params.imageId) {
@@ -21,7 +20,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string;
   }
 }
 
-// Update an image
 export async function PATCH(req: Request, { params }: { params: { storeId: string; imageId: string } }) {
   try {
     const { userId } = await auth()
@@ -68,7 +66,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
   }
 }
 
-// Delete an image
 export async function DELETE(req: Request, { params }: { params: { storeId: string; imageId: string } }) {
   try {
     const { userId } = await auth()
@@ -92,7 +89,6 @@ export async function DELETE(req: Request, { params }: { params: { storeId: stri
       return new NextResponse("Unauthorized", { status: 403 })
     }
 
-    // Check if image is used by any products
     const imageUsage = await prismadb.productImage.findFirst({
       where: {
         imageId: params.imageId,
@@ -105,7 +101,6 @@ export async function DELETE(req: Request, { params }: { params: { storeId: stri
       })
     }
 
-    // Delete the image
     const image = await prismadb.image.delete({
       where: {
         id: params.imageId,

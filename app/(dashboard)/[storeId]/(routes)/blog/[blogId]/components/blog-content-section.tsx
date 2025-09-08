@@ -31,12 +31,10 @@ export const BlogContentSection: React.FC<BlogContentSectionProps> = ({
   onSaveText,
   onSaveImage,
 }) => {
-  // State for modal visibility and editing content
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [currentEditField, setCurrentEditField] = useState<string>("")
   const [editData, setEditData] = useState<any>(null)
 
-  // Open modal for editing specific content
   const openEditorModal = (field: string) => {
     let data = null
 
@@ -76,11 +74,9 @@ export const BlogContentSection: React.FC<BlogContentSectionProps> = ({
     setIsModalOpen(true)
   }
 
-  // Handle saving content from modal
   const handleSaveContent = (data: any) => {
     if (!currentEditField) return
 
-    // Extract content from the data
     const content =
       data.content && data.content.length > 0
         ? Array.isArray(data.content)
@@ -88,7 +84,6 @@ export const BlogContentSection: React.FC<BlogContentSectionProps> = ({
           : data.content
         : ""
 
-    // Save the content based on which field was being edited
     switch (currentEditField) {
       case "title":
         onSaveText("contentSection.title", content)
@@ -104,7 +99,6 @@ export const BlogContentSection: React.FC<BlogContentSectionProps> = ({
         break
     }
 
-    // Close the modal
     setIsModalOpen(false)
     toast.success("Content updated successfully")
   }
@@ -209,7 +203,6 @@ export const BlogContentSection: React.FC<BlogContentSectionProps> = ({
         </div>
       </div>
 
-      {/* Text Editor Modal */}
       <TextEditorModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

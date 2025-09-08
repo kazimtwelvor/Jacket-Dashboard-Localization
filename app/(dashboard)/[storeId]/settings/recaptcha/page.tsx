@@ -17,7 +17,6 @@ export default async function RecaptchaPage({
     redirect("/sign-in")
   }
 
-  // Check if user is the owner
   const store = await prismadb.store.findFirst({
     where: {
       id: params.storeId,
@@ -25,7 +24,6 @@ export default async function RecaptchaPage({
     },
   })
 
-  // If not the owner, check if they have ADMIN role
   if (!store) {
     const userRole = await getUserStoreRole(userId, params.storeId)
 
@@ -34,7 +32,6 @@ export default async function RecaptchaPage({
     }
   }
 
-  // Get reCAPTCHA settings from the database
   const recaptchaSettings = await prismadb.recaptchaSettings.findFirst({
     where: {
       storeId: params.storeId,

@@ -29,22 +29,17 @@ export const EditableImage: React.FC<EditableImageProps> = ({
   const [isEditing, setIsEditing] = useState(false)
   const [imageUrl, setImageUrl] = useState<string>(value || "")
   const [isLoading, setIsLoading] = useState(false)
-  // Add a flag to prevent duplicate toasts
   const [toastShown, setToastShown] = useState(false)
 
-  // Update local state when prop changes
   useEffect(() => {
     setImageUrl(value || "")
-    // Reset toast flag when value changes
     setToastShown(false)
   }, [value])
 
-  // Update the handleImageChange function to add more debugging and better validation
   const handleImageChange = (url: string) => {
     try {
       setIsLoading(true)
 
-      // Validate URL - make sure it's not a field path or undefined
       if (!url) {
         if (!toastShown) {
           toast.error("No image URL received")
@@ -55,7 +50,6 @@ export const EditableImage: React.FC<EditableImageProps> = ({
         return
       }
 
-      // Check for invalid URLs - field paths, undefined, or non-URL strings
       if (
         url.startsWith("guideContent.") ||
         url === "undefined" ||
@@ -71,11 +65,9 @@ export const EditableImage: React.FC<EditableImageProps> = ({
         return
       }
 
-      // Save the image URL - IMPORTANT: Pass the field and URL separately
       onSave(field, url)
       setImageUrl(url)
 
-      // Only show success toast if we haven't shown one yet
       if (!toastShown) {
         toast.success("Image updated successfully")
         setToastShown(true)
@@ -109,11 +101,9 @@ export const EditableImage: React.FC<EditableImageProps> = ({
     }
   }
 
-  // Handle click on the image container
   const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation() // Prevent event from bubbling up
+    e.stopPropagation() 
     setIsEditing(true)
-    // Reset toast flag when starting a new edit
     setToastShown(false)
   }
 
@@ -143,7 +133,6 @@ export const EditableImage: React.FC<EditableImageProps> = ({
     )
   }
 
-  // Check if we have a valid image URL
   const hasValidImage = imageUrl && imageUrl !== "undefined" && !imageUrl.startsWith("guideContent.steps.")
 
   return (
@@ -172,7 +161,6 @@ export const EditableImage: React.FC<EditableImageProps> = ({
           </div>
         </div>
       )}
-      {/* This overlay should not block clicks */}
       <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 flex items-center justify-center transition-all pointer-events-none">
         <Edit2 className="text-white opacity-0 group-hover:opacity-100 h-8 w-8" />
       </div>

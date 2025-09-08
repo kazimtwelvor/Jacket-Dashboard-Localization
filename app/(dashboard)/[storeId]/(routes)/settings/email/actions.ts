@@ -14,7 +14,6 @@ import prismadb from "@/lib/prismadb"
 
 export async function previewEmail(storeId: string, templateId: string) {
   try {
-    // Get store details
     const store = await prismadb.store.findUnique({
       where: { id: storeId },
     })
@@ -23,7 +22,6 @@ export async function previewEmail(storeId: string, templateId: string) {
       return { success: false, error: "Store not found" }
     }
 
-    // Generate sample data based on template type
     let emailComponent
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://yourstore.com"
 

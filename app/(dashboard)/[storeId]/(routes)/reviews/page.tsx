@@ -12,7 +12,7 @@ const Page = async (props: {
     where: {
       storeId: storeId,
       product: {
-        isDeleted: false, // Only get reviews for non-deleted products
+        isDeleted: false, 
       },
     },
     include: {

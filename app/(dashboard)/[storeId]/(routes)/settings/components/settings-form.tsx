@@ -28,8 +28,6 @@ import ImageUpload from "@/components/ui/image-upload"
 
 interface SettingsFromProps {
   initialData: Store & {
-    // Add these fields to the Store type for our component
-    // In a real app, you'd update the Prisma schema
     logo?: string
     description?: string
     contactEmail?: string
@@ -297,7 +295,6 @@ export const SettingsForm: React.FC<SettingsFromProps> = ({ initialData }) => {
                               {...field}
                               maxLength={10}
                               onChange={(e) => {
-                                // Only allow letters, numbers, and hyphens
                                 const value = e.target.value.replace(/[^a-zA-Z0-9-]/g, "").toUpperCase()
                                 field.onChange(value)
                               }}

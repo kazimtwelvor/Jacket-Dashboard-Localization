@@ -57,7 +57,6 @@ export const Sidebar = ({ className, items = [], memberStores = [] }: SidebarPro
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const storeModal = useStoreModal()
 
-  // Log props for debugging
   useEffect(() => {
     logProps("Sidebar", {
       ownedStoresCount: items.length,
@@ -67,7 +66,6 @@ export const Sidebar = ({ className, items = [], memberStores = [] }: SidebarPro
     })
   }, [items, memberStores])
 
-  // Update document root with sidebar state
   useEffect(() => {
     document.documentElement.style.setProperty("--sidebar-width", isCollapsed ? "70px" : "240px")
   }, [isCollapsed])
@@ -87,12 +85,7 @@ export const Sidebar = ({ className, items = [], memberStores = [] }: SidebarPro
     {
       category: "Content",
       items: [
-        // {
-        //   href: `/${params.storeId}/billboards`,
-        //   label: "Billboards",
-        //   icon: ImageIcon,
-        //   active: pathname.includes(`/${params.storeId}/billboards`),
-        // },
+        
         {
           href: `/${params?.storeId}/pages`,
           label: "Pages",
@@ -200,11 +193,9 @@ export const Sidebar = ({ className, items = [], memberStores = [] }: SidebarPro
   }, [])
 
   useEffect(() => {
-    // Close mobile sidebar when route changes
     setIsMobileOpen(false)
   }, [pathname])
 
-  // Combine owned and member stores for the store switcher
   const allStores = [
     ...items.map((store) => ({
       id: store.id,

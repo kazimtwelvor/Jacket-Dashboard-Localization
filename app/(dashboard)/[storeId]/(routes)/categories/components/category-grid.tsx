@@ -73,7 +73,6 @@ const CategoryGridItem = ({
   const [isHovered, setIsHovered] = useState(false)
 
   const handleClick = (e: React.MouseEvent) => {
-    // Don't trigger selection when clicking on dropdown or checkbox
     if ((e.target as HTMLElement).closest('[data-no-select="true"]')) {
       return
     }

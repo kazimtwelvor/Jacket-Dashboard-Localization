@@ -17,7 +17,7 @@ interface KeyTakeawaysProps {
     items: string[]
   }
   onSaveText: (field: string, value: string) => void
-  openTextEditor?: () => void // Add this prop
+  openTextEditor?: () => void 
 }
 
 export const KeyTakeaways: React.FC<KeyTakeawaysProps> = ({ 

@@ -27,33 +27,26 @@ export const StepNineVideoMarketing: React.FC<StepNineVideoMarketingProps> = ({
   stepIndex,
   openTextEditor,
 }) => {
-  // Track the current image locally
   const [currentImage, setCurrentImage] = useState(image || "")
 
-  // Update local state when prop changes
   useEffect(() => {
     setCurrentImage(image || "")
   }, [image])
 
-  // Create a direct handler for the image save
   const handleSaveImage = (field: string, url: string) => {
     try {
-      // Don't use the field parameter, use our hardcoded path instead
       if (!url) {
         return
       }
 
-      // Validate URL
       if (url.includes("guideContent.steps.") || url === "undefined") {
         toast.error("Invalid image URL")
         return
       }
 
 
-      // Update local state
       setCurrentImage(url)
 
-      // Save to parent component with correct field path
       onSaveImage(`guideContent.steps.${stepIndex}.image`, url)
     } catch (error) {
       toast.error("Failed to save image")

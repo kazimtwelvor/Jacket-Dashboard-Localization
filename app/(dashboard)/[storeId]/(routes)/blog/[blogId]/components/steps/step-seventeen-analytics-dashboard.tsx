@@ -31,7 +31,6 @@ export const StepSeventeenAnalyticsDashboard: React.FC<StepSeventeenAnalyticsDas
   onSaveImage,
   stepIndex,
 }) => {
-  // Function to handle image save with direct URL
   const handleSaveImage = (index: number, url: string) => {
     onSaveImage(`guideContent.steps.${stepIndex}.images.${index}`, url)
   }
@@ -39,7 +38,6 @@ export const StepSeventeenAnalyticsDashboard: React.FC<StepSeventeenAnalyticsDas
   return (
     <div className="animate-fade-in my-16">
       <div className="relative overflow-hidden rounded-xl bg-[#f3f4f6] p-8">
-        {/* Background elements for parallax effect */}
         <div className="absolute top-10 left-10 w-32 h-32 rounded-full bg-[#FF6C1A]/10 pointer-events-none"></div>
         <div className="absolute bottom-10 right-10 w-48 h-48 rounded-full bg-[#0A2463]/10 pointer-events-none"></div>
         <div className="absolute top-1/2 left-1/3 w-16 h-16 rounded-full bg-[#FF6C1A]/20 pointer-events-none"></div>
@@ -101,9 +99,7 @@ export const StepSeventeenAnalyticsDashboard: React.FC<StepSeventeenAnalyticsDas
             ))}
           </div>
 
-          {/* Main dashboard container with relative positioning */}
           <div className="relative mt-8 mb-16">
-            {/* Main dashboard image */}
             <div className="relative z-20 rounded-lg overflow-hidden shadow-2xl border-8 border-white">
               <div className="h-[300px] relative">
                 <EditableImage
@@ -118,7 +114,6 @@ export const StepSeventeenAnalyticsDashboard: React.FC<StepSeventeenAnalyticsDas
               </div>
             </div>
 
-            {/* Traffic Analytics Box - Top Right, outside of text area */}
             <div className="absolute -top-12 -right-8 z-30 w-48 h-48 rounded-lg overflow-hidden shadow-lg transform rotate-6">
               <div className="relative h-full w-full">
                 <div className="h-full w-full" onClick={(e) => e.stopPropagation()}>
@@ -140,7 +135,6 @@ export const StepSeventeenAnalyticsDashboard: React.FC<StepSeventeenAnalyticsDas
               </div>
             </div>
 
-            {/* Conversion Metrics Box - Bottom Left, positioned better */}
             <div className="absolute -bottom-12 -left-8 z-30 w-40 h-40 rounded-lg overflow-hidden shadow-lg transform -rotate-3">
               <div className="relative h-full w-full">
                 <div className="h-full w-full" onClick={(e) => e.stopPropagation()}>

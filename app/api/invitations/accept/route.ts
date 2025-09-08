@@ -20,7 +20,6 @@ export async function POST(req: Request) {
       return new NextResponse("Token is required", { status: 400 })
     }
 
-    // Find the invitation
     const invitation = await prismadb.invitation.findUnique({
       where: { token },
       include: {
@@ -32,7 +31,6 @@ export async function POST(req: Request) {
       return new NextResponse("Invalid invitation token", { status: 404 })
     }
 
-    // Check if invitation has expired
     if (invitation.expires < new Date()) {
       await prismadb.invitation.update({
         where: { id: invitation.id },
@@ -41,25 +39,21 @@ export async function POST(req: Request) {
       return new NextResponse("Invitation has expired", { status: 400 })
     }
 
-    // Check if invitation has already been accepted
     if (invitation.status !== "PENDING") {
       return new NextResponse(`Invitation is ${invitation.status.toLowerCase()}`, { status: 400 })
     }
 
-    // Check if the user's email matches the invitation email
     const userEmail = user.emailAddresses[0]?.emailAddress?.toLowerCase()
     if (userEmail !== invitation.email.toLowerCase()) {
       return new NextResponse("This invitation was sent to a different email address", { status: 403 })
     }
 
-    // Check if a User record already exists for this Clerk user
     let dbUser = await prismadb.user.findFirst({
       where: {
         clerkId: userId,
       },
     })
 
-    // If no User record exists, create one
     if (!dbUser) {
       dbUser = await prismadb.user.create({
         data: {
@@ -72,7 +66,6 @@ export async function POST(req: Request) {
       })
     }
 
-    // Check if user is already a member of the store
     const existingMember = await prismadb.storeUser.findFirst({
       where: {
         storeId: invitation.storeId,
@@ -92,7 +85,6 @@ export async function POST(req: Request) {
       })
     }
 
-    // Create store member with the role from the invitation
     await prismadb.storeUser.create({
       data: {
         storeId: invitation.storeId,
@@ -101,7 +93,6 @@ export async function POST(req: Request) {
       },
     })
 
-    // Update invitation status
     await prismadb.invitation.update({
       where: { id: invitation.id },
       data: { status: "ACCEPTED" },

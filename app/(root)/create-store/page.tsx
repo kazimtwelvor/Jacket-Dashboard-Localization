@@ -1,121 +1,4 @@
-// "use client"
 
-// import type React from "react"
-
-// import { useState } from "react"
-// import { useRouter } from "next/navigation"
-// import { useUser } from "@clerk/nextjs"
-// import { toast } from "react-hot-toast"
-
-// import { Button } from "@/components/ui/button"
-// import { Heading } from "@/components/ui/heading"
-// import { Separator } from "@/components/ui/separator"
-// import { Input } from "@/components/ui/input"
-// import { Alert, AlertDescription } from "@/components/ui/alert"
-// import { useSuperAdmin } from "@/hooks/use-super-admin"
-
-// export default function CreateStorePage() {
-//   const router = useRouter()
-//   const { user } = useUser()
-//   const { isSuperAdmin } = useSuperAdmin()
-
-//   const [loading, setLoading] = useState(false)
-//   const [name, setName] = useState("")
-//   const [url, setUrl] = useState("")
-
-//   const onSubmit = async (e: React.FormEvent) => {
-//     e.preventDefault()
-
-//     if (!isSuperAdmin) {
-//       toast.error("Only super administrators can create stores")
-//       return
-//     }
-
-//     try {
-//       setLoading(true)
-
-//       const response = await fetch("/api/stores", {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify({ name, url }),
-//       })
-
-//       if (!response.ok) {
-//         throw new Error("Failed to create store")
-//       }
-
-//       const store = await response.json()
-
-//       window.location.assign(`/${store.id}`)
-//     } catch (error) {
-//       toast.error("Something went wrong")
-//     } finally {
-//       setLoading(false)
-//     }
-//   }
-
-//   // Get the current user's email
-//   const userEmail = user?.emailAddresses?.[0]?.emailAddress || "Not available"
-
-//   return (
-//     <div className="flex-col">
-//       <div className="flex-1 space-y-4 p-8 pt-6">
-//         <Heading title="Create a store" description="Add a new store to manage products and categories" />
-//         <Separator />
-
-//         <form onSubmit={onSubmit} className="space-y-8 max-w-md">
-//           {!isSuperAdmin && (
-//             <Alert variant="destructive">
-//               <AlertDescription>
-//                 Store Creation has been stopped. And this email is not allowed to create a new store or manage an existing store ({userEmail}). So just close this tab and do anything else in the world. There are alot of things waiting for you.
-//               </AlertDescription>
-//             </Alert>
-//           )}
-
-//           <div className="space-y-4">
-//             <div className="space-y-1">
-//               <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-//                 Name
-//               </label>
-//               <Input
-//                 placeholder="E-Commerce"
-//                 onChange={(e) => setName(e.target.value)}
-//                 value={name}
-//                 disabled={loading || !isSuperAdmin}
-//               />
-//             </div>
-
-//             <div className="space-y-1">
-//               <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-//                 Store URL
-//               </label>
-//               <Input
-//                 placeholder="example.com"
-//                 onChange={(e) => setUrl(e.target.value)}
-//                 value={url}
-//                 disabled={loading || !isSuperAdmin}
-//               />
-//               <p className="text-xs text-muted-foreground mt-1">
-//                 Enter the website URL for this store (e.g., example.com)
-//               </p>
-//             </div>
-//           </div>
-
-//           <div className="flex items-center justify-end space-x-2">
-//             <Button variant="outline" onClick={() => router.push("/")} disabled={loading} type="button">
-//               Cancel
-//             </Button>
-//             <Button type="submit" disabled={loading || !name || !isSuperAdmin}>
-//               Continue
-//             </Button>
-//           </div>
-//         </form>
-//       </div>
-//     </div>
-//   )
-// }
 
 "use client"
 
@@ -194,7 +77,6 @@ export default function CreateStorePage() {
     }
   }
 
-  // Get the current user's email
   const userEmail = user?.emailAddresses?.[0]?.emailAddress || "Not available"
 
   if (!mounted) {
@@ -203,16 +85,13 @@ export default function CreateStorePage() {
 
   return (
     <div className="min-h-screen bg-[#0a1122] flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Animated background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#0a1122] via-[#0c1529] to-[#0a1122] opacity-80"></div>
 
-      {/* Decorative elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-10 left-10 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl"></div>
         <div className="absolute bottom-10 right-10 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl"></div>
         <div className="absolute top-1/2 left-1/4 w-40 h-40 bg-indigo-400/5 rounded-full blur-3xl"></div>
 
-        {/* Animated particles */}
         <div className="stars">
           {[...Array(30)].map((_, i) => (
             <motion.div
@@ -238,7 +117,6 @@ export default function CreateStorePage() {
           ))}
         </div>
 
-        {/* Floating elements */}
         <motion.div
           className="absolute top-20 right-[20%] w-12 h-12 rounded-full bg-blue-500/5 backdrop-blur-md"
           animate={{

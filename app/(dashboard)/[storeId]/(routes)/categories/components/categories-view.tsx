@@ -56,7 +56,6 @@ export const CategoriesView = ({ data }: CategoriesViewProps) => {
   const router = useRouter()
   const params = useParams()
 
-  // State
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [filteredData, setFilteredData] = useState<CategoryColumn[]>(data)
   const [searchQuery, setSearchQuery] = useState("")
@@ -72,7 +71,6 @@ export const CategoriesView = ({ data }: CategoriesViewProps) => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [bulkDeleteModalOpen, setBulkDeleteModalOpen] = useState(false)
 
-  // Calculate stats
   const totalCategories = filteredData.length
   const totalProducts = filteredData.reduce((sum, category) => sum + category.productCount, 0)
   const categoriesWithProducts = filteredData.filter((category) => category.productCount > 0).length
@@ -80,11 +78,9 @@ export const CategoriesView = ({ data }: CategoriesViewProps) => {
   const activeCategories = filteredData.filter((category) => category.isActive !== false).length
   const inactiveCategories = filteredData.filter((category) => category.isActive === false).length
 
-  // Filter data based on status
   useEffect(() => {
     let result = [...data]
 
-    // Apply search filter
     if (searchQuery) {
       result = result.filter(
         (category) =>
@@ -94,7 +90,6 @@ export const CategoriesView = ({ data }: CategoriesViewProps) => {
       )
     }
 
-    // Apply status filter
     if (filterStatus === "active") {
       result = result.filter((category) => category.isActive !== false)
     } else if (filterStatus === "inactive") {
@@ -105,7 +100,6 @@ export const CategoriesView = ({ data }: CategoriesViewProps) => {
       result = result.filter((category) => category.productCount === 0)
     }
 
-    // Apply sort
     result = result.sort((a, b) => {
       if (sortField === "name") {
         return sortOrder === "asc" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
@@ -121,34 +115,28 @@ export const CategoriesView = ({ data }: CategoriesViewProps) => {
     setFilteredData(result)
   }, [data, searchQuery, filterStatus, sortField, sortOrder])
 
-  // Handle search
   const handleSearch = (query: string) => {
     setSearchQuery(query)
   }
 
-  // Handle sort
   const handleSort = (field: "name" | "productCount" | "createdAt") => {
     const newOrder = field === sortField && sortOrder === "asc" ? "desc" : "asc"
     setSortField(field)
     setSortOrder(newOrder)
   }
 
-  // Handle category selection
   const handleCategorySelect = (category: CategoryColumn) => {
     setSelectedCategory(category)
   }
 
-  // Handle category creation
   const handleCreateCategory = () => {
     router.push(`/${params.storeId}/categories/new`)
   }
 
-  // Handle category edit
   const handleEditCategory = (id: string) => {
     router.push(`/${params.storeId}/categories/${id}`)
   }
 
-  // Handle category delete
   const handleDeleteCategory = async () => {
     if (!selectedCategory) return
 
@@ -166,11 +154,9 @@ export const CategoriesView = ({ data }: CategoriesViewProps) => {
     }
   }
 
-  // Handle bulk delete
   const handleBulkDelete = async () => {
     try {
       setIsLoading(true)
-      // This would need to be implemented in the API
       await Promise.all(selectedItems.map((id) => axios.delete(`/api/${params.storeId}/categories/${id}`)))
       router.refresh()
       toast.success(`${selectedItems.length} categories deleted successfully.`)
@@ -183,12 +169,10 @@ export const CategoriesView = ({ data }: CategoriesViewProps) => {
     }
   }
 
-  // Handle item selection for bulk actions
   const toggleItemSelection = (id: string) => {
     setSelectedItems((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]))
   }
 
-  // Handle select all
   const toggleSelectAll = () => {
     if (selectedItems.length === filteredData.length) {
       setSelectedItems([])
@@ -197,7 +181,6 @@ export const CategoriesView = ({ data }: CategoriesViewProps) => {
     }
   }
 
-  // Reset filters
   const resetFilters = () => {
     setSearchQuery("")
     setFilterStatus("all")

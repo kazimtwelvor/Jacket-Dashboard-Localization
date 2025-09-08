@@ -24,10 +24,7 @@ export const GlobalSearch = () => {
       label: "Overview",
       route: `/${params?.storeId}`,
     },
-    // {
-    //   label: "Billboards",
-    //   route: `/${params.storeId}/billboards`,
-    // },
+    
     {
       label: "Categories",
       route: `/${params?.storeId}/categories`,

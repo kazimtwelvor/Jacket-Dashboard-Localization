@@ -45,7 +45,6 @@ export const invitationColumns: ColumnDef<any>[] = [
 
       try {
         const date = new Date(dateValue)
-        // Check if date is valid
         if (isNaN(date.getTime())) {
           return <div>Invalid date</div>
         }

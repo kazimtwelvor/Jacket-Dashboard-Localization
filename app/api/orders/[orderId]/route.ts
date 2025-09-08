@@ -21,7 +21,6 @@ export async function GET(req: NextRequest, { params }: { params: { orderId: str
       return new NextResponse("Unauthorized", { status: 401 })
     }
 
-    // Find the user in our database
     const dbUser = await prismadb.user.findFirst({
       where: {
         clerkId: userId,
@@ -32,7 +31,6 @@ export async function GET(req: NextRequest, { params }: { params: { orderId: str
       return new NextResponse("User not found", { status: 404 })
     }
 
-    // Get the order by ID, ensuring it belongs to this user
     const order = await prismadb.order.findFirst({
       where: {
         id: params.orderId,

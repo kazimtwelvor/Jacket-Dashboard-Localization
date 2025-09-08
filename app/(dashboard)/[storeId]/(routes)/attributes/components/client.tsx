@@ -31,7 +31,6 @@ export const AttributesClient: React.FC<AttributesClientProps> = ({
   const [activeTab, setActiveTab] = useState(initialTab)
 
   useEffect(() => {
-    // Update URL when tab changes
     router.push(`/${params.storeId}/attributes?tab=${activeTab}`, { scroll: false })
   }, [activeTab, params.storeId, router])
 

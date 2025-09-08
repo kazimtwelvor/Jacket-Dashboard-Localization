@@ -3,7 +3,6 @@ import { auth } from "@clerk/nextjs/server"
 import { db } from "@/lib/db"
 import { z } from "zod"
 
-// Helper function to create a unique slug from a name and store ID
 const createUniqueSlug = (name: string, storeId: string) => {
   const baseSlug = name
     .toLowerCase()
@@ -12,7 +11,6 @@ const createUniqueSlug = (name: string, storeId: string) => {
   return `${baseSlug}-${storeId.slice(0, 8)}`
 }
 
-// Define validation schema for store creation
 const storeSchema = z.object({
   name: z.string().min(1, "Store name is required"),
 })
@@ -39,7 +37,6 @@ export async function POST(req: Request) {
             },
           })
 
-          // Create default billboard
           const billboard = await tx.billboard.create({
             data: {
               label: "Default Categories",
@@ -48,27 +45,22 @@ export async function POST(req: Request) {
             },
           })
 
-          // Define default categories - reduced number for faster creation
           const defaultCategories = [
-            // Materials - reduced set
             { name: "Leather", type: "material" },
             { name: "Denim", type: "material" },
             { name: "Wool", type: "material" },
 
-            // Styles - reduced set
             { name: "Bomber", type: "style" },
             { name: "Puffer", type: "style" },
             { name: "Varsity", type: "style" },
             { name: "Biker", type: "style" },
             { name: "Blazer", type: "style" },
 
-            // Genders
             { name: "Men", type: "gender" },
             { name: "Women", type: "gender" },
             { name: "Unisex", type: "gender" },
           ]
 
-          // Define default colors - reduced set
           const defaultColors = [
             { name: "Black", value: "#000000" },
             { name: "White", value: "#FFFFFF" },
@@ -77,7 +69,6 @@ export async function POST(req: Request) {
             { name: "Green", value: "#00FF00" },
           ]
 
-          // Define default sizes - reduced set
           const defaultSizes = [
             { name: "XS", value: "XS" },
             { name: "S", value: "S" },
@@ -86,7 +77,6 @@ export async function POST(req: Request) {
             { name: "XL", value: "XL" },
           ]
 
-          // Process in smaller batches instead of all at once
           const createCategories = async () => {
             const results = []
             for (const category of defaultCategories) {
@@ -134,13 +124,11 @@ export async function POST(req: Request) {
             return results
           }
 
-          // Execute sequentially instead of in parallel to reduce database load
           const categories = await createCategories()
           const colors = await createColors()
           const sizes = await createSizes()
 
 
-          // Verify all creations
           const [createdCategories, createdColors, createdSizes, createdBillboard] = await Promise.all([
             tx.category.count({ where: { storeId: newStore.id } }),
             tx.color.count({ where: { storeId: newStore.id } }),

@@ -33,12 +33,10 @@ export const StepThirteenContentOptimization: React.FC<StepThirteenContentOptimi
   stepIndex,
   openTextEditor,
 }) => {
-  // Handler for saving images directly
   const handleSaveImage = (index: number, url: string) => {
     onSaveImage(`guideContent.steps.${stepIndex}.images.${index}`, url)
   }
 
-  // Handler for saving metrics
   const handleSaveMetric = (type: "before" | "after", index: number, value: string) => {
     onSaveText(`guideContent.steps.${stepIndex}.metrics.${type}.${index}`, value)
   }

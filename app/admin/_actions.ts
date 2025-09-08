@@ -6,7 +6,6 @@ import type { Roles } from "@/types/globals"
 import { revalidatePath } from "next/cache"
 
 export async function setRole(formData: FormData) {
-  // Check that the user trying to set the role is an admin
   const isAdmin = await checkRole("admin")
   if (!isAdmin) {
     return { success: false, message: "Not Authorized" }
@@ -29,7 +28,6 @@ export async function setRole(formData: FormData) {
 }
 
 export async function removeRole(formData: FormData) {
-  // Check that the user trying to remove the role is an admin
   const isAdmin = await checkRole("admin")
   if (!isAdmin) {
     return { success: false, message: "Not Authorized" }

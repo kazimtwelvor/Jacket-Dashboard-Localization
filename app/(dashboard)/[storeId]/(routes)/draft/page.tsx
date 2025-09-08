@@ -15,7 +15,6 @@ const DraftPage = async ({
     redirect('/sign-in')
   }
 
-  // Check user role - only allow owner and admin
   const user = await prismadb.user.findUnique({
     where: {
       clerkId: userId
@@ -26,7 +25,6 @@ const DraftPage = async ({
     redirect('/')
   }
 
-  // Check if user is store owner or has admin role
   const store = await prismadb.store.findFirst({
     where: {
       id: storeId,
@@ -50,7 +48,6 @@ const DraftPage = async ({
     redirect('/')
   }
 
-  // Get all active products for the store
   const products = await prismadb.product.findMany({
     where: {
       storeId: storeId,
@@ -68,7 +65,6 @@ const DraftPage = async ({
     }
   })
 
-  // Get trashed products
   const trashedProducts = await prismadb.product.findMany({
     where: {
       storeId: storeId,
@@ -86,7 +82,6 @@ const DraftPage = async ({
     }
   })
 
-  // Determine user role
   const userRole = store ? 'OWNER' : storeUser?.role || 'VIEWER'
 
   return (

@@ -9,7 +9,6 @@ const BlogPage = async ({ params }: { params: { blogId: string } }) => {
     },
   })
 
-  // Transform the blog data from the content JSON to match the form structure
   let transformedBlog = null
 
   if (blog) {
@@ -33,7 +32,6 @@ const BlogPage = async ({ params }: { params: { blogId: string } }) => {
         title: content.guideContent?.title || "",
         steps:
           content.guideContent?.steps?.map((step: any) => {
-            // Remove the ID from each step as it's not needed in the form
             const { id, ...stepWithoutId } = step
             return stepWithoutId
           }) || [],

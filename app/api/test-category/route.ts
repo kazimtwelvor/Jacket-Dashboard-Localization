@@ -10,7 +10,6 @@ export async function GET(req: Request) {
       return new NextResponse("Unauthorized", { status: 401 })
     }
 
-    // Get the first store owned by this user
     const store = await prismadb.store.findFirst({
       where: {
         userId,
@@ -21,7 +20,6 @@ export async function GET(req: Request) {
       return new NextResponse("No store found", { status: 404 })
     }
 
-    // Get the first billboard in this store
     const billboard = await prismadb.billboard.findFirst({
       where: {
         storeId: store.id,
@@ -30,7 +28,6 @@ export async function GET(req: Request) {
 
     let billboardId = billboard?.id
 
-    // If no billboard exists, create one
     if (!billboardId) {
       const newBillboard = await prismadb.billboard.create({
         data: {
@@ -42,7 +39,6 @@ export async function GET(req: Request) {
       billboardId = newBillboard.id
     }
 
-    // Try to create a test category
     const category = await prismadb.category.create({
       data: {
         name: "Test Category",

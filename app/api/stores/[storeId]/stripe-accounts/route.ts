@@ -31,7 +31,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       return new NextResponse("Secret key is required", { status: 400 })
     }
 
-    // Check if the user has permission to update this store
     const storeByUserId = await prismadb.store.findFirst({
       where: {
         id: params.storeId,
@@ -43,7 +42,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       return new NextResponse("Unauthorized", { status: 403 })
     }
 
-    // If this account is set as default, unset any other default accounts
     if (isDefault) {
       await prismadb.stripeAccount.updateMany({
         where: {

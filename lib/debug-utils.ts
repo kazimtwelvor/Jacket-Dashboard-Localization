@@ -1,23 +1,14 @@
-/**
- * Debug utilities for tracking data flow through components
- */
 
-// Enable or disable debug logging
+
 const DEBUG_ENABLED = true
 
-// Create a unique session ID for this page load
 const SESSION_ID = Math.random().toString(36).substring(2, 8)
 
-// Track component render counts
 const renderCounts: Record<string, number> = {}
 
-/**
- * Log debug information with consistent formatting
- */
 export function debugLog(component: string, action: string, data: any) {
   if (!DEBUG_ENABLED) return
 
-  // Increment render count
   renderCounts[component] = (renderCounts[component] || 0) + 1
 
 }

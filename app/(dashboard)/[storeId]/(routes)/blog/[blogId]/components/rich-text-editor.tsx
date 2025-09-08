@@ -101,7 +101,6 @@ export default function RichTextEditor({
 
   const insertVideo = () => {
     if (videoUrl) {
-      // Extract YouTube video ID
       let videoId = ""
       const match = videoUrl.match(
         /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/,
@@ -123,14 +122,12 @@ export default function RichTextEditor({
   const insertTable = () => {
     let tableHTML = '<table style="width:100%; border-collapse: collapse;">'
 
-    // Create header row
     tableHTML += "<thead><tr>"
     for (let i = 0; i < tableCols; i++) {
       tableHTML += `<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Header ${i + 1}</th>`
     }
     tableHTML += "</tr></thead><tbody>"
 
-    // Create data rows
     for (let i = 0; i < tableRows; i++) {
       tableHTML += "<tr>"
       for (let j = 0; j < tableCols; j++) {

@@ -22,10 +22,8 @@ export const StepTwoContentCreation = ({
   stepIndex,
   openTextEditor,
 }: StepTwoContentCreationProps) => {
-  // Create a handler function that properly passes the field and url to the parent component
   const handleImageSave = (field: string, url: string) => {
     if (onSaveImage) {
-      // Make sure we're using the correct field path format
       onSaveImage(`guideContent.steps.${stepIndex}.image`, url)
     }
   }

@@ -12,7 +12,6 @@ const SettingsPage = async ({ params }: { params: Promise<{ storeId: string }> }
     redirect("/sign-in")
   }
 
-  // First check if user is the owner
   const store = await prismadb.store.findFirst({
     where: {
       id: storeId,
@@ -20,7 +19,6 @@ const SettingsPage = async ({ params }: { params: Promise<{ storeId: string }> }
     },
   })
 
-  // If not the owner, check if they have ADMIN role
   if (!store) {
     const userRole = await getUserStoreRole(userId, storeId)
 
@@ -28,7 +26,6 @@ const SettingsPage = async ({ params }: { params: Promise<{ storeId: string }> }
       redirect("/")
     }
 
-    // Get the store data for admin
     const storeData = await prismadb.store.findUnique({
       where: {
         id: storeId,

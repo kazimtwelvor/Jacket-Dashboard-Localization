@@ -9,7 +9,6 @@ const resetPasswordSchema = z.object({
   storeId: z.string().uuid("Invalid store ID"),
 })
 
-// Helper to set CORS headers
 function setCorsHeaders(response: NextResponse) {
   response.headers.set("Access-Control-Allow-Origin", "*") // Or replace * with your frontend domain
   response.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS")
@@ -17,7 +16,6 @@ function setCorsHeaders(response: NextResponse) {
   return response
 }
 
-// Handle POST request
 export async function POST(req: Request) {
   try {
     const body = await req.json()
@@ -65,7 +63,6 @@ export async function POST(req: Request) {
   }
 }
 
-// Handle CORS preflight
 export function OPTIONS() {
   const response = new NextResponse(null, { status: 204 })
   return setCorsHeaders(response)

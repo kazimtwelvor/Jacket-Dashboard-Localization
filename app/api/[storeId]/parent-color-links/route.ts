@@ -35,7 +35,6 @@ export async function GET(
       return new NextResponse("Parent product not found", { status: 404 })
     }
 
-    // Parse colorLinks if it's a string, otherwise return as is
     let colorLinks = {}
     if (product.colorLinks) {
       if (typeof product.colorLinks === 'string') {

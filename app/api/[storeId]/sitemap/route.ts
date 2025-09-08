@@ -10,7 +10,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       return new NextResponse("Store ID is required", { status: 400 });
     }
 
-    // Get all published products
     const products = await prismadb.product.findMany({
       where: {
         storeId,
@@ -26,7 +25,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       orderBy: { updatedAt: "desc" },
     });
 
-    // Get all categories of type 'material' or 'style'
     const categories = await prismadb.category.findMany({
       where: {
         storeId,
@@ -44,7 +42,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       orderBy: { updatedAt: "desc" },
     });
 
-    // Get all category pages (PageCategory model)
     const categoryPages = await prismadb.categoryPage.findMany({
       where: { storeId },
       select: {
@@ -55,7 +52,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       orderBy: { updatedAt: "desc" },
     });
 
-    // Format output
     const productList = products.map((p) => ({
       slug: p.slug,
       lastModified: p.updatedAt,

@@ -52,7 +52,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
       return new NextResponse("Category id is required", { status: 400 })
     }
 
-    // Check if user is the store owner
     const storeByUserId = await prismadb.store.findFirst({
       where: {
         id: storeId,
@@ -60,9 +59,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
       },
     })
 
-    // If not store owner, check if user has Admin or Editor role
     if (!storeByUserId) {
-      // Find user by clerk ID
       const user = await prismadb.user.findUnique({
         where: { clerkId: userId },
       })
@@ -71,7 +68,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
         return new NextResponse("Unauthorized", { status: 403 })
       }
 
-      // Check if user has store access with Admin or Editor role
       const storeUser = await prismadb.storeUser.findFirst({
         where: {
           userId: user.id,
@@ -119,7 +115,6 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ store
       return new NextResponse("Category id is required", { status: 400 })
     }
 
-    // Check if user is the store owner
     const storeByUserId = await prismadb.store.findFirst({
       where: {
         id: storeId,
@@ -127,9 +122,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ store
       },
     })
 
-    // If not store owner, check if user has Admin or Editor role
     if (!storeByUserId) {
-      // Find user by clerk ID
       const user = await prismadb.user.findUnique({
         where: { clerkId: userId },
       })
@@ -138,7 +131,6 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ store
         return new NextResponse("Unauthorized", { status: 403 })
       }
 
-      // Check if user has store access with Admin or Editor role
       const storeUser = await prismadb.storeUser.findFirst({
         where: {
           userId: user.id,

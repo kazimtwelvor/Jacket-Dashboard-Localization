@@ -18,13 +18,11 @@ export const MembersClient = ({ members = [], invitations = [], currentUserId, s
   const router = useRouter()
   const params = useParams()
 
-  // Add storeId to each member
   const enhancedMembers = members.map((member) => ({
     ...member,
     storeId: params.storeId,
   }))
 
-  // Add storeId to each invitation
   const enhancedInvitations = invitations.map((invitation) => ({
     ...invitation,
     storeId: params.storeId,

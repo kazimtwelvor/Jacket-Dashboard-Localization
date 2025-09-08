@@ -60,7 +60,6 @@ export const ImagesClient = () => {
 
         setStoreUrl(url)
 
-        // Fetch images once we have the store URL
         fetchImages(url)
       } catch (error) {
         toast.error("Failed to fetch store URL. Using default.")

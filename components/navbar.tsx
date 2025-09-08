@@ -17,7 +17,6 @@ export const Navbar = async () => {
     return null
   }
 
-  // Get user role
   const userRole = await getUserRole()
 
   return (
@@ -28,7 +27,6 @@ export const Navbar = async () => {
           <GlobalSearch />
           <Notifications />
 
-          {/* Role-based navigation links */}
           {userRole === "admin" && (
             <Button variant="outline" size="sm" asChild>
               <Link href="/admin" className="flex items-center gap-1">

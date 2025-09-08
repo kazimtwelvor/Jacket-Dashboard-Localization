@@ -25,17 +25,12 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       return new NextResponse("Order ID is required", { status: 400 })
     }
 
-    // Get the Stripe instance for this store
     const stripe = await getStripeForStore(storeId)
-
-    // Retrieve the payment intent to verify its status
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId)
-
     if (paymentIntent.status !== "succeeded") {
       return new NextResponse(`Payment not successful. Status: ${paymentIntent.status}`, { status: 400 })
     }
 
-    // Update the order as paid
     const updatedOrder = await prismadb.order.update({
       where: {
         id: orderId,

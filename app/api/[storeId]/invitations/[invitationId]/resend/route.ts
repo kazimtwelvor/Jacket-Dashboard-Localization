@@ -12,7 +12,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       return new NextResponse("Unauthorized", { status: 401 })
     }
 
-    // Check if store exists and user has access
     const storeByOwner = await prismadb.store.findFirst({
       where: {
         id: params.storeId,
@@ -20,7 +19,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       },
     })
 
-    // If not owner, check if user is an admin member
     const storeMember = !storeByOwner
       ? await prismadb.storeMember.findFirst({
           where: {
@@ -35,7 +33,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       return new NextResponse("Unauthorized", { status: 403 })
     }
 
-    // Check if invitation exists
     const invitation = await prismadb.invitation.findUnique({
       where: {
         id: params.invitationId,
@@ -48,12 +45,10 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       return new NextResponse("Invitation not found", { status: 404 })
     }
 
-    // Generate a new token and update expiration
     const token = crypto.randomBytes(32).toString("hex")
     const expiresAt = new Date()
     expiresAt.setHours(expiresAt.getHours() + 48) // Token expires in 48 hours
 
-    // Update the invitation
     const updatedInvitation = await prismadb.invitation.update({
       where: {
         id: params.invitationId,
@@ -64,8 +59,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       },
     })
 
-    // In a real app, you would send an email here with the invitation link
-    // For now, we'll just return the token in the response
     return NextResponse.json({
       id: updatedInvitation.id,
       email: updatedInvitation.email,

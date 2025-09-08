@@ -10,7 +10,6 @@ export async function GET(req: Request) {
       return new NextResponse("Token is required", { status: 400 })
     }
 
-    // Find the invitation
     const invitation = await prismadb.invitation.findUnique({
       where: { token },
       include: {
@@ -26,12 +25,10 @@ export async function GET(req: Request) {
       return new NextResponse("Invalid invitation token", { status: 404 })
     }
 
-    // Check if invitation has expired
     if (invitation.expires < new Date()) {
       return new NextResponse("Invitation has expired", { status: 400 })
     }
 
-    // Check if invitation has already been accepted
     if (invitation.status !== "PENDING") {
       return new NextResponse(`Invitation is ${invitation.status.toLowerCase()}`, { status: 400 })
     }

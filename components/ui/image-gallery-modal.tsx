@@ -155,7 +155,6 @@ export const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({
 
   const handleImageSelect = (imageUrl: string) => {
     if (!multiSelect) {
-      // Single select mode
       const baseUrl = storeUrl?.endsWith("/") ? storeUrl.slice(0, -1) : storeUrl
       const fullUrl = `${baseUrl}${imageUrl}`
       onSelect(fullUrl)
@@ -219,7 +218,6 @@ export const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({
 
   const handleSetProductImage = () => {
     if (selectedImage) {
-      // For single image selection
       onSelect(selectedImage)
       toast.success("Product image set successfully")
       onClose()
@@ -228,10 +226,8 @@ export const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({
 
   const toggleSelectAll = () => {
     if (selectedImages.length === filteredImages.length) {
-      // Deselect all
       setSelectedImages([])
     } else {
-      // Select all
       setSelectedImages(filteredImages.map((img) => img.url))
     }
   }

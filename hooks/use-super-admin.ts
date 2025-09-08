@@ -18,7 +18,6 @@ export const useSuperAdmin = () => {
       }
 
       try {
-        // Check if the user has super_admin role in Clerk metadata
         const clerkRole = user.publicMetadata.role as string
         if (clerkRole === "super_admin") {
           setIsSuperAdmin(true)
@@ -26,7 +25,6 @@ export const useSuperAdmin = () => {
           return
         }
 
-        // If not found in Clerk, check the database as a fallback
         const response = await axios.get("/api/check-admin")
         setIsSuperAdmin(response.data.isSuperAdmin)
       } catch (error) {
@@ -39,15 +37,12 @@ export const useSuperAdmin = () => {
     checkSuperAdmin()
   }, [user, isLoaded])
 
-  // Check if user's email is in the SUPER_USER_EMAILS environment variable
   const isEmailSuperUser =
     user?.emailAddresses?.some((emailObj) => {
-      // Get the list of super user emails from the client-side accessible env var
       const superUserEmails = process.env.NEXT_PUBLIC_SUPER_USER_EMAILS?.split(",") || []
       return superUserEmails.includes(emailObj.emailAddress)
     }) || false
 
-  // Return both the async result and the direct checks
   return {
     isSuperAdmin: isSuperAdmin || isEmailSuperUser,
     isLoading,

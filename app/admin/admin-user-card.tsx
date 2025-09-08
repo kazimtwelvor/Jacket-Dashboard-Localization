@@ -10,7 +10,6 @@ import { updateUserRole } from "./actions"
 import { toast } from "@/components/ui/use-toast"
 import { Shield, ShieldAlert, User, UserCog, Copy, Check } from "lucide-react"
 
-// Define the user type for better type safety
 type SerializedUser = {
   id: string
   firstName: string
@@ -32,40 +31,33 @@ export function AdminUserCard({
   const [role, setRole] = useState(user.role || "user")
   const [isUpdating, setIsUpdating] = useState(false)
   const [copied, setCopied] = useState(false)
-
-  // Get user initials for avatar fallback
   const initials = `${user.firstName?.charAt(0) || ""}${user.lastName?.charAt(0) || ""}`
-
-  // Format date
   const formattedDate = new Date(user.createdAt).toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
   })
 
-  // Handle role change
   const handleRoleChange = async (newRole: string) => {
     setRole(newRole)
 
-    // Only super_admin can set admin roles
     if (newRole === "admin" && currentUserRole !== "super_admin") {
       toast({
         title: "Permission denied",
         description: "Only super admins can assign admin roles",
         variant: "destructive",
       })
-      setRole(user.role) // Reset to original role
+      setRole(user.role) 
       return
     }
 
-    // Prevent changing super_admin roles unless you're a super_admin
     if (user.role === "super_admin" && currentUserRole !== "super_admin") {
       toast({
         title: "Permission denied",
         description: "You cannot modify a super admin's role",
         variant: "destructive",
       })
-      setRole(user.role) // Reset to original role
+      setRole(user.role) 
       return
     }
 
@@ -82,13 +74,12 @@ export function AdminUserCard({
         description: "There was an error updating the user role",
         variant: "destructive",
       })
-      setRole(user.role) // Reset to original role on error
+      setRole(user.role)
     } finally {
       setIsUpdating(false)
     }
   }
 
-  // Copy user ID to clipboard
   const copyToClipboard = () => {
     navigator.clipboard.writeText(user.id)
     setCopied(true)
@@ -100,7 +91,6 @@ export function AdminUserCard({
     })
   }
 
-  // Get role badge color and icon
   const getRoleBadge = () => {
     switch (role) {
       case "super_admin":
@@ -127,8 +117,6 @@ export function AdminUserCard({
   }
 
   const roleBadge = getRoleBadge()
-
-  // Calculate time since joined
   const getTimeSince = (dateString: string) => {
     const date = new Date(dateString)
     const now = new Date()

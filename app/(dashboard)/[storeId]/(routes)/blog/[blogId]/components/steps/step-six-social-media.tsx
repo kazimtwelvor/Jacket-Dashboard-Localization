@@ -29,33 +29,22 @@ export const StepSixSocialMedia = ({
   const socialPlatforms = ["Instagram Marketing", "Twitter Marketing", "YouTube Marketing"]
   const bgColors = ["bg-pink-500", "bg-blue-400", "bg-red-500"]
 
-  // Track local state for images
   const [localImages, setLocalImages] = useState<string[]>(images || ["", "", ""])
   const [isEditing, setIsEditing] = useState<number | null>(null)
 
-  // Update local state when props change
   useEffect(() => {
     setLocalImages(images || ["", "", ""])
   }, [images])
 
-  // Direct image upload handler
   const handleImageUpload = (index: number, url: string) => {
     try {
 
-      // Update local state
       const newImages = [...localImages]
       newImages[index] = url
       setLocalImages(newImages)
-
-      // Update form state - first update the specific index
       onSaveImage(`guideContent.steps.${stepIndex}.images.${index}`, url)
-
-      // Then update the entire array
-
-      // Use a direct approach to update the array in the form
       const arrayPath = `guideContent.steps.${stepIndex}.images`
       onSaveImage(arrayPath, JSON.stringify(newImages))
-
       toast.success(`Image ${index + 1} updated successfully`)
       setIsEditing(null)
     } catch (error) {
@@ -63,17 +52,13 @@ export const StepSixSocialMedia = ({
     }
   }
 
-  // Handle image removal
   const handleImageRemove = (index: number) => {
     try {
       const newImages = [...localImages]
       newImages[index] = ""
       setLocalImages(newImages)
-
-      // Update form state
       onSaveImage(`guideContent.steps.${stepIndex}.images.${index}`, "")
       onSaveImage(`guideContent.steps.${stepIndex}.images`, JSON.stringify(newImages))
-
       toast.success(`Image ${index + 1} removed`)
       setIsEditing(null)
     } catch (error) {

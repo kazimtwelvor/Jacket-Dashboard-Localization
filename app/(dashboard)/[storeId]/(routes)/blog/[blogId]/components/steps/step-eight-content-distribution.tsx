@@ -33,7 +33,6 @@ export const StepEightContentDistribution: React.FC<StepEightContentDistribution
   stepIndex,
   openTextEditor,
 }) => {
-  // Create a handler function for saving images with proper field path
   const handleSaveImage = (index: number, url: string) => {
     const fieldPath = `guideContent.steps.${stepIndex}.images.${index}`
     onSaveImage(fieldPath, url)

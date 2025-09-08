@@ -65,7 +65,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
       data: {
         name,
         value,
-        // updatedAt is handled automatically by Prisma
       },
     })
 
@@ -75,7 +74,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
   }
 }
 
-//// Delete Method
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ storeId: string; sizeId: string }> }) {
   try {

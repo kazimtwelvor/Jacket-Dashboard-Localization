@@ -46,7 +46,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       take: limit,
     })
 
-    // Get total count for pagination
     const totalCount = await prismadb.order.count({
       where: {
         storeId: params.storeId,
@@ -57,7 +56,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       },
     })
 
-    // Convert Decimal fields to numbers for client compatibility
     const serializedOrders = orders.map(order => ({
       ...order,
       shippingCost: Number(order.shippingCost),
@@ -136,7 +134,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       return new NextResponse("Order items are required", { status: 400 })
     }
 
-    // Check if user has access to this store
     const storeByUserId = await prismadb.store.findFirst({
       where: {
         id: params.storeId,
@@ -144,7 +141,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       },
     })
 
-    // If user is not the owner, check if they are a member with appropriate permissions
     if (!storeByUserId) {
       const dbUser = await prismadb.user.findFirst({
         where: {
@@ -168,7 +164,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       }
     }
 
-    // Create user if customerId is provided but doesn't exist
     let finalUserId = null
     if (customerId) {
       const existingUser = await prismadb.user.findUnique({
@@ -178,10 +173,8 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       if (existingUser) {
         finalUserId = customerId
       }
-      // If user doesn't exist, we'll create order without userId (guest order)
     }
 
-    // Create the order with all provided fields
     const order = await prismadb.order.create({
       data: {
         storeId: params.storeId,
@@ -239,7 +232,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       },
     })
 
-    // Convert Decimal fields to numbers for client compatibility
     const serializedOrder = {
       ...order,
       shippingCost: Number(order.shippingCost),

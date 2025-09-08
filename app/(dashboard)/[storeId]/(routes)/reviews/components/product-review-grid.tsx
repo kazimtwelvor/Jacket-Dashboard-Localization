@@ -16,7 +16,6 @@ export const ProductReviewsGrid: React.FC<ProductReviewsGridProps> = ({ data }) 
   const [refreshKey, setRefreshKey] = useState(0)
   const router = useRouter()
   
-  // Group reviews by product
   const groupedReviews = data.reduce((acc, review) => {
     if (!acc[review.productName]) {
       acc[review.productName] = []
@@ -25,7 +24,6 @@ export const ProductReviewsGrid: React.FC<ProductReviewsGridProps> = ({ data }) 
     return acc
   }, {} as Record<string, ReviewColumn[]>)
   
-  // Filter products by search term
   const filteredProducts = Object.keys(groupedReviews)
     .filter(productName => 
       productName.toLowerCase().includes(searchTerm.toLowerCase())
@@ -37,7 +35,6 @@ export const ProductReviewsGrid: React.FC<ProductReviewsGridProps> = ({ data }) 
     router.refresh()
   }
   
-  // Force refresh when data changes
   useEffect(() => {
     setRefreshKey(prev => prev + 1)
   }, [data])

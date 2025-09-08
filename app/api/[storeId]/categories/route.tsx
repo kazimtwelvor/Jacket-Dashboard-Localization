@@ -2,7 +2,6 @@ import { NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import prismadb from "@/lib/prismadb"
 
-// CORS headers
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
@@ -41,7 +40,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       return new NextResponse("Store Id is required", { status: 400 })
     }
 
-    // Check if user is the store owner
     const storeByUserId = await prismadb.store.findFirst({
       where: {
         id: storeId,
@@ -49,9 +47,7 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       },
     })
 
-    // If not store owner, check if user has Admin or Editor role
     if (!storeByUserId) {
-      // Find user by clerk ID
       const user = await prismadb.user.findUnique({
         where: { clerkId: userId },
       })
@@ -60,7 +56,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
         return new NextResponse("Unauthorized", { status: 403 })
       }
 
-      // Check if user has store access with Admin or Editor role
       const storeUser = await prismadb.storeUser.findFirst({
         where: {
           userId: user.id,
@@ -105,14 +100,12 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
     }
 
     if (forTemplate) {
-      // For templates, return category pages instead of regular categories
       const categoryPages = await prismadb.categoryPage.findMany({
         where: {
           storeId: storeId,
         },
       })
       
-      // Format them to match the expected structure
       const formattedCategoryPages = categoryPages.map(page => ({
         categoryId: page.id,
         categoryName: page.name,
@@ -121,19 +114,16 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       
       return NextResponse.json(formattedCategoryPages, { headers: corsHeaders })
     } else {
-      // Build where clause for filtering
       const whereClause: any = {
         storeId: storeId,
       }
       
-      // Add isBest filter if provided
       if (isBest === "true") {
         whereClause.isBest = true
       } else if (isBest === "false") {
         whereClause.isBest = { not: true }
       }
       
-      // Regular category listing
       const categories = await prismadb.category.findMany({
         where: whereClause,
       })

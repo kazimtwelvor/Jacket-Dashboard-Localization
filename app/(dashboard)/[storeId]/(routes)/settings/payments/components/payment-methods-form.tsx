@@ -56,24 +56,20 @@ interface PaymentMethodsFormProps {
 }
 
 const formSchema = z.object({
-  // PayPal settings
   paypalClientId: z.string().optional(),
   paypalClientSecret: z.string().optional(),
   paypalEnabled: z.boolean().default(false),
   paypalSandboxMode: z.boolean().default(true),
 
-  // Legacy Stripe settings - kept for backward compatibility
   stripePublishableKey: z.string().optional(),
   stripeSecretKey: z.string().optional(),
   stripeEnabled: z.boolean().default(false),
   stripeTestMode: z.boolean().default(true),
   stripeWebhookSecret: z.string().optional(),
 
-  // Cash on Delivery settings
   cashOnDeliveryEnabled: z.boolean().default(false),
   cashOnDeliveryFee: z.coerce.number().min(0).default(0),
 
-  // Bank Transfer settings
   bankTransferEnabled: z.boolean().default(false),
   bankTransferDetails: z.string().optional(),
 })
@@ -107,12 +103,12 @@ export const PaymentMethodsForm: React.FC<PaymentMethodsFormProps> = ({ initialD
       paypalClientId: initialData.paypalClientId || "",
       paypalClientSecret: initialData.paypalClientSecret || "",
       paypalEnabled: initialData.paypalEnabled || false,
-      paypalSandboxMode: initialData.paypalSandboxMode !== false, // Default to true if not set
+      paypalSandboxMode: initialData.paypalSandboxMode !== false, 
 
       stripePublishableKey: initialData.stripePublishableKey || "",
       stripeSecretKey: initialData.stripeSecretKey || "",
       stripeEnabled: initialData.stripeEnabled || false,
-      stripeTestMode: initialData.stripeTestMode !== false, // Default to true if not set
+      stripeTestMode: initialData.stripeTestMode !== false, 
       stripeWebhookSecret: initialData.stripeWebhookSecret || "",
 
       cashOnDeliveryEnabled: initialData.cashOnDeliveryEnabled || false,
@@ -136,7 +132,6 @@ export const PaymentMethodsForm: React.FC<PaymentMethodsFormProps> = ({ initialD
     },
   })
 
-  // Fetch Stripe accounts
   useEffect(() => {
     const fetchStripeAccounts = async () => {
       try {
@@ -170,8 +165,6 @@ export const PaymentMethodsForm: React.FC<PaymentMethodsFormProps> = ({ initialD
       toast.success("Stripe account created.")
       setIsCreating(false)
       stripeAccountForm.reset()
-
-      // Refresh the list of accounts
       const response = await axios.get(`/api/stores/${params.storeId}/stripe-accounts`)
       setStripeAccounts(response.data)
     } catch (error) {
@@ -190,8 +183,6 @@ export const PaymentMethodsForm: React.FC<PaymentMethodsFormProps> = ({ initialD
       toast.success("Stripe account updated.")
       setIsEditing(null)
       stripeAccountForm.reset()
-
-      // Refresh the list of accounts
       const response = await axios.get(`/api/stores/${params.storeId}/stripe-accounts`)
       setStripeAccounts(response.data)
     } catch (error) {
@@ -210,8 +201,6 @@ export const PaymentMethodsForm: React.FC<PaymentMethodsFormProps> = ({ initialD
       toast.success("Stripe account deleted.")
       setDeleteAccountId(null)
       setOpen(false)
-
-      // Refresh the list of accounts
       const response = await axios.get(`/api/stores/${params.storeId}/stripe-accounts`)
       setStripeAccounts(response.data)
     } catch (error) {

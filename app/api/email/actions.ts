@@ -4,12 +4,8 @@ import { queueEmail } from "@/lib/email/queue/producer"
 import prismadb from "@/lib/prismadb"
 import { emailLogger } from "@/lib/email/logger"
 
-/**
- * Send order confirmation email
- */
 export async function sendOrderConfirmationEmail(orderId: string) {
   try {
-    // Get order details from database
     const order = await prismadb.order.findUnique({
       where: { id: orderId },
       include: {
@@ -29,7 +25,6 @@ export async function sendOrderConfirmationEmail(orderId: string) {
       throw new Error(`Order not found: ${orderId}`)
     }
 
-    // Get store details
     const store = await prismadb.store.findUnique({
       where: { id: order.storeId },
     })
@@ -38,7 +33,6 @@ export async function sendOrderConfirmationEmail(orderId: string) {
       throw new Error(`Store not found for order: ${orderId}`)
     }
 
-    // Format order data for email template
     const orderItems = order.orderItems.map((item) => ({
       id: item.id,
       name: item.product.name,
@@ -52,7 +46,6 @@ export async function sendOrderConfirmationEmail(orderId: string) {
     const tax = Number.parseFloat(order.taxAmount?.toString() || "0")
     const total = Number.parseFloat(order.totalPrice.toString())
 
-    // Queue the email
     const result = await queueEmail({
       type: "order-confirmation",
       payload: {
@@ -96,12 +89,9 @@ export async function sendOrderConfirmationEmail(orderId: string) {
   }
 }
 
-/**
- * Send password reset email
- */
+
 export async function sendPasswordResetEmail(email: string, storeId: string) {
   try {
-    // Find user by email
     const user = await prismadb.storeUser.findFirst({
       where: {
         email,
@@ -110,18 +100,12 @@ export async function sendPasswordResetEmail(email: string, storeId: string) {
     })
 
     if (!user) {
-      // Don't reveal if user exists or not for security
       return { success: true }
     }
 
-    // Generate reset token
     const resetToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
-
-    // Calculate expiry (24 hours from now)
     const resetTokenExp = new Date()
     resetTokenExp.setHours(resetTokenExp.getHours() + 24)
-
-    // Save reset token
     await prismadb.storeUser.update({
       where: { id: user.id },
       data: {
@@ -130,16 +114,13 @@ export async function sendPasswordResetEmail(email: string, storeId: string) {
       },
     })
 
-    // Get store details
     const store = await prismadb.store.findUnique({
       where: { id: storeId },
     })
 
-    // Build reset link
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://yourstore.com"
     const resetLink = `${baseUrl}/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}&storeId=${storeId}`
 
-    // Queue the email
     const result = await queueEmail({
       type: "password-reset",
       payload: {
@@ -168,12 +149,9 @@ export async function sendPasswordResetEmail(email: string, storeId: string) {
   }
 }
 
-/**
- * Send welcome email to new customer
- */
+
 export async function sendWelcomeEmail(userId: string, storeId: string) {
   try {
-    // Find user
     const user = await prismadb.storeUser.findUnique({
       where: { id: userId },
     })
@@ -182,7 +160,6 @@ export async function sendWelcomeEmail(userId: string, storeId: string) {
       throw new Error(`User not found: ${userId}`)
     }
 
-    // Get store details
     const store = await prismadb.store.findUnique({
       where: { id: storeId },
     })
@@ -191,11 +168,9 @@ export async function sendWelcomeEmail(userId: string, storeId: string) {
       throw new Error(`Store not found: ${storeId}`)
     }
 
-    // Build login link
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://yourstore.com"
     const loginLink = `${baseUrl}/sign-in?storeId=${storeId}`
 
-    // Queue the email
     const result = await queueEmail({
       type: "welcome",
       payload: {
@@ -223,9 +198,7 @@ export async function sendWelcomeEmail(userId: string, storeId: string) {
   }
 }
 
-/**
- * Send shipping update email
- */
+
 export async function sendShippingUpdateEmail(
   orderId: string,
   trackingInfo: {
@@ -236,7 +209,6 @@ export async function sendShippingUpdateEmail(
   },
 ) {
   try {
-    // Get order details from database
     const order = await prismadb.order.findUnique({
       where: { id: orderId },
     })
@@ -245,7 +217,6 @@ export async function sendShippingUpdateEmail(
       throw new Error(`Order not found: ${orderId}`)
     }
 
-    // Get store details
     const store = await prismadb.store.findUnique({
       where: { id: order.storeId },
     })
@@ -254,7 +225,6 @@ export async function sendShippingUpdateEmail(
       throw new Error(`Store not found for order: ${orderId}`)
     }
 
-    // Queue the email
     const result = await queueEmail({
       type: "shipping-update",
       payload: {

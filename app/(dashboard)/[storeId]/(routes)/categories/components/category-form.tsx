@@ -63,22 +63,18 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ initialData, billboa
           name: "",
           slug: "",
           billboardId: undefined,
-          // Ensure type is explicitly set to a valid value
           type: (typeParam as "material" | "style" | "gender" | "regular") || "regular",
           isBest: false,
         },
   })
 
-  // Add a useEffect to log the current form values for debugging
   useEffect(() => {
   }, [form.watch("type")])
 
-  // Generate slug from name
   const onNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.value
     form.setValue("name", name)
 
-    // Only auto-generate slug if it's empty or hasn't been manually edited
     if (!initialData?.slug && !form.getValues("slug")) {
       const slug = name
         .toLowerCase()
@@ -214,7 +210,6 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ initialData, billboa
                         value={field.value}
                         onValueChange={(value) => {
                           field.onChange(value)
-                          // Force form to update
                           form.setValue("type", value as "material" | "style" | "gender" | "regular")
                         }}
                         className="grid grid-cols-2 gap-4"

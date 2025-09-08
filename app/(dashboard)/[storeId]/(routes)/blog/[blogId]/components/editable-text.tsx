@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input"
 import { Check, X, Edit2, Bold, Italic, Underline, Code, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, LinkIcon, ImageIcon, Heading1, Heading2, Heading3, Strikethrough } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 
-// Import TipTap editor components
 import { EditorContent, useEditor } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import UnderlineExtension from "@tiptap/extension-underline"
@@ -33,7 +32,6 @@ interface EditableTextProps {
   isRichText?: boolean
 }
 
-// Menu button component for editor toolbar
 const MenuButton = ({
   onClick,
   isActive = false,
@@ -79,7 +77,6 @@ export const EditableText: React.FC<EditableTextProps> = ({
   const initialValueRef = useRef(value || "")
   const linkUrlRef = useRef<HTMLInputElement>(null)
 
-  // Initialize TipTap editor for rich text editing
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -121,20 +118,17 @@ export const EditableText: React.FC<EditableTextProps> = ({
     },
   })
 
-  // Update local value when prop value changes and not in editing mode
   useEffect(() => {
     if (!isEditing) {
       setLocalValue(value || "")
       initialValueRef.current = value || ""
       
-      // Update editor content if it exists
       if (editor && value !== editor.getHTML()) {
         editor.commands.setContent(value || "")
       }
     }
   }, [value, isEditing, editor])
 
-  // Focus the input when editing starts
   useEffect(() => {
     if (isEditing && !isRichText && inputRef.current) {
       inputRef.current.focus()
@@ -143,16 +137,13 @@ export const EditableText: React.FC<EditableTextProps> = ({
     }
   }, [isEditing, isRichText, editor])
 
-  // Save changes
   const saveChanges = (e?: React.MouseEvent | React.KeyboardEvent) => {
     if (e) {
       e.preventDefault()
       e.stopPropagation()
     }
 
-    // Only save if the value has actually changed
     if (localValue !== initialValueRef.current) {
-      // Use setTimeout to defer the save operation outside the current event cycle
       setTimeout(() => {
         onSave(field, localValue)
       }, 0)
@@ -160,14 +151,12 @@ export const EditableText: React.FC<EditableTextProps> = ({
     setIsEditing(false)
   }
 
-  // Cancel editing
   const cancelEditing = (e?: React.MouseEvent | React.KeyboardEvent) => {
     if (e) {
       e.preventDefault()
       e.stopPropagation()
     }
 
-    // Reset to the initial value
     setLocalValue(initialValueRef.current)
     if (editor) {
       editor.commands.setContent(initialValueRef.current)
@@ -175,24 +164,18 @@ export const EditableText: React.FC<EditableTextProps> = ({
     setIsEditing(false)
   }
 
-  // Start editing - completely isolated from form events
   const startEditing = (e: React.MouseEvent) => {
-    // Prevent any form submission or event bubbling
     e.preventDefault()
     e.stopPropagation()
 
-    // Store the current value as the initial value
     initialValueRef.current = value || ""
     setLocalValue(value || "")
     setIsEditing(true)
 
-    // Prevent any other handlers from executing
     return false
   }
 
-  // Handle keyboard shortcuts
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    // Prevent form submission on Enter
     if (e.key === "Enter" && !isTextarea && !isRichText) {
       e.preventDefault()
       saveChanges(e)
@@ -205,22 +188,15 @@ export const EditableText: React.FC<EditableTextProps> = ({
     }
   }
 
-  // Editor toolbar actions
   const setLink = useCallback(() => {
     if (!editor) return
 
     const url = linkUrlRef.current?.value || ""
-
-    // cancelled
     if (url === "") {
       editor.chain().focus().extendMarkRange("link").unsetLink().run()
       return
     }
-
-    // update link
     editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run()
-
-    // Close dialog
     setShowLinkDialog(false)
   }, [editor])
 
@@ -236,8 +212,6 @@ export const EditableText: React.FC<EditableTextProps> = ({
           alt: imageAlt,
         })
         .run()
-
-      // Reset and close dialog
       setImageUrl("")
       setImageAlt("")
       setShowImageDialog(false)
@@ -254,13 +228,10 @@ export const EditableText: React.FC<EditableTextProps> = ({
             e.stopPropagation()
           }}
         >
-          {/* Rich Text Editor */}
           <div className="border rounded-md">
-            {/* Editor Toolbar */}
             <div className="border-b p-1 bg-muted/20 flex flex-wrap gap-1 items-center">
               {editor && (
                 <>
-                  {/* Text Formatting */}
                   <MenuButton
                     onClick={() => editor.chain().focus().toggleBold().run()}
                     isActive={editor.isActive("bold")}
@@ -295,7 +266,6 @@ export const EditableText: React.FC<EditableTextProps> = ({
 
                   <div className="w-px h-5 bg-border mx-1"></div>
 
-                  {/* Headings */}
                   <MenuButton
                     onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
                     isActive={editor.isActive("heading", { level: 1 })}
@@ -322,7 +292,6 @@ export const EditableText: React.FC<EditableTextProps> = ({
 
                   <div className="w-px h-5 bg-border mx-1"></div>
 
-                  {/* Lists */}
                   <MenuButton
                     onClick={() => editor.chain().focus().toggleBulletList().run()}
                     isActive={editor.isActive("bulletList")}
@@ -341,7 +310,6 @@ export const EditableText: React.FC<EditableTextProps> = ({
 
                   <div className="w-px h-5 bg-border mx-1"></div>
 
-                  {/* Alignment */}
                   <MenuButton
                     onClick={() => editor.chain().focus().setTextAlign("left").run()}
                     isActive={editor.isActive({ textAlign: "left" })}
@@ -368,7 +336,6 @@ export const EditableText: React.FC<EditableTextProps> = ({
 
                   <div className="w-px h-5 bg-border mx-1"></div>
 
-                  {/* Media */}
                   <MenuButton onClick={() => setShowLinkDialog(true)} title="Insert Link">
                     <LinkIcon className="h-3.5 w-3.5" />
                   </MenuButton>
@@ -380,7 +347,6 @@ export const EditableText: React.FC<EditableTextProps> = ({
               )}
             </div>
 
-            {/* Editor Content */}
             <div className="p-3 min-h-[100px]">
               <EditorContent editor={editor} className="prose prose-sm max-w-none min-h-[80px]" />
             </div>
@@ -468,7 +434,6 @@ export const EditableText: React.FC<EditableTextProps> = ({
         <Edit2 className="h-4 w-4" />
       </Button>
 
-      {/* Link Dialog */}
       {showLinkDialog && (
         <Dialog open={showLinkDialog} onOpenChange={setShowLinkDialog}>
           <DialogContent className="sm:max-w-md">
@@ -498,7 +463,6 @@ export const EditableText: React.FC<EditableTextProps> = ({
         </Dialog>
       )}
 
-      {/* Image Dialog */}
       {showImageDialog && (
         <Dialog open={showImageDialog} onOpenChange={setShowImageDialog}>
           <DialogContent className="sm:max-w-md">

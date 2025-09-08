@@ -53,12 +53,10 @@ export const EditableCategoryTemplate: React.FC<EditableCategoryTemplateProps> =
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [allCategories, setAllCategories] = useState<Category[]>([])
   
-  // Initialize content from existing data or defaults
   const existingContent = form.getValues("categoryContent")
   
   let parsedContent = null
   try {
-    // Handle both string and object formats
     if (existingContent) {
       if (typeof existingContent === 'string') {
         parsedContent = JSON.parse(existingContent);
@@ -95,25 +93,20 @@ export const EditableCategoryTemplate: React.FC<EditableCategoryTemplateProps> =
   const [otherCategories, setOtherCategories] = useState<OtherCategory[]>(parsedContent?.otherCategories || [])
   const [selectedBlogs, setSelectedBlogs] = useState<SelectedBlog[]>(parsedContent?.selectedBlogs || [])
 
-  // Store category pages and blogs for reference
   const [categoryPages, setCategoryPages] = useState<any[]>([])
   const [availableBlogs, setAvailableBlogs] = useState<any[]>([])
   
-  // Fetch category pages only
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch category pages instead of categories
         const categoryPagesResponse = await axios.get(`/api/${params.storeId}/category-pages`)
         const pages = categoryPagesResponse.data
         setCategoryPages(pages)
         
-        // Fetch available blogs
         const blogsResponse = await axios.get(`/api/${params.storeId}/blog`)
         const blogs = blogsResponse.data
         setAvailableBlogs(blogs)
         
-        // Convert category pages to the format expected by allCategories
         const categoryPagesAsCategories = pages.map(page => ({
           id: page.id,
           name: page.name,
@@ -122,12 +115,9 @@ export const EditableCategoryTemplate: React.FC<EditableCategoryTemplateProps> =
         
         setAllCategories(categoryPagesAsCategories)
         
-        // Update existing otherCategories with images from matching category pages
         if (otherCategories.length > 0) {
           const updatedCategories = otherCategories.map(cat => {
-            // Find a matching category page by ID
             const matchingPage = pages.find(page => page.id === cat.categoryId)
-            
             if (matchingPage?.imageUrl) {
               return { ...cat, imageUrl: matchingPage.imageUrl }
             }
@@ -177,14 +167,8 @@ export const EditableCategoryTemplate: React.FC<EditableCategoryTemplateProps> =
 
   const toggleCategory = (category: Category, checked: boolean) => {
     if (checked) {
-      // Since we're now using category pages directly, the category is already a category page
-      // Find the matching page in categoryPages
       const matchingPage = categoryPages.find(page => page.id === category.id)
-      
-      // Use the image URL from the matching page if found
       const imageUrl = matchingPage?.imageUrl || ""
-      
-      // Add the category with its image URL
       setOtherCategories([...otherCategories, {
         categoryId: category.id,
         categoryName: category.name,

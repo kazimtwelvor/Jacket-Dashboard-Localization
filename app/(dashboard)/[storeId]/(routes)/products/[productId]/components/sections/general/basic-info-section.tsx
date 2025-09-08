@@ -91,7 +91,6 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
       const data = await response.json();
       setIsSlugUnique(data.isUnique);
     } catch (error) {
-      console.error("Error checking slug uniqueness:", error);
       setIsSlugUnique(null);
     } finally {
       setIsCheckingSlug(false);
@@ -145,7 +144,6 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
       }
 
       if (needsUpdate) {
-        console.log("Syncing external materials from material categories:", selectedMaterialCategories)
         form.setValue("specifications.externalMaterial", [...selectedMaterialCategories], {
           shouldValidate: true,
           shouldDirty: true,
@@ -170,7 +168,6 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
       }
 
       if (needsUpdate) {
-        console.log("Syncing color specifications from color variations:", selectedColorVariations)
         form.setValue("specifications.color", [...selectedColorVariations], {
           shouldValidate: true,
           shouldDirty: true,

@@ -28,7 +28,6 @@ export const NewsletterFormModal = ({ isOpen, onClose }: NewsletterFormModalProp
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Newsletter form submitted:", formData)
     onClose()
   }
 

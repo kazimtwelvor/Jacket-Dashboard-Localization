@@ -74,7 +74,6 @@ export async function generateReviewsForNewProduct(
         
         if (response.status === 429) {
           const waitTime = Math.pow(2, retryCount) * 1000 
-          console.log(`Rate limited, waiting ${waitTime}ms before retry ${retryCount + 1}/${maxRetries}`)
           await new Promise(resolve => setTimeout(resolve, waitTime))
           retryCount++
           continue
@@ -92,7 +91,6 @@ export async function generateReviewsForNewProduct(
 
     if (!response || !response.ok) {
       if (response?.status === 429) {
-        console.log("Rate limited, generating fallback reviews")
         const fallbackReviews = generateFallbackReviews(reviewCount, productName)
         const tempProductId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
         
@@ -105,7 +103,6 @@ export async function generateReviewsForNewProduct(
         }
       }
       const errorData = response ? await response.json() : {}
-      console.error("Gemini API error:", errorData)
       throw new Error(`API call failed: ${response?.statusText || 'Network error'}`)
     }
 
@@ -116,7 +113,6 @@ export async function generateReviewsForNewProduct(
     }
 
     const rawText = data.candidates[0].content.parts[0].text
-    console.log("Raw Gemini response:", rawText)
 
     let cleanedText = rawText.trim()
     
@@ -146,7 +142,6 @@ export async function generateReviewsForNewProduct(
       reviews: generatedReviews,
     }
   } catch (error) {
-    console.error("Error generating reviews for new product:", error)
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unknown error occurred",

@@ -86,7 +86,6 @@ export async function GET() {
       headers,
     })
   } catch (error) {
-    console.error("Error in diagnostic endpoint:", error)
     return new NextResponse(
       JSON.stringify({
         error: "Internal server error",

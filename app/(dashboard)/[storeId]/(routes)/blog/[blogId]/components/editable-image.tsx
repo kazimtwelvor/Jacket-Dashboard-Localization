@@ -43,12 +43,9 @@ export const EditableImage: React.FC<EditableImageProps> = ({
   const handleImageChange = (url: string) => {
     try {
       setIsLoading(true)
-      console.log("EditableImage: Image URL received:", url)
-      console.log("EditableImage: Field being updated:", field)
 
       // Validate URL - make sure it's not a field path or undefined
       if (!url) {
-        console.error("EditableImage: Empty URL received")
         if (!toastShown) {
           toast.error("No image URL received")
           setToastShown(true)
@@ -65,7 +62,6 @@ export const EditableImage: React.FC<EditableImageProps> = ({
         url.includes(".steps.") ||
         url.includes(".images.")
       ) {
-        console.error("EditableImage: Invalid URL detected:", url)
         if (!toastShown) {
           toast.error("Invalid image URL")
           setToastShown(true)
@@ -76,7 +72,6 @@ export const EditableImage: React.FC<EditableImageProps> = ({
       }
 
       // Save the image URL - IMPORTANT: Pass the field and URL separately
-      console.log("EditableImage: Saving valid URL:", url)
       onSave(field, url)
       setImageUrl(url)
 
@@ -86,7 +81,6 @@ export const EditableImage: React.FC<EditableImageProps> = ({
         setToastShown(true)
       }
     } catch (error) {
-      console.error("Error in handleImageChange:", error)
       if (!toastShown) {
         toast.error("Failed to update image")
         setToastShown(true)
@@ -106,7 +100,6 @@ export const EditableImage: React.FC<EditableImageProps> = ({
         setToastShown(true)
       }
     } catch (error) {
-      console.error("Error removing image:", error)
       if (!toastShown) {
         toast.error("Failed to remove image")
         setToastShown(true)

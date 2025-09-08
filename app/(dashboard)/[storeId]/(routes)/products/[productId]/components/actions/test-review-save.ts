@@ -22,7 +22,6 @@ export async function testReviewSave(storeId: string, productId: string) {
       throw new Error("Product not found")
     }
 
-    console.log("Product found:", product.name)
 
     const testReview = await prismadb.review.create({
       data: {

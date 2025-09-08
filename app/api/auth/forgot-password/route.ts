@@ -36,7 +36,6 @@ export async function POST(req: Request) {
       }
     );
   } catch (error) {
-    console.error("[FORGOT_PASSWORD_ERROR]", error);
     return new NextResponse(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
       headers: {

@@ -31,13 +31,11 @@ export const StepTenInteractiveContent: React.FC<StepTenInteractiveContentProps>
 }) => {
   // Create a handler function for saving images with direct field path
   const handleSaveImage = (index: number, url: string) => {
-    console.log(`Saving image for step ${stepIndex}, image index ${index}:`, url)
     onSaveImage(`guideContent.steps.${stepIndex}.images.${index}`, url)
   }
 
   // Create a handler function for saving card titles and descriptions
   const handleSaveCardText = (index: number, type: "title" | "description", value: string) => {
-    console.log(`Saving ${type} for step ${stepIndex}, card index ${index}:`, value)
     const fieldPath = `guideContent.steps.${stepIndex}.card${type === "title" ? "Titles" : "Descriptions"}.${index}`
     onSaveText(fieldPath, value)
   }

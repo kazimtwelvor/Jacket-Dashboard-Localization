@@ -13,7 +13,6 @@ export async function GET() {
 
     // Check if the userRole model exists in prismadb
     if (!prismadb.userRole) {
-      console.error("userRole model not found in prismadb")
       return NextResponse.json({
         userId,
         roles: [],
@@ -45,7 +44,6 @@ export async function GET() {
         isAdmin,
       })
     } catch (dbError) {
-      console.error("Database query error:", dbError)
       return NextResponse.json({
         userId,
         roles: [],
@@ -55,7 +53,6 @@ export async function GET() {
       })
     }
   } catch (error) {
-    console.error("[USER_ROLES_GET]", error)
     return NextResponse.json({ error: "Internal error" }, { status: 500 })
   }
 }

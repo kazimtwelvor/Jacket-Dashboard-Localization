@@ -21,7 +21,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       )
     }
 
-    // Check if the slug already exists for another product
     const existingProduct = await prismadb.product.findFirst({
       where: {
         slug: slug,
@@ -37,7 +36,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       isUnique: !existingProduct,
     })
   } catch (error) {
-    console.error("[CHECK_SLUG_GET]", error)
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

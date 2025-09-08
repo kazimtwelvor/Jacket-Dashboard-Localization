@@ -55,28 +55,22 @@ export const EditableCategoryTemplate: React.FC<EditableCategoryTemplateProps> =
   
   // Initialize content from existing data or defaults
   const existingContent = form.getValues("categoryContent")
-  console.log('EditableCategoryTemplate - existingContent:', existingContent, 'type:', typeof existingContent);
   
   let parsedContent = null
   try {
     // Handle both string and object formats
     if (existingContent) {
       if (typeof existingContent === 'string') {
-        console.log('Parsing string content...');
         parsedContent = JSON.parse(existingContent);
       } else {
-        console.log('Using object content directly...');
         parsedContent = existingContent;
       }
     } else {
-      console.log('No existing content found');
     }
   } catch (e) {
-    console.error("Error parsing category content:", e);
     parsedContent = null;
   }
   
-  console.log('Parsed content:', parsedContent);
   
   const [mainContent, setMainContent] = useState<string>(parsedContent?.mainContent || `<h2>Explore Our Collection</h2>
 <p>Discover our premium collection of products designed with quality and style in mind. Our carefully curated selection offers something for everyone, combining the latest trends with timeless classics.</p>
@@ -118,7 +112,6 @@ export const EditableCategoryTemplate: React.FC<EditableCategoryTemplateProps> =
         const blogsResponse = await axios.get(`/api/${params.storeId}/blog`)
         const blogs = blogsResponse.data
         setAvailableBlogs(blogs)
-        console.log('Fetched blogs:', blogs)
         
         // Convert category pages to the format expected by allCategories
         const categoryPagesAsCategories = pages.map(page => ({
@@ -128,7 +121,6 @@ export const EditableCategoryTemplate: React.FC<EditableCategoryTemplateProps> =
         }))
         
         setAllCategories(categoryPagesAsCategories)
-        console.log('Fetched category pages:', pages)
         
         // Update existing otherCategories with images from matching category pages
         if (otherCategories.length > 0) {
@@ -145,7 +137,6 @@ export const EditableCategoryTemplate: React.FC<EditableCategoryTemplateProps> =
           setOtherCategories(updatedCategories)
         }
       } catch (error) {
-        console.error('Failed to fetch data:', error)
       }
     }
     if (params.storeId) {
@@ -192,7 +183,6 @@ export const EditableCategoryTemplate: React.FC<EditableCategoryTemplateProps> =
       
       // Use the image URL from the matching page if found
       const imageUrl = matchingPage?.imageUrl || ""
-      console.log(`Adding category page ${category.name} with image URL:`, imageUrl)
       
       // Add the category with its image URL
       setOtherCategories([...otherCategories, {
@@ -465,11 +455,7 @@ export const EditableCategoryTemplate: React.FC<EditableCategoryTemplateProps> =
                     otherCategories
                   }
 
-                  console.log('Saving template data:', templateData);
-                  console.log('Other categories with images:', otherCategories);
-                  console.log('Available category pages:', categoryPages);
                   const jsonString = JSON.stringify(templateData);
-                  console.log('JSON string length:', jsonString);
                   form.setValue("categoryContent", jsonString);
                   setIsModalOpen(false);
                 }}>

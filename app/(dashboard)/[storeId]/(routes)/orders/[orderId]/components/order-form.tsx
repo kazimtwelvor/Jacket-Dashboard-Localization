@@ -101,8 +101,6 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
   // Normalize payment method from initialData
   const normalizedPaymentMethod = normalizePaymentMethod(initialData?.paymentMethod)
 
-  console.log("Original payment method:", initialData?.paymentMethod)
-  console.log("Normalized payment method:", normalizedPaymentMethod)
 
   const defaultValues = initialData
     ? {

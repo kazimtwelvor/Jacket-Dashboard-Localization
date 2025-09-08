@@ -27,7 +27,6 @@ export const ColorSelector: React.FC<ColorSelectorProps> = ({ form }) => {
         const response = await axios.get(`/api/${params?.storeId}/colors`)
         setColors(response.data || [])
       } catch (error) {
-        console.error("Failed to fetch colors:", error)
         setColors([
           { id: "black", name: "Black", value: "#000000" },
           { id: "white", name: "White", value: "#FFFFFF" },

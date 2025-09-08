@@ -57,7 +57,6 @@ export async function GET(req: NextRequest, { params }: { params: { orderId: str
 
     return NextResponse.json({ order })
   } catch (error) {
-    console.error("[ORDER_GET]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

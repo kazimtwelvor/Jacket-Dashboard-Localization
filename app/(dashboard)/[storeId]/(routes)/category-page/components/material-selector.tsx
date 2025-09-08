@@ -32,7 +32,6 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({ form }) => {
           }))
         setMaterials(materialCategories || [])
       } catch (error) {
-        console.error("Failed to fetch materials:", error)
         setMaterials([
           { id: "leather", name: "Leather" },
           { id: "cotton", name: "Cotton" },

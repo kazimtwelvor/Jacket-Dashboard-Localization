@@ -76,7 +76,6 @@ export const ReviewsSection = () => {
             form.setValue("cachedReviews", parsedReviews, { shouldValidate: false })
           }
         } catch (error) {
-          console.error("Error loading existing reviews:", error)
         } finally {
           setIsLoadingReviews(false)
         }
@@ -101,10 +100,8 @@ export const ReviewsSection = () => {
           const result = await getReviewCount(storeId, productId)
           if (result.success) {
             setReviewStats({ total: result.totalReviews, product: result.productReviews })
-            console.log("Review count loaded:", result)
           }
         } catch (error) {
-          console.error("Error loading review count:", error)
         }
       }
     }
@@ -130,7 +127,6 @@ export const ReviewsSection = () => {
       const storeId = getStoreId()
 
       if (productId && storeId && productId !== "new") {
-        console.log(`Generating ${reviewCount} reviews for existing product ${productId} (to be saved on publish)`)
 
         const result = await generateAndSaveReviews(storeId, productId, productName, productDescription, reviewCount)
 
@@ -161,7 +157,6 @@ export const ReviewsSection = () => {
       else if (storeId) {
         const { generateReviewsForNewProduct } = await import("../../actions/generate-reviews-for-new-product")
         
-        console.log(`Generating ${reviewCount} reviews for new product (to be saved later)`)
         
         const result = await generateReviewsForNewProduct(productName, productDescription, reviewCount, storeId)
         
@@ -173,9 +168,6 @@ export const ReviewsSection = () => {
           
           localStorage.setItem(`cachedReviews_new`, JSON.stringify(result.reviews))
           
-          console.log("Cached reviews set in form:", result.reviews)
-          console.log("Form cachedReviews value:", form.getValues("cachedReviews"))
-          console.log("Form tempReviewsId value:", form.getValues("tempReviewsId"))
           
           form.setValue("reviews", true, { shouldDirty: true })
           
@@ -198,7 +190,6 @@ export const ReviewsSection = () => {
         })
       }
     } catch (error) {
-      console.error("Error generating reviews:", error)
       const errorMessage = error instanceof Error ? error.message : "An unknown error occurred"
       
       if (errorMessage.includes("Rate limit") || errorMessage.includes("429")) {
@@ -244,7 +235,6 @@ export const ReviewsSection = () => {
         })
       }
     } catch (error) {
-      console.error("Test review save error:", error)
       toast({
         title: "Test Error",
         description: error instanceof Error ? error.message : "Unknown error occurred",

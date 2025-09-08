@@ -36,16 +36,7 @@ const OrderPage = async ({
     })
 
     // Log order details for debugging
-    console.log("Order details:", {
-      id: order?.id,
-      customerEmail: order?.customerEmail,
-      phone: order?.phone,
-      address: order?.address,
-      billingAddress: order?.billingAddress,
-      shippingAddress: order?.shippingAddress,
-      paymentStatus: order?.paymentStatus,
-      transactionId: order?.transactionId,
-    })
+ 
   }
 
   // Fetch products for product selection

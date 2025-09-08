@@ -252,7 +252,6 @@ export const ProductPreviewModal = ({ isOpen, onClose, product }: ProductPreview
                           </div>
                         )
                       } catch (error) {
-                        console.error('Error parsing specifications:', error)
                         return <span>Error loading specifications</span>
                       }
                     })()} 

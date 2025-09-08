@@ -86,7 +86,6 @@ export async function POST(req: Request, { params }: { params: { token: string }
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.log("[INVITATION_ACCEPT]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

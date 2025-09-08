@@ -659,11 +659,9 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
   // Update the handleSaveImage function to fix the issues with specific steps
   const handleSaveImage = useCallback(
     (field: string, url: string) => {
-      console.log("BlogForm: Saving image:", field, url) // Add logging for debugging
 
       // CRITICAL: Validate URL to prevent field paths being saved as URLs
       if (!url) {
-        console.log("BlogForm: Empty URL, skipping save")
         return
       }
 
@@ -682,11 +680,9 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
       try {
         // Special handling for step 15 (Content Auditing)
         if (field.includes("guideContent.steps.14.images")) {
-          console.log("BlogForm: Special handling for step 15 (Content Auditing)")
 
           // If we're receiving an array directly, use it
           if (Array.isArray(url)) {
-            console.log("BlogForm: Received array directly for step 15:", url)
             form.setValue("guideContent.steps.14.images", url, {
               shouldValidate: false,
               shouldDirty: true,
@@ -699,7 +695,6 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
           const imageMatch = field.match(/images\.(\d+)/)
           if (imageMatch && imageMatch[1]) {
             const imageIndex = Number.parseInt(imageMatch[1], 10)
-            console.log(`BlogForm: Processing image for step 15, image index ${imageIndex}:`, url)
 
             // Get current images array or initialize it
             const currentStep = form.getValues("guideContent.steps.14") || {}
@@ -712,7 +707,6 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
 
             // Update the specific index
             currentImages[imageIndex] = url
-            console.log(`BlogForm: Updated step 15 images array:`, currentImages)
 
             // Update the entire step with the new images array
             const updatedStep = { ...currentStep, images: currentImages }
@@ -725,7 +719,6 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
           }
         }
 
-        // Extract step index and image index from the field path
         const stepMatch = field.match(/steps\.(\d+)/)
         const imageMatch = field.match(/images\.(\d+)/)
 
@@ -734,10 +727,8 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
           const currentStepPath = `guideContent.steps.${stepIndex}`
           const currentStep = form.getValues(currentStepPath as any) || {}
 
-          // Handle array fields (images array)
           if (imageMatch && imageMatch[1]) {
             const imageIndex = Number.parseInt(imageMatch[1], 10)
-            console.log(`BlogForm: Processing image for step ${stepIndex}, image index ${imageIndex}:`, url)
 
             // Get current images array or initialize it
             const currentImages = Array.isArray(currentStep.images) ? [...currentStep.images] : []
@@ -749,7 +740,6 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
 
             // Update the specific index
             currentImages[imageIndex] = url
-            console.log(`BlogForm: Updated step ${stepIndex} images array:`, currentImages)
 
             // Update the entire step with the new images array
             const updatedStep = { ...currentStep, images: currentImages }
@@ -761,7 +751,6 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
           }
           // Handle single image field
           else if (field.includes(".image")) {
-            console.log(`BlogForm: Setting single image for step ${stepIndex}:`, url)
             const updatedStep = { ...currentStep, image: url }
             form.setValue(currentStepPath as any, updatedStep, {
               shouldValidate: false,
@@ -771,7 +760,6 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
           }
           // Fallback for any other field
           else {
-            console.log(`BlogForm: Setting field ${field} directly:`, url)
             form.setValue(field as any, url, {
               shouldValidate: false,
               shouldDirty: true,
@@ -781,7 +769,6 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
         }
         // Handle non-step fields
         else {
-          console.log(`BlogForm: Setting non-step field ${field} directly:`, url)
           form.setValue(field as any, url, {
             shouldValidate: false,
             shouldDirty: true,
@@ -813,7 +800,6 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
     try {
       setLoading(true)
       const data = form.getValues()
-      console.log("Saving data:", data)
 
       // Log the specific step 15 data
       if (data.guideContent?.steps?.[14]) {

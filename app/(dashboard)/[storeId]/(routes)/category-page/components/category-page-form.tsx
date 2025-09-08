@@ -102,7 +102,6 @@ export const CategoryPageForm: React.FC<CategoryPageFormProps> = ({ initialData 
     status: initialData.status || "DRAFT",
   } : null;
   
-  console.log('Processed initial data:', JSON.stringify(processedInitialData));
   
   const form = useForm<CategoryPageFormValues>({
     resolver: zodResolver(formSchema),
@@ -217,39 +216,24 @@ export const CategoryPageForm: React.FC<CategoryPageFormProps> = ({ initialData 
       
       
       if (initialData && initialData.id) {
-        console.log('Updating category page with ID:', initialData.id);
         try {
           const updateUrl = `/api/${params?.storeId}/category-pages/${initialData.id}`;
-          console.log('Update URL:', updateUrl);
           const response = await axios.patch(updateUrl, formData);
-          console.log('Update response:', response.data);
           toast.success(status === 'PUBLISHED' ? "Category page published successfully" : "Category page updated successfully");
         } catch (updateError: any) {
-          console.error('Update error details:', {
-            status: updateError?.response?.status,
-            data: updateError?.response?.data,
-            message: updateError?.message
-          });
           throw updateError;
         }
       } else {
         try {
           const response = await axios.post(`/api/${params?.storeId}/category-pages`, formData);
-          console.log('Create response:', response.data);
           toast.success(status === 'PUBLISHED' ? "Category page published successfully" : "Category page created successfully");
         } catch (createError: any) {
-          console.error('Create error details:', {
-            status: createError?.response?.status,
-            data: createError?.response?.data,
-            message: createError?.message
-          });
           throw createError;
         }
       }
       router.refresh()
       router.push(`/${params?.storeId}/category-page`) 
     } catch (error: any) {
-      console.error("Error saving category page:", error)
       const errorMessage = error.response?.data || error.message || "Failed to save category page"
       toast.error(errorMessage)
     } finally {

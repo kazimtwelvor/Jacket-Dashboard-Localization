@@ -55,10 +55,8 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ store
           })
           
           if (!response.ok) {
-            console.log(`Failed to delete image from frontend: ${productImage.image.url}`)
           }
         } catch (fileError) {
-          console.log(`Failed to delete file: ${productImage.image.url}`, fileError)
         }
       }
 
@@ -119,7 +117,6 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ store
 
     return NextResponse.json({ message: "Product permanently deleted" })
   } catch (error) {
-    console.log("[PRODUCT_PERMANENT_DELETE]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

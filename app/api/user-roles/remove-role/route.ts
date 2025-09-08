@@ -33,7 +33,6 @@ export async function POST(req: NextRequest) {
       },
     })
   } catch (error) {
-    console.error("Error removing role:", error)
     return NextResponse.json({ message: "Failed to remove role" }, { status: 500 })
   }
 }

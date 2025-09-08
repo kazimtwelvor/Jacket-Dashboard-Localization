@@ -13,7 +13,6 @@ export const GenderSection: React.FC<GenderSectionProps> = ({ form, control }) =
   const formControl = control || form?.control
 
   if (!formControl) {
-    console.error("GenderSection: No form control provided")
     return null
   }
 

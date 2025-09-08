@@ -107,45 +107,33 @@ async function generateUniqueSku(storeId: string, manualSku: string | null): Pro
 
     return newSku
   } catch (error) {
-    console.error("Error generating SKU:", error)
     const timestamp = Date.now().toString().slice(-8)
     return `SKU-${timestamp}`
   }
 }
 
 async function logFormDataContents(formData: FormData, label: string) {
-  console.log(`--- ${label} - FormData Contents ---`)
   for (const [key, value] of Array.from(formData.entries())) {
     if (typeof value === "string" && value.length > 100) {
-      console.log(`${key}: ${value.substring(0, 100)}... (truncated)`)
     } else {
-      console.log(`${key}: ${value}`)
     }
   }
-  console.log(`--- End ${label} ---`)
 }
 
 export async function createProduct(formData: FormData) {
   try {
-    console.log("--- Create Product - FormData Contents ---")
     for (const [key, value] of Array.from(formData.entries())) {
       if (typeof value === "string" && value.length > 100) {
-        console.log(`${key}: ${value.substring(0, 100)}... (truncated)`)
       } else {
-        console.log(`${key}: ${value}`)
       }
     }
-    console.log("--- End FormData Contents ---")
 
     const formDataKeys = Array.from(formData.keys())
-    console.log("createProduct action called with formData keys:", formDataKeys)
 
     let storeId = formData.get("storeId") as string
-    console.log("StoreId from formData:", storeId)
 
     if (!storeId) {
       const urlPath = formData.get("url") as string 
-      console.log("URL path from formData:", urlPath)
 
       if (urlPath) {
         const urlParts = urlPath.split("/")
@@ -155,7 +143,6 @@ export async function createProduct(formData: FormData) {
 
 
         if (potentialStoreId) {
-          console.log(`Extracted storeId from URL path: ${potentialStoreId}`)
           storeId = potentialStoreId;
           formData.set("storeId", potentialStoreId) 
         }
@@ -181,7 +168,6 @@ export async function createProduct(formData: FormData) {
     if (!storeId) { 
       throw new Error("Store ID is required")
     }
-    console.log("Using storeId:", storeId)
 
     const submitType = formData.get("submitType") as string
     const name = formData.get("name") as string
@@ -190,8 +176,6 @@ export async function createProduct(formData: FormData) {
     const submittedSlug = formData.get("slug") as string;
     let productSlugForDb = sanitizeSlug(submittedSlug); 
     productSlugForDb = generateSlugFromNameIfEmpty(productSlugForDb, name); 
-    console.log("Submitted slug from form:", submittedSlug);
-    console.log("Sanitized and finalized slug for DB:", productSlugForDb);
 
 
     const regularPriceStr = formData.get("regularPrice") as string
@@ -208,10 +192,8 @@ export async function createProduct(formData: FormData) {
     const gender = formData.get("gender") as string
 
     const tagsJson = formData.get("tags") as string
-    console.log("Raw tags from form:", tagsJson)
     
     const relatedProductsJson = formData.get("relatedProducts") as string
-    console.log("Raw relatedProducts from form:", relatedProductsJson)
 
     const isFeaturedValue = formData.get("isFeatured")
     const isFeatured = isFeaturedValue === "true" || String(isFeaturedValue) === "true"
@@ -220,20 +202,7 @@ export async function createProduct(formData: FormData) {
     const isParentProduct = isParentProductValue === "true" || String(isParentProductValue) === "true"
     
     const parentProductId = formData.get("parentProductId") as string || null
-    
-    console.log("isParentProduct debug:", {
-      rawValue: isParentProductValue,
-      processedValue: isParentProduct,
-      typeOfRawValue: typeof isParentProductValue,
-    })
-    
-    console.log("Final isParentProduct being saved to DB:", isParentProduct)
-
-    console.log("isFeatured value:", {
-      rawValue: isFeaturedValue,
-      processedValue: isFeatured,
-      typeOfRawValue: typeof isFeaturedValue,
-    })
+  
 
     const imagesJson = formData.get("images") as string
 
@@ -244,12 +213,9 @@ export async function createProduct(formData: FormData) {
         if (Array.isArray(parsedTags)) {
           tags = parsedTags
         } else {
-          console.log("Tags JSON did not parse to an array, using empty array instead")
         }
       }
-      console.log("Parsed tags:", tags)
     } catch (e) {
-      console.log("Error parsing tags JSON:", e instanceof Error ? e.message : String(e))
       tags = []
     }
     
@@ -260,12 +226,9 @@ export async function createProduct(formData: FormData) {
         if (Array.isArray(parsedRelatedProducts)) {
           relatedProducts = parsedRelatedProducts
         } else {
-          console.log("RelatedProducts JSON did not parse to an array, using empty array instead")
         }
       }
-      console.log("Parsed relatedProducts:", relatedProducts)
     } catch (e) {
-      console.log("Error parsing relatedProducts JSON:", e instanceof Error ? e.message : String(e))
       relatedProducts = []
     }
 
@@ -302,7 +265,6 @@ export async function createProduct(formData: FormData) {
         seoData.slug = productSlugForDb;
       }
     } catch (e) {
-      console.log("Error parsing SEO JSON:", e instanceof Error ? e.message : String(e))
       
       seoData.slug = productSlugForDb;
     }
@@ -314,19 +276,13 @@ export async function createProduct(formData: FormData) {
 
 
     const { metaTitle, metaDescription, keywords, noIndex } = seoData
-    console.log("Extracted keywords:", keywords)
-    console.log("Final SEO slug being used for seoData:", seoData.slug)
 
 
     const brandName = (formData.get("brandName") as string) || "Leather Jacket By Fineyst"
     const ratingValue = (formData.get("ratingValue") as string) || "4.5"
     const reviewCount = (formData.get("reviewCount") as string) || "0"
 
-    console.log("Extracted brand info:", {
-      brandName,
-      ratingValue,
-      reviewCount,
-    })
+  
 
     const purchaseNote = formData.get("purchaseNote") as string
     const categoryData = formData.get("categoryData") as string | null 
@@ -337,7 +293,6 @@ export async function createProduct(formData: FormData) {
 
     
     const colorLinksJson = formData.get("colorLinks") as string
-    console.log("Raw colorLinks from form:", colorLinksJson)
 
     
     const schema1Json = formData.get("schema1") as string
@@ -350,9 +305,7 @@ export async function createProduct(formData: FormData) {
     if (schemaJson && schemaJson.trim() !== "") {
       try {
         combinedSchema = JSON.parse(schemaJson)
-        console.log("Using existing combined schema")
       } catch (e) {
-        console.log("Error parsing existing schema JSON:", e instanceof Error ? e.message : String(e))
         combinedSchema = {}
       }
     }
@@ -363,11 +316,9 @@ export async function createProduct(formData: FormData) {
         if (parsedSchema1) {
           const schemaType = parsedSchema1.templateName || parsedSchema1["@type"] || "Product"
           combinedSchema[schemaType] = parsedSchema1
-          console.log(`Added schema1 as ${schemaType} to combined schema`)
         }
       }
     } catch (e) {
-      console.log("Error processing schema1 for combined schema:", e instanceof Error ? e.message : String(e))
     }
 
     try {
@@ -376,11 +327,9 @@ export async function createProduct(formData: FormData) {
         if (parsedSchema2) {
           const schemaType = parsedSchema2.templateName || parsedSchema2["@type"] || "FAQPage"
           combinedSchema[schemaType] = parsedSchema2
-          console.log(`Added schema2 as ${schemaType} to combined schema`)
         }
       }
     } catch (e) {
-      console.log("Error processing schema2 for combined schema:", e instanceof Error ? e.message : String(e))
     }
 
     try {
@@ -389,11 +338,9 @@ export async function createProduct(formData: FormData) {
         if (parsedSchema3) {
           const schemaType = parsedSchema3.templateName || parsedSchema3["@type"] || "HowTo"
           combinedSchema[schemaType] = parsedSchema3
-          console.log(`Added schema3 as ${schemaType} to combined schema`)
         }
       }
     } catch (e) {
-      console.log("Error processing schema3 for combined schema:", e instanceof Error ? e.message : String(e))
     }
 
     if (Object.keys(combinedSchema).length === 0) {
@@ -412,7 +359,6 @@ export async function createProduct(formData: FormData) {
           },
         },
       }
-      console.log("Created default product schema in server action")
     }
 
     const schemaDataString = JSON.stringify(combinedSchema)
@@ -435,35 +381,27 @@ export async function createProduct(formData: FormData) {
             if (typeof parsedData === "object" && parsedData !== null) {
               colorLinksData = parsedData
               colorLinksString = colorLinksJson
-              console.log("Successfully parsed colorLinks into an object")
             } else {
-              console.log("Parsed colorLinks but result is not an object:", typeof parsedData)
               colorLinksData = {}
             }
           } catch (parseError) {
-            console.log("Failed to parse colorLinks JSON:", parseError)
             colorLinksData = {}
           }
         } else {
-          console.log("colorLinksJson is not in valid JSON format")
           colorLinksData = {}
         }
       }
     } catch (e) {
-      console.log("Error processing colorLinks:", e instanceof Error ? e.message : String(e))
       colorLinksData = {}
     }
 
     let colorLinksToSave = colorLinksData
 
-    console.log("Final colorLinksData structure:", JSON.stringify(colorLinksData).substring(0, 100))
-    console.log("ColorLinks to save:", JSON.stringify(colorLinksToSave))
 
     if (colorDetailsJson) {
       try {
         colorDetails = JSON.parse(colorDetailsJson)
       } catch (e) {
-        console.log("Error parsing colorDetails JSON:", e instanceof Error ? e.message : String(e))
       }
     }
 
@@ -485,10 +423,8 @@ export async function createProduct(formData: FormData) {
             value: color.value,
           }))
 
-          console.log("Converted colorIds to colorDetails:", colorDetails)
         }
       } catch (e) {
-        console.log("Error processing colorIds:", e instanceof Error ? e.message : String(e))
       }
     }
 
@@ -501,7 +437,6 @@ export async function createProduct(formData: FormData) {
     try {
       if (sizeDetailsJson) {
         sizeDetailsData = JSON.parse(sizeDetailsJson)
-        console.log("Successfully parsed sizeDetails:", sizeDetailsData)
          if (Array.isArray(sizeDetailsData)) {
             sizeIds = sizeDetailsData.map(sd => sd.id).filter(Boolean);
         }
@@ -526,29 +461,14 @@ export async function createProduct(formData: FormData) {
               value: size.value,
             }))
 
-            console.log("Built sizeDetails from sizeIds (fallback):", sizeDetailsData)
           }
         }
       }
     } catch (e) {
-      console.log("Error processing sizeDetails:", e instanceof Error ? e.message : String(e))
       sizeDetailsData = [] 
     }
 
 
-    console.log("Parsed images", images)
-    console.log("Parsed specifications:", specifications ? JSON.parse(specifications) : {})
-    console.log("Parsed categories:", {
-      gender,
-      material: materialParsed,
-      style: styleParsed,
-    })
-    console.log("Extracted material:", materialParsed)
-    console.log("Extracted style:", styleParsed)
-    console.log("Extracted size IDs:", sizeIds) 
-    console.log("Extracted size details data:", sizeDetailsData)
-
-    console.log("Parsed SEO data (object):", seoData)
 
 
     const dbUser = await prismadb.user.findUnique({
@@ -601,31 +521,18 @@ export async function createProduct(formData: FormData) {
       createdByEmail: dbUser.email,
     }
 
-    console.log("Keywords being saved to database:", productData.keywords)
-    console.log("Final slug being saved to database:", productData.slug)
-    console.log("Product data prepared:", productData)
-    console.log("Brand info being saved:", {
-      brandName: productData.brandName,
-      ratingValue: productData.ratingValue,
-      reviewCount: productData.reviewCount,
-    })
 
-    console.log("Final tags being saved to database:", productData.tags)
 
     const selectedColors = specifications ? JSON.parse(specifications).color || [] : []
     if (!selectedColors || selectedColors.length === 0) {
       throw new Error("At least one color must be selected before saving the product")
     }
-    console.log("Color validation passed:", selectedColors)
 
     let cachedReviews = null
     if (cachedReviewsJson) {
       try {
         cachedReviews = JSON.parse(cachedReviewsJson)
-        console.log("Parsed cached reviews:", cachedReviews)
-        console.log("Number of cached reviews:", Array.isArray(cachedReviews) ? cachedReviews.length : 0)
       } catch (e) {
-        console.log("Error parsing cached reviews JSON:", e instanceof Error ? e.message : String(e))
         cachedReviews = null
       }
     }
@@ -651,7 +558,6 @@ export async function createProduct(formData: FormData) {
     }
 
     if (id) {
-      console.log(`Updating existing product: ${id}`)
 
       try {
         const currentProduct = await prismadb.product.findUnique({
@@ -669,19 +575,15 @@ export async function createProduct(formData: FormData) {
 
         if (manualSku && manualSku.trim() !== "" && currentProduct && manualSku !== currentProduct.sku) {
           newSkuForUpdate = await generateUniqueSku(storeId, manualSku)
-          console.log(`SKU changed from ${currentProduct.sku} to ${newSkuForUpdate}`)
         } else if (!currentProduct?.sku && manualSku && manualSku.trim() !== "") {
            newSkuForUpdate = await generateUniqueSku(storeId, manualSku);
-           console.log(`Generated SKU for existing product (was empty): ${newSkuForUpdate}`);
         } else if (!currentProduct?.sku && (!manualSku || manualSku.trim() === "")) {
             newSkuForUpdate = await generateUniqueSku(storeId, null);
-            console.log(`Auto-generated SKU for existing product (was empty): ${newSkuForUpdate}`);
         }
 
 
         const { createdById, createdByName, createdByEmail, ...dataWithoutCreator } = productData
         
-        console.log('Server action - relatedProducts being updated:', dataWithoutCreator.relatedProducts)
 
         const product = await prismadb.product.update({
           where: {
@@ -705,11 +607,9 @@ export async function createProduct(formData: FormData) {
         
         if (cachedReviews && Array.isArray(cachedReviews) && cachedReviews.length > 0) {
           try {
-            console.log(`Processing ${cachedReviews.length} cached reviews for updated product ${id}`)
             
             for (let i = 0; i < cachedReviews.length; i++) {
               const review = cachedReviews[i]
-              console.log(`Processing review ${i + 1} for update:`, review)
               
               const reviewData = {
                 storeId: storeId,
@@ -723,21 +623,15 @@ export async function createProduct(formData: FormData) {
                 createdAt: review.date ? new Date(review.date) : new Date(),
               }
               
-              console.log(`Creating review ${i + 1} with data:`, reviewData)
               
               const savedReview = await prismadb.review.create({
                 data: reviewData,
               })
               
-              console.log(`Successfully saved review ${i + 1}:`, savedReview.id)
             }
-            console.log(`Successfully saved ${cachedReviews.length} cached reviews for updated product ${id}`)
           } catch (reviewError) {
-            console.error("Error saving cached reviews during product update:", reviewError)
-            console.error("Review error details:", reviewError instanceof Error ? reviewError.message : String(reviewError))
           }
         } else {
-          console.log("No cached reviews to save for updated product")
         }
 
         for (const image of images) { 
@@ -780,17 +674,14 @@ export async function createProduct(formData: FormData) {
           })
         }
       } catch (error) {
-        console.error("Error updating product:", error)
         throw error
       }
     } else {
-      console.log("Creating new product")
 
       try {
         const uniqueSku = await generateUniqueSku(storeId, manualSku)
         
         const resolvedCategoryData = productData.categoryData;
-        console.log('Using categoryData from productData:', resolvedCategoryData);
 
 
         const product = await prismadb.product.create({
@@ -802,7 +693,6 @@ export async function createProduct(formData: FormData) {
           },
         })
 
-        console.log(`Created new product with ID: ${product.id}`)
 
         for (const image of images) { 
           let imageUrl = ""
@@ -847,16 +737,13 @@ export async function createProduct(formData: FormData) {
           })
         }
 
-        console.log(`Added ${images.length} images to product ${product.id}`)
         
         // Handle cached reviews for new products
         if (cachedReviews && Array.isArray(cachedReviews) && cachedReviews.length > 0) {
           try {
-            console.log(`Processing ${cachedReviews.length} cached reviews for new product ${product.id}`)
             
             for (let i = 0; i < cachedReviews.length; i++) {
               const review = cachedReviews[i]
-              console.log(`Processing review ${i + 1}:`, review)
               
               const reviewData = {
                 storeId: storeId,
@@ -870,27 +757,20 @@ export async function createProduct(formData: FormData) {
                 createdAt: review.date ? new Date(review.date) : new Date(),
               }
               
-              console.log(`Creating review ${i + 1} with data:`, reviewData)
               
               const savedReview = await prismadb.review.create({
                 data: reviewData,
               })
               
-              console.log(`Successfully saved review ${i + 1}:`, savedReview.id)
             }
-            console.log(`Successfully saved ${cachedReviews.length} cached reviews for new product ${product.id}`)
           } catch (reviewError) {
-            console.error("Error saving cached reviews for new product:", reviewError)
-            console.error("Review error details:", reviewError instanceof Error ? reviewError.message : String(reviewError))
           }
         } else {
-          console.log("No cached reviews to save for new product")
         }
         
         // Handle temporary reviews for new products (legacy support)
         if (tempReviewsId) {
           try {
-            console.log(`Moving temporary reviews from ${tempReviewsId} to product ${product.id}`)
             
             // Update all temporary reviews to use the actual product ID
             const updatedReviews = await prismadb.review.updateMany({
@@ -903,14 +783,11 @@ export async function createProduct(formData: FormData) {
               },
             })
             
-            console.log(`Successfully moved ${updatedReviews.count} reviews to product ${product.id}`)
           } catch (reviewError) {
-            console.error("Error moving temporary reviews:", reviewError)
             // Don't fail the entire product creation if review moving fails
           }
         }
       } catch (error) {
-        console.error("Error creating product:", error)
         throw error
       }
     }
@@ -918,12 +795,9 @@ export async function createProduct(formData: FormData) {
     revalidatePath(`/${storeId}/products`)
 
     // Log before returning
-    console.log("createProduct completed successfully")
     return { success: true }
   } catch (error) {
-    console.log("Error in createProduct action:", error instanceof Error ? error.message : String(error))
     const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
-    console.log("Server: Error creating/updating product:", errorMessage)
     // Return a JSON error response instead of throwing, or ensure the client can handle thrown errors from server actions.
     // For now, re-throwing to match existing pattern, but this might need adjustment based on client-side error handling.
     throw new Error(`Failed to save product: ${errorMessage}`)
@@ -1038,7 +912,6 @@ Important: I will be displaying this in a plain text field, so don't use markdow
 
     if (!response.ok) {
       const errorData = await response.json()
-      console.log("Gemini API error:", errorData)
       throw new Error(`API call failed: ${response.statusText}`)
     }
 
@@ -1059,7 +932,6 @@ Important: I will be displaying this in a plain text field, so don't use markdow
   } catch (error) {
     // Fix the error handling to properly handle null or undefined errors
     const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
-    console.log("Error generating description:", errorMessage)
     throw new Error(`Failed to generate description: ${errorMessage}`)
   }
 }

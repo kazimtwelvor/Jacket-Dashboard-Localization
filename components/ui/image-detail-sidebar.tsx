@@ -48,10 +48,9 @@ interface ImageMetadata {
   caption: string
   description: string
   excludeFromSitemap: boolean
-  imageId?: string // Added to track the specific image ID
+  imageId?: string 
 }
 
-// Simple in-memory cache for metadata
 const metadataCache = new Map<string, any>()
 
 export const ImageDetailSidebar: React.FC<ImageDetailSidebarProps> = ({
@@ -108,52 +107,36 @@ export const ImageDetailSidebar: React.FC<ImageDetailSidebarProps> = ({
     }
   }
 
-  // Get store ID from params or URL
   const getStoreId = () => {
-    // First, try to get storeId from params (most reliable)
     if (params && params.storeId) {
-      console.log("Found storeId in params:", params.storeId)
       return params.storeId
     }
 
-    // If not in params, try to extract from URL
     if (!storeUrl) return null
 
-    console.log("Trying to extract storeId from URL:", storeUrl)
 
-    // Common URL patterns:
-    // 1. /dashboard/[storeId]/products
-    // 2. /[storeId]/products
-    // 3. /store/[storeId]/products
-    // 4. /admin/store/[storeId]/products
-
-    // Try to match UUID pattern first
+  
     const uuidMatch = storeUrl.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i)
     if (uuidMatch) {
-      console.log("Found UUID in URL:", uuidMatch[0])
       return uuidMatch[0]
     }
 
     // Try to extract from path segments
     const urlParts = storeUrl.split("/").filter(Boolean) // Remove empty segments
-    console.log("URL parts:", urlParts)
 
     // Look for segments after known markers
     const markers = ["dashboard", "store", "admin"]
     for (let i = 0; i < urlParts.length; i++) {
       if (markers.includes(urlParts[i]) && i + 1 < urlParts.length) {
-        console.log("Found potential storeId after marker:", urlParts[i + 1])
         return urlParts[i + 1]
       }
     }
 
     // If we have at least 2 segments, the second one might be the storeId
     if (urlParts.length >= 2 && !markers.includes(urlParts[0])) {
-      console.log("Using second segment as storeId:", urlParts[1])
       return urlParts[1]
     }
 
-    console.log("Could not determine storeId from URL")
     return null
   }
 
@@ -175,7 +158,6 @@ export const ImageDetailSidebar: React.FC<ImageDetailSidebarProps> = ({
             initialMetadata.description ||
             initialMetadata.excludeFromSitemap)
         ) {
-          console.log("Using provided initial metadata:", initialMetadata)
           setMetadata({
             ...createDefaultMetadata(imageUrl),
             ...initialMetadata,
@@ -199,7 +181,6 @@ export const ImageDetailSidebar: React.FC<ImageDetailSidebarProps> = ({
           const timestamp = new Date().getTime()
           // Use the direct API endpoint with storeId
           const apiUrl = `/api/${storeId}/images/metadata?url=${encodeURIComponent(imageUrl)}&t=${timestamp}`
-          console.log("Fetching metadata from:", apiUrl)
 
           try {
             const response = await fetch(apiUrl, {
@@ -214,11 +195,9 @@ export const ImageDetailSidebar: React.FC<ImageDetailSidebarProps> = ({
               cache: "no-store",
             })
 
-            console.log("API response status:", response.status)
 
             if (response.ok) {
               const data = await response.json()
-              console.log("Received metadata:", data)
 
               if (data && Object.keys(data).length > 0) {
                 setMetadata(data)
@@ -233,34 +212,25 @@ export const ImageDetailSidebar: React.FC<ImageDetailSidebarProps> = ({
                 // Store the image ID if available
                 if (data.imageId) {
                   setImageId(data.imageId)
-                  console.log("Stored image ID:", data.imageId)
                 }
 
                 setIsLoading(false)
                 return
               }
             } else {
-              console.error("API error:", response.status)
               try {
                 const errorText = await response.text()
-                console.error("API error details:", errorText)
               } catch (textError) {
-                console.error("Could not read error response text")
               }
               throw new Error(`API error: ${response.status}`)
             }
           } catch (apiError) {
-            console.error("API fetch error:", apiError)
             setError("Failed to load image details from server. Using default values.")
-            // Continue to default data if API fails
           }
         } else {
-          console.error("Could not determine storeId from URL or params")
           setError("Could not determine store ID. Using default values.")
         }
 
-        // If we get here, either the API failed or returned no data
-        // Create default metadata
         const defaultData = createDefaultMetadata(imageUrl)
         setMetadata(defaultData)
         setSeoData({
@@ -271,10 +241,8 @@ export const ImageDetailSidebar: React.FC<ImageDetailSidebarProps> = ({
           excludeFromSitemap: false,
         })
       } catch (error) {
-        console.error("Error in metadata handling:", error)
         setError("An error occurred while loading image details. Using default values.")
 
-        // Ensure we always have something to display
         if (!metadata) {
           const defaultData = createDefaultMetadata(imageUrl)
           setMetadata(defaultData)
@@ -324,8 +292,6 @@ export const ImageDetailSidebar: React.FC<ImageDetailSidebarProps> = ({
       if (storeId) {
         // Use the direct API endpoint with storeId
         const apiUrl = `/api/${storeId}/images/metadata/save`
-        console.log("Saving metadata to:", apiUrl)
-        console.log("Metadata being sent:", updatedMetadata)
 
         try {
           const response = await fetch(apiUrl, {
@@ -336,16 +302,13 @@ export const ImageDetailSidebar: React.FC<ImageDetailSidebarProps> = ({
             body: JSON.stringify(updatedMetadata),
           })
 
-          console.log("Save response status:", response.status)
 
           if (response.ok) {
             const savedData = await response.json()
-            console.log("Save response data:", savedData)
 
             // Update the imageId if it was returned
             if (savedData.id && (!imageId || imageId !== savedData.id)) {
               setImageId(savedData.id)
-              console.log("Updated image ID:", savedData.id)
 
               // Update the metadata with the new ID
               updatedMetadata.imageId = savedData.id
@@ -363,28 +326,22 @@ export const ImageDetailSidebar: React.FC<ImageDetailSidebarProps> = ({
 
             toast.success("Image details saved successfully")
           } else {
-            console.error("Save API error:", response.status)
             try {
               const errorText = await response.text()
-              console.error("Save API error details:", errorText)
             } catch (textError) {
-              console.error("Could not read error response text")
             }
             setError("Failed to save to server. Changes preserved locally.")
             toast.error("Failed to save to server. Changes preserved locally.")
           }
         } catch (apiError) {
-          console.error("API save error:", apiError)
           setError("Failed to save to server. Changes preserved locally.")
           toast.error("Failed to save to server. Changes preserved locally.")
         }
       } else {
-        console.error("Could not determine storeId for saving")
         setError("Could not determine store ID. Changes preserved locally.")
         toast.error("Could not determine store ID. Changes preserved locally.")
       }
     } catch (error) {
-      console.error("Error in save handling:", error)
       setError("An error occurred, but changes were saved locally")
       toast.error("An error occurred, but changes were saved locally")
     } finally {

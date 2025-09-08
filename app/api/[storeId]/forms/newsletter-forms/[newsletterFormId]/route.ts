@@ -19,7 +19,6 @@ export async function GET(
 
     return NextResponse.json(newsletterForm)
   } catch (error) {
-    console.log("[NEWSLETTER_FORM_GET]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }
@@ -46,7 +45,6 @@ export async function PATCH(
 
     return NextResponse.json(newsletterForm)
   } catch (error) {
-    console.log("[NEWSLETTER_FORM_PATCH]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }
@@ -65,7 +63,6 @@ export async function DELETE(
 
     return NextResponse.json(newsletterForm)
   } catch (error) {
-    console.log("[NEWSLETTER_FORM_DELETE]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

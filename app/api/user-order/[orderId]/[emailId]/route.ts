@@ -38,7 +38,6 @@ export async function GET(
 
     return NextResponse.json(order)
   } catch (error) {
-    console.log("[USER_ORDER_GET]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

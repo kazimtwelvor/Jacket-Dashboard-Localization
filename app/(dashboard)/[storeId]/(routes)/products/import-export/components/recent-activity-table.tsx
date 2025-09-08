@@ -95,7 +95,6 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({ type, 
 
       toast.success("Export downloaded successfully")
     } catch (error) {
-      console.error("Download error:", error)
       toast.error("Failed to download export")
     } finally {
       setDownloadingId(null)
@@ -133,7 +132,6 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({ type, 
 
       toast.success("Error log downloaded")
     } catch (error) {
-      console.error("Error log fetch error:", error)
       toast.error("Failed to download error log")
     } finally {
       setViewingErrorsId(null)

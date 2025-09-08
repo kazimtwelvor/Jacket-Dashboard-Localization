@@ -32,7 +32,6 @@ export const ContactFormModal = ({ isOpen, onClose }: ContactFormModalProps) => 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Contact form submitted:", formData)
     onClose()
   }
 

@@ -68,7 +68,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       uniqueSku: sku,
     })
   } catch (error) {
-    console.error("[CHECK_SKU]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

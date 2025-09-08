@@ -24,7 +24,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       return new NextResponse("Role is required", { status: 400 })
     }
 
-    // Check if user has permission to update member roles
     const store = await prismadb.store.findFirst({
       where: {
         id: params.storeId,
@@ -36,7 +35,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       return new NextResponse("Unauthorized", { status: 403 })
     }
 
-    // Get the member to update
     const memberToUpdate = await prismadb.storeUser.findUnique({
       where: {
         id: params.memberId,
@@ -47,12 +45,10 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       return new NextResponse("Member not found", { status: 404 })
     }
 
-    // Don't allow changing the role of the store owner
     if (memberToUpdate.userId === store.userId) {
       return new NextResponse("Cannot change the role of the store owner", { status: 403 })
     }
 
-    // Update the member's role
     const updatedMember = await prismadb.storeUser.update({
       where: {
         id: params.memberId,
@@ -64,7 +60,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
 
     return NextResponse.json(updatedMember)
   } catch (error) {
-    console.log("[MEMBER_ROLE_PATCH]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

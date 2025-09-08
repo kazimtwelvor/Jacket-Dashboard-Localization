@@ -54,7 +54,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       { headers: corsHeaders },
     )
   } catch (error) {
-    console.error("[PAYMENT_CONFIRM_ERROR]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

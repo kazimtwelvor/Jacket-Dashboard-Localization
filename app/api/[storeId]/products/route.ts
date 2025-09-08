@@ -10,11 +10,9 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
   try {
     const { storeId } = params
     const { searchParams } = new URL(req.url)
-
     const page = Number.parseInt(searchParams.get("page") || "1")
     const limit = Number.parseInt(searchParams.get("limit") || "28")
     const skip = (page - 1) * limit
-
     const isAdmin = searchParams.get("admin") === "true"
     const colors = searchParams.get("colors")
     const materials = searchParams.get("materials")
@@ -22,14 +20,11 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
     const genders = searchParams.get("genders")
     const search = searchParams.get("search")
     const trash = searchParams.get("trash") === "true"
-    
     const baseWhereClause = {
       storeId: storeId,
       ...(trash ? { isDeleted: true } : { isDeleted: false }),
       ...(isAdmin ? {} : { isPublished: true, isArchived: false }),
     }
-    
-    
     const allProducts = await prismadb.product.findMany({
       where: baseWhereClause,
       include: {

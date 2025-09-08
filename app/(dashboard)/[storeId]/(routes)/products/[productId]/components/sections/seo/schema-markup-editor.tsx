@@ -242,7 +242,7 @@ export const SchemaMarkupEditor = () => {
             )}
 
             <div className="relative">
-              <Code className="absolute top-3 left-3 h-4 w-4 text-muted-foreground" />
+              <Code className="absolute top-3 left-3 h-4 w-4 text-gray-500 dark:text-gray-400" />
               <Textarea
                 value={schemaValue}
                 onChange={(e) => handleSchemaChange(e.target.value)}
@@ -251,15 +251,15 @@ export const SchemaMarkupEditor = () => {
               />
             </div>
 
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-gray-600 dark:text-gray-300">
               Enter valid JSON-LD schema markup for this product. This will be added to the page's HTML to improve
               search engine visibility.
             </p>
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-6 text-center">
-            <Code className="h-10 w-10 text-muted-foreground mb-2" />
-            <p className="text-muted-foreground mb-4">Schema markup is disabled</p>
+            <Code className="h-10 w-10 text-gray-500 dark:text-gray-400 mb-2" />
+            <p className="text-gray-600 dark:text-gray-300 mb-4">Schema markup is disabled</p>
             <Button variant="outline" size="sm" onClick={() => handleToggleSchema(true)}>
               Enable Schema Markup
             </Button>

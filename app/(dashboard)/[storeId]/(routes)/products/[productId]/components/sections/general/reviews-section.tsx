@@ -358,43 +358,23 @@ export const ReviewsSection = () => {
               </div>
             </div>
 
-            <div className="flex space-x-2">
-              <Button
-                onClick={handleGenerateAndSaveReviews}
-                disabled={isGenerating || !productName}
-                className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generating & Saving...
-                  </>
-                ) : (
-                  <>
-                    <Database className="mr-2 h-4 w-4" />
-                    Generate & Save to Database
-                  </>
-                )}
-              </Button>
-              <Button
-                onClick={handleTestReviewSave}
-                disabled={isTestingReviewSave}
-                variant="outline"
-                className="border-green-500 text-green-600 hover:bg-green-50"
-              >
-                {isTestingReviewSave ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Testing...
-                  </>
-                ) : (
-                  <>
-                    <Check className="mr-2 h-4 w-4" />
-                    Test Review Save
-                  </>
-                )}
-              </Button>
-            </div>
+            <Button
+              onClick={handleGenerateAndSaveReviews}
+              disabled={isGenerating || !productName}
+              className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+            >
+              {isGenerating ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Generating & Saving...
+                </>
+              ) : (
+                <>
+                  <Database className="mr-2 h-4 w-4" />
+                  Generate & Save to Database
+                </>
+              )}
+            </Button>
           </div>
 
           {(existingReviews.length > 0 || savedReviews.length > 0 || cachedReviews.length > 0) && (

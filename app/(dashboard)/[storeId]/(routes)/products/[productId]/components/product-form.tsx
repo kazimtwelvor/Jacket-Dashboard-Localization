@@ -2033,13 +2033,13 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
             <TabsList className="w-full justify-start h-auto p-0 bg-transparent border-b rounded-none mb-6">
               <div
-                className="flex w-full gap-1 p-1 bg-primary dark:bg-white rounded-lg shadow-sm"
+                className="flex w-full gap-1 p-1 bg-primary dark:bg-primary rounded-lg shadow-sm"
                 role="tablist"
                 aria-orientation="horizontal"
               >
                 <TabsTrigger
                   value="general"
-                  className="flex-1 relative px-6 py-3 text-base font-semibold rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:text-primary dark:data-[state=active]:text-white data-[state=active]:shadow-sm data-[state=inactive]:bg-transparent data-[state=inactive]:text-white dark:data-[state=inactive]:text-gray-800 data-[state=inactive]:hover:bg-primary/80 dark:data-[state=inactive]:hover:bg-white/80 transition-all duration-200"
+                  className="flex-1 relative px-6 py-3 text-base font-semibold rounded-md data-[state=active]:bg-background data-[state=active]:text-primary dark:data-[state=active]:text-white data-[state=active]:shadow-sm data-[state=inactive]:bg-transparent data-[state=inactive]:text-white dark:data-[state=inactive]:text-white data-[state=inactive]:hover:bg-background/20 transition-all duration-200"
                   aria-selected={activeTab === "general"}
                 >
                   <div className="flex items-center justify-center gap-2">
@@ -2063,7 +2063,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
                 </TabsTrigger>
                 <TabsTrigger
                   value="seo"
-                  className="flex-1 relative px-6 py-3 text-base font-semibold rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:text-primary dark:data-[state=active]:text-white data-[state=active]:shadow-sm data-[state=inactive]:bg-transparent data-[state=inactive]:text-white dark:data-[state=inactive]:text-gray-800 data-[state=inactive]:hover:bg-primary/80 dark:data-[state=inactive]:hover:bg-white/80 transition-all duration-200"
+                  className="flex-1 relative px-6 py-3 text-base font-semibold rounded-md data-[state=active]:bg-background data-[state=active]:text-primary dark:data-[state=active]:text-white data-[state=active]:shadow-sm data-[state=inactive]:bg-transparent data-[state=inactive]:text-white dark:data-[state=inactive]:text-white data-[state=inactive]:hover:bg-background/20 transition-all duration-200"
                   aria-selected={activeTab === "seo"}
                 >
                   <div className="flex items-center justify-center gap-2">

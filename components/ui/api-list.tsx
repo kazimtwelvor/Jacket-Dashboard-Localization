@@ -17,12 +17,12 @@ export const ApiList: React.FC<ApiListProps> = ({ entityIdName, entityName }) =>
   const baseUrl = `${origin}/api/${params.storeId}`
 
   return (
-    <>
+    <div className="space-y-4">
       <ApiAlert title="GET" variant="public" description={`${baseUrl}/${entityName}`} />
       <ApiAlert title="GET" variant="public" description={`${baseUrl}/${entityName}/{${entityIdName}}`} />
       <ApiAlert title="POST" variant="admin" description={`${baseUrl}/${entityName}`} />
       <ApiAlert title="PATCH" variant="admin" description={`${baseUrl}/${entityName}/{${entityIdName}}`} />
       <ApiAlert title="DELETE" variant="admin" description={`${baseUrl}/${entityName}/{${entityIdName}}`} />
-    </>
+    </div>
   )
 }

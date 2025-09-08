@@ -9,12 +9,23 @@ export type TrashProductColumn = {
   id: string
   name: string
   price: string
+  salePrice?: string | null
   category: string
   sku: string
+  stockStatus?: string
   deletedAt: string
   sizes: string
   colors: string
   imageUrl?: string
+  createdAt: string
+  createdByName?: string
+  updatedByName?: string
+  updatedAt?: string
+  publishedAt?: string
+  description?: string
+  isFeatured: boolean
+  isArchived: boolean
+  isPublished: boolean
 }
 
 export const trashColumns: ColumnDef<TrashProductColumn>[] = [

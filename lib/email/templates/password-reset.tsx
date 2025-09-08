@@ -63,7 +63,6 @@ export const PasswordResetEmail = ({
   )
 }
 
-// Styles
 const paragraphStyle = {
   fontSize: "16px",
   lineHeight: "24px",

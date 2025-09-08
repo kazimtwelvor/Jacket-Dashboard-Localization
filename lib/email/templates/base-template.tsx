@@ -61,7 +61,6 @@ export const BaseTemplate = ({
   )
 }
 
-// Styles
 const bodyStyle = {
   backgroundColor: "#f6f9fc",
   fontFamily:

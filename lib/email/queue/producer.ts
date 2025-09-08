@@ -2,7 +2,6 @@ import { Queue } from "bullmq"
 import { redisConnection, QUEUE_NAMES, defaultJobOptions } from "./config"
 import { emailLogger } from "../logger"
 
-// Email job types
 export type EmailJobType =
   | "order-confirmation"
   | "password-reset"
@@ -14,7 +13,6 @@ export type EmailJobType =
   | "review-request"
   | "account-verification"
 
-// Email job data interface
 export interface EmailJobData {
   type: EmailJobType
   payload: Record<string, any>
@@ -26,15 +24,12 @@ export interface EmailJobData {
   }
 }
 
-// Create email queue
 const emailQueue = new Queue<EmailJobData>(QUEUE_NAMES.EMAIL, {
   connection: redisConnection,
   defaultJobOptions,
 })
 
-/**
- * Add an email job to the queue
- */
+
 export async function queueEmail(
   jobData: EmailJobData,
   options?: {
@@ -74,5 +69,4 @@ export async function queueEmail(
   }
 }
 
-// Export the queue for direct access if needed
 export { emailQueue }

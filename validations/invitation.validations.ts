@@ -33,7 +33,6 @@ export const validateCreateInvitation = () => [
     .withMessage('Expires must be a valid date')
 ];
 
-// Update Invitation validation
 export const validateUpdateInvitation = () => [
   param('id')
     .isUUID()
@@ -65,21 +64,18 @@ export const validateUpdateInvitation = () => [
     .withMessage('Expires must be a valid date')
 ];
 
-// Get Invitation by ID validation
 export const validateGetInvitation = () => [
   param('id')
     .isUUID()
     .withMessage('Invitation ID must be a valid UUID')
 ];
 
-// Delete Invitation validation
 export const validateDeleteInvitation = () => [
   param('id')
     .isUUID()
     .withMessage('Invitation ID must be a valid UUID')
 ];
 
-// Get Invitations validation (with pagination and search)
 export const validateGetInvitations = () => [
   ...validatePagination(),
   ...validateSearch(),
@@ -101,7 +97,6 @@ export const validateGetInvitations = () => [
     .withMessage('Status must be one of: PENDING, ACCEPTED, EXPIRED, CANCELLED')
 ];
 
-// Accept Invitation validation
 export const validateAcceptInvitation = () => [
   body('token')
     .notEmpty()
@@ -122,21 +117,18 @@ export const validateAcceptInvitation = () => [
     .withMessage('Please provide a valid email address')
 ];
 
-// Verify Invitation validation
 export const validateVerifyInvitation = () => [
   body('token')
     .notEmpty()
     .withMessage('Token is required')
 ];
 
-// Resend Invitation validation
 export const validateResendInvitation = () => [
   param('id')
     .isUUID()
     .withMessage('Invitation ID must be a valid UUID')
 ];
 
-// Cancel Invitation validation
 export const validateCancelInvitation = () => [
   param('id')
     .isUUID()
@@ -148,7 +140,6 @@ export const validateCancelInvitation = () => [
     .withMessage('Reason must be between 1 and 500 characters')
 ];
 
-// Bulk Invitation operations validation
 export const validateBulkInvitationOperation = () => [
   body('invitationIds')
     .isArray({ min: 1 })

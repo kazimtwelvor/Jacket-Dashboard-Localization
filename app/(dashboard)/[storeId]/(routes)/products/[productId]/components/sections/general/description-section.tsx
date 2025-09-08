@@ -364,7 +364,7 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
   }, [descriptionText, descriptionImages])
 
   return (
-    <div className="rounded-lg border-2 border-primary/10 p-6 bg-gradient-to-r from-white to-primary/5">
+    <div className="rounded-lg border-2 border-primary/10 p-6 bg-gradient-to-r from-background to-primary/5 dark:from-background dark:to-primary/10">
       <FormField
         control={form.control}
         name="description"
@@ -372,18 +372,18 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
           <FormItem>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <FormLabel className="text-lg font-bold block">
+                <FormLabel className="text-lg font-bold block text-foreground">
                   Full Description <span className="text-red-500">*</span>
                 </FormLabel>
                 <p className="text-sm text-muted-foreground">Provide a detailed description of your product</p>
               </div>
-              <Badge variant="outline" className="font-normal">
+              <Badge variant="outline" className="font-normal bg-background text-foreground border-border">
                 Step 9
               </Badge>
             </div>
 
             {!canGenerate && (
-              <Alert variant="destructive" className="mb-4 bg-amber-50 text-amber-800 border-amber-200">
+              <Alert variant="destructive" className="mb-4 bg-amber-50 dark:bg-amber-950 text-amber-800 dark:text-amber-200 border-amber-200 dark:border-amber-800">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
                   {!form.getValues("name") || form.getValues("name").trim() === ""
@@ -394,7 +394,7 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
             )}
 
             {canGenerate && (
-              <Alert className="mb-4 bg-green-50 text-green-800 border-green-200">
+              <Alert className="mb-4 bg-green-50 dark:bg-green-950 text-green-800 dark:text-green-200 border-green-200 dark:border-green-800">
                 <CheckCircle2 className="h-4 w-4" />
                 <AlertDescription>
                   Ready to generate! Click the button below to create an AI-powered description
@@ -636,8 +636,8 @@ export const DescriptionSection: React.FC<DescriptionSectionProps> = ({ form }) 
               </FormControl>
 
               {descriptionImages.length > 0 && (
-                <div className="mt-4 border rounded-md p-4 bg-gray-50">
-                  <h3 className="text-sm font-medium mb-3">Product Images</h3>
+                <div className="mt-4 border rounded-md p-4 bg-muted/50">
+                  <h3 className="text-sm font-medium mb-3 text-foreground">Product Images</h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {descriptionImages.map((img, index) => (
                       <div key={index} className="relative group">

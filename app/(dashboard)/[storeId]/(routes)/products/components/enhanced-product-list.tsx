@@ -285,53 +285,7 @@ export const EnhancedProductList = ({ products, storeId, onSelectItems, searchTe
       )}
 
       <div className="space-y-4">
-        <div className="flex flex-col sm:flex-row gap-4 justify-between">
-          {externalSearchTerm === undefined && (
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search products by name, SKU, category or creator..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 w-full"
-              />
-            </div>
-          )}
-          <div className={`flex gap-2 ${externalSearchTerm !== undefined ? 'w-full justify-end' : ''}`}>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="outline" size="icon" onClick={refreshList}>
-                    <RefreshCw className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Refresh list</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex items-center gap-2">
-                  <Filter className="h-4 w-4" />
-                  <span className="hidden sm:inline">Filter</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>Filter by Status</DropdownMenuLabel>
-                <DropdownMenuItem onClick={() => {}}>All Products</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => {}}>Published Only</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => {}}>Draft Only</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuLabel>Filter by Category</DropdownMenuLabel>
-                <DropdownMenuItem onClick={() => {}}>All Categories</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <Button onClick={() => router.push(`/${storeId}/products/new`)}>Add New</Button>
-          </div>
-        </div>
+   
 
         {selectedItems.length > 0 && (
           <div className="bg-muted/30 p-2 rounded-md flex items-center justify-between">
@@ -340,10 +294,6 @@ export const EnhancedProductList = ({ products, storeId, onSelectItems, searchTe
               <span className="text-sm font-medium">{selectedItems.length} selected</span>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={() => router.push(`/${storeId}/products/bulk-edit`)}>
-                <Tag className="h-3.5 w-3.5 mr-2" />
-                Bulk Edit
-              </Button>
               <Button 
                 variant="outline" 
                 size="sm" 
@@ -737,24 +687,6 @@ export const EnhancedProductList = ({ products, storeId, onSelectItems, searchTe
           </div>
         </div>
 
-        {sortedProducts.length > 0 && (
-          <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <div>
-              Showing {sortedProducts.length} of {products.length} products
-            </div>
-            <div className="flex items-center gap-1">
-              <Button variant="outline" size="sm" disabled>
-                Previous
-              </Button>
-              <Button variant="outline" size="sm" className="bg-primary text-primary-foreground">
-                1
-              </Button>
-              <Button variant="outline" size="sm" disabled>
-                Next
-              </Button>
-            </div>
-          </div>
-        )}
       </div>
     </>
   )

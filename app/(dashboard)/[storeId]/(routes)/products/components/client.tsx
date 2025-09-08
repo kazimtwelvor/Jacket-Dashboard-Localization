@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { Plus, Package, BarChart3, List, Filter, Search, RefreshCw, CheckCircle, Users, Upload } from "lucide-react"
+import { Plus, Package, BarChart3, List, Filter, Search, X, CheckCircle, Users, Upload, RefreshCw } from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 import { toast } from "react-hot-toast"
@@ -46,6 +46,9 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState<number | "all">(20)
   const [isBulkPublishing, setIsBulkPublishing] = useState(false)
+  const [isSearching, setIsSearching] = useState(false)
+  const [searchResults, setSearchResults] = useState<ProductColumn[]>([])
+  const [isSearchActive, setIsSearchActive] = useState(false)
 
   const publishedProducts = data.filter((product) => product.isPublished && !product.isArchived)
   const archivedProducts = data.filter((product) => product.isArchived)
@@ -64,6 +67,107 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
 
   const storeId = params?.storeId as string
 
+  const searchProducts = async (searchQuery: string) => {
+    if (!searchQuery.trim()) {
+      setSearchResults([])
+      setIsSearchActive(false)
+      return
+    }
+
+    setIsSearching(true)
+    try {
+      const isTrashSearch = activeTab === "trash"
+      const apiUrl = `/api/${storeId}/products?search=${encodeURIComponent(searchQuery)}&admin=true${isTrashSearch ? '&trash=true' : ''}`
+
+      const response = await fetch(apiUrl)
+      if (response.ok) {
+        const result = await response.json()
+        const formattedResults = result.products.map((product: any) => ({
+          id: product.id,
+          name: product.name,
+          isFeatured: product.isFeatured,
+          isArchived: product.isArchived,
+          isPublished: product.isPublished,
+          price: product.price,
+          salePrice: product.salePrice,
+          category: product.categoryData && typeof product.categoryData === 'object' && product.categoryData !== null
+            ? `${product.categoryData.material || ''} ${product.categoryData.style || ''}`.trim() || "Uncategorized"
+            : "Uncategorized",
+          sku: product.sku,
+          stockStatus: product.stockStatus || "instock",
+          sizes: product.sizeDetails
+            ? JSON.parse(JSON.stringify(product.sizeDetails))
+              .map((size: any) => size.name)
+              .join(", ")
+            : "N/A",
+          colors: product.colorDetails
+            ? JSON.parse(JSON.stringify(product.colorDetails))
+              .map((color: any) => color.name)
+              .join(", ")
+            : "N/A",
+          imageUrl: product.images && product.images.length > 0 ? product.images[0].url : "/placeholder.svg",
+          createdAt: new Date(product.createdAt).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          }),
+          createdByName: product.createdByName || "Unknown",
+          updatedByName: product.updatedByName || undefined,
+          updatedAt: product.updatedAt ? new Date(product.updatedAt).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          }) : undefined,
+          publishedAt: new Date(product.createdAt).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          }),
+          description: product.description || "",
+          ...(isTrashSearch && product.deletedAt ? {
+            deletedAt: new Date(product.deletedAt).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            })
+          } : {}),
+        }))
+        console.log(`Setting search results for ${isTrashSearch ? 'trash' : 'regular'} search:`, formattedResults.length, 'products')
+        setSearchResults(formattedResults)
+        setIsSearchActive(true)
+      } else {
+        console.error('Search failed:', response.statusText)
+        setSearchResults([])
+        setIsSearchActive(false)
+      }
+    } catch (error) {
+      console.error('Search error:', error)
+      setSearchResults([])
+      setIsSearchActive(false)
+    } finally {
+      setIsSearching(false)
+    }
+  }
+
+  useEffect(() => {
+    setSearchResults([])
+    setIsSearchActive(false)
+  }, [activeTab])
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (searchTerm.trim()) {
+        searchProducts(searchTerm)
+      } else {
+        console.log('Clearing search results - no search term')
+        setSearchResults([])
+        setIsSearchActive(false)
+      }
+    }, 500) 
+
+    return () => clearTimeout(timeoutId)
+  }, [searchTerm, storeId, activeTab])
+
   const handleBulkPublish = async () => {
     if (!isOwner) {
       toast.error("Only store owners can bulk publish products")
@@ -72,7 +176,7 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
 
     try {
       setIsBulkPublishing(true)
-      
+
       const response = await fetch(`/api/${storeId}/products/bulk-publish`, {
         method: "POST",
         headers: {
@@ -101,23 +205,25 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
     } else {
       setItemsPerPage(Number(value))
     }
-    setCurrentPage(1) 
+    setCurrentPage(1)
   }
 
   const getFilteredProductsForTab = () => {
+    if (isSearchActive || searchTerm.trim()) {
+      console.log(`Using API search results for ${activeTab} tab:`, searchResults.length, 'products (search term: "${searchTerm}")')
+      return searchResults
+    }
+
     let listToFilter: ProductColumn[] | TrashProductColumn[] = []
     if (activeTab === "published") {
       listToFilter = publishedProducts
     } else if (activeTab === "archived") {
       listToFilter = archivedProducts
     } else if (activeTab === "trash") {
-      listToFilter = trashedData 
+      listToFilter = trashedData
     }
-    return listToFilter.filter(
-      (product) => 
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.sku?.toLowerCase().includes(searchTerm.toLowerCase())
-    ) as ProductColumn[]
+
+    return listToFilter as ProductColumn[]
   }
 
   const filteredProducts = getFilteredProductsForTab()
@@ -138,10 +244,10 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
   } else {
     const numericItemsPerPage = Number(itemsPerPage)
     displayTotalPages = totalItems > 0 ? Math.ceil(totalItems / numericItemsPerPage) : 1
-    
+
     const safeCurrentPage = Math.min(currentPage, displayTotalPages) || 1;
     if (currentPage !== safeCurrentPage) {
-        setCurrentPage(safeCurrentPage); 
+      setCurrentPage(safeCurrentPage);
     }
 
     displayStartIndex = (safeCurrentPage - 1) * numericItemsPerPage
@@ -149,23 +255,23 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
     currentDisplayProducts = filteredProducts.slice(displayStartIndex, displayEndIndex)
     showPaginationControls = displayTotalPages > 1
   }
-  
-   useEffect(() => {
+
+  useEffect(() => {
     if (itemsPerPage !== "all") {
-        const numericItemsPerPage = Number(itemsPerPage);
-        const newTotalPages = totalItems > 0 ? Math.ceil(totalItems / numericItemsPerPage) : 1;
-        if (currentPage > newTotalPages) {
-            setCurrentPage(newTotalPages);
-        }
+      const numericItemsPerPage = Number(itemsPerPage);
+      const newTotalPages = totalItems > 0 ? Math.ceil(totalItems / numericItemsPerPage) : 1;
+      if (currentPage > newTotalPages) {
+        setCurrentPage(newTotalPages);
+      }
     }
   }, [totalItems, itemsPerPage, currentPage]);
 
 
   const renderPagination = () => {
-    if (totalItems === 0 && activeTab !== "trash") { 
-        return <div className="text-center py-4 text-sm text-muted-foreground">No products found.</div>;
+    if (totalItems === 0 && activeTab !== "trash") {
+      return null
     }
-    if (activeTab === "trash") return null; 
+
 
     return (
       <div className="flex flex-col sm:flex-row items-center justify-between mt-4 gap-4">
@@ -184,7 +290,7 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
             </SelectContent>
           </Select>
         </div>
-        {showPaginationControls && (
+        {totalItems > 0 && (
           <Pagination>
             <PaginationContent>
               <PaginationItem>
@@ -197,15 +303,15 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
               {Array.from({ length: Math.min(5, displayTotalPages) }, (_, i) => {
                 let pageNumber: number;
                 if (displayTotalPages <= 5) {
-                    pageNumber = i + 1;
+                  pageNumber = i + 1;
                 } else {
-                    if (currentPage <= 3) {
-                        pageNumber = i + 1;
-                    } else if (currentPage >= displayTotalPages - 2) {
-                        pageNumber = displayTotalPages - 4 + i;
-                    } else {
-                        pageNumber = currentPage - 2 + i;
-                    }
+                  if (currentPage <= 3) {
+                    pageNumber = i + 1;
+                  } else if (currentPage >= displayTotalPages - 2) {
+                    pageNumber = displayTotalPages - 4 + i;
+                  } else {
+                    pageNumber = currentPage - 2 + i;
+                  }
                 }
                 if (pageNumber > 0 && pageNumber <= displayTotalPages) {
                   return (
@@ -221,7 +327,7 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
                 }
                 return null;
               })}
-              {displayTotalPages > 5 && currentPage < displayTotalPages -2 && <PaginationEllipsis />}
+              {displayTotalPages > 5 && currentPage < displayTotalPages - 2 && <PaginationEllipsis />}
               <PaginationItem>
                 <PaginationNext
                   onClick={() => setCurrentPage((prev) => Math.min(prev + 1, displayTotalPages))}
@@ -233,7 +339,13 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
           </Pagination>
         )}
         <div className="text-sm text-muted-foreground order-first sm:order-last">
-          Showing {totalItems > 0 ? displayStartIndex + 1 : 0}-{Math.min(displayEndIndex, totalItems)} of {totalItems}
+          {totalItems > 0 ? (
+            <>
+              Showing {displayStartIndex + 1} to {Math.min(displayEndIndex, totalItems)} of {totalItems} {activeTab === "trash" ? "deleted products" : "products"}
+            </>
+          ) : (
+            "No products found"
+          )}
         </div>
       </div>
     )
@@ -334,7 +446,7 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
                         onClick={handleBulkPublish}
                         disabled={isBulkPublishing}
                         variant="outline"
-                        className="border-green-200 hover:bg-green-50 hover:border-green-300 text-green-700"
+                        className="border-green-200 dark:border-green-800 hover:bg-green-50 dark:hover:bg-green-950 hover:border-green-300 dark:hover:border-green-700 text-green-700 dark:text-green-300"
                       >
                         {isBulkPublishing ? (
                           <>
@@ -393,9 +505,10 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
               {activeTab !== "trash" && (
                 <div className="flex items-center w-full gap-2">
                   <div className="relative flex-1">
+
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
-                      placeholder="Search products by name, SKU, category or creator..."
+                      placeholder="Search by name, SKU, category, creator, dates, prices, status..."
                       value={searchTerm}
                       onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                       className="pl-9 w-full"
@@ -403,30 +516,55 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
                     />
                   </div>
                   <div className="flex gap-1">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button variant="outline" size="icon" onClick={() => router.refresh()} aria-label="Refresh list">
-                            <RefreshCw className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Refresh list</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+                    {searchTerm && (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => { setSearchTerm(""); setSearchResults([]); setIsSearchActive(false); setCurrentPage(1); }}
+                              aria-label="Clear search"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Clear search</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    )}
                   </div>
                 </div>
               )}
             </div>
 
             <TabsContent value="published" className="space-y-4">
-              <EnhancedProductList products={currentDisplayProducts} storeId={storeId} searchTerm={searchTerm} />
+              {isSearching ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="flex flex-col items-center gap-3">
+                    <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">Searching products...</p>
+                  </div>
+                </div>
+              ) : (
+                <EnhancedProductList products={currentDisplayProducts} storeId={storeId} searchTerm={searchTerm} />
+              )}
               {renderPagination()}
             </TabsContent>
 
             <TabsContent value="archived" className="space-y-4">
-              <EnhancedProductList products={currentDisplayProducts} storeId={storeId} searchTerm={searchTerm} />
+              {isSearching ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="flex flex-col items-center gap-3">
+                    <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">Searching products...</p>
+                  </div>
+                </div>
+              ) : (
+                <EnhancedProductList products={currentDisplayProducts} storeId={storeId} searchTerm={searchTerm} />
+              )}
               {renderPagination()}
             </TabsContent>
 
@@ -486,7 +624,54 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
                       </div>
                     </div>
                   </div>
-                  <TrashDataTable columns={trashColumns} data={trashedData} />
+
+                  <div className="flex items-center w-full gap-2 mb-4">
+                    <div className="relative flex-1">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Search trash by name, SKU, category, creator, dates..."
+                        value={searchTerm}
+                        onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+                        className="pl-9 w-full"
+                        aria-label="Search trash products"
+                      />
+                    </div>
+                    <div className="flex gap-1">
+                      {searchTerm && (
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => { setSearchTerm(""); setSearchResults([]); setIsSearchActive(false); setCurrentPage(1); }}
+                                aria-label="Clear search"
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Clear search</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      )}
+                    </div>
+                  </div>
+
+                  {isSearching ? (
+                    <div className="flex items-center justify-center py-12">
+                      <div className="flex flex-col items-center gap-3">
+                        <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
+                        <p className="text-sm text-muted-foreground">Searching trash...</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <TrashDataTable columns={trashColumns} data={currentDisplayProducts as TrashProductColumn[]} />
+                      {renderPagination()}
+                    </>
+                  )}
                 </>
               )}
             </TabsContent>

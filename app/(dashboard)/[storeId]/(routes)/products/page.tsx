@@ -118,16 +118,19 @@ const ProductsPage: React.FC<ProductsPageProps> = async ({ params }) => {
       updatedByName: product.updatedByName || undefined,
       updatedAt: product.updatedAt ? format(product.updatedAt, "MMMM do, yyyy") : undefined,
       publishedAt: format(product.createdAt, "MMMM do, yyyy"),
+      description: product.description || "",
     }))
 
     const formattedTrashedProducts = trashedProducts.map((product) => ({
       id: product.id,
       name: product.name,
       price: formatter.format(Number(product.price)),
+      salePrice: product.salePrice ? formatter.format(Number(product.salePrice)) : null,
       category: product.categoryData && typeof product.categoryData === 'object' && product.categoryData !== null 
         ? `${(product.categoryData as any).material || ''} ${(product.categoryData as any).style || ''}`.trim() || "Uncategorized" 
         : "Uncategorized",
       sku: product.sku,
+      stockStatus: product.stockStatus || "instock",
       deletedAt: product.deletedAt ? format(product.deletedAt, "MMMM do, yyyy") : "Unknown",
       sizes: product.sizeDetails
         ? JSON.parse(JSON.stringify(product.sizeDetails))
@@ -143,6 +146,15 @@ const ProductsPage: React.FC<ProductsPageProps> = async ({ params }) => {
         product.images && product.images.length > 0 && product.images[0].image
           ? product.images[0].image.url
           : "/placeholder.svg",
+      createdAt: format(product.createdAt, "MMMM do, yyyy"),
+      createdByName: product.createdByName || "Unknown",
+      updatedByName: product.updatedByName || undefined,
+      updatedAt: product.updatedAt ? format(product.updatedAt, "MMMM do, yyyy") : undefined,
+      publishedAt: format(product.createdAt, "MMMM do, yyyy"),
+      description: product.description || "",
+      isFeatured: product.isFeatured,
+      isArchived: product.isArchived,
+      isPublished: product.isPublished,
     }))
 
     const creatorCounts = formattedProducts.reduce(

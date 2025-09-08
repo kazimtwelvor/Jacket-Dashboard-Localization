@@ -83,7 +83,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       categoryPages: categoryPageList,
     });
   } catch (error) {
-    console.log("[SITEMAP_GET]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }

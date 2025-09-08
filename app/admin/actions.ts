@@ -47,7 +47,6 @@ export async function updateUserRole(userId: string, role: string) {
 
     return { success: true }
   } catch (error) {
-    console.error("Error updating user role:", error)
     throw error
   }
 }

@@ -39,7 +39,6 @@ export async function GET(
       headers: corsHeaders(),
     })
   } catch (error) {
-    console.log("[NEWSLETTER_FORMS_GET]", error)
     return new NextResponse("Internal error", { 
       status: 500,
       headers: corsHeaders(),
@@ -75,7 +74,6 @@ export async function POST(
       headers: corsHeaders(),
     })
   } catch (error) {
-    console.log("[NEWSLETTER_FORMS_POST]", error)
     return new NextResponse("Internal error", { 
       status: 500,
       headers: corsHeaders(),

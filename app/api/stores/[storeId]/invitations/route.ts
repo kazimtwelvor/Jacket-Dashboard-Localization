@@ -4,7 +4,7 @@ import { db } from "@/lib/db"
 
 export async function GET(req: Request, { params }: { params: { storeId: string } }) {
   try {
-    const { userId } = auth()
+    const { userId } = await auth()
     const { storeId } = params
 
     if (!userId) {
@@ -38,7 +38,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
 
     return NextResponse.json(invitations)
   } catch (error) {
-    console.log("[INVITATIONS_GET]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

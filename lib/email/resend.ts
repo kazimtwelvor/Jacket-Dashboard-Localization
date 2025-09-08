@@ -48,13 +48,11 @@ export async function sendEmail({
     })
 
     if (error) {
-      console.error("Error sending email:", error)
       return { success: false, error }
     }
 
     return { success: true, data }
   } catch (error) {
-    console.error("Exception sending email:", error)
     return { success: false, error }
   }
 }

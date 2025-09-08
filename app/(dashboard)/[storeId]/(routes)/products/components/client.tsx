@@ -193,7 +193,6 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
       toast.success(result.message || `Successfully published ${result.count || 0} products`)
       router.refresh()
     } catch (error) {
-      console.error("Error bulk publishing products:", error)
       toast.error(error instanceof Error ? error.message : "Failed to bulk publish products")
     } finally {
       setIsBulkPublishing(false)

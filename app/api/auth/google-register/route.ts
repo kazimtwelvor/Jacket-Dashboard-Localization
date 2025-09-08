@@ -131,7 +131,6 @@ export async function POST(req: Request) {
       }
     );
   } catch (error) {
-    console.error("[GOOGLE_REGISTER_ERROR]", error);
     return new NextResponse(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
       headers: corsHeaders,

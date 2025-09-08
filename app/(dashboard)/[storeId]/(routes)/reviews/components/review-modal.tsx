@@ -53,7 +53,6 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
     }
     
     // Debug the review data
-    console.log("Review data:", { review, allReviews })
   }, [review, allReviews, isOpen])
 
   // Update current review when index changes

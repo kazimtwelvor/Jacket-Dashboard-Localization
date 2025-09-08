@@ -51,18 +51,15 @@ export const StepElevenContentPersonalization: React.FC<StepElevenContentPersona
     try {
       // Don't use the field parameter, use our hardcoded path instead
       if (!url) {
-        console.log("Empty URL received, skipping save")
         return
       }
 
       // Validate URL
       if (url.includes("guideContent.steps.") || url === "undefined") {
-        console.error("Invalid URL detected:", url)
         toast.error("Invalid image URL")
         return
       }
 
-      console.log(`Step 11: Saving image:`, url)
 
       // Update local state
       setCurrentImage(url)
@@ -70,7 +67,6 @@ export const StepElevenContentPersonalization: React.FC<StepElevenContentPersona
       // Save to parent component with correct field path
       onSaveImage(`guideContent.steps.${stepIndex}.image`, url)
     } catch (error) {
-      console.error("Error saving image:", error)
       toast.error("Failed to save image")
     }
   }

@@ -77,7 +77,6 @@ export const SchemaMarkupEditor = () => {
     const template = getTemplateById(templateType)
 
     if (!template) {
-      console.error("Template not found:", templateType)
       return
     }
 

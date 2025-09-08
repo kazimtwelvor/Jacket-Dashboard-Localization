@@ -64,14 +64,9 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       },
     })
 
-    console.log("[PAGES_POST] Title check:", { 
-      title, 
-      storeId: params.storeId, 
-      existingPageByTitle: existingPageByTitle ? { id: existingPageByTitle.id, title: existingPageByTitle.title } : null 
-    })
+  
 
     if (existingPageByTitle) {
-      console.log("[PAGES_POST] Title already exists, returning error")
       return new NextResponse("Title already exists", { status: 400 })
     }
 
@@ -87,7 +82,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
 
     return NextResponse.json(page)
   } catch (error) {
-    console.log("[PAGES_POST]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }
@@ -109,7 +103,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
 
     return NextResponse.json(pages)
   } catch (error) {
-    console.log("[PAGES_GET]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

@@ -19,15 +19,12 @@ export default async function AdminLayout({
     const user = await clerkClient.users.getUser(userId)
     const userRole = user.publicMetadata.role as string
 
-    console.log("Admin layout access - User role:", userRole)
 
     // Allow both admin and super_admin roles
     if (userRole !== "admin" && userRole !== "super_admin") {
-      console.log("Unauthorized access to admin layout:", userId, "Role:", userRole)
       redirect("/")
     }
   } catch (error) {
-    console.error("Error checking user role:", error)
     redirect("/")
   }
 

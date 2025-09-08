@@ -19,6 +19,13 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
     // Check if this is an admin request
     const isAdmin = searchParams.get("admin") === "true"
     
+
+    const baseWhereClause = {
+      storeId: storeId,
+      isDeleted: false,
+      ...(isAdmin ? {} : { isPublished: true, isArchived: false }),
+    }
+
     const colors = searchParams.get("colors")
     const materials = searchParams.get("materials")
     const styles = searchParams.get("styles")
@@ -58,7 +65,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       }
     })
     
-    console.log(`Retrieved ${allProducts.length} products before additional filtering (trash: ${trash})`)
     
     let filteredProducts = [...allProducts]
     
@@ -159,6 +165,7 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       
     }
     
+
     if (colors) {
       const colorsList = colors.toLowerCase().split(',')
       filteredProducts = filteredProducts.filter(product => {
@@ -183,7 +190,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
         return false
       })
       
-      console.log(`After color filtering: ${filteredProducts.length} products`)
     }
     
     if (materials) {
@@ -206,7 +212,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
         return materialsList.includes(productMaterial.toString().toLowerCase())
       })
       
-      console.log(`After material filtering: ${filteredProducts.length} products`)
     }
     
     if (styles) {
@@ -229,7 +234,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
         return stylesList.includes(productStyle.toString().toLowerCase())
       })
       
-      console.log(`After style filtering: ${filteredProducts.length} products`)
     }
     
     if (genders) {
@@ -252,7 +256,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
         return gendersList.includes(productGender.toString().toLowerCase())
       })
       
-      console.log(`After gender filtering: ${filteredProducts.length} products`)
     }
     
     const totalProducts = filteredProducts.length
@@ -301,5 +304,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
     console.error(`[PRODUCTS_GET] Error:`, err)
     const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred'
     return new NextResponse(`Internal error: ${errorMessage}`, { status: 500, headers: corsHeaders })
+
   }
 }

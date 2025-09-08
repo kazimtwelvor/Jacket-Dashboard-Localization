@@ -46,7 +46,6 @@ export async function GET(req: Request) {
       status: invitation.status,
     })
   } catch (error) {
-    console.log("[INVITATION_VERIFY]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

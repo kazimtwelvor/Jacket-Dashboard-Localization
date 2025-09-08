@@ -100,7 +100,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       token, // Include the token in the response
     })
   } catch (error) {
-    console.log("[INVITATIONS_POST]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }
@@ -143,7 +142,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
 
     return NextResponse.json(invitations)
   } catch (error) {
-    console.log("[INVITATIONS_GET]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

@@ -39,7 +39,6 @@ export const StoreNameProvider = ({ storeId, children }: StoreNameProviderProps)
           setStoreName(`Store ${storeId.substring(0, 8)}`)
         }
       } catch (err) {
-        console.error("Error fetching store name:", err)
         setError(err instanceof Error ? err : new Error("Failed to fetch store name"))
         setStoreName(`Store ${storeId.substring(0, 8)}`)
       } finally {

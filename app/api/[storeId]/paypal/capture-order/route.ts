@@ -76,7 +76,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
 
     return NextResponse.json({ success: true, order: updatedOrder }, { headers: corsHeaders })
   } catch (error) {
-    console.error("[PAYPAL_CAPTURE_ORDER]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

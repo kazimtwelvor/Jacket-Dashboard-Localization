@@ -87,7 +87,6 @@ export async function GET() {
       headers,
     })
   } catch (error) {
-    console.error("Error in diagnostic endpoint:", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

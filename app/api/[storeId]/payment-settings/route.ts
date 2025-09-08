@@ -36,7 +36,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
 
     return NextResponse.json(paymentSettings)
   } catch (error) {
-    console.log("[PAYMENT_SETTINGS_GET]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

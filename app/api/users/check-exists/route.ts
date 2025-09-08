@@ -18,7 +18,6 @@ export async function GET(req: Request) {
 
     return Response.json(Boolean(existingUser))
   } catch (error) {
-    console.error("[USERS_CHECK_EXISTS]", error)
     return new Response("Internal error", { status: 500 })
   }
 }

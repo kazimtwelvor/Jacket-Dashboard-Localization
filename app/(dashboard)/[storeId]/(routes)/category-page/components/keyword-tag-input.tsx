@@ -43,10 +43,8 @@ export const KeywordTagInput: React.FC<KeywordTagInputProps> = ({ form }) => {
   }
 
   const removeKeyword = (keyword: string) => {
-    console.log('Removing keyword:', keyword)
     
     if (keyword === focusKeyword) {
-      console.log('Removing focus keyword')
       form.setValue("focusKeyword", "", {
         shouldValidate: true,
         shouldDirty: true,
@@ -54,7 +52,6 @@ export const KeywordTagInput: React.FC<KeywordTagInputProps> = ({ form }) => {
       
       if (supportingKeywords.length > 0) {
         const [newFocus, ...restKeywords] = supportingKeywords
-        console.log('Promoting supporting keyword to focus:', newFocus)
         form.setValue("focusKeyword", newFocus, {
           shouldValidate: true,
           shouldDirty: true,

@@ -256,7 +256,6 @@ export async function previewEmail(storeId: string, templateId: string) {
 
     return { success: true, html }
   } catch (error) {
-    console.error("Error generating email preview:", error)
     return { success: false, error: "Failed to generate email preview" }
   }
 }

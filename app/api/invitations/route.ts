@@ -92,7 +92,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json(invitation)
   } catch (error) {
-    console.log("[INVITATIONS_POST]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

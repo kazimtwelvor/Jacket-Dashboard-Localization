@@ -73,7 +73,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       expiresAt: updatedInvitation.expiresAt,
     })
   } catch (error) {
-    console.log("[INVITATION_RESEND]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

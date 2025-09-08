@@ -34,10 +34,8 @@ export const NewsletterFormNew = () => {
       if (response.ok) {
         router.back()
       } else {
-        console.error('Failed to create newsletter form')
       }
     } catch (error) {
-      console.error('Error creating newsletter form:', error)
     }
   }
 

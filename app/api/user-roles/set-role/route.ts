@@ -41,7 +41,6 @@ export async function POST(req: NextRequest) {
       },
     })
   } catch (error) {
-    console.error("Error setting role:", error)
     return NextResponse.json({ message: "Failed to set role" }, { status: 500 })
   }
 }

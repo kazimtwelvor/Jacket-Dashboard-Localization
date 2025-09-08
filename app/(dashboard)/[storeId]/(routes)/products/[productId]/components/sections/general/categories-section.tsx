@@ -49,7 +49,6 @@ export const CategoriesSection = () => {
       }
 
       if (needsUpdate) {
-        console.log("Syncing material categories from external materials:", externalMaterialValues)
         form.setValue("categories.material", [...externalMaterialValues], {
           shouldValidate: true,
           shouldDirty: true,

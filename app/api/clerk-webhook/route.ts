@@ -34,7 +34,6 @@ export async function POST(req: Request) {
       "svix-signature": svix_signature,
     }) as WebhookEvent
   } catch (err) {
-    console.error("Error verifying webhook:", err)
     return new Response("Error: Invalid signature", {
       status: 400,
     })
@@ -55,9 +54,7 @@ export async function POST(req: Request) {
         },
       })
 
-      console.log(`Set default role 'user' for new user: ${id}`)
     } catch (error) {
-      console.error("Error setting default role:", error)
     }
   }
 

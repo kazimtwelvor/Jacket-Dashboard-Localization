@@ -42,10 +42,8 @@ export const NewsletterFormEdit = ({ initialData }: NewsletterFormEditProps) => 
       if (response.ok) {
         router.back()
       } else {
-        console.error('Failed to update newsletter form')
       }
     } catch (error) {
-      console.error('Error updating newsletter form:', error)
     }
   }
 

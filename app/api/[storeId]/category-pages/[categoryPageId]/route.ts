@@ -35,11 +35,7 @@ export async function GET(
         return new NextResponse("This is a regular category, not a category page", { status: 400 })
       }
     }
-    
-    console.log('Category Page Keywords:', {
-      focusKeyword: categoryPage.focusKeyword,
-      supportingKeywords: categoryPage.supportingKeywords
-    });
+
     
     const responseData = {
       ...categoryPage,
@@ -52,7 +48,6 @@ export async function GET(
 
     return NextResponse.json(responseData)
   } catch (error) {
-    console.log("[CATEGORY_PAGE_GET]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

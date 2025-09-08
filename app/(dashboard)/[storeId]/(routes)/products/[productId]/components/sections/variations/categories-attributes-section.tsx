@@ -73,9 +73,6 @@ export const CategoriesAttributesSection: React.FC<CategoriesAttributesSectionPr
     : defaultStyleOptions
 
   useEffect(() => {
-    console.log("Available gender options:", genderOptions)
-    console.log("Available material options:", materialOptions)
-    console.log("Available style options:", styleOptions)
   }, [genderOptions, materialOptions, styleOptions])
 
   const filteredMaterials = materialOptions.filter((material) =>

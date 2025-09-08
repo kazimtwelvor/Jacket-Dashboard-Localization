@@ -4,7 +4,7 @@ import { db } from "@/lib/db"
 
 export async function DELETE(req: Request, { params }: { params: { storeId: string; invitationId: string } }) {
   try {
-    const { userId } = auth()
+    const { userId } = await auth()
     const { storeId, invitationId } = params
 
     if (!userId) {
@@ -46,14 +46,13 @@ export async function DELETE(req: Request, { params }: { params: { storeId: stri
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.log("[INVITATION_DELETE]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }
 
 export async function PATCH(req: Request, { params }: { params: { storeId: string; invitationId: string } }) {
   try {
-    const { userId } = auth()
+    const { userId } = await auth()
     const { storeId, invitationId } = params
     const body = await req.json()
 
@@ -102,7 +101,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
 
     return NextResponse.json(updatedInvitation)
   } catch (error) {
-    console.log("[INVITATION_PATCH]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

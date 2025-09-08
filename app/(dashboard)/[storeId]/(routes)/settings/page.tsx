@@ -25,7 +25,6 @@ const SettingsPage = async ({ params }: { params: Promise<{ storeId: string }> }
     const userRole = await getUserStoreRole(userId, storeId)
 
     if (userRole !== "ADMIN") {
-      console.log("Access denied: User is not the store owner or admin")
       redirect("/")
     }
 

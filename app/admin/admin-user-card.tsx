@@ -77,7 +77,6 @@ export function AdminUserCard({
         description: `User role updated to ${newRole}`,
       })
     } catch (error) {
-      console.error("Failed to update role:", error)
       toast({
         title: "Update failed",
         description: "There was an error updating the user role",

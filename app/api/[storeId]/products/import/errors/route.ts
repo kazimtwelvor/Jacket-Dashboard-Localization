@@ -56,7 +56,6 @@ export async function GET(req: NextRequest, { params }: { params: { storeId: str
       },
     })
   } catch (error) {
-    console.error("[PRODUCTS_IMPORT_ERRORS]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

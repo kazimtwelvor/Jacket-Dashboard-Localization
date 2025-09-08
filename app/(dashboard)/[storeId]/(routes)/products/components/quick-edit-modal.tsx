@@ -91,7 +91,6 @@ export const QuickEditModal: React.FC<QuickEditModalProps> = ({ isOpen, onClose,
       router.refresh()
       onClose()
     } catch (error) {
-      console.error("Error updating product:", error)
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",

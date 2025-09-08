@@ -119,7 +119,6 @@ export const EnhancedProductList = ({ products, storeId, onSelectItems, searchTe
         setPreviewProduct(fullProduct)
       }
     } catch (error) {
-      console.error('Error fetching product details:', error)
     }
   }
 
@@ -133,7 +132,6 @@ export const EnhancedProductList = ({ products, storeId, onSelectItems, searchTe
         return fullProduct
       }
     } catch (error) {
-      console.error('Error fetching product details:', error)
     }
     return null
   }
@@ -218,7 +216,6 @@ export const EnhancedProductList = ({ products, storeId, onSelectItems, searchTe
       setSelectedItems([])
       onSelectItems?.([])
     } catch (error) {
-      console.error("Error deleting products:", error)
       toast.error("Failed to delete products")
     } finally {
       setIsBulkDeleting(false)
@@ -242,7 +239,6 @@ export const EnhancedProductList = ({ products, storeId, onSelectItems, searchTe
       setSelectedItems([])
       onSelectItems?.([])
     } catch (error) {
-      console.error("Error duplicating products:", error)
       toast.error("Failed to duplicate products")
     } finally {
       setIsBulkDuplicating(false)

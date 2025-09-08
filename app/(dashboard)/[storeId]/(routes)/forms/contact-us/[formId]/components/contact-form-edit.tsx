@@ -53,10 +53,8 @@ export const ContactFormEdit = ({ initialData }: ContactFormEditProps) => {
       if (response.ok) {
         router.back()
       } else {
-        console.error('Failed to update contact form')
       }
     } catch (error) {
-      console.error('Error updating contact form:', error)
     }
   }
 

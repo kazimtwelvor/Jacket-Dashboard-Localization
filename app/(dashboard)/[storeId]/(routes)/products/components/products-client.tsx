@@ -87,12 +87,9 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({
         if (response.ok) {
           const { url } = await response.json()
           setFrontendUrl(url)
-          console.log("Frontend URL loaded in products-client:", url)
         } else {
-          console.warn("Failed to load frontend URL from API")
         }
       } catch (error) {
-        console.error("Error fetching frontend URL:", error)
       }
     }
 
@@ -277,11 +274,8 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({
     const hardcodedUrl = "http://192.168.100.114:3001"
 
     const previewUrl = `${hardcodedUrl}/product/${productId}`
-    console.log("Opening preview URL:", previewUrl)
     window.open(previewUrl, "_blank")
 
-    console.log("Environment variable:", process.env.NEXT_PUBLIC_FRONTEND_STORE_URL)
-    console.log("Frontend URL from state:", frontendUrl)
   }
 
   const onDuplicate = async (productId: string) => {

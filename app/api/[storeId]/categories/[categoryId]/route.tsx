@@ -20,7 +20,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ category
 
     return NextResponse.json(category)
   } catch (err) {
-    console.log("[CATEGORY_GET]", err)
     return new NextResponse("Internal error", { status: 500 })
   }
 }
@@ -103,7 +102,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
 
     return NextResponse.json(category)
   } catch (err) {
-    console.log("[CATEGORY_PATCH]", err)
     return new NextResponse("Internal error", { status: 500 })
   }
 }
@@ -162,7 +160,6 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ store
 
     return NextResponse.json(category)
   } catch (err) {
-    console.log("[CATEGORY_DELETE]", err)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

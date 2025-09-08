@@ -57,7 +57,6 @@ export const RelatedProductsSelector: React.FC<RelatedProductsSelectorProps> = (
           : allProducts
         setProducts(filteredProducts)
       } catch (error) {
-        console.error("Failed to fetch products:", error)
       } finally {
         setLoading(false)
       }

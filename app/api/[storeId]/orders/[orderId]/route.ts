@@ -1,210 +1,4 @@
-// import { NextResponse } from "next/server"
-// import { auth } from "@clerk/nextjs/server"
 
-// import prismadb from "@/lib/prismadb"
-
-// export async function GET(req: Request, { params }: { params: { storeId: string; orderId: string } }) {
-//   try {
-//     if (!params.orderId) {
-//       return new NextResponse("Order ID is required", { status: 400 })
-//     }
-
-//     const order = await prismadb.order.findUnique({
-//       where: {
-//         id: params.orderId,
-//       },
-//       include: {
-//         orderItems: {
-//           include: {
-//             product: {
-//               include: {
-//                 images: true,
-//               },
-//             },
-//           },
-//         },
-//         user: true,
-//       },
-//     })
-
-//     return NextResponse.json(order)
-//   } catch (error) {
-//     console.log("[ORDER_GET]", error)
-//     return new NextResponse("Internal error", { status: 500 })
-//   }
-// }
-
-// export async function PATCH(req: Request, { params }: { params: { storeId: string; orderId: string } }) {
-//   try {
-//     const { userId } = await auth()
-//     const body = await req.json()
-
-//     const {
-//       userId: customerId,
-//       phone,
-//       address,
-//       isPaid,
-//       status,
-//       paymentMethod,
-//       shippingMethod,
-//       shippingCost,
-//       tax,
-//       discount,
-//       total,
-//       notes,
-//       trackingNumber,
-//       customerEmail,
-//       billingAddress,
-//       shippingAddress,
-//       fulfillmentStatus,
-//       estimatedDelivery,
-//       actualDelivery,
-//       transactionId,
-//       paymentStatus,
-//     } = body
-
-//     if (!userId) {
-//       return new NextResponse("Unauthenticated", { status: 401 })
-//     }
-
-//     if (!params.orderId) {
-//       return new NextResponse("Order ID is required", { status: 400 })
-//     }
-
-//     // Check if user has access to this store
-//     const storeByUserId = await prismadb.store.findFirst({
-//       where: {
-//         id: params.storeId,
-//         userId,
-//       },
-//     })
-
-//     // If user is not the owner, check if they are a member with appropriate permissions
-//     if (!storeByUserId) {
-//       const dbUser = await prismadb.user.findFirst({
-//         where: {
-//           clerkId: userId,
-//         },
-//       })
-
-//       if (!dbUser) {
-//         return new NextResponse("Unauthorized", { status: 403 })
-//       }
-
-//       const storeMember = await prismadb.storeUser.findFirst({
-//         where: {
-//           storeId: params.storeId,
-//           userId: dbUser.id,
-//         },
-//       })
-
-//       if (!storeMember || !storeMember.permissions.includes("MANAGE_ORDERS")) {
-//         return new NextResponse("Unauthorized", { status: 403 })
-//       }
-//     }
-
-//     // Update the order with all provided fields
-//     const order = await prismadb.order.update({
-//       where: {
-//         id: params.orderId,
-//       },
-//       data: {
-//         userId: customerId,
-//         phone: phone !== undefined ? phone : undefined,
-//         address: address !== undefined ? address : undefined,
-//         isPaid: isPaid !== undefined ? isPaid : undefined,
-//         status: status !== undefined ? status : undefined,
-//         paymentMethod: paymentMethod !== undefined ? paymentMethod : undefined,
-//         shippingMethod: shippingMethod !== undefined ? shippingMethod : undefined,
-//         shippingCost: shippingCost !== undefined ? shippingCost : undefined,
-//         tax: tax !== undefined ? tax : undefined,
-//         discount: discount !== undefined ? discount : undefined,
-//         total: total !== undefined ? total : undefined,
-//         notes: notes !== undefined ? notes : undefined,
-//         trackingNumber: trackingNumber !== undefined ? trackingNumber : undefined,
-//         customerEmail: customerEmail !== undefined ? customerEmail : undefined,
-//         billingAddress: billingAddress !== undefined ? billingAddress : undefined,
-//         shippingAddress: shippingAddress !== undefined ? shippingAddress : undefined,
-//         fulfillmentStatus: fulfillmentStatus !== undefined ? fulfillmentStatus : undefined,
-//         estimatedDelivery:
-//           estimatedDelivery !== undefined ? (estimatedDelivery ? new Date(estimatedDelivery) : null) : undefined,
-//         actualDelivery: actualDelivery !== undefined ? (actualDelivery ? new Date(actualDelivery) : null) : undefined,
-//         transactionId: transactionId !== undefined ? transactionId : undefined,
-//         paymentStatus: paymentStatus !== undefined ? paymentStatus : undefined,
-//       },
-//     })
-
-//     return NextResponse.json(order)
-//   } catch (error) {
-//     console.log("[ORDER_PATCH]", error)
-//     return new NextResponse("Internal error", { status: 500 })
-//   }
-// }
-
-// export async function DELETE(req: Request, { params }: { params: { storeId: string; orderId: string } }) {
-//   try {
-//     const { userId } = await auth()
-
-//     if (!userId) {
-//       return new NextResponse("Unauthenticated", { status: 401 })
-//     }
-
-//     if (!params.orderId) {
-//       return new NextResponse("Order ID is required", { status: 400 })
-//     }
-
-//     // Check if user has access to this store
-//     const storeByUserId = await prismadb.store.findFirst({
-//       where: {
-//         id: params.storeId,
-//         userId,
-//       },
-//     })
-
-//     // If user is not the owner, check if they are a member with appropriate permissions
-//     if (!storeByUserId) {
-//       const dbUser = await prismadb.user.findFirst({
-//         where: {
-//           clerkId: userId,
-//         },
-//       })
-
-//       if (!dbUser) {
-//         return new NextResponse("Unauthorized", { status: 403 })
-//       }
-
-//       const storeMember = await prismadb.storeUser.findFirst({
-//         where: {
-//           storeId: params.storeId,
-//           userId: dbUser.id,
-//         },
-//       })
-
-//       if (!storeMember || !storeMember.permissions.includes("MANAGE_ORDERS")) {
-//         return new NextResponse("Unauthorized", { status: 403 })
-//       }
-//     }
-
-//     // First delete all order items
-//     await prismadb.orderItem.deleteMany({
-//       where: {
-//         orderId: params.orderId,
-//       },
-//     })
-
-//     // Then delete the order
-//     const order = await prismadb.order.delete({
-//       where: {
-//         id: params.orderId,
-//       },
-//     })
-
-//     return NextResponse.json(order)
-//   } catch (error) {
-//     console.log("[ORDER_DELETE]", error)
-//     return new NextResponse("Internal error", { status: 500 })
-//   }
-// }
 
 
 import { NextResponse } from "next/server"
@@ -260,7 +54,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ storeId:
 
     return NextResponse.json(serializedOrder)
   } catch (error) {
-    console.log("[ORDER_GET]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }
@@ -479,7 +272,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
 
     return NextResponse.json(serializedOrder)
   } catch (error) {
-    console.log("[ORDER_PATCH]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }
@@ -545,7 +337,6 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ store
 
     return NextResponse.json(order)
   } catch (error) {
-    console.log("[ORDER_DELETE]", error)
     return new NextResponse("Internal error", { status: 500 })
   }
 }

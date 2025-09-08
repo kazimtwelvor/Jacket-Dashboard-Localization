@@ -57,7 +57,6 @@ export const AcceptInvitationForm = () => {
 
       router.refresh()
     } catch (error: any) {
-      console.error("Error accepting invitation:", error)
       toast.error(error.response?.data?.message || "Failed to accept invitation")
     } finally {
       setLoading(false)

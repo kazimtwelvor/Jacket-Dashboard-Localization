@@ -50,8 +50,10 @@ export const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({
   multiSelect = true, 
   onViewDetails,
 }) => {
-  const [images, setImages] = useState<GalleryImage[]>([])
+  const [allImages, setAllImages] = useState<GalleryImage[]>([])
+  const [displayedImages, setDisplayedImages] = useState<GalleryImage[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [activeTab, setActiveTab] = useState("browse")
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
@@ -62,6 +64,9 @@ export const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({
   const [caption, setCaption] = useState("")
   const [description, setDescription] = useState("")
   const [sidebarTab, setSidebarTab] = useState("details")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [searchPage, setSearchPage] = useState(1)
+  const imagesPerPage = 50
 
   useEffect(() => {
     if (isOpen && storeUrl) {
@@ -77,7 +82,7 @@ export const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({
 
   useEffect(() => {
     if (selectedImage) {
-      const selectedImageObj = images.find((img) => {
+      const selectedImageObj = allImages.find((img) => {
         const baseUrl = storeUrl?.endsWith("/") ? storeUrl.slice(0, -1) : storeUrl
         return `${baseUrl}${img.url}` === selectedImage
       })
@@ -89,7 +94,7 @@ export const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({
         setDescription("")
       }
     }
-  }, [selectedImage, images, storeUrl])
+  }, [selectedImage, allImages, storeUrl])
 
   const fetchImages = async () => {
     if (!storeUrl) return
@@ -125,14 +130,71 @@ export const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({
         }
       })
 
-      setImages(processedImages)
+      setAllImages(processedImages)
+      setCurrentPage(1)
+      setDisplayedImages(processedImages.slice(0, imagesPerPage))
     } catch (error) {
     } finally {
       setIsLoading(false)
     }
   }
 
-  const filteredImages = images.filter((image) => image.name.toLowerCase().includes(searchTerm.toLowerCase()))
+  const loadMoreImages = () => {
+    if (isLoadingMore) return
+    
+    if (searchTerm) {
+      loadMoreSearchResults()
+    } else {
+      const nextPage = currentPage + 1
+      const startIndex = (nextPage - 1) * imagesPerPage
+      const endIndex = startIndex + imagesPerPage
+      const hasMoreImages = startIndex < allImages.length
+      
+      if (hasMoreImages) {
+        setIsLoadingMore(true)
+        
+        const newImages = allImages.slice(startIndex, endIndex)
+        setDisplayedImages(prev => [...prev, ...newImages])
+        setCurrentPage(nextPage)
+        setIsLoadingMore(false)
+      }
+    }
+  }
+
+  const loadMoreSearchResults = () => {
+    setIsLoadingMore(true)
+    
+    const filteredAllImages = allImages.filter((image) => 
+      image.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    
+    const nextSearchPage = searchPage + 1
+    const startIndex = (nextSearchPage - 1) * imagesPerPage
+    const endIndex = startIndex + imagesPerPage
+    const newSearchResults = filteredAllImages.slice(startIndex, endIndex)
+    
+    if (newSearchResults.length > 0) {
+      setDisplayedImages(prev => [...prev, ...newSearchResults])
+      setSearchPage(nextSearchPage)
+    }
+    
+    setIsLoadingMore(false)
+  }
+
+  useEffect(() => {
+    if (searchTerm) {
+      setSearchPage(1)
+      const filteredAllImages = allImages.filter((image) => 
+        image.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      setDisplayedImages(filteredAllImages.slice(0, imagesPerPage))
+    } else {
+      setCurrentPage(1)
+      setDisplayedImages(allImages.slice(0, imagesPerPage))
+    }
+  }, [searchTerm, allImages])
+
+  const filteredImages = displayedImages
 
   const formatFileSize = (bytes: number) => {
     if (bytes < 1024) return bytes + " B"
@@ -190,13 +252,20 @@ export const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({
     try {
       await new Promise((resolve) => setTimeout(resolve, 500))
 
-      const updatedImages = images.filter((img) => {
+      const updatedAllImages = allImages.filter((img) => {
         const baseUrl = storeUrl?.endsWith("/") ? storeUrl.slice(0, -1) : storeUrl
         const fullUrl = `${baseUrl}${img.url}`
         return fullUrl !== imageUrl
       })
 
-      setImages(updatedImages)
+      const updatedDisplayedImages = displayedImages.filter((img) => {
+        const baseUrl = storeUrl?.endsWith("/") ? storeUrl.slice(0, -1) : storeUrl
+        const fullUrl = `${baseUrl}${img.url}`
+        return fullUrl !== imageUrl
+      })
+
+      setAllImages(updatedAllImages)
+      setDisplayedImages(updatedDisplayedImages)
       setIsDetailSidebarOpen(false)
       toast.success("Image deleted successfully")
     } catch (error) {
@@ -236,7 +305,7 @@ export const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({
     if (!selectedImage || !storeUrl) return null
 
     const baseUrl = storeUrl.endsWith("/") ? storeUrl.slice(0, -1) : storeUrl
-    return images.find((img) => `${baseUrl}${img.url}` === selectedImage)
+    return allImages.find((img) => `${baseUrl}${img.url}` === selectedImage)
   }
 
   const selectedImageInfo = getSelectedImageInfo()
@@ -281,12 +350,24 @@ export const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({
               </TabsList>
 
               <div className="py-4 flex items-center justify-between">
-                <Input
-                  placeholder="Search media items..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="max-w-sm"
-                />
+                <div className="flex items-center gap-4">
+                  <Input
+                    placeholder="Search media items..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="max-w-sm"
+                  />
+                  
+                  {activeTab === "browse" && allImages.length > 0 && (
+                    <div className="text-sm text-muted-foreground">
+                      {searchTerm ? (
+                        <>Showing {displayedImages.length} of {allImages.filter(img => img.name.toLowerCase().includes(searchTerm.toLowerCase())).length} matching images</>
+                      ) : (
+                        <>Showing {displayedImages.length} of {allImages.length} images</>
+                      )}
+                    </div>
+                  )}
+                </div>
 
                 {multiSelect && activeTab === "browse" && filteredImages.length > 0 && (
                   <div className="flex items-center gap-4">
@@ -328,7 +409,7 @@ export const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({
 
                         return (
                           <div
-                            key={index}
+                            key={`${image.name}-${index}`}
                             className={`border rounded-md overflow-hidden transition-colors ${
                               isSelected ? "border-primary border-2 ring-2 ring-primary/20" : "hover:border-primary/60"
                             }`}
@@ -388,6 +469,50 @@ export const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({
                         )
                       })}
                     </div>
+                    
+                    {/* Load More Button */}
+                    {(() => {
+                      const totalAvailable = searchTerm 
+                        ? allImages.filter(img => img.name.toLowerCase().includes(searchTerm.toLowerCase())).length
+                        : allImages.length
+                      const hasMore = displayedImages.length < totalAvailable
+                      const remaining = totalAvailable - displayedImages.length
+                      
+                      return hasMore && !isLoadingMore && (
+                        <div className="flex items-center justify-center py-8">
+                          <Button onClick={loadMoreImages} variant="outline" size="lg">
+                            Load More Images ({remaining} remaining)
+                          </Button>
+                        </div>
+                      )
+                    })()}
+
+                    {/* Loading more indicator */}
+                    {isLoadingMore && (
+                      <div className="flex items-center justify-center py-8">
+                        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                        <span className="ml-2 text-muted-foreground">Loading more images...</span>
+                      </div>
+                    )}
+                    
+                    {/* End of results indicator */}
+                    {(() => {
+                      const totalAvailable = searchTerm 
+                        ? allImages.filter(img => img.name.toLowerCase().includes(searchTerm.toLowerCase())).length
+                        : allImages.length
+                      const allLoaded = displayedImages.length >= totalAvailable && displayedImages.length > 0
+                      
+                      return allLoaded && !isLoadingMore && (
+                        <div className="flex items-center justify-center py-8 text-muted-foreground">
+                          <span>
+                            {searchTerm 
+                              ? `All matching images loaded (${totalAvailable} found)`
+                              : `All images loaded (${totalAvailable} total)`
+                            }
+                          </span>
+                        </div>
+                      )
+                    })()}
                   </ScrollArea>
                 )}
               </TabsContent>

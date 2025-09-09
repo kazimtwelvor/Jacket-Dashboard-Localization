@@ -31,11 +31,13 @@ interface GalleryImage {
 
 export const ImagesClient = () => {
   const params = useParams()
-  const storeId = params.storeId as string
+  const storeId = params?.storeId as string
 
-  const [images, setImages] = useState<GalleryImage[]>([])
+  const [allImages, setAllImages] = useState<GalleryImage[]>([])
+  const [displayedImages, setDisplayedImages] = useState<GalleryImage[]>([])
   const [isUploading, setIsUploading] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [storeUrl, setStoreUrl] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [activeTab, setActiveTab] = useState("browse")
@@ -43,6 +45,9 @@ export const ImagesClient = () => {
   const [isDetailSidebarOpen, setIsDetailSidebarOpen] = useState(false)
   const [selectedImages, setSelectedImages] = useState<string[]>([])
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [searchPage, setSearchPage] = useState(1)
+  const imagesPerPage = 50
 
   useEffect(() => {
     const fetchStoreUrl = async () => {
@@ -107,7 +112,9 @@ export const ImagesClient = () => {
         dimensions: { width: 1920, height: 1080 },
       }))
 
-      setImages(enhancedImages)
+      setAllImages(enhancedImages)
+      setCurrentPage(1)
+      setDisplayedImages(enhancedImages.slice(0, imagesPerPage))
     } catch (error) {
       toast.error("Failed to fetch images. Please try again.")
     } finally {
@@ -122,7 +129,62 @@ export const ImagesClient = () => {
     }
   }
 
-  const filteredImages = images.filter((image) => image.name.toLowerCase().includes(searchTerm.toLowerCase()))
+  const loadMoreImages = () => {
+    if (isLoadingMore) return
+    
+    if (searchTerm) {
+      loadMoreSearchResults()
+    } else {
+      const nextPage = currentPage + 1
+      const startIndex = (nextPage - 1) * imagesPerPage
+      const endIndex = startIndex + imagesPerPage
+      const hasMoreImages = startIndex < allImages.length
+      
+      if (hasMoreImages) {
+        setIsLoadingMore(true)
+        
+        const newImages = allImages.slice(startIndex, endIndex)
+        setDisplayedImages(prev => [...prev, ...newImages])
+        setCurrentPage(nextPage)
+        setIsLoadingMore(false)
+      }
+    }
+  }
+
+  const loadMoreSearchResults = () => {
+    setIsLoadingMore(true)
+    
+    const filteredAllImages = allImages.filter((image) => 
+      image.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    
+    const nextSearchPage = searchPage + 1
+    const startIndex = (nextSearchPage - 1) * imagesPerPage
+    const endIndex = startIndex + imagesPerPage
+    const newSearchResults = filteredAllImages.slice(startIndex, endIndex)
+    
+    if (newSearchResults.length > 0) {
+      setDisplayedImages(prev => [...prev, ...newSearchResults])
+      setSearchPage(nextSearchPage)
+    }
+    
+    setIsLoadingMore(false)
+  }
+
+  useEffect(() => {
+    if (searchTerm) {
+      setSearchPage(1)
+      const filteredAllImages = allImages.filter((image) => 
+        image.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      setDisplayedImages(filteredAllImages.slice(0, imagesPerPage))
+    } else {
+      setCurrentPage(1)
+      setDisplayedImages(allImages.slice(0, imagesPerPage))
+    }
+  }, [searchTerm, allImages])
+
+  const filteredImages = displayedImages
 
   const formatFileSize = (bytes: number) => {
     if (bytes < 1024) return bytes + " B"
@@ -152,13 +214,20 @@ export const ImagesClient = () => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 500))
 
-      const updatedImages = images.filter((img) => {
+      const updatedAllImages = allImages.filter((img) => {
         const baseUrl = storeUrl?.endsWith("/") ? storeUrl.slice(0, -1) : storeUrl
         const fullUrl = `${baseUrl}${img.url}`
         return fullUrl !== imageUrl
       })
 
-      setImages(updatedImages)
+      const updatedDisplayedImages = displayedImages.filter((img) => {
+        const baseUrl = storeUrl?.endsWith("/") ? storeUrl.slice(0, -1) : storeUrl
+        const fullUrl = `${baseUrl}${img.url}`
+        return fullUrl !== imageUrl
+      })
+
+      setAllImages(updatedAllImages)
+      setDisplayedImages(updatedDisplayedImages)
       setIsDetailSidebarOpen(false)
       toast.success("Image deleted successfully")
     } catch (error) {
@@ -172,13 +241,20 @@ export const ImagesClient = () => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 500))
 
-      const updatedImages = images.filter((img) => {
+      const updatedAllImages = allImages.filter((img) => {
         const baseUrl = storeUrl?.endsWith("/") ? storeUrl.slice(0, -1) : storeUrl
         const fullUrl = `${baseUrl}${img.url}`
         return !selectedImages.includes(fullUrl)
       })
 
-      setImages(updatedImages)
+      const updatedDisplayedImages = displayedImages.filter((img) => {
+        const baseUrl = storeUrl?.endsWith("/") ? storeUrl.slice(0, -1) : storeUrl
+        const fullUrl = `${baseUrl}${img.url}`
+        return !selectedImages.includes(fullUrl)
+      })
+
+      setAllImages(updatedAllImages)
+      setDisplayedImages(updatedDisplayedImages)
       toast.success(`${selectedImages.length} images deleted successfully`)
       setSelectedImages([])
       setIsDeleteModalOpen(false)
@@ -248,9 +324,10 @@ export const ImagesClient = () => {
         }
       }
 
-      if (newImages.length > 0) {
-        setImages((prev) => [...newImages, ...prev])
-      }
+        if (newImages.length > 0) {
+          setAllImages((prev) => [...newImages, ...prev])
+          setDisplayedImages((prev) => [...newImages, ...prev])
+        }
 
       if (successCount > 0) {
         toast.success(`Successfully uploaded ${successCount} image${successCount > 1 ? "s" : ""}`)
@@ -292,12 +369,24 @@ export const ImagesClient = () => {
         </TabsList>
 
         <div className="py-4 flex items-center justify-between">
-          <Input
-            placeholder="Search media items..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-sm"
-          />
+          <div className="flex items-center gap-4">
+            <Input
+              placeholder="Search media items..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="max-w-sm"
+            />
+            
+            {activeTab === "browse" && allImages.length > 0 && (
+              <div className="text-sm text-muted-foreground">
+                {searchTerm ? (
+                  <>Showing {displayedImages.length} of {allImages.filter(img => img.name.toLowerCase().includes(searchTerm.toLowerCase())).length} matching images</>
+                ) : (
+                  <>Showing {displayedImages.length} of {allImages.length} images</>
+                )}
+              </div>
+            )}
+          </div>
 
           {activeTab === "browse" && filteredImages.length > 0 && (
             <div className="flex items-center gap-4">
@@ -333,7 +422,7 @@ export const ImagesClient = () => {
 
                   return (
                     <div
-                      key={index}
+                      key={`${image.name}-${index}`}
                       className={`border rounded-md overflow-hidden transition-colors ${
                         isSelected ? "border-primary border-2 ring-2 ring-primary/20" : "hover:border-primary/60"
                       }`}
@@ -373,6 +462,47 @@ export const ImagesClient = () => {
                   )
                 })}
               </div>
+              
+              {(() => {
+                const totalAvailable = searchTerm 
+                  ? allImages.filter(img => img.name.toLowerCase().includes(searchTerm.toLowerCase())).length
+                  : allImages.length
+                const hasMore = displayedImages.length < totalAvailable
+                const remaining = totalAvailable - displayedImages.length
+                
+                return hasMore && !isLoadingMore && (
+                  <div className="flex items-center justify-center py-8">
+                    <Button onClick={loadMoreImages} variant="outline" size="lg">
+                      Load More Images ({remaining} remaining)
+                    </Button>
+                  </div>
+                )
+              })()}
+
+              {isLoadingMore && (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  <span className="ml-2 text-muted-foreground">Loading more images...</span>
+                </div>
+              )}
+              
+              {(() => {
+                const totalAvailable = searchTerm 
+                  ? allImages.filter(img => img.name.toLowerCase().includes(searchTerm.toLowerCase())).length
+                  : allImages.length
+                const allLoaded = displayedImages.length >= totalAvailable && displayedImages.length > 0
+                
+                return allLoaded && !isLoadingMore && (
+                  <div className="flex items-center justify-center py-8 text-muted-foreground">
+                    <span>
+                      {searchTerm 
+                        ? `All matching images loaded (${totalAvailable} found)`
+                        : `All images loaded (${totalAvailable} total)`
+                      }
+                    </span>
+                  </div>
+                )
+              })()}
             </ScrollArea>
           )}
         </TabsContent>

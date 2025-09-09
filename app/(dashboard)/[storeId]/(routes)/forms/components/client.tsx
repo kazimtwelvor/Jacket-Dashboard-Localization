@@ -1,8 +1,7 @@
 "use client"
 
-import { Plus, FileText, Mail, Users } from "lucide-react"
-import { useState } from "react"
-import { MemberRoleGate } from "@/components/member-role-gate"
+import { Plus, FileText, Mail, Users, RefreshCw } from "lucide-react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Heading } from "@/components/ui/heading"
@@ -12,6 +11,7 @@ import { DataTable } from "@/components/ui/data-table"
 import { contactColumns } from "./contact-columns"
 import { newsletterColumns } from "./newsletter-columns"
 import { allFormsColumns } from "./all-forms-columns"
+import { toast } from "react-hot-toast"
 
 import { useParams, useRouter } from "next/navigation"
 
@@ -21,11 +21,70 @@ interface FormsClientProps {
   allForms: any[]
 }
 
-export const FormsClient = ({ contactForms, newsletterForms, allForms }: FormsClientProps) => {
+export const FormsClient = ({ contactForms: initialContactForms, newsletterForms: initialNewsletterForms, allForms: initialAllForms }: FormsClientProps) => {
   const [activeTab, setActiveTab] = useState("all")
+  const [contactForms, setContactForms] = useState(initialContactForms)
+  const [newsletterForms, setNewsletterForms] = useState(initialNewsletterForms)
+  const [allForms, setAllForms] = useState(initialAllForms)
+  const [isLoading, setIsLoading] = useState(false)
 
   const params = useParams()
   const router = useRouter()
+
+  const fetchForms = async () => {
+    if (!params?.storeId) return
+    
+    setIsLoading(true)
+    try {
+      const [contactResponse, newsletterResponse] = await Promise.all([
+        fetch(`/api/${params.storeId}/forms/contact-forms`),
+        fetch(`/api/${params.storeId}/forms/newsletter-forms`)
+      ])
+
+      if (contactResponse.ok && newsletterResponse.ok) {
+        const contactData = await contactResponse.json()
+        const newsletterData = await newsletterResponse.json()
+
+        const formattedContactForms = contactData.map((form: any) => ({
+          ...form,
+          type: "contact" as const,
+          createdAt: form.createdAt,
+          status: form.status || "PENDING"
+        }))
+
+        const formattedNewsletterForms = newsletterData.map((form: any) => ({
+          ...form,
+          name: form.email,
+          type: "newsletter" as const,
+          createdAt: form.createdAt,
+          status: form.status || "ACTIVE"
+        }))
+
+        const newAllForms = [...formattedContactForms, ...formattedNewsletterForms]
+
+        setContactForms(formattedContactForms)
+        setNewsletterForms(formattedNewsletterForms)
+        setAllForms(newAllForms)
+      }
+    } catch (error) {
+      toast.error("Failed to refresh forms")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    const handleFocus = () => {
+      fetchForms()
+    }
+
+    window.addEventListener('focus', handleFocus)
+    return () => window.removeEventListener('focus', handleFocus)
+  }, [params?.storeId])
+
+  useEffect(() => {
+    fetchForms()
+  }, [params?.storeId])
 
   return (
     <>

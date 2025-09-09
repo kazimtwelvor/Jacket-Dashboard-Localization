@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Heading } from "@/components/ui/heading"
 import { Separator } from "@/components/ui/separator"
+import { toast } from "react-hot-toast"
 
 export const ContactFormNew = () => {
   const router = useRouter()
@@ -38,10 +39,13 @@ export const ContactFormNew = () => {
       })
 
       if (response.ok) {
+        toast.success("Contact form created successfully")
         router.back()
       } else {
+        toast.error("Failed to create contact form")
       }
     } catch (error) {
+      toast.error("Failed to create contact form")
     }
   }
 

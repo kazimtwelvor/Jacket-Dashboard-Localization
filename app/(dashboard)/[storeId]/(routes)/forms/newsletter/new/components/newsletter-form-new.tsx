@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Heading } from "@/components/ui/heading"
 import { Separator } from "@/components/ui/separator"
+import { toast } from "react-hot-toast"
 
 export const NewsletterFormNew = () => {
   const router = useRouter()
@@ -32,10 +33,13 @@ export const NewsletterFormNew = () => {
       })
 
       if (response.ok) {
+        toast.success("Newsletter subscription created successfully")
         router.back()
       } else {
+        toast.error("Failed to create newsletter subscription")
       }
     } catch (error) {
+      toast.error("Failed to create newsletter subscription")
     }
   }
 

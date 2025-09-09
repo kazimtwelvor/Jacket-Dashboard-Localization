@@ -106,7 +106,7 @@ export async function GET(req: NextRequest, { params }: { params: { storeId: str
         isVirtual: product.isVirtual ? "Yes" : "No",
         isDownloadable: product.isDownloadable ? "Yes" : "No",
 
-        purchaseNote: product.purchaseNote || "",
+        // purchaseNote: product.purchaseNote || "",
       }
 
       productData.categoryId = product.categoryId

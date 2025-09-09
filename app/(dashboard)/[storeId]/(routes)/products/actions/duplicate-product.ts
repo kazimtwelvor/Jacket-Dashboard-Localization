@@ -100,7 +100,7 @@ export async function duplicateProduct(productId: string, storeId: string) {
         brandName: product.brandName,
         ratingValue: product.ratingValue,
         reviewCount: product.reviewCount,
-        purchaseNote: product.purchaseNote,
+        // purchaseNote: product.purchaseNote,
       },
     })
 

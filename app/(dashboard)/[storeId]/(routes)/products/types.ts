@@ -31,7 +31,7 @@ export interface Product {
   ratingValue?: string
   reviewCount?: string
   schema?: string 
-  purchaseNote?: string
+  // purchaseNote?: string
   menuOrder?: number
   productType?: string
   seoScore?: number
@@ -122,7 +122,7 @@ export interface ProductFormValues {
   ratingValue: string
   reviewCount: string
   tags: string[]
-  purchaseNote: string
+  // purchaseNote: string
   menuOrder: string
   reviews: boolean
   seo: ProductSEO

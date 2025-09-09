@@ -308,7 +308,7 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       schema1, // Add schema field
       schema2,
       schema3,
-      purchaseNote,
+      // purchaseNote,
       productType,
       isVirtual,
       isDownloadable,
@@ -437,7 +437,7 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
         brandName,
         ratingValue,
         reviewCount,
-        purchaseNote,
+        // purchaseNote,
         productType,
         isVirtual: isVirtual === true || isVirtual === "true",
         isDownloadable: isDownloadable === true || isDownloadable === "true",

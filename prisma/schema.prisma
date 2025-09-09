@@ -58,7 +58,6 @@ model Store {
   importLogs ImportLog[]
 }
 
-// New model for Stripe accounts
 model StripeAccount {
   id                String   @id @default(cuid())
   storeId           String
@@ -245,17 +244,17 @@ model AuditLog {
   @@index([entity, entityId])
 }
 
-model WishlistItem {
-  id        String   @id @default(cuid())
-  userId    String
-  productId String
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
+// model WishlistItem {
+//   id        String   @id @default(cuid())
+//   userId    String
+//   productId String
+//   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+//   createdAt DateTime @default(now())
 
-  @@unique([userId, productId])
-  @@index([userId])
-  @@index([productId])
-}
+//   @@unique([userId, productId])
+//   @@index([userId])
+//   @@index([productId])
+// }
 
 model Billboard {
   id         String     @id @default(cuid())
@@ -298,25 +297,25 @@ model Product {
   price         Decimal
   isFeatured    Boolean        @default(false)
   isArchived    Boolean        @default(false)
-  purchaseNote  String?
+// purchaseNote  String?
   sizeDetails   Json?          // Will store array of {id, name, value} objects
   colorDetails  Json?          // Will store array of {id, name, value} objects
   images        ProductImage[]
   orderItems    OrderItem[]
-  originalPrice Decimal        @default(0)
+//  originalPrice Decimal        @default(0)
   isDiscounted  Boolean        @default(false)
   isPublished   Boolean        @default(true)
   isDeleted     Boolean        @default(false)
   deletedAt     DateTime?
   reviews       Review[]
-  wishlistItems WishlistItem[]
+// wishlistItems WishlistItem[]
 
   // Product details
   sku            String   @unique
   stockStatus    String?  @default("instock") // instock, outofstock, onbackorder
   description    String?  @db.Text
   salePrice      Decimal?
-  specifications Json?
+  specifications Json?    //need to be fix
   tags           String[]
   gender         String?
   colorLinks     Json?
@@ -327,20 +326,20 @@ model Product {
   metaDescription    String?  @db.Text
   slug               String?
   keywords           String[]
-  noIndex            Boolean  @default(false)
+ // noIndex            Boolean  @default(false)
   brandName          String?
-  ratingValue        String?
-  reviewCount        String?
+ // ratingValue        String?
+ // reviewCount        String?
   schema             String?  @db.Text  // Add this field to store JSON-LD schema data
 
   // Product classification
-  productType  String? @default("variable") // simple, variable, grouped, etc.
+ // productType  String? @default("variable") // simple, variable, grouped, etc.
   isParentProduct Boolean? @default(false)
   parentProductId String? // Reference to parent product
 
   // Virtual/downloadable
-  isVirtual      Boolean? @default(false)
-  isDownloadable Boolean? @default(false)
+ // isVirtual      Boolean? @default(false)
+ // isDownloadable Boolean? @default(false)
 
   // Timestamps
   createdAt DateTime @default(now())

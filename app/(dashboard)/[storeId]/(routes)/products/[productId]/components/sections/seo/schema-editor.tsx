@@ -27,7 +27,7 @@ interface ProductData {
   gender: string
   tags: string[]
   // ratingValue?: string
-  reviewCount?: string
+  // reviewCount?: string
   slug?: string
   metaTitle?: string
   metaDescription?: string
@@ -173,7 +173,7 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
     const brandName = productData.brandName || productData.storeName || ""
     const stockStatus = productData.stockStatus || "instock"
     // const ratingValue = productData.ratingValue || "4.5"
-    const reviewCount = productData.reviewCount || "0"
+    // const reviewCount = productData.reviewCount || "0"
 
     return {
       "@context": "https://schema.org/",
@@ -195,11 +195,11 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
         priceValidUntil: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split("T")[0],
         availability: stockStatus === "instock" ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
       },
-      aggregateRating: {
-        "@type": "AggregateRating",
-        // ratingValue,
-        reviewCount,
-      },
+      // aggregateRating: {
+      //   "@type": "AggregateRating",
+      //   // ratingValue,
+      //   reviewCount,
+      // },
       templateName: "Product",
     }
   }

@@ -29,7 +29,7 @@ export interface Product {
   // noIndex?: boolean
   brandName?: string
   // ratingValue?: string
-  reviewCount?: string
+  // reviewCount?: string
   schema?: string 
   // purchaseNote?: string
   menuOrder?: number
@@ -120,7 +120,7 @@ export interface ProductFormValues {
   categories: ProductCategories
   brandName: string
   // ratingValue: string
-  reviewCount: string
+  // reviewCount: string
   tags: string[]
   // purchaseNote: string
   menuOrder: string

@@ -66,7 +66,7 @@ export async function POST(req: Request, { params }: { params: { storeId: string
         // noIndex: true,
         brandName: true,
         // ratingValue: true,
-        reviewCount: true,
+        // reviewCount: true,
         // purchaseNote: true,
         images: {
           select: {
@@ -128,7 +128,7 @@ export async function POST(req: Request, { params }: { params: { storeId: string
         // noIndex: originalProduct.noIndex,
         brandName: originalProduct.brandName,
         // ratingValue: originalProduct.ratingValue,
-        reviewCount: originalProduct.reviewCount,
+        // reviewCount: originalProduct.reviewCount,
         // purchaseNote: originalProduct.purchaseNote,
       },
     })

@@ -319,7 +319,7 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
             // if (row.noIndex !== undefined) updateData.noIndex = processBooleanField(row.noIndex)
             if (row.brandName !== undefined) updateData.brandName = row.brandName
             // if (row.ratingValue !== undefined) updateData.ratingValue = row.ratingValue
-            if (row.reviewCount !== undefined) updateData.reviewCount = row.reviewCount
+            // if (row.reviewCount !== undefined) updateData.reviewCount = row.reviewCount
             if (row.schema !== undefined) updateData.schema = row.schema
             if (row.gender !== undefined) updateData.gender = row.gender
 
@@ -530,7 +530,7 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
                 // noIndex: processBooleanField(row.noIndex),
                 brandName: row.brandName || null,
                 // ratingValue: row.ratingValue || null,
-                reviewCount: row.reviewCount || null,
+                // reviewCount: row.reviewCount || null,
                 schema: row.schema || null,
                 // purchaseNote: row.purchaseNote || null,
                 productType: row.productType || "variable",

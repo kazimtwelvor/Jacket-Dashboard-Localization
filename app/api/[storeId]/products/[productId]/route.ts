@@ -304,7 +304,7 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       // noIndex,
       brandName,
       // ratingValue,
-      reviewCount,
+      // reviewCount,
       schema1, // Add schema field
       schema2,
       schema3,
@@ -436,7 +436,7 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
         // noIndex: noIndex === true || noIndex === "true",
         brandName,
         // ratingValue,
-        reviewCount,
+        // reviewCount,
         // purchaseNote,
         productType,
         isVirtual: isVirtual === true || isVirtual === "true",

@@ -806,7 +806,7 @@ export const SeoTab = ({ initialData, form }: SeoTabProps) => {
       gender: form.getValues("categories.gender") || initialData?.gender || "",
       tags: form.getValues("tags") || initialData?.tags || [],
       // ratingValue: form.getValues("ratingValue") || initialData?.ratingValue || "4.5",
-      reviewCount: form.getValues("reviewCount") || initialData?.reviewCount || "0",
+      // reviewCount: form.getValues("reviewCount") || initialData?.reviewCount || "0",
       slug: form.getValues("seo.slug") || form.getValues("slug") || initialData?.slug || "",
       metaTitle: form.getValues("seo.metaTitle") || initialData?.metaTitle || "",
       metaDescription: form.getValues("seo.metaDescription") || initialData?.metaDescription || "",

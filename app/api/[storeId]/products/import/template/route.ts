@@ -92,7 +92,7 @@ export async function GET(req: NextRequest, { params }: { params: { storeId: str
         // noIndex: "No",
         brandName: "Your Brand",
         // ratingValue: "4.5",
-        reviewCount: "10",
+        // reviewCount: "10",
 
         // Additional fields
         // purchaseNote: "Thank you for your purchase!",

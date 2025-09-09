@@ -75,7 +75,7 @@ export const formSchema = z.object({
 
   brandName: z.string().optional(),
   // ratingValue: z.string().optional(),
-  reviewCount: z.string().optional(),
+  // reviewCount: z.string().optional(),
   tags: z.array(z.string()).default([]),
   // purchaseNote: z.string().optional(),
   menuOrder: z.string().optional(),

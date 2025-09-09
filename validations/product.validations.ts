@@ -208,11 +208,11 @@ export const validateCreateProduct = () => [
   //   .isString()
   //   .isLength({ min: 1, max: 10 })
   //   .withMessage('Rating value must be between 1 and 10 characters'),
-  body('reviewCount')
-    .optional()
-    .isString()
-    .isLength({ min: 1, max: 10 })
-    .withMessage('Review count must be between 1 and 10 characters')
+  // body('reviewCount')
+  //   .optional()
+  //   .isString()
+  //   .isLength({ min: 1, max: 10 })
+  //   .withMessage('Review count must be between 1 and 10 characters')
 ];
 
 export const validateUpdateProduct = () => [
@@ -417,11 +417,11 @@ export const validateUpdateProduct = () => [
   //   .isString()
   //   .isLength({ min: 1, max: 10 })
   //   .withMessage('Rating value must be between 1 and 10 characters'),
-  body('reviewCount')
-    .optional()
-    .isString()
-    .isLength({ min: 1, max: 10 })
-    .withMessage('Review count must be between 1 and 10 characters')
+  // body('reviewCount')
+  //   .optional()
+  //   .isString()
+  //   .isLength({ min: 1, max: 10 })
+  //   .withMessage('Review count must be between 1 and 10 characters')
 ];
 
 export const validateGetProduct = () => [

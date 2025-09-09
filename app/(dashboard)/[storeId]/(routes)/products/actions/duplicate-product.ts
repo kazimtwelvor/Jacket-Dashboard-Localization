@@ -99,7 +99,7 @@ export async function duplicateProduct(productId: string, storeId: string) {
         // noIndex: product.noIndex,
         brandName: product.brandName,
         // ratingValue: product.ratingValue,
-        reviewCount: product.reviewCount,
+        // reviewCount: product.reviewCount,
         // purchaseNote: product.purchaseNote,
       },
     })

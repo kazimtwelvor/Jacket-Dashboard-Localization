@@ -8,7 +8,7 @@ interface SchemaGeneratorOptions {
   stockStatus: string
   brandName: string
   // ratingValue?: string
-  reviewCount?: string
+  // reviewCount?: string
   images: string[]
   mainImage?: string
   slug?: string
@@ -81,14 +81,14 @@ export function generateProductSchema(options: SchemaGeneratorOptions): string {
 
   if (
     // options.ratingValue &&
-    options.reviewCount &&
+    // options.reviewCount &&
     // Number.parseFloat(options.ratingValue) > 0 &&
-    Number.parseInt(options.reviewCount) > 0
+    // Number.parseInt(options.reviewCount) > 0
   ) {
     baseSchema.aggregateRating = {
       "@type": "AggregateRating",
       // ratingValue: options.ratingValue,
-      reviewCount: options.reviewCount,
+      // reviewCount: options.reviewCount,
     }
   }
 
@@ -160,7 +160,7 @@ export function extractSchemaDataFromForm(formData: any): SchemaGeneratorOptions
     stockStatus: formData.stockStatus || "instock",
     brandName: formData.brandName || "",
     // ratingValue: formData.ratingValue || "",
-    reviewCount: formData.reviewCount || "",
+    // reviewCount: formData.reviewCount || "",
     images: formData.images || [],
     mainImage: formData.mainImage || "",
     slug: formData.seo?.slug || "",

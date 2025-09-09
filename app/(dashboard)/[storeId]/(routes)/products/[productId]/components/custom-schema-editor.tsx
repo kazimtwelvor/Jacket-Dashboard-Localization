@@ -33,7 +33,7 @@ interface ProductData {
   metaDescription?: string
   slug?: string
   // ratingValue?: string
-  reviewCount?: string
+  // reviewCount?: string
   categoryId?: string
   categoryName?: string
   storeId?: string
@@ -123,15 +123,15 @@ const schemaTemplates = {
         itemCondition: "https://schema.org/NewCondition",
         availability: availability,
       },
-      ...(data.ratingValue && data.reviewCount
-        ? {
-            aggregateRating: {
-              "@type": "AggregateRating",
-              ratingValue: data.ratingValue || "4.5",
-              reviewCount: data.reviewCount || "0",
-            },
-          }
-        : {}),
+      // ...(data.ratingValue && data.reviewCount
+      //   ? {
+      //       // aggregateRating: {
+      //       //   "@type": "AggregateRating",
+      //       //   ratingValue: data.ratingValue || "4.5",
+      //       //   reviewCount: data.reviewCount || "0",
+      //       // },
+      //     }
+      //   : {}),
     }
   },
   clothing: (data: ProductData) => {
@@ -180,15 +180,15 @@ const schemaTemplates = {
         itemCondition: "https://schema.org/NewCondition",
         availability: availability,
       },
-      ...(data.ratingValue && data.reviewCount
-        ? {
-            aggregateRating: {
-              "@type": "AggregateRating",
-              ratingValue: data.ratingValue || "4.5",
-              reviewCount: data.reviewCount || "0",
-            },
-          }
-        : {}),
+      // ...(data.ratingValue && data.reviewCount
+      //   ? {
+      //       // aggregateRating: {
+      //       //   "@type": "AggregateRating",
+      //       //   ratingValue: data.ratingValue || "4.5",
+      //       //   reviewCount: data.reviewCount || "0",
+      //       // }, 
+      //     }
+      //   : {}),
       color: colors.length > 0 ? colors.join(", ") : undefined,
       material: materials.length > 0 ? materials.join(", ") : undefined,
       category: data.categoryName || data.gender || "Clothing",
@@ -221,15 +221,15 @@ const schemaTemplates = {
         availability: availability,
         warranty: "1 Year Manufacturer Warranty",
       },
-      ...(data.ratingValue && data.reviewCount
-        ? {
-            aggregateRating: {
-              "@type": "AggregateRating",
-              ratingValue: data.ratingValue || "4.5",
-              reviewCount: data.reviewCount || "0",
-            },
-          }
-        : {}),
+      // ...(data.ratingValue && data.reviewCount
+      //   ? {
+      //       // aggregateRating: {
+      //       //   "@type": "AggregateRating",
+      //       //   ratingValue: data.ratingValue || "4.5",
+      //       //   reviewCount: data.reviewCount || "0",
+      //       // },
+      //     }
+      //   : {}),
       category: data.categoryName || "Electronics",
       ...(data.tags && data.tags.length > 0 ? { keywords: data.tags.join(", ") } : {}),
     }
@@ -259,15 +259,15 @@ const schemaTemplates = {
         itemCondition: "https://schema.org/NewCondition",
         availability: availability,
       },
-      ...(data.ratingValue && data.reviewCount
-        ? {
-            aggregateRating: {
-              "@type": "AggregateRating",
-              ratingValue: data.ratingValue || "4.5",
-              reviewCount: data.reviewCount || "0",
-            },
-          }
-        : {}),
+      // ...(data.ratingValue && data.reviewCount
+      //   ? {
+      //       // aggregateRating: {
+      //       //   "@type": "AggregateRating",
+      //       //   ratingValue: data.ratingValue || "4.5",
+      //       //   reviewCount: data.reviewCount || "0",
+      //       // },
+      //     }
+      //   : {}),
       category: data.categoryName || "Food",
       nutrition: {
         "@type": "NutritionInformation",
@@ -304,15 +304,15 @@ const schemaTemplates = {
         itemCondition: "https://schema.org/NewCondition",
         availability: availability,
       },
-      ...(data.ratingValue && data.reviewCount
-        ? {
-            aggregateRating: {
-              "@type": "AggregateRating",
-              ratingValue: data.ratingValue || "4.5",
-              reviewCount: data.reviewCount || "0",
-            },
-          }
-        : {}),
+      // ...(data.ratingValue && data.reviewCount
+      //   ? {
+      //       // aggregateRating: {
+      //       //   "@type": "AggregateRating",
+      //       //   ratingValue: data.ratingValue || "4.5",
+      //       //   reviewCount: data.reviewCount || "0",
+      //       // },
+      //     }
+      //   : {}),
       ...(data.tags && data.tags.length > 0 ? { keywords: data.tags.join(", ") } : {}),
     }
   },
@@ -388,11 +388,11 @@ const schemaTemplates = {
           name: data.storeName || data.brandName || "Brand Name",
         },
       },
-      reviewRating: {
-        "@type": "Rating",
-        ratingValue: data.ratingValue || "4.5",
-        bestRating: "5",
-      },
+      // reviewRating: {
+      //   "@type": "Rating",
+      //   // ratingValue: data.ratingValue || "4.5",
+      //   bestRating: "5",
+      // },
       author: {
         "@type": "Person",
         name: "Customer Review",

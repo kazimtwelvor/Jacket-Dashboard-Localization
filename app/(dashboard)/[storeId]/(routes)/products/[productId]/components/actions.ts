@@ -279,7 +279,7 @@ export async function createProduct(formData: FormData) {
 
 
     const brandName = (formData.get("brandName") as string) || "Leather Jacket By Fineyst"
-    const ratingValue = (formData.get("ratingValue") as string) || "4.5"
+    // const ratingValue = (formData.get("ratingValue") as string) || "4.5"
     const reviewCount = (formData.get("reviewCount") as string) || "0"
 
   
@@ -506,7 +506,7 @@ export async function createProduct(formData: FormData) {
       keywords: Array.isArray(seoData.keywords) ? seoData.keywords : [],
       // noIndex: seoData.noIndex,
       brandName: brandName || "Leather Jacket By Fineyst", 
-      ratingValue: ratingValue || "4.5", 
+      // ratingValue: ratingValue || "4.5", 
       reviewCount: reviewCount || "0", 
       // purchaseNote,
       isFeatured,

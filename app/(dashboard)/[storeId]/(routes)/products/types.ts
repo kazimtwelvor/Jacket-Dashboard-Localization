@@ -28,7 +28,7 @@ export interface Product {
   additionalKeywords?: string[]
   // noIndex?: boolean
   brandName?: string
-  ratingValue?: string
+  // ratingValue?: string
   reviewCount?: string
   schema?: string 
   // purchaseNote?: string
@@ -119,7 +119,7 @@ export interface ProductFormValues {
   specifications: ProductSpecifications
   categories: ProductCategories
   brandName: string
-  ratingValue: string
+  // ratingValue: string
   reviewCount: string
   tags: string[]
   // purchaseNote: string

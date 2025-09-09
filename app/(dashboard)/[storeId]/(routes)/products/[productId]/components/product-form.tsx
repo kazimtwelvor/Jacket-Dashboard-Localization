@@ -222,7 +222,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       stockStatus: initialData.stockStatus || "instock",
       isFeatured: initialData.isFeatured || false,
       brandName: initialData.brandName || "Leather Jacket By Fineyst",
-      ratingValue: initialData.ratingValue || "4.5",
+      // ratingValue: initialData.ratingValue || "4.5",
       reviewCount: initialData.reviewCount || "0",
       categories: {
         gender: initialData.gender || "",
@@ -411,7 +411,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       sku: "",
       stockStatus: "instock",
       brandName: "Leather Jacket By Fineyst",
-      ratingValue: "4.5",
+      // ratingValue: "4.5",
       reviewCount: "0",
       categories: {
         gender: "",

@@ -26,7 +26,7 @@ interface ProductData {
   style: string[]
   gender: string
   tags: string[]
-  ratingValue?: string
+  // ratingValue?: string
   reviewCount?: string
   slug?: string
   metaTitle?: string
@@ -172,7 +172,7 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
     const price = productData.isDiscounted && productData.salePrice ? productData.salePrice : productData.price || "0"
     const brandName = productData.brandName || productData.storeName || ""
     const stockStatus = productData.stockStatus || "instock"
-    const ratingValue = productData.ratingValue || "4.5"
+    // const ratingValue = productData.ratingValue || "4.5"
     const reviewCount = productData.reviewCount || "0"
 
     return {
@@ -197,7 +197,7 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
       },
       aggregateRating: {
         "@type": "AggregateRating",
-        ratingValue,
+        // ratingValue,
         reviewCount,
       },
       templateName: "Product",
@@ -281,7 +281,7 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
       },
       reviewRating: {
         "@type": "Rating",
-        ratingValue: productData.ratingValue || "4.5",
+        // ratingValue: productData.ratingValue || "4.5",
         bestRating: "5",
       },
       author: {
@@ -454,8 +454,8 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
                 </div>
                 {schema.aggregateRating && (
                   <div>
-                    <span className="font-medium">Rating:</span> {schema.aggregateRating.ratingValue}/5 (
-                    {schema.aggregateRating.reviewCount} reviews)
+                    {/* <span className="font-medium">Rating:</span> {schema.aggregateRating.ratingValue}/5 ( */}
+                    {/* {schema.aggregateRating.reviewCount} reviews) */}
                   </div>
                 )}
               </div>
@@ -492,7 +492,7 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
                   <span className="font-medium">Product:</span> {schema.itemReviewed?.name}
                 </div>
                 <div>
-                  <span className="font-medium">Rating:</span> {schema.reviewRating?.ratingValue}/5
+                  {/* <span className="font-medium">Rating:</span> {schema.reviewRating?.ratingValue}/5 */}
                 </div>
                 <div>
                   <span className="font-medium">Review:</span> {schema.reviewBody?.substring(0, 100)}...

@@ -32,7 +32,7 @@ interface ProductData {
   metaTitle?: string
   metaDescription?: string
   slug?: string
-  ratingValue?: string
+  // ratingValue?: string
   reviewCount?: string
   categoryId?: string
   categoryName?: string

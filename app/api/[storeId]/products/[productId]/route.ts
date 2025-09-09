@@ -303,7 +303,7 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       keywords, // Use a single keywords array instead of focusKeyword and additionalKeywords
       // noIndex,
       brandName,
-      ratingValue,
+      // ratingValue,
       reviewCount,
       schema1, // Add schema field
       schema2,
@@ -435,7 +435,7 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
         keywords: keywordsArray, // Use the keywords array
         // noIndex: noIndex === true || noIndex === "true",
         brandName,
-        ratingValue,
+        // ratingValue,
         reviewCount,
         // purchaseNote,
         productType,

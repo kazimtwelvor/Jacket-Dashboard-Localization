@@ -98,7 +98,7 @@ export async function duplicateProduct(productId: string, storeId: string) {
         additionalKeywords: product.additionalKeywords,
         // noIndex: product.noIndex,
         brandName: product.brandName,
-        ratingValue: product.ratingValue,
+        // ratingValue: product.ratingValue,
         reviewCount: product.reviewCount,
         // purchaseNote: product.purchaseNote,
       },

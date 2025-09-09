@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -72,22 +72,29 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
   useEffect(() => {
     if (schemaType) {
       setSelectedTemplate(schemaType)
-    } else if (initialSchema) {
+    }
+    else if (initialSchema) {
       try {
         const parsed = JSON.parse(initialSchema)
         if (parsed["@type"]) {
           setSelectedTemplate(parsed["@type"])
         }
       } catch (e) {
-        setSelectedTemplate("Product")
       }
     }
 
     if (initialSchema && initialSchema.trim() !== "") {
       setSchemaData(initialSchema)
     }
-  }, [initialSchema, schemaType]) 
-  const safelyUpdateSchemaData = useCallback((newSchema: string) => {
+    else {
+      const timer = setTimeout(() => {
+        generateSchema()
+      }, 0)
+      return () => clearTimeout(timer)
+    }
+  }, [initialSchema, schemaType])
+
+  const safelyUpdateSchemaData = (newSchema: string) => {
     setSchemaData(newSchema)
     if (onSchemaChange) {
       try {
@@ -95,12 +102,8 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
         if (parsed && parsed["@type"]) {
           if (!parsed.templateName) {
             parsed.templateName = parsed["@type"]
-            const updatedSchema = JSON.stringify(parsed)
-            setSchemaData(updatedSchema)
-            onSchemaChange(updatedSchema)
-          } else {
-            onSchemaChange(newSchema)
           }
+          onSchemaChange(JSON.stringify(parsed))
         } else {
           onSchemaChange(newSchema)
         }
@@ -108,233 +111,9 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
         onSchemaChange(newSchema)
       }
     }
-  }, [onSchemaChange])
+  }
 
-
-  const generateProductSchema = useCallback(() => {
-    const images = Array.isArray(productData.images)
-      ? productData.images.map((img) => (typeof img === "object" && img.url ? img.url : img)).filter(Boolean)
-      : []
-
-    const mainImage = productData.mainImage || (images.length > 0 ? images[0] : "")
-
-    const name = productData.name || ""
-    const description = stripHtmlTags(productData.description || "")
-    const sku = productData.sku || ""
-    const price = productData.isDiscounted && productData.salePrice ? productData.salePrice : productData.price || "0"
-    const brandName = productData.brandName || productData.storeName || ""
-    const stockStatus = productData.stockStatus || "instock"
-    // const ratingValue = productData.ratingValue || "4.5"
-    // const reviewCount = productData.reviewCount || "0"
-
-    return {
-      "@context": "https://schema.org/",
-      "@type": "Product",
-      name,
-      description,
-      image: [mainImage, ...images].filter(Boolean),
-      sku,
-      mpn: sku,
-      brand: {
-        "@type": "Brand",
-        name: brandName,
-      },
-      offers: {
-        "@type": "Offer",
-        url: productData.slug ? `${window.location.origin}/${productData.slug}` : window.location.href,
-        priceCurrency: "USD",
-        price,
-        priceValidUntil: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split("T")[0],
-        availability: stockStatus === "instock" ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-      },
-      // aggregateRating: {
-      //   "@type": "AggregateRating",
-      //   // ratingValue,
-      //   reviewCount,
-      // },
-      templateName: "Product",
-    }
-  }, [productData])
-
-  const generateFAQSchema = useCallback(() => {
-    return {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      mainEntity: [
-        {
-          "@type": "Question",
-          name: `What materials is the ${productData.name} made of?`,
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: `The ${productData.name} is made of ${productData.material?.join(", ") || "high-quality materials"}.`,
-          },
-        },
-        {
-          "@type": "Question",
-          name: `What sizes are available for the ${productData.name}?`,
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: "This product is available in various sizes. Please check the product description for detailed sizing information.",
-          },
-        },
-        {
-          "@type": "Question",
-          name: "What is your return policy?",
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: "We offer a 30-day return policy for all our products. Items must be in original condition with tags attached.",
-          },
-        },
-      ],
-    }
-  }, [productData])
-
-  const generateHowToSchema = useCallback(() => {
-    return {
-      "@context": "https://schema.org",
-      "@type": "HowTo",
-      name: `How to Care for Your ${productData.name}`,
-      description: `Learn how to properly care for your ${productData.name} to ensure it lasts for years to come.`,
-      step: [
-        {
-          "@type": "HowToStep",
-          name: "Check Care Label",
-          text: "Always check the care label inside the garment for specific instructions.",
-        },
-        {
-          "@type": "HowToStep",
-          name: "Washing",
-          text: `For ${productData.material?.join(", ") || "this material"}, we recommend gentle washing with similar colors.`,
-        },
-        {
-          "@type": "HowToStep",
-          name: "Drying",
-          text: "Air dry flat or hang to dry for best results and to maintain shape.",
-        },
-        {
-          "@type": "HowToStep",
-          name: "Storage",
-          text: "Store in a cool, dry place away from direct sunlight to prevent fading.",
-        },
-      ],
-    }
-  }, [productData])
-
-  const generateReviewSchema = useCallback(() => {
-    return {
-      "@context": "https://schema.org",
-      "@type": "Review",
-      itemReviewed: {
-        "@type": "Product",
-        name: productData.name,
-        image: productData.mainImage,
-        description: stripHtmlTags(productData.description),
-        sku: productData.sku,
-      },
-      reviewRating: {
-        "@type": "Rating",
-        // ratingValue: productData.ratingValue || "4.5",
-        bestRating: "5",
-      },
-      author: {
-        "@type": "Person",
-        name: "Customer Review",
-      },
-      reviewBody: `This ${productData.name} is excellent quality and exactly as described. The ${productData.material?.join(", ") || "material"} feels premium and the fit is perfect.`,
-    }
-  }, [productData])
-
-  const generateArticleSchema = useCallback(() => {
-    return {
-      "@context": "https://schema.org",
-      "@type": "Article",
-      headline: productData.metaTitle || `About ${productData.name}`,
-      description: stripHtmlTags(productData.metaDescription || productData.description),
-      image: productData.mainImage,
-      author: {
-        "@type": "Organization",
-        name: productData.storeName || "Store",
-      },
-      publisher: {
-        "@type": "Organization",
-        name: productData.storeName || "Store",
-        logo: {
-          "@type": "ImageObject",
-          url: `${window.location.origin}/logo.png`,
-        },
-      },
-      datePublished: new Date().toISOString(),
-      dateModified: new Date().toISOString(),
-    }
-  }, [productData])
-
-  const generateBreadcrumbSchema = useCallback(() => {
-    return {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        {
-          "@type": "ListItem",
-          position: 1,
-          name: "Home",
-          item: window.location.origin,
-        },
-        {
-          "@type": "ListItem",
-          position: 2,
-          name: productData.categoryName || "Products",
-          item: `${window.location.origin}/products`,
-        },
-        {
-          "@type": "ListItem",
-          position: 3,
-          name: productData.name,
-          item: window.location.href,
-        },
-      ],
-    }
-  }, [productData])
-
-  const generateOrganizationSchema = useCallback(() => {
-    return {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      name: productData.storeName || "Store",
-      url: window.location.origin,
-      logo: `${window.location.origin}/logo.png`,
-      contactPoint: {
-        "@type": "ContactPoint",
-        telephone: "+1-800-123-4567",
-        contactType: "customer service",
-        availableLanguage: ["English"],
-      },
-      sameAs: [
-        "https://www.facebook.com/yourstore",
-        "https://www.instagram.com/yourstore",
-        "https://twitter.com/yourstore",
-      ],
-    }
-  }, [productData])
-
-  const generateWebPageSchema = useCallback(() => {
-    return {
-      "@context": "https://schema.org",
-      "@type": "WebPage",
-      name: productData.metaTitle || productData.name,
-      description: stripHtmlTags(productData.metaDescription || productData.description),
-      url: window.location.href,
-      image: productData.mainImage,
-      datePublished: new Date().toISOString(),
-      dateModified: new Date().toISOString(),
-      isPartOf: {
-        "@type": "WebSite",
-        name: productData.storeName || "Store",
-        url: window.location.origin,
-      },
-    }
-  }, [productData])
-
-  const generateSchema = useCallback(() => {
+  const generateSchema = () => {
     let schema = {}
     
     const templateType = typeof selectedTemplate === 'string' ? selectedTemplate : 'Product'
@@ -379,7 +158,230 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
     setIsValid(true)
     setValidationMessage("")
 
-  }, [selectedTemplate, productData, safelyUpdateSchemaData, generateProductSchema, generateFAQSchema, generateHowToSchema, generateReviewSchema, generateArticleSchema, generateBreadcrumbSchema, generateOrganizationSchema, generateWebPageSchema])
+  }
+
+  const generateProductSchema = () => {
+    const images = Array.isArray(productData.images)
+      ? productData.images.map((img) => (typeof img === "object" && img.url ? img.url : img)).filter(Boolean)
+      : []
+
+    const mainImage = productData.mainImage || (images.length > 0 ? images[0] : "")
+
+    const name = productData.name || ""
+    const description = stripHtmlTags(productData.description || "")
+    const sku = productData.sku || ""
+    const price = productData.isDiscounted && productData.salePrice ? productData.salePrice : productData.price || "0"
+    const brandName = productData.brandName || productData.storeName || ""
+    const stockStatus = productData.stockStatus || "instock"
+    // const ratingValue = productData.ratingValue || "4.5"
+    // const reviewCount = productData.reviewCount || "0"
+
+    return {
+      "@context": "https://schema.org/",
+      "@type": "Product",
+      name,
+      description,
+      image: [mainImage, ...images].filter(Boolean),
+      sku,
+      mpn: sku,
+      brand: {
+        "@type": "Brand",
+        name: brandName,
+      },
+      offers: {
+        "@type": "Offer",
+        url: productData.slug ? `${window.location.origin}/${productData.slug}` : window.location.href,
+        priceCurrency: "USD",
+        price,
+        priceValidUntil: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split("T")[0],
+        availability: stockStatus === "instock" ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      },
+      // aggregateRating: {
+      //   "@type": "AggregateRating",
+      //   // ratingValue,
+      //   reviewCount,
+      // },
+      templateName: "Product",
+    }
+  }
+
+  const generateFAQSchema = () => {
+    return {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: [
+        {
+          "@type": "Question",
+          name: `What materials is the ${productData.name} made of?`,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: `The ${productData.name} is made of ${productData.material?.join(", ") || "high-quality materials"}.`,
+          },
+        },
+        {
+          "@type": "Question",
+          name: `What sizes are available for the ${productData.name}?`,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "This product is available in various sizes. Please check the product description for detailed sizing information.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "What is your return policy?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "We offer a 30-day return policy for all our products. Items must be in original condition with tags attached.",
+          },
+        },
+      ],
+    }
+  }
+
+  const generateHowToSchema = () => {
+    return {
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      name: `How to Care for Your ${productData.name}`,
+      description: `Learn how to properly care for your ${productData.name} to ensure it lasts for years to come.`,
+      step: [
+        {
+          "@type": "HowToStep",
+          name: "Check Care Label",
+          text: "Always check the care label inside the garment for specific instructions.",
+        },
+        {
+          "@type": "HowToStep",
+          name: "Washing",
+          text: `For ${productData.material?.join(", ") || "this material"}, we recommend gentle washing with similar colors.`,
+        },
+        {
+          "@type": "HowToStep",
+          name: "Drying",
+          text: "Air dry flat or hang to dry for best results and to maintain shape.",
+        },
+        {
+          "@type": "HowToStep",
+          name: "Storage",
+          text: "Store in a cool, dry place away from direct sunlight to prevent fading.",
+        },
+      ],
+    }
+  }
+
+  const generateReviewSchema = () => {
+    return {
+      "@context": "https://schema.org",
+      "@type": "Review",
+      itemReviewed: {
+        "@type": "Product",
+        name: productData.name,
+        image: productData.mainImage,
+        description: stripHtmlTags(productData.description),
+        sku: productData.sku,
+      },
+      reviewRating: {
+        "@type": "Rating",
+        // ratingValue: productData.ratingValue || "4.5",
+        bestRating: "5",
+      },
+      author: {
+        "@type": "Person",
+        name: "Customer Review",
+      },
+      reviewBody: `This ${productData.name} is excellent quality and exactly as described. The ${productData.material?.join(", ") || "material"} feels premium and the fit is perfect.`,
+    }
+  }
+
+  const generateArticleSchema = () => {
+    return {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      headline: productData.metaTitle || `About ${productData.name}`,
+      description: stripHtmlTags(productData.metaDescription || productData.description),
+      image: productData.mainImage,
+      author: {
+        "@type": "Organization",
+        name: productData.storeName || "Store",
+      },
+      publisher: {
+        "@type": "Organization",
+        name: productData.storeName || "Store",
+        logo: {
+          "@type": "ImageObject",
+          url: `${window.location.origin}/logo.png`,
+        },
+      },
+      datePublished: new Date().toISOString(),
+      dateModified: new Date().toISOString(),
+    }
+  }
+
+  const generateBreadcrumbSchema = () => {
+    return {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: window.location.origin,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: productData.categoryName || "Products",
+          item: `${window.location.origin}/products`,
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: productData.name,
+          item: window.location.href,
+        },
+      ],
+    }
+  }
+
+  const generateOrganizationSchema = () => {
+    return {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: productData.storeName || "Store",
+      url: window.location.origin,
+      logo: `${window.location.origin}/logo.png`,
+      contactPoint: {
+        "@type": "ContactPoint",
+        telephone: "+1-800-123-4567",
+        contactType: "customer service",
+        availableLanguage: ["English"],
+      },
+      sameAs: [
+        "https://www.facebook.com/yourstore",
+        "https://www.instagram.com/yourstore",
+        "https://twitter.com/yourstore",
+      ],
+    }
+  }
+
+  const generateWebPageSchema = () => {
+    return {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: productData.metaTitle || productData.name,
+      description: stripHtmlTags(productData.metaDescription || productData.description),
+      url: window.location.href,
+      image: productData.mainImage,
+      datePublished: new Date().toISOString(),
+      dateModified: new Date().toISOString(),
+      isPartOf: {
+        "@type": "WebSite",
+        name: productData.storeName || "Store",
+        url: window.location.origin,
+      },
+    }
+  }
 
   const validateSchema = () => {
     try {
@@ -491,6 +493,7 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
                   <span className="font-medium">Product:</span> {schema.itemReviewed?.name}
                 </div>
                 <div>
+                  {/* <span className="font-medium">Rating:</span> {schema.reviewRating?.ratingValue}/5 */}
                 </div>
                 <div>
                   <span className="font-medium">Review:</span> {schema.reviewBody?.substring(0, 100)}...
@@ -557,20 +560,20 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
   }
 
   useEffect(() => {
-    if (!schemaData || schemaData.trim() === "") {
-      generateSchema()
-      return
-    }
+    if (schemaData) {
+      try {
+        const parsed = JSON.parse(schemaData)
 
-    try {
-      const parsed = JSON.parse(schemaData)
-      if (parsed["@type"] !== selectedTemplate) {
+        if (parsed["@type"] !== selectedTemplate) {
+          generateSchema()
+        }
+      } catch (e) {
         generateSchema()
       }
-    } catch (e) {
+    } else {
       generateSchema()
     }
-  }, [selectedTemplate, generateSchema])
+  }, [selectedTemplate])
 
   return (
     <div className="space-y-4">
@@ -676,3 +679,4 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
     </div>
   )
 }
+

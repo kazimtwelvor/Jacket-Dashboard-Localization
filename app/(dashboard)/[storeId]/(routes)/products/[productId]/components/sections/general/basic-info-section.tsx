@@ -186,7 +186,7 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Product Name</FormLabel>
+                  <FormLabel>Product Name <span className="text-red-500">*</span></FormLabel>
                   <FormControl>
                     <Input placeholder="Enter product name" {...field} disabled={isUploading} />
                   </FormControl>

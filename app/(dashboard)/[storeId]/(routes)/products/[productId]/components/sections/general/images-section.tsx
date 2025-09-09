@@ -258,7 +258,7 @@ export const ImagesSection = ({ isUploading }: { isUploading: boolean }) => {
                   <FormItem>
                     <div className="space-y-3">
                       <FormLabel className="text-base font-medium flex items-center gap-1">
-                        Main Product Image <span className="text-red-500">*</span>
+                        Main Product Image
                       </FormLabel>
                       <p className="text-xs text-muted-foreground">
                         This will be the main thumbnail image displayed in product listings and at the top of the

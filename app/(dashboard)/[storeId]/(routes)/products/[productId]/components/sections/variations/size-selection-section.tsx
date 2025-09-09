@@ -80,7 +80,7 @@ export const SizeSelectionSection: React.FC<SizeSelectionSectionProps> = ({ size
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <FormLabel className="text-base font-semibold">Available Sizes</FormLabel>
+          <FormLabel className="text-base font-semibold">Available Sizes <span className="text-red-500">*</span></FormLabel>
           <Badge variant="outline" className="ml-2">
             {selectedSizeIds.length} selected
           </Badge>

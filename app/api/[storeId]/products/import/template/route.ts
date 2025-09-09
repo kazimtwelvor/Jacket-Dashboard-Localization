@@ -89,7 +89,7 @@ export async function GET(req: NextRequest, { params }: { params: { storeId: str
         metaDescription: "This is an example product meta description for SEO.",
         slug: "example-product",
         keywords: "example, product, template",
-        noIndex: "No",
+        // noIndex: "No",
         brandName: "Your Brand",
         ratingValue: "4.5",
         reviewCount: "10",

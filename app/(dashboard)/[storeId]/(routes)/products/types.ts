@@ -26,7 +26,7 @@ export interface Product {
   slug?: string
   focusKeyword?: string
   additionalKeywords?: string[]
-  noIndex?: boolean
+  // noIndex?: boolean
   brandName?: string
   ratingValue?: string
   reviewCount?: string
@@ -102,7 +102,7 @@ export interface ProductSEO {
   focusKeyword: string
   additionalKeywords: string[]
   isPillarContent: boolean
-  noIndex: boolean
+  // noIndex: boolean
   seoScore: number
   canonicalUrl: string
 }

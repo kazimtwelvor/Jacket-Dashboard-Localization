@@ -242,7 +242,7 @@ export async function createProduct(formData: FormData) {
       slug: "", 
       keywords: [],
       isPillarContent: false,
-      noIndex: false,
+      // noIndex: false,
       seoScore: 0,
       canonicalUrl: "",
     }
@@ -256,7 +256,7 @@ export async function createProduct(formData: FormData) {
           slug: parsedSeo.slug ? sanitizeSlug(parsedSeo.slug) : productSlugForDb, 
           keywords: Array.isArray(parsedSeo.keywords) ? parsedSeo.keywords : [],
           isPillarContent: !!parsedSeo.isPillarContent,
-          noIndex: !!parsedSeo.noIndex,
+          // noIndex: !!parsedSeo.noIndex,
           seoScore: parsedSeo.seoScore || 0,
           canonicalUrl: parsedSeo.canonicalUrl || "",
         }
@@ -275,7 +275,7 @@ export async function createProduct(formData: FormData) {
     }
 
 
-    const { metaTitle, metaDescription, keywords, noIndex } = seoData
+    const { metaTitle, metaDescription, keywords,} = seoData
 
 
     const brandName = (formData.get("brandName") as string) || "Leather Jacket By Fineyst"
@@ -504,7 +504,7 @@ export async function createProduct(formData: FormData) {
       metaDescription: seoData.metaDescription,
       slug: productSlugForDb, 
       keywords: Array.isArray(seoData.keywords) ? seoData.keywords : [],
-      noIndex: seoData.noIndex,
+      // noIndex: seoData.noIndex,
       brandName: brandName || "Leather Jacket By Fineyst", 
       ratingValue: ratingValue || "4.5", 
       reviewCount: reviewCount || "0", 

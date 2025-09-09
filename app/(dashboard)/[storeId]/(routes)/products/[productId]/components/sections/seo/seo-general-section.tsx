@@ -78,7 +78,7 @@ export const SeoGeneralSection: React.FC<SeoGeneralSectionProps> = ({ form, seoC
             <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 p-4 rounded-md">
               <h3 className="font-medium text-yellow-800 dark:text-yellow-400">Noindex robots meta is enabled</h3>
               <p className="text-sm text-yellow-700 dark:text-yellow-500">
-                This page will not appear in search results. You can disable noindex in the Advanced tab.
+                This page will not appear in search results. You can disable  in the Advanced tab.
               </p>
             </div>
           )}

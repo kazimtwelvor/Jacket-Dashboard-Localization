@@ -88,7 +88,7 @@ export const formSchema = z.object({
       slug: z.string().optional(),
       keywords: z.array(z.string()).optional().default([]),
       isPillarContent: z.boolean().optional().default(false),
-      noIndex: z.boolean().optional().default(false),
+      // noIndex: z.boolean().optional().default(false),
       seoScore: z.number().optional().default(0),
       canonicalUrl: z.string().optional(),
     })
@@ -99,7 +99,7 @@ export const formSchema = z.object({
       slug: "",
       keywords: [],
       isPillarContent: false,
-      noIndex: false,
+      // noIndex: false,
       seoScore: 0,
       canonicalUrl: "",
     }),

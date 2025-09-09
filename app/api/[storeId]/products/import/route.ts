@@ -90,7 +90,7 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
         "isFeatured",
         "isDeleted",
         "isDiscounted",
-        "noIndex",
+        // "noIndex",
         "isVirtual",
         "isDownloadable",
       ]
@@ -316,7 +316,7 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
             if (row.metaTitle !== undefined) updateData.metaTitle = row.metaTitle
             if (row.metaDescription !== undefined) updateData.metaDescription = row.metaDescription
             if (row.slug !== undefined) updateData.slug = row.slug
-            if (row.noIndex !== undefined) updateData.noIndex = processBooleanField(row.noIndex)
+            // if (row.noIndex !== undefined) updateData.noIndex = processBooleanField(row.noIndex)
             if (row.brandName !== undefined) updateData.brandName = row.brandName
             if (row.ratingValue !== undefined) updateData.ratingValue = row.ratingValue
             if (row.reviewCount !== undefined) updateData.reviewCount = row.reviewCount
@@ -527,7 +527,7 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
                 metaTitle: row.metaTitle || null,
                 metaDescription: row.metaDescription || null,
                 slug: row.slug || null,
-                noIndex: processBooleanField(row.noIndex),
+                // noIndex: processBooleanField(row.noIndex),
                 brandName: row.brandName || null,
                 ratingValue: row.ratingValue || null,
                 reviewCount: row.reviewCount || null,

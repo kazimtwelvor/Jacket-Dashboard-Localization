@@ -301,7 +301,7 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       metaDescription,
       slug,
       keywords, // Use a single keywords array instead of focusKeyword and additionalKeywords
-      noIndex,
+      // noIndex,
       brandName,
       ratingValue,
       reviewCount,
@@ -433,7 +433,7 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
         metaDescription,
         slug,
         keywords: keywordsArray, // Use the keywords array
-        noIndex: noIndex === true || noIndex === "true",
+        // noIndex: noIndex === true || noIndex === "true",
         brandName,
         ratingValue,
         reviewCount,

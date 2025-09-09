@@ -286,7 +286,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
             ? [initialData.focusKeyword, ...(initialData.additionalKeywords || [])]
             : initialData.additionalKeywords || [],
         isPillarContent: false,
-        noIndex: initialData.noIndex || false,
+        // noIndex: initialData.noIndex || false,
         seoScore: 0,
         canonicalUrl: "",
         structuredData: true,
@@ -434,7 +434,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
         slug: "", // Initialize seo.slug as empty
         keywords: [],
         isPillarContent: false,
-        noIndex: false, // Ensure this defaults to false for new products
+        // noIndex: false, // Ensure this defaults to false for new products
         seoScore: 0,
         canonicalUrl: "",
         structuredData: true,

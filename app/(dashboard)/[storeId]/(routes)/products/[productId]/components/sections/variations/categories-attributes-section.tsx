@@ -127,7 +127,7 @@ export const CategoriesAttributesSection: React.FC<CategoriesAttributesSectionPr
         <CardContent className="pt-6">
           <div className="space-y-4">
             <div>
-              <Label className="text-base font-semibold">Gender</Label>
+              <Label className="text-base font-semibold">Gender <span className="text-red-500">*</span></Label>
               <p className="text-sm text-muted-foreground mb-3">Select the gender this product is designed for</p>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
@@ -167,7 +167,7 @@ export const CategoriesAttributesSection: React.FC<CategoriesAttributesSectionPr
         <CardContent className="pt-6">
           <div className="space-y-4">
             <div>
-              <Label className="text-base font-semibold">Material</Label>
+              <Label className="text-base font-semibold">Material <span className="text-red-500">*</span></Label>
               <p className="text-sm text-muted-foreground mb-3">Select all materials used in this product</p>
             </div>
 
@@ -256,7 +256,7 @@ export const CategoriesAttributesSection: React.FC<CategoriesAttributesSectionPr
         <CardContent className="pt-6">
           <div className="space-y-4">
             <div>
-              <Label className="text-base font-semibold">Style</Label>
+              <Label className="text-base font-semibold">Style <span className="text-red-500">*</span></Label>
               <p className="text-sm text-muted-foreground mb-3">Select all styles that apply to this product</p>
             </div>
 

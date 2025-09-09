@@ -33,7 +33,7 @@ export const InventorySection: React.FC<InventorySectionProps> = ({ form, storeI
           render={({ field }) => (
             <FormItem>
               <div className="flex items-center gap-2">
-                <FormLabel>SKU</FormLabel>
+                <FormLabel>SKU <span className="text-red-500">*</span></FormLabel>
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -80,7 +80,7 @@ export const InventorySection: React.FC<InventorySectionProps> = ({ form, storeI
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                Stock Status <span className="text-red-500">*</span>
+                Stock Status
               </FormLabel>
               <Select
                 disabled={form.formState.isSubmitting}
@@ -111,7 +111,7 @@ export const InventorySection: React.FC<InventorySectionProps> = ({ form, storeI
         render={({ field }) => (
           <FormItem>
             <FormLabel>
-              Product Status <span className="text-red-500">*</span>
+              Product Status
             </FormLabel>
             <Select
               disabled={form.formState.isSubmitting}

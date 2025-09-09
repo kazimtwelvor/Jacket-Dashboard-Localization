@@ -223,7 +223,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       isFeatured: initialData.isFeatured || false,
       brandName: initialData.brandName || "Leather Jacket By Fineyst",
       // ratingValue: initialData.ratingValue || "4.5",
-      reviewCount: initialData.reviewCount || "0",
+      // reviewCount: initialData.reviewCount || "0",
       categories: {
         gender: initialData.gender || "",
         material: (() => {

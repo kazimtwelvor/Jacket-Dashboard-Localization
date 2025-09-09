@@ -38,7 +38,7 @@ export const ProductReviewCard: React.FC<ProductReviewCardProps> = ({ productNam
       
       await Promise.all(
         pendingReviews.map(review => 
-          axios.patch(`/api/${params.storeId}/reviews/${review.id}`, { isApproved: true })
+          axios.patch(`/api/${params?.storeId}/reviews/${review.id}`, { isApproved: true })
         )
       )
       
@@ -151,7 +151,7 @@ export const ProductReviewCard: React.FC<ProductReviewCardProps> = ({ productNam
               size="sm" 
               variant="outline" 
               className="w-full"
-              onClick={() => router.push(`/${params.storeId}/products`)}
+              onClick={() => router.push(`/${params?.storeId}/products`)}
             >
               View Product
             </Button>

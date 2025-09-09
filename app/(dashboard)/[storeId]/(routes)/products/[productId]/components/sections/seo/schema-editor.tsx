@@ -88,26 +88,27 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
     }
     else {
       const timer = setTimeout(() => {
-        if (selectedTemplate && typeof selectedTemplate === 'string') {
-          generateSchema()
-        }
+        generateSchema()
       }, 0)
       return () => clearTimeout(timer)
     }
-  }, [initialSchema, schemaType, selectedTemplate])
+  }, [initialSchema, schemaType])
 
   const safelyUpdateSchemaData = (newSchema: string) => {
     setSchemaData(newSchema)
     if (onSchemaChange) {
-      onSchemaChange(newSchema)
-
       try {
         const parsed = JSON.parse(newSchema)
         if (parsed && parsed["@type"]) {
-          parsed.templateName = parsed["@type"]
+          if (!parsed.templateName) {
+            parsed.templateName = parsed["@type"]
+          }
           onSchemaChange(JSON.stringify(parsed))
+        } else {
+          onSchemaChange(newSchema)
         }
       } catch (e) {
+        onSchemaChange(newSchema)
       }
     }
   }
@@ -678,3 +679,4 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
     </div>
   )
 }
+

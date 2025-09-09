@@ -89,10 +89,10 @@ export const CategoriesTab: React.FC<CategoriesTabProps> = ({ data }) => {
             {totalCategories}
           </Badge>
         </div>
-        <Button onClick={() => handleCreateCategory()}>
+        {/* <Button onClick={() => handleCreateCategory()}>
           <PlusCircle className="mr-2 h-4 w-4" />
           Add New Category
-        </Button>
+        </Button> */}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

@@ -203,11 +203,11 @@ export const validateCreateProduct = () => [
     .isString()
     .isLength({ min: 1, max: 10000 })
     .withMessage('Schema must be between 1 and 10000 characters'),
-  body('ratingValue')
-    .optional()
-    .isString()
-    .isLength({ min: 1, max: 10 })
-    .withMessage('Rating value must be between 1 and 10 characters'),
+  // body('ratingValue')
+  //   .optional()
+  //   .isString()
+  //   .isLength({ min: 1, max: 10 })
+  //   .withMessage('Rating value must be between 1 and 10 characters'),
   body('reviewCount')
     .optional()
     .isString()
@@ -412,11 +412,11 @@ export const validateUpdateProduct = () => [
     .isString()
     .isLength({ min: 1, max: 10000 })
     .withMessage('Schema must be between 1 and 10000 characters'),
-  body('ratingValue')
-    .optional()
-    .isString()
-    .isLength({ min: 1, max: 10 })
-    .withMessage('Rating value must be between 1 and 10 characters'),
+  // body('ratingValue')
+  //   .optional()
+  //   .isString()
+  //   .isLength({ min: 1, max: 10 })
+  //   .withMessage('Rating value must be between 1 and 10 characters'),
   body('reviewCount')
     .optional()
     .isString()

@@ -65,7 +65,7 @@ export async function POST(req: Request, { params }: { params: { storeId: string
         additionalKeywords: true,
         // noIndex: true,
         brandName: true,
-        ratingValue: true,
+        // ratingValue: true,
         reviewCount: true,
         // purchaseNote: true,
         images: {
@@ -127,7 +127,7 @@ export async function POST(req: Request, { params }: { params: { storeId: string
         additionalKeywords: originalProduct.additionalKeywords || [],
         // noIndex: originalProduct.noIndex,
         brandName: originalProduct.brandName,
-        ratingValue: originalProduct.ratingValue,
+        // ratingValue: originalProduct.ratingValue,
         reviewCount: originalProduct.reviewCount,
         // purchaseNote: originalProduct.purchaseNote,
       },

@@ -177,7 +177,7 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
         productData.slug = product.slug || ""
         // productData.noIndex = product.noIndex ? "Yes" : "No"
         productData.brandName = product.brandName || ""
-        productData.ratingValue = product.ratingValue || ""
+        // productData.ratingValue = product.ratingValue || ""
         productData.reviewCount = product.reviewCount || ""
         productData.schema = product.schema || ""
 

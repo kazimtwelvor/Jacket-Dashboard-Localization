@@ -91,7 +91,7 @@ export async function GET(req: NextRequest, { params }: { params: { storeId: str
         keywords: "example, product, template",
         // noIndex: "No",
         brandName: "Your Brand",
-        ratingValue: "4.5",
+        // ratingValue: "4.5",
         reviewCount: "10",
 
         // Additional fields

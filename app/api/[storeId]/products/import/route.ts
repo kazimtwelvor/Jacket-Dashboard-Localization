@@ -92,7 +92,7 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
         "isDiscounted",
         // "noIndex",
         // "isVirtual",
-        "isDownloadable",
+        // "isDownloadable",
       ]
       booleanFields.forEach((field) => {
         if (
@@ -250,7 +250,7 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
             // if (row.purchaseNote !== undefined) updateData.purchaseNote = row.purchaseNote
             // if (row.productType !== undefined) updateData.productType = row.productType
             // if (row.isVirtual !== undefined) updateData.isVirtual = processBooleanField(row.isVirtual)
-            if (row.isDownloadable !== undefined) updateData.isDownloadable = processBooleanField(row.isDownloadable)
+            // if (row.isDownloadable !== undefined) updateData.isDownloadable = processBooleanField(row.isDownloadable)
 
             try {
               if (row.colorDetailsJSON) {
@@ -535,7 +535,7 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
                 // purchaseNote: row.purchaseNote || null,
                 // productType: row.productType || "variable",
                 // isVirtual: processBooleanField(row.isVirtual),
-                isDownloadable: processBooleanField(row.isDownloadable),
+                // isDownloadable: processBooleanField(row.isDownloadable),
               },
             })
 

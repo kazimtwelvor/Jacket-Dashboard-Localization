@@ -98,7 +98,7 @@ export async function GET(req: NextRequest, { params }: { params: { storeId: str
         // purchaseNote: "Thank you for your purchase!",
         // productType: "variable", // simple, variable, grouped, etc.
         // isVirtual: "No",
-        isDownloadable: "No",
+        // isDownloadable: "No",
 
         // Image placeholders
         imageUrls: "https://example.com/image1.jpg, https://example.com/image2.jpg",

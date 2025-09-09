@@ -64,20 +64,20 @@ export const validateCreateProduct = () => [
     .optional()
     .isIn(['instock', 'outofstock', 'onbackorder'])
     .withMessage('Stock status must be one of: instock, outofstock, onbackorder'),
-  body('purchaseNote')
-    .optional()
-    .isString()
-    .isLength({ min: 1, max: 1000 })
-    .withMessage('Purchase note must be between 1 and 1000 characters'),
-  validateBoolean('isFeatured'),
-  validateBoolean('isArchived'),
-  validateBoolean('isPublished'),
-  validateBoolean('isDeleted'),
-  validateBoolean('isDiscounted'),
-  validateBoolean('isVirtual'),
-  validateBoolean('isDownloadable'),
-  validateBoolean('isParentProduct'),
-  validateBoolean('noIndex'),
+  // body('purchaseNote')
+  //   .optional()
+  //   .isString()
+  //   .isLength({ min: 1, max: 1000 })
+  //   .withMessage('Purchase note must be between 1 and 1000 characters'),
+  // validateBoolean('isFeatured'),
+  // validateBoolean('isArchived'),
+  // validateBoolean('isPublished'),
+  // validateBoolean('isDeleted'),
+  // validateBoolean('isDiscounted'),
+  // validateBoolean('isVirtual'),
+  // validateBoolean('isDownloadable'),
+  // validateBoolean('isParentProduct'),
+  // validateBoolean('noIndex'),
   body('productType')
     .optional()
     .isIn(['simple', 'variable', 'grouped'])
@@ -273,20 +273,20 @@ export const validateUpdateProduct = () => [
     .optional()
     .isIn(['instock', 'outofstock', 'onbackorder'])
     .withMessage('Stock status must be one of: instock, outofstock, onbackorder'),
-  body('purchaseNote')
-    .optional()
-    .isString()
-    .isLength({ min: 1, max: 1000 })
-    .withMessage('Purchase note must be between 1 and 1000 characters'),
-  validateBoolean('isFeatured'),
-  validateBoolean('isArchived'),
-  validateBoolean('isPublished'),
-  validateBoolean('isDeleted'),
-  validateBoolean('isDiscounted'),
-  validateBoolean('isVirtual'),
-  validateBoolean('isDownloadable'),
-  validateBoolean('isParentProduct'),
-  validateBoolean('noIndex'),
+  // body('purchaseNote')
+  //   .optional()
+  //   .isString()
+  //   .isLength({ min: 1, max: 1000 })
+  //   .withMessage('Purchase note must be between 1 and 1000 characters'),
+  // validateBoolean('isFeatured'),
+  // validateBoolean('isArchived'),
+  // validateBoolean('isPublished'),
+  // validateBoolean('isDeleted'),
+  // validateBoolean('isDiscounted'),
+  // validateBoolean('isVirtual'),
+  // validateBoolean('isDownloadable'),
+  // validateBoolean('isParentProduct'),
+  // validateBoolean('noIndex'),
   body('productType')
     .optional()
     .isIn(['simple', 'variable', 'grouped'])

@@ -101,7 +101,7 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
           isVirtual: product.isVirtual ? "Yes" : "No",
           isDownloadable: product.isDownloadable ? "Yes" : "No",
 
-          purchaseNote: product.purchaseNote || "",
+          // purchaseNote: product.purchaseNote || "",
         }
 
         productData.categoryId = product.categoryId

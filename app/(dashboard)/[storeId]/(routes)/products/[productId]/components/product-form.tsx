@@ -272,7 +272,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
         colorVariationLinks: processColorLinks(),
       },
       tags: initialData.tags || [],
-      purchaseNote: initialData.purchaseNote || "",
+      // purchaseNote: initialData.purchaseNote || "",
       relatedProducts: Array.isArray((initialData as any).relatedProducts) ? (initialData as any).relatedProducts : [],
       menuOrder: initialData.menuOrder?.toString() || "0",
       reviews: true,
@@ -422,7 +422,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
         sizes: [], // Initialize with empty array
       },
       tags: [],
-      purchaseNote: "",
+      // purchaseNote: "",
       relatedProducts: [],
 
       // Debug log for new product

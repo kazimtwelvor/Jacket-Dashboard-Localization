@@ -284,7 +284,7 @@ export async function createProduct(formData: FormData) {
 
   
 
-    const purchaseNote = formData.get("purchaseNote") as string
+    // const purchaseNote = formData.get("purchaseNote") as string
     const categoryData = formData.get("categoryData") as string | null 
 
     let colorDetails = null
@@ -508,7 +508,7 @@ export async function createProduct(formData: FormData) {
       brandName: brandName || "Leather Jacket By Fineyst", 
       ratingValue: ratingValue || "4.5", 
       reviewCount: reviewCount || "0", 
-      purchaseNote,
+      // purchaseNote,
       isFeatured,
       isParentProduct,
       parentProductId,

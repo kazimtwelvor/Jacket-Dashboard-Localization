@@ -33,7 +33,7 @@ export interface Product {
   schema?: string 
   // purchaseNote?: string
   menuOrder?: number
-  productType?: string
+  // productType?: string
   seoScore?: number
   productSizes?: ProductSize[]
   sizeDetails?: any

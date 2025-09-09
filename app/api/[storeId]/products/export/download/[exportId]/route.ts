@@ -101,7 +101,7 @@ export async function GET(req: NextRequest, { params }: { params: { storeId: str
         updatedAt: format(product.updatedAt, "yyyy-MM-dd HH:mm:ss"),
         storeId: product.storeId,
 
-        productType: product.productType || "variable",
+        // productType: product.productType || "variable",
 
         isVirtual: product.isVirtual ? "Yes" : "No",
         isDownloadable: product.isDownloadable ? "Yes" : "No",

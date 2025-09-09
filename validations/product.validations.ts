@@ -78,10 +78,10 @@ export const validateCreateProduct = () => [
   // validateBoolean('isDownloadable'),
   // validateBoolean('isParentProduct'),
   // validateBoolean('noIndex'),
-  body('productType')
-    .optional()
-    .isIn(['simple', 'variable', 'grouped'])
-    .withMessage('Product type must be one of: simple, variable, grouped'),
+  // body('productType')
+  //   .optional()
+  //   .isIn(['simple', 'variable', 'grouped'])
+  //   .withMessage('Product type must be one of: simple, variable, grouped'),
   body('gender')
     .optional()
     .isIn(['men', 'women', 'unisex', 'kids'])
@@ -287,10 +287,10 @@ export const validateUpdateProduct = () => [
   // validateBoolean('isDownloadable'),
   // validateBoolean('isParentProduct'),
   // validateBoolean('noIndex'),
-  body('productType')
-    .optional()
-    .isIn(['simple', 'variable', 'grouped'])
-    .withMessage('Product type must be one of: simple, variable, grouped'),
+  // body('productType')
+  //   .optional()
+  //   .isIn(['simple', 'variable', 'grouped'])
+  //   .withMessage('Product type must be one of: simple, variable, grouped'),
   body('gender')
     .optional()
     .isIn(['men', 'women', 'unisex', 'kids'])
@@ -467,10 +467,10 @@ export const validateGetProducts = () => [
     .optional()
     .isIn(['men', 'women', 'unisex', 'kids'])
     .withMessage('Gender must be one of: men, women, unisex, kids'),
-  query('productType')
-    .optional()
-    .isIn(['simple', 'variable', 'grouped'])
-    .withMessage('Product type must be one of: simple, variable, grouped'),
+  // query('productType')
+  //   .optional()
+  //   .isIn(['simple', 'variable', 'grouped'])
+  //   .withMessage('Product type must be one of: simple, variable, grouped'),
   query('minPrice')
     .optional()
     .isDecimal()

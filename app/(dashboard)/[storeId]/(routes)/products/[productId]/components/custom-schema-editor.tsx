@@ -41,7 +41,7 @@ interface ProductData {
   isFeatured?: boolean
   isPublished?: boolean
   tags?: string[]
-  productType?: string
+  // productType?: string
 }
 
 interface SchemaEditorProps {

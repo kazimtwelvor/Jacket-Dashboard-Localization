@@ -248,7 +248,7 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
             if (row.stockStatus !== undefined) updateData.stockStatus = row.stockStatus
 
             // if (row.purchaseNote !== undefined) updateData.purchaseNote = row.purchaseNote
-            if (row.productType !== undefined) updateData.productType = row.productType
+            // if (row.productType !== undefined) updateData.productType = row.productType
             if (row.isVirtual !== undefined) updateData.isVirtual = processBooleanField(row.isVirtual)
             if (row.isDownloadable !== undefined) updateData.isDownloadable = processBooleanField(row.isDownloadable)
 
@@ -533,7 +533,7 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
                 // reviewCount: row.reviewCount || null,
                 schema: row.schema || null,
                 // purchaseNote: row.purchaseNote || null,
-                productType: row.productType || "variable",
+                // productType: row.productType || "variable",
                 isVirtual: processBooleanField(row.isVirtual),
                 isDownloadable: processBooleanField(row.isDownloadable),
               },

@@ -56,7 +56,7 @@ export async function GET(req: Request, { params }: { params: { storeId: string;
     const serializedProducts = filteredProducts.map((product) => ({
       ...product,
       price: product.price.toString(),
-      originalPrice: product.originalPrice.toString(),
+      // originalPrice: product.originalPrice.toString(),
       salePrice: product.salePrice ? product.salePrice.toString() : null,
       images: product.images.map((productImage) => ({
         id: productImage.imageId,

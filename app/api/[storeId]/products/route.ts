@@ -250,7 +250,7 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
     const serializedProducts = paginatedProducts.map(product => ({
       ...product,
       price: product.price.toString(),
-      originalPrice: product.originalPrice ? product.originalPrice.toString() : "0",
+      // originalPrice: product.originalPrice ? product.originalPrice.toString() : "0",
       salePrice: product.salePrice ? product.salePrice.toString() : null,
       images: product.images.map(productImage => ({
         id: productImage.imageId,

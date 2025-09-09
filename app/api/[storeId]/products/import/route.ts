@@ -76,9 +76,9 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
         rowErrors.push("Sale price must be a number")
       }
 
-      if (row.originalPrice && isNaN(Number(row.originalPrice))) {
-        rowErrors.push("Original price must be a number")
-      }
+      // if (row.originalPrice && isNaN(Number(row.originalPrice))) {
+      //   rowErrors.push("Original price must be a number")
+      // }
 
       if (row.sku && !/^[a-zA-Z0-9-_]+$/.test(row.sku)) {
         rowErrors.push("SKU must contain only letters, numbers, hyphens, and underscores")
@@ -240,9 +240,9 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
             if (row.salePrice !== undefined) {
               updateData.salePrice = row.salePrice ? Number.parseFloat(row.salePrice) : null
             }
-            if (row.originalPrice !== undefined) {
-              updateData.originalPrice = row.originalPrice ? Number.parseFloat(row.originalPrice) : 0
-            }
+            // if (row.originalPrice !== undefined) {
+            //   updateData.originalPrice = row.originalPrice ? Number.parseFloat(row.originalPrice) : 0
+            // }
             if (row.isDiscounted !== undefined) updateData.isDiscounted = processBooleanField(row.isDiscounted)
 
             if (row.stockStatus !== undefined) updateData.stockStatus = row.stockStatus
@@ -506,7 +506,7 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
                 price: Number.parseFloat(row.price),
                 description: row.description || "",
                 salePrice: row.salePrice ? Number.parseFloat(row.salePrice) : null,
-                originalPrice: row.originalPrice ? Number.parseFloat(row.originalPrice) : 0,
+                // originalPrice: row.originalPrice ? Number.parseFloat(row.originalPrice) : 0,
                 isPublished: processBooleanField(row.isPublished),
                 isArchived: processBooleanField(row.isArchived),
                 isFeatured: processBooleanField(row.isFeatured),

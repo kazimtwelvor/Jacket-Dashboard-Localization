@@ -66,7 +66,7 @@ export async function GET(req: NextRequest, { params }: { params: { storeId: str
 
         // Pricing
         salePrice: "79.99",
-        originalPrice: "129.99",
+        // originalPrice: "129.99",
         isDiscounted: "Yes",
 
         // Inventory

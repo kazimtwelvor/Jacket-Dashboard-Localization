@@ -95,7 +95,7 @@ export async function GET(req: Request) {
       orderItems: order.orderItems.map(item => ({
         ...item,
         price: Number(item.price),
-        originalPrice: Number(item.originalPrice),
+        // originalPrice: Number(item.originalPrice),
         discountAmount: Number(item.discountAmount),
         total: Number(item.total),
       })),

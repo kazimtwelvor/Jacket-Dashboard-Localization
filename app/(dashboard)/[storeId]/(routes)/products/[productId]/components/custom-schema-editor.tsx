@@ -19,7 +19,7 @@ interface ProductData {
   price: string | number
   salePrice?: string | number | null
   isDiscounted?: boolean
-  originalPrice?: string | number
+  // originalPrice?: string | number
   images?: Array<{ id: string; url: string }>
   mainImage?: string
   brandName?: string

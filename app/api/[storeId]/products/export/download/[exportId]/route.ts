@@ -117,7 +117,7 @@ export async function GET(req: NextRequest, { params }: { params: { storeId: str
       productData.price = product.price.toString()
       productData.salePrice = product.salePrice ? product.salePrice.toString() : ""
       productData.isDiscounted = product.isDiscounted ? "Yes" : "No"
-      productData.originalPrice = product.originalPrice ? product.originalPrice.toString() : ""
+      // productData.originalPrice = product.originalPrice ? product.originalPrice.toString() : ""
 
       productData.stockStatus = product.stockStatus || "instock"
 

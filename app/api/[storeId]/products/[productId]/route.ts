@@ -199,7 +199,7 @@ export async function GET(req: Request, { params }: { params: { productId: strin
       const serializedProduct = {
         ...product,
         price: product.price.toString(),
-        originalPrice: product.originalPrice.toString(),
+        // originalPrice: product.originalPrice.toString(),
         salePrice: product.salePrice ? product.salePrice.toString() : null,
         images: formattedImages,
         sizeDetails: sizeDetails,
@@ -291,7 +291,7 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       stockStatus,
       description,
       salePrice,
-      originalPrice,
+      // originalPrice,
       isDiscounted,
       specifications,
       tags,
@@ -422,7 +422,7 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
         stockStatus,
         description,
         salePrice,
-        originalPrice,
+        // originalPrice,
         isDiscounted: isDiscounted === true || isDiscounted === "true",
         tags: tagsArray,
         specifications: specificationsObject,
@@ -546,7 +546,7 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
     const serializedProduct = {
       ...updatedProductWithReviews,
       price: updatedProductWithReviews.price.toString(),
-      originalPrice: updatedProductWithReviews.originalPrice.toString(),
+      // originalPrice: updatedProductWithReviews.originalPrice.toString(),
       salePrice: updatedProductWithReviews.salePrice ? updatedProductWithReviews.salePrice.toString() : null,
       reviews: updatedProductWithReviews.reviews.map((review) => ({
         id: review.id,

@@ -77,14 +77,14 @@ const OrderPage = async ({
     orderItems: order.orderItems.map(item => ({
       ...item,
       price: Number(item.price),
-      originalPrice: Number(item.originalPrice),
+      // originalPrice: Number(item.originalPrice),
       discountAmount: Number(item.discountAmount),
       total: Number(item.total),
       product: item.product ? {
         ...item.product,
         price: Number(item.product.price),
         salePrice: item.product.salePrice ? Number(item.product.salePrice) : null,
-        originalPrice: Number(item.product.originalPrice)
+        // originalPrice: Number(item.product.originalPrice)
       } : null
     }))
   } : null

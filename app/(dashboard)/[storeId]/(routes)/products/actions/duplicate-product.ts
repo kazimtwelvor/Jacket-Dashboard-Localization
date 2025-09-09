@@ -96,10 +96,10 @@ export async function duplicateProduct(productId: string, storeId: string) {
         slug: product.slug ? `${product.slug}-copy-${newSku.split('-').pop()}` : null,
         focusKeyword: product.focusKeyword,
         additionalKeywords: product.additionalKeywords,
-        noIndex: product.noIndex,
+        // noIndex: product.noIndex,
         brandName: product.brandName,
-        ratingValue: product.ratingValue,
-        reviewCount: product.reviewCount,
+        // ratingValue: product.ratingValue,
+        // reviewCount: product.reviewCount,
         // purchaseNote: product.purchaseNote,
       },
     })

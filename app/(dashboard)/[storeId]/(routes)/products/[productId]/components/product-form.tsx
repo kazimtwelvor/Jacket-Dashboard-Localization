@@ -222,7 +222,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       stockStatus: initialData.stockStatus || "instock",
       isFeatured: initialData.isFeatured || false,
       brandName: initialData.brandName || "Leather Jacket By Fineyst",
-      ratingValue: initialData.ratingValue || "4.5",
+      // ratingValue: initialData.ratingValue || "4.5",
       reviewCount: initialData.reviewCount || "0",
       categories: {
         gender: initialData.gender || "",
@@ -286,7 +286,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
             ? [initialData.focusKeyword, ...(initialData.additionalKeywords || [])]
             : initialData.additionalKeywords || [],
         isPillarContent: false,
-        noIndex: initialData.noIndex || false,
+        // noIndex: initialData.noIndex || false,
         seoScore: 0,
         canonicalUrl: "",
         structuredData: true,
@@ -411,7 +411,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       sku: "",
       stockStatus: "instock",
       brandName: "Leather Jacket By Fineyst",
-      ratingValue: "4.5",
+      // ratingValue: "4.5",
       reviewCount: "0",
       categories: {
         gender: "",
@@ -434,7 +434,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
         slug: "", // Initialize seo.slug as empty
         keywords: [],
         isPillarContent: false,
-        noIndex: false, // Ensure this defaults to false for new products
+        // noIndex: false, // Ensure this defaults to false for new products
         seoScore: 0,
         canonicalUrl: "",
         structuredData: true,

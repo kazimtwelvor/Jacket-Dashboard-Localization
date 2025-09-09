@@ -28,7 +28,7 @@ interface ProductsClientProps {
   categoriesOld: { id: string; name: string }[]
   sizesOld: { id: string; name: string }[]
   colorsOld: { id: string; name: string; value: string }[]
-  productTypes: { id: string; name: string }[]
+  // productTypes: { id: string; name: string }[]
   stockStatuses: { id: string; name: string }[]
   seoStatuses: { id: string; name: string }[]
   storeId: string
@@ -56,7 +56,7 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({
   colors,
   isTrash = false,
   products,
-  productTypes,
+  // productTypes,
   storeId,
   stats,
   pagination,
@@ -73,7 +73,7 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({
   const [sortColumn, setSortColumn] = useState(searchParams?.get("sort") || "createdAt")
   const [sortOrder, setSortOrder] = useState(searchParams?.get("order") || "desc")
   const [categoryFilter, setCategoryFilter] = useState(searchParams?.get("category") || "")
-  const [productTypeFilter, setProductTypeFilter] = useState(searchParams?.get("productType") || "")
+  // const [productTypeFilter, setProductTypeFilter] = useState(searchParams?.get("productType") || "")
   const [stockStatusFilter, setStockStatusFilter] = useState(searchParams?.get("stockStatus") || "")
   const [seoStatusFilter, setSeoStatusFilter] = useState(searchParams?.get("seoStatus") || "")
   const [filterOpen, setFilterOpen] = useState(false)
@@ -113,8 +113,8 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({
     if (categoryFilter) params.set("category", categoryFilter)
     else params.delete("category")
 
-    if (productTypeFilter) params.set("productType", productTypeFilter)
-    else params.delete("productType")
+    // if (productTypeFilter) params.set("productType", productTypeFilter)
+    // else params.delete("productType")
 
     if (stockStatusFilter) params.set("stockStatus", stockStatusFilter)
     else params.delete("stockStatus")
@@ -135,7 +135,7 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({
     sortColumn,
     sortOrder,
     categoryFilter,
-    productTypeFilter,
+    // productTypeFilter,
     stockStatusFilter,
     seoStatusFilter,
     currentTab,
@@ -152,7 +152,7 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({
     setSortColumn(searchParams?.get("sort") || "createdAt")
     setSortOrder(searchParams?.get("order") || "desc")
     setCategoryFilter(searchParams?.get("category") || "")
-    setProductTypeFilter(searchParams?.get("productType") || "")
+    // setProductTypeFilter(searchParams?.get("productType") || "")
     setStockStatusFilter(searchParams?.get("stockStatus") || "")
     setSeoStatusFilter(searchParams?.get("seoStatus") || "")
 

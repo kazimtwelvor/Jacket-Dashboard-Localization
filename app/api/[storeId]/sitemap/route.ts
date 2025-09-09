@@ -15,7 +15,7 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
         storeId,
         isArchived: false,
         isDeleted: false,
-        noIndex: false,
+        // noIndex: false,
       },
       select: {
         slug: true,

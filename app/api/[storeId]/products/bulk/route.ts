@@ -70,7 +70,7 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
 
     if (data.price) updateData.price = Number.parseFloat(data.price)
     if (data.salePrice) updateData.salePrice = Number.parseFloat(data.salePrice)
-    if (data.originalPrice) updateData.originalPrice = Number.parseFloat(data.originalPrice)
+    // if (data.originalPrice) updateData.originalPrice = Number.parseFloat(data.originalPrice)
 
     if (data.specifications) {
       updateData.specifications =

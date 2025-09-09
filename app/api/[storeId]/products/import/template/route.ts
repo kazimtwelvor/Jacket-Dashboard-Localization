@@ -66,7 +66,7 @@ export async function GET(req: NextRequest, { params }: { params: { storeId: str
 
         // Pricing
         salePrice: "79.99",
-        originalPrice: "129.99",
+        // originalPrice: "129.99",
         isDiscounted: "Yes",
 
         // Inventory
@@ -89,16 +89,16 @@ export async function GET(req: NextRequest, { params }: { params: { storeId: str
         metaDescription: "This is an example product meta description for SEO.",
         slug: "example-product",
         keywords: "example, product, template",
-        noIndex: "No",
+        // noIndex: "No",
         brandName: "Your Brand",
-        ratingValue: "4.5",
-        reviewCount: "10",
+        // ratingValue: "4.5",
+        // reviewCount: "10",
 
         // Additional fields
         // purchaseNote: "Thank you for your purchase!",
-        productType: "variable", // simple, variable, grouped, etc.
-        isVirtual: "No",
-        isDownloadable: "No",
+        // productType: "variable", // simple, variable, grouped, etc.
+        // isVirtual: "No",
+        // isDownloadable: "No",
 
         // Image placeholders
         imageUrls: "https://example.com/image1.jpg, https://example.com/image2.jpg",

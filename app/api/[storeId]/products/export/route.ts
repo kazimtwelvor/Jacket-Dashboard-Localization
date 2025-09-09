@@ -96,10 +96,10 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
           updatedAt: format(product.updatedAt, "yyyy-MM-dd HH:mm:ss"),
           storeId: product.storeId,
 
-          productType: product.productType || "variable",
+          // productType: product.productType || "variable",
 
-          isVirtual: product.isVirtual ? "Yes" : "No",
-          isDownloadable: product.isDownloadable ? "Yes" : "No",
+          // isVirtual: product.isVirtual ? "Yes" : "No",
+          // isDownloadable: product.isDownloadable ? "Yes" : "No",
 
           // purchaseNote: product.purchaseNote || "",
         }
@@ -112,7 +112,7 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
         productData.price = product.price.toString()
         productData.salePrice = product.salePrice ? product.salePrice.toString() : ""
         productData.isDiscounted = product.isDiscounted ? "Yes" : "No"
-        productData.originalPrice = product.originalPrice ? product.originalPrice.toString() : ""
+        // productData.originalPrice = product.originalPrice ? product.originalPrice.toString() : ""
 
         productData.stockStatus = product.stockStatus || "instock"
 
@@ -175,10 +175,10 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
         productData.metaTitle = product.metaTitle || ""
         productData.metaDescription = product.metaDescription || ""
         productData.slug = product.slug || ""
-        productData.noIndex = product.noIndex ? "Yes" : "No"
+        // productData.noIndex = product.noIndex ? "Yes" : "No"
         productData.brandName = product.brandName || ""
-        productData.ratingValue = product.ratingValue || ""
-        productData.reviewCount = product.reviewCount || ""
+        // productData.ratingValue = product.ratingValue || ""
+        // productData.reviewCount = product.reviewCount || ""
         productData.schema = product.schema || ""
 
         if (product.keywords) {

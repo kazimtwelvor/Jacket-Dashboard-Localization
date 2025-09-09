@@ -45,7 +45,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ storeId:
       orderItems: order.orderItems.map(item => ({
         ...item,
         price: Number(item.price),
-        originalPrice: Number(item.originalPrice),
+        // originalPrice: Number(item.originalPrice),
         discountAmount: Number(item.discountAmount),
         total: Number(item.total)
       }))
@@ -214,7 +214,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
             productId: item.productId,
             quantity: item.quantity || 1,
             price: item.price,
-            originalPrice: item.originalPrice || item.price,
+            // originalPrice: item.originalPrice || item.price,
             discountAmount: item.discountAmount || 0,
             total: item.total || item.price * (item.quantity || 1),
             sizeIds: item.sizeIds || [],
@@ -254,7 +254,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
       orderItems: order.orderItems?.map(item => ({
         ...item,
         price: Number(item.price),
-        originalPrice: Number(item.originalPrice),
+        // originalPrice: Number(item.originalPrice),
         discountAmount: Number(item.discountAmount),
         total: Number(item.total)
       })) || []

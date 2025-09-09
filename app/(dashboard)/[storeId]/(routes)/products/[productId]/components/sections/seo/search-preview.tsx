@@ -9,7 +9,7 @@ interface SearchPreviewProps {
   url: string
   price?: string
   rating?: number
-  reviewCount?: number
+  // reviewCount?: number
   inStock?: boolean
 }
 
@@ -19,7 +19,7 @@ export const SearchPreview: React.FC<SearchPreviewProps> = ({
   url,
   price = "$99.99",
   rating = 4,
-  reviewCount = 42,
+  // reviewCount = 42,
   inStock = true,
 }) => {
   const displayUrl = url || "yourstore.com/products/product-name"
@@ -61,7 +61,7 @@ export const SearchPreview: React.FC<SearchPreviewProps> = ({
               {[...Array(5)].map((_, i) => (
                 <Star key={i} className={`h-3 w-3 ${i < rating ? "fill-current" : ""}`} />
               ))}
-              <span className="text-gray-700">({reviewCount} reviews)</span>
+              {/* <span className="text-gray-700">({reviewCount} reviews)</span> */}
             </div>
             <div className="text-gray-700 text-xs line-clamp-2">
               {description || "Your product description will appear here. Make sure to write a compelling description."}

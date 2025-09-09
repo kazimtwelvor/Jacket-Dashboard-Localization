@@ -397,17 +397,17 @@ export const validateCreateOrderItem = () => [
       }
       return true;
     }),
-  body('originalPrice')
-    .optional()
-    .isDecimal()
-    .withMessage('Original price must be a decimal number')
-    .custom((value) => {
-      const num = parseFloat(value);
-      if (num < 0) {
-        throw new Error('Original price must be non-negative');
-      }
-      return true;
-    }),
+  // body('originalPrice')
+  //   .optional()
+  //   .isDecimal()
+  //   .withMessage('Original price must be a decimal number')
+  //   .custom((value) => {
+  //     const num = parseFloat(value);
+  //     if (num < 0) {
+  //       throw new Error('Original price must be non-negative');
+  //     }
+  //     return true;
+  //   }),
   body('discountAmount')
     .optional()
     .isDecimal()
@@ -498,17 +498,17 @@ export const validateUpdateOrderItem = () => [
       }
       return true;
     }),
-  body('originalPrice')
-    .optional()
-    .isDecimal()
-    .withMessage('Original price must be a decimal number')
-    .custom((value) => {
-      const num = parseFloat(value);
-      if (num < 0) {
-        throw new Error('Original price must be non-negative');
-      }
-      return true;
-    }),
+  // body('originalPrice')
+  //   .optional()
+  //   .isDecimal()
+  //   .withMessage('Original price must be a decimal number')
+  //   .custom((value) => {
+  //     const num = parseFloat(value);
+  //     if (num < 0) {
+  //       throw new Error('Original price must be non-negative');
+  //     }
+  //     return true;
+  //   }),
   body('discountAmount')
     .optional()
     .isDecimal()

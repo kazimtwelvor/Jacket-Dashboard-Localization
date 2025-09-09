@@ -63,10 +63,10 @@ export async function POST(req: Request, { params }: { params: { storeId: string
         slug: true,
         focusKeyword: true,
         additionalKeywords: true,
-        noIndex: true,
+        // noIndex: true,
         brandName: true,
-        ratingValue: true,
-        reviewCount: true,
+        // ratingValue: true,
+        // reviewCount: true,
         // purchaseNote: true,
         images: {
           select: {
@@ -125,10 +125,10 @@ export async function POST(req: Request, { params }: { params: { storeId: string
         slug: originalProduct.slug ? `${originalProduct.slug}-copy` : null,
         focusKeyword: originalProduct.focusKeyword,
         additionalKeywords: originalProduct.additionalKeywords || [],
-        noIndex: originalProduct.noIndex,
+        // noIndex: originalProduct.noIndex,
         brandName: originalProduct.brandName,
-        ratingValue: originalProduct.ratingValue,
-        reviewCount: originalProduct.reviewCount,
+        // ratingValue: originalProduct.ratingValue,
+        // reviewCount: originalProduct.reviewCount,
         // purchaseNote: originalProduct.purchaseNote,
       },
     })

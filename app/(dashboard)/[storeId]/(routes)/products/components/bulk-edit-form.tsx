@@ -27,10 +27,10 @@ interface Color {
   value: string
 }
 
-interface ProductType {
-  id: string
-  name: string
-}
+// interface ProductType {
+//   id: string
+//   name: string
+// }
 
 interface StockStatus {
   id: string
@@ -41,7 +41,7 @@ interface BulkEditFormProps {
   categories: Category[]
   sizes: Size[]
   colors: Color[]
-  productTypes: ProductType[]
+  // productTypes: ProductType[]
   stockStatuses: StockStatus[]
   onSubmit: (data: any) => void
   loading: boolean
@@ -51,7 +51,7 @@ const formSchema = z.object({
   categoryId: z.string().optional(),
   sizeId: z.string().optional(),
   colorId: z.string().optional(),
-  productType: z.string().optional(),
+  // productType: z.string().optional(),
   price: z.string().optional(),
   salePrice: z.string().optional(),
   isFeatured: z.boolean().optional(),
@@ -66,7 +66,7 @@ export const BulkEditForm = ({
   categories,
   sizes,
   colors,
-  productTypes,
+  // productTypes,
   stockStatuses,
   onSubmit,
   loading,
@@ -75,7 +75,7 @@ export const BulkEditForm = ({
     category: false,
     size: false,
     color: false,
-    productType: false,
+    // productType: false,
     price: false,
     salePrice: false,
     isFeatured: false,
@@ -91,7 +91,7 @@ export const BulkEditForm = ({
       categoryId: "",
       sizeId: "",
       colorId: "",
-      productType: "",
+      // productType: "",
       price: "",
       salePrice: "",
       isFeatured: false,
@@ -118,9 +118,9 @@ export const BulkEditForm = ({
       dataToSubmit.colorId = values.colorId
     }
 
-    if (updateFields.productType && values.productType) {
-      dataToSubmit.productType = values.productType
-    }
+    // if (updateFields.productType && values.productType) {
+    //   dataToSubmit.productType = values.productType
+    // }
 
     if (updateFields.price && values.price) {
       dataToSubmit.price = values.price
@@ -284,7 +284,7 @@ export const BulkEditForm = ({
           </div>
         </div>
 
-        <div className="flex items-start space-x-2">
+        {/* <div className="flex items-start space-x-2">
           <Checkbox
             id="update-product-type"
             checked={updateFields.productType}
@@ -322,7 +322,7 @@ export const BulkEditForm = ({
               )}
             />
           </div>
-        </div>
+        </div> */}
 
         <div className="flex items-start space-x-2">
           <Checkbox

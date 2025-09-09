@@ -76,9 +76,9 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
         rowErrors.push("Sale price must be a number")
       }
 
-      if (row.originalPrice && isNaN(Number(row.originalPrice))) {
-        rowErrors.push("Original price must be a number")
-      }
+      // if (row.originalPrice && isNaN(Number(row.originalPrice))) {
+      //   rowErrors.push("Original price must be a number")
+      // }
 
       if (row.sku && !/^[a-zA-Z0-9-_]+$/.test(row.sku)) {
         rowErrors.push("SKU must contain only letters, numbers, hyphens, and underscores")
@@ -90,9 +90,9 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
         "isFeatured",
         "isDeleted",
         "isDiscounted",
-        "noIndex",
-        "isVirtual",
-        "isDownloadable",
+        // "noIndex",
+        // "isVirtual",
+        // "isDownloadable",
       ]
       booleanFields.forEach((field) => {
         if (
@@ -240,17 +240,17 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
             if (row.salePrice !== undefined) {
               updateData.salePrice = row.salePrice ? Number.parseFloat(row.salePrice) : null
             }
-            if (row.originalPrice !== undefined) {
-              updateData.originalPrice = row.originalPrice ? Number.parseFloat(row.originalPrice) : 0
-            }
+            // if (row.originalPrice !== undefined) {
+            //   updateData.originalPrice = row.originalPrice ? Number.parseFloat(row.originalPrice) : 0
+            // }
             if (row.isDiscounted !== undefined) updateData.isDiscounted = processBooleanField(row.isDiscounted)
 
             if (row.stockStatus !== undefined) updateData.stockStatus = row.stockStatus
 
             // if (row.purchaseNote !== undefined) updateData.purchaseNote = row.purchaseNote
-            if (row.productType !== undefined) updateData.productType = row.productType
-            if (row.isVirtual !== undefined) updateData.isVirtual = processBooleanField(row.isVirtual)
-            if (row.isDownloadable !== undefined) updateData.isDownloadable = processBooleanField(row.isDownloadable)
+            // if (row.productType !== undefined) updateData.productType = row.productType
+            // if (row.isVirtual !== undefined) updateData.isVirtual = processBooleanField(row.isVirtual)
+            // if (row.isDownloadable !== undefined) updateData.isDownloadable = processBooleanField(row.isDownloadable)
 
             try {
               if (row.colorDetailsJSON) {
@@ -316,10 +316,10 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
             if (row.metaTitle !== undefined) updateData.metaTitle = row.metaTitle
             if (row.metaDescription !== undefined) updateData.metaDescription = row.metaDescription
             if (row.slug !== undefined) updateData.slug = row.slug
-            if (row.noIndex !== undefined) updateData.noIndex = processBooleanField(row.noIndex)
+            // if (row.noIndex !== undefined) updateData.noIndex = processBooleanField(row.noIndex)
             if (row.brandName !== undefined) updateData.brandName = row.brandName
-            if (row.ratingValue !== undefined) updateData.ratingValue = row.ratingValue
-            if (row.reviewCount !== undefined) updateData.reviewCount = row.reviewCount
+            // if (row.ratingValue !== undefined) updateData.ratingValue = row.ratingValue
+            // if (row.reviewCount !== undefined) updateData.reviewCount = row.reviewCount
             if (row.schema !== undefined) updateData.schema = row.schema
             if (row.gender !== undefined) updateData.gender = row.gender
 
@@ -506,7 +506,7 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
                 price: Number.parseFloat(row.price),
                 description: row.description || "",
                 salePrice: row.salePrice ? Number.parseFloat(row.salePrice) : null,
-                originalPrice: row.originalPrice ? Number.parseFloat(row.originalPrice) : 0,
+                // originalPrice: row.originalPrice ? Number.parseFloat(row.originalPrice) : 0,
                 isPublished: processBooleanField(row.isPublished),
                 isArchived: processBooleanField(row.isArchived),
                 isFeatured: processBooleanField(row.isFeatured),
@@ -527,15 +527,15 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
                 metaTitle: row.metaTitle || null,
                 metaDescription: row.metaDescription || null,
                 slug: row.slug || null,
-                noIndex: processBooleanField(row.noIndex),
+                // noIndex: processBooleanField(row.noIndex),
                 brandName: row.brandName || null,
-                ratingValue: row.ratingValue || null,
-                reviewCount: row.reviewCount || null,
+                // ratingValue: row.ratingValue || null,
+                // reviewCount: row.reviewCount || null,
                 schema: row.schema || null,
                 // purchaseNote: row.purchaseNote || null,
-                productType: row.productType || "variable",
-                isVirtual: processBooleanField(row.isVirtual),
-                isDownloadable: processBooleanField(row.isDownloadable),
+                // productType: row.productType || "variable",
+                // isVirtual: processBooleanField(row.isVirtual),
+                // isDownloadable: processBooleanField(row.isDownloadable),
               },
             })
 

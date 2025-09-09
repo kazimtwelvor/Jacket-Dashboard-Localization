@@ -26,14 +26,14 @@ export interface Product {
   slug?: string
   focusKeyword?: string
   additionalKeywords?: string[]
-  noIndex?: boolean
+  // noIndex?: boolean
   brandName?: string
-  ratingValue?: string
-  reviewCount?: string
+  // ratingValue?: string
+  // reviewCount?: string
   schema?: string 
   // purchaseNote?: string
   menuOrder?: number
-  productType?: string
+  // productType?: string
   seoScore?: number
   productSizes?: ProductSize[]
   sizeDetails?: any
@@ -102,7 +102,7 @@ export interface ProductSEO {
   focusKeyword: string
   additionalKeywords: string[]
   isPillarContent: boolean
-  noIndex: boolean
+  // noIndex: boolean
   seoScore: number
   canonicalUrl: string
 }
@@ -119,8 +119,8 @@ export interface ProductFormValues {
   specifications: ProductSpecifications
   categories: ProductCategories
   brandName: string
-  ratingValue: string
-  reviewCount: string
+  // ratingValue: string
+  // reviewCount: string
   tags: string[]
   // purchaseNote: string
   menuOrder: string

@@ -27,17 +27,17 @@ export const validateCreateProduct = () => [
       }
       return true;
     }),
-  body('originalPrice')
-    .optional()
-    .isDecimal()
-    .withMessage('Original price must be a decimal number')
-    .custom((value) => {
-      const num = parseFloat(value);
-      if (num < 0) {
-        throw new Error('Original price must be non-negative');
-      }
-      return true;
-    }),
+  // body('originalPrice')
+  //   .optional()
+  //   .isDecimal()
+  //   .withMessage('Original price must be a decimal number')
+  //   .custom((value) => {
+  //     const num = parseFloat(value);
+  //     if (num < 0) {
+  //       throw new Error('Original price must be non-negative');
+  //     }
+  //     return true;
+  //   }),
   body('salePrice')
     .optional()
     .isDecimal()
@@ -78,10 +78,10 @@ export const validateCreateProduct = () => [
   // validateBoolean('isDownloadable'),
   // validateBoolean('isParentProduct'),
   // validateBoolean('noIndex'),
-  body('productType')
-    .optional()
-    .isIn(['simple', 'variable', 'grouped'])
-    .withMessage('Product type must be one of: simple, variable, grouped'),
+  // body('productType')
+  //   .optional()
+  //   .isIn(['simple', 'variable', 'grouped'])
+  //   .withMessage('Product type must be one of: simple, variable, grouped'),
   body('gender')
     .optional()
     .isIn(['men', 'women', 'unisex', 'kids'])
@@ -203,16 +203,16 @@ export const validateCreateProduct = () => [
     .isString()
     .isLength({ min: 1, max: 10000 })
     .withMessage('Schema must be between 1 and 10000 characters'),
-  body('ratingValue')
-    .optional()
-    .isString()
-    .isLength({ min: 1, max: 10 })
-    .withMessage('Rating value must be between 1 and 10 characters'),
-  body('reviewCount')
-    .optional()
-    .isString()
-    .isLength({ min: 1, max: 10 })
-    .withMessage('Review count must be between 1 and 10 characters')
+  // body('ratingValue')
+  //   .optional()
+  //   .isString()
+  //   .isLength({ min: 1, max: 10 })
+  //   .withMessage('Rating value must be between 1 and 10 characters'),
+  // body('reviewCount')
+  //   .optional()
+  //   .isString()
+  //   .isLength({ min: 1, max: 10 })
+  //   .withMessage('Review count must be between 1 and 10 characters')
 ];
 
 export const validateUpdateProduct = () => [
@@ -235,17 +235,17 @@ export const validateUpdateProduct = () => [
       }
       return true;
     }),
-  body('originalPrice')
-    .optional()
-    .isDecimal()
-    .withMessage('Original price must be a decimal number')
-    .custom((value) => {
-      const num = parseFloat(value);
-      if (num < 0) {
-        throw new Error('Original price must be non-negative');
-      }
-      return true;
-    }),
+  // body('originalPrice')
+  //   .optional()
+  //   .isDecimal()
+  //   .withMessage('Original price must be a decimal number')
+  //   .custom((value) => {
+  //     const num = parseFloat(value);
+  //     if (num < 0) {
+  //       throw new Error('Original price must be non-negative');
+  //     }
+  //     return true;
+  //   }),
   body('salePrice')
     .optional()
     .isDecimal()
@@ -287,10 +287,10 @@ export const validateUpdateProduct = () => [
   // validateBoolean('isDownloadable'),
   // validateBoolean('isParentProduct'),
   // validateBoolean('noIndex'),
-  body('productType')
-    .optional()
-    .isIn(['simple', 'variable', 'grouped'])
-    .withMessage('Product type must be one of: simple, variable, grouped'),
+  // body('productType')
+  //   .optional()
+  //   .isIn(['simple', 'variable', 'grouped'])
+  //   .withMessage('Product type must be one of: simple, variable, grouped'),
   body('gender')
     .optional()
     .isIn(['men', 'women', 'unisex', 'kids'])
@@ -412,16 +412,16 @@ export const validateUpdateProduct = () => [
     .isString()
     .isLength({ min: 1, max: 10000 })
     .withMessage('Schema must be between 1 and 10000 characters'),
-  body('ratingValue')
-    .optional()
-    .isString()
-    .isLength({ min: 1, max: 10 })
-    .withMessage('Rating value must be between 1 and 10 characters'),
-  body('reviewCount')
-    .optional()
-    .isString()
-    .isLength({ min: 1, max: 10 })
-    .withMessage('Review count must be between 1 and 10 characters')
+  // body('ratingValue')
+  //   .optional()
+  //   .isString()
+  //   .isLength({ min: 1, max: 10 })
+  //   .withMessage('Rating value must be between 1 and 10 characters'),
+  // body('reviewCount')
+  //   .optional()
+  //   .isString()
+  //   .isLength({ min: 1, max: 10 })
+  //   .withMessage('Review count must be between 1 and 10 characters')
 ];
 
 export const validateGetProduct = () => [
@@ -467,10 +467,10 @@ export const validateGetProducts = () => [
     .optional()
     .isIn(['men', 'women', 'unisex', 'kids'])
     .withMessage('Gender must be one of: men, women, unisex, kids'),
-  query('productType')
-    .optional()
-    .isIn(['simple', 'variable', 'grouped'])
-    .withMessage('Product type must be one of: simple, variable, grouped'),
+  // query('productType')
+  //   .optional()
+  //   .isIn(['simple', 'variable', 'grouped'])
+  //   .withMessage('Product type must be one of: simple, variable, grouped'),
   query('minPrice')
     .optional()
     .isDecimal()

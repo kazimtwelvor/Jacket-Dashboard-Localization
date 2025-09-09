@@ -97,7 +97,7 @@ export async function GET(req: NextRequest, { params }: { params: { storeId: str
         // Additional fields
         // purchaseNote: "Thank you for your purchase!",
         // productType: "variable", // simple, variable, grouped, etc.
-        isVirtual: "No",
+        // isVirtual: "No",
         isDownloadable: "No",
 
         // Image placeholders

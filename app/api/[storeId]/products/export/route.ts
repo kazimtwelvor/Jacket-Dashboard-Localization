@@ -98,7 +98,7 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
 
           // productType: product.productType || "variable",
 
-          isVirtual: product.isVirtual ? "Yes" : "No",
+          // isVirtual: product.isVirtual ? "Yes" : "No",
           isDownloadable: product.isDownloadable ? "Yes" : "No",
 
           // purchaseNote: product.purchaseNote || "",

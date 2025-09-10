@@ -12,7 +12,6 @@ import { toast } from "react-hot-toast"
 import { Trash } from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
 import { format } from "date-fns"
-
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Separator } from "@/components/ui/separator"
@@ -70,14 +69,11 @@ interface OrderFormProps {
   storeUsers: any[]
 }
 
-// Helper function to normalize payment method
 const normalizePaymentMethod = (method: string | null | undefined): string => {
   if (!method) return ""
 
-  // Convert to lowercase
   const lowercaseMethod = method.toLowerCase()
 
-  // Handle specific cases
   if (lowercaseMethod === "stripe" || lowercaseMethod === "STRIPE") {
     return "stripe"
   }
@@ -97,8 +93,6 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
   const description = initialData ? "Edit order details" : "Create a new order"
   const toastMessage = initialData ? "Order updated." : "Order created."
   const action = initialData ? "Save changes" : "Create"
-
-  // Normalize payment method from initialData
   const normalizedPaymentMethod = normalizePaymentMethod(initialData?.paymentMethod)
 
 
@@ -169,14 +163,12 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
     defaultValues,
   })
 
-  // This effect ensures the form is updated if initialData changes
   useEffect(() => {
     if (initialData) {
       const normalizedPaymentMethod = normalizePaymentMethod(initialData.paymentMethod)
 
       form.setValue("paymentMethod", normalizedPaymentMethod)
 
-      // Set other fields as needed
       form.setValue("userId", initialData.userId || "")
       form.setValue("customerEmail", initialData.customerEmail || "")
       form.setValue("isPaid", initialData.isPaid || false)
@@ -190,20 +182,16 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
     try {
       setLoading(true)
 
-      // Calculate total from order items
       const subtotal = orderItems.reduce((acc: number, item: any) => {
         return acc + Number.parseFloat(String(item.price)) * item.quantity
       }, 0)
 
       const total = subtotal + data.shippingCost + data.tax - data.discount
-
-      // Prepare order items data
       const formattedOrderItems = orderItems.map((item: any) => ({
         id: item.id,
         productId: item.productId || item.product.id,
         quantity: item.quantity,
         price: Number.parseFloat(String(item.price)),
-        // originalPrice: Number.parseFloat(String(item.originalPrice || item.price)),
         discountAmount: Number.parseFloat(String(item.discountAmount || 0)),
         total: Number.parseFloat(String(item.price)) * item.quantity,
         sizeIds: item.sizeIds || [],
@@ -215,14 +203,12 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
       }))
 
       if (initialData) {
-        // Update existing order
         await axios.patch(`/api/${params.storeId}/orders/${params.orderId}`, {
           ...data,
           total,
           orderItems: formattedOrderItems,
         })
       } else {
-        // Create new order
         const response = await axios.post(`/api/${params.storeId}/orders`, {
           ...data,
           total,
@@ -263,7 +249,6 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
         productId: product.id,
         quantity: 1,
         price: Number.parseFloat(String(product.price)),
-        // originalPrice: Number.parseFloat(String(product.price)),
         discountAmount: 0,
         sizeIds: [],
         colorIds: [],
@@ -286,7 +271,6 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
     setOrderItems(newOrderItems)
   }
 
-  // Calculate order summary
   const subtotal = orderItems.reduce((acc: number, item: any) => {
     return acc + Number.parseFloat(String(item.price)) * item.quantity
   }, 0)

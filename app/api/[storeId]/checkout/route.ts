@@ -23,7 +23,12 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       address,
       billingAddress,
       shippingAddress,
-      embedded = false, // New parameter to determine if we should use embedded checkout
+      state,
+      country,
+      zipCode,
+      city,
+      customerName,
+      embedded = false, 
     } = await req.json()
     const { storeId } = params
 
@@ -121,10 +126,14 @@ export async function POST(req: Request, { params }: { params: { storeId: string
           address: address || "",
           billingAddress: billingAddress || null,
           shippingAddress: shippingAddress || null,
+          city: city || null,
+          country: country || null,
+          state: state || null,
+          zipCode: zipCode || null,
+          customerName: customerName || null,
         },
       })
 
-      // For embedded checkout, create a payment intent instead of a checkout session
       if (embedded) {
         // Create a PaymentIntent
         const paymentIntent = await stripe.paymentIntents.create({

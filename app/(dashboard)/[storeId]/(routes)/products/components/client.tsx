@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { Plus, Package, BarChart3, List, Filter, Search, X, CheckCircle, Users, Upload, RefreshCw } from "lucide-react"
+import { Plus, Package, BarChart3, List, Filter, Search, X, CheckCircle, Users, Upload, RefreshCw, Download, FileText, File } from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 import { toast } from "react-hot-toast"
@@ -14,6 +14,12 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
   Pagination,
   PaginationContent,
@@ -49,6 +55,7 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
   const [isSearching, setIsSearching] = useState(false)
   const [searchResults, setSearchResults] = useState<ProductColumn[]>([])
   const [isSearchActive, setIsSearchActive] = useState(false)
+  const [isExporting, setIsExporting] = useState(false)
 
   const publishedProducts = data.filter((product) => product.isPublished && !product.isArchived)
   const archivedProducts = data.filter((product) => product.isArchived)
@@ -196,6 +203,42 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
       toast.error(error instanceof Error ? error.message : "Failed to bulk publish products")
     } finally {
       setIsBulkPublishing(false)
+    }
+  }
+
+  const handleExport = async (format: 'csv' | 'xlsx') => {
+    try {
+      setIsExporting(true)
+      toast.loading(`Preparing ${format.toUpperCase()} export...`)
+
+      const response = await fetch(`/api/${storeId}/products/export?format=${format}`)
+      
+      if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(errorText || `Failed to export ${format.toUpperCase()}`)
+      }
+
+      // Create download
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      
+      const filename = `products-export-${new Date().toISOString().split('T')[0]}.${format}`
+      link.download = filename
+      
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+
+      toast.dismiss()
+      toast.success(`Products exported successfully as ${format.toUpperCase()}`)
+    } catch (error) {
+      toast.dismiss()
+      toast.error(error instanceof Error ? error.message : `Failed to export ${format.toUpperCase()}`)
+    } finally {
+      setIsExporting(false)
     }
   }
 
@@ -438,6 +481,37 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
               <CardDescription>Manage your store products</CardDescription>
             </div>
             <div className="flex items-center gap-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    disabled={isExporting || data.length === 0}
+                    className="border-purple-200 dark:border-purple-800 hover:bg-purple-50 dark:hover:bg-purple-950 hover:border-purple-300 dark:hover:border-purple-700 text-purple-700 dark:text-purple-300"
+                  >
+                    {isExporting ? (
+                      <>
+                        <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                        Exporting...
+                      </>
+                    ) : (
+                      <>
+                        <Download className="mr-2 h-4 w-4" />
+                        Export
+                      </>
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => handleExport('csv')} disabled={isExporting}>
+                    <FileText className="mr-2 h-4 w-4" />
+                    Export as CSV
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleExport('xlsx')} disabled={isExporting}>
+                    <File className="mr-2 h-4 w-4" />
+                    Export as XLSX
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               {isOwner && (
                 <TooltipProvider>
                   <Tooltip>

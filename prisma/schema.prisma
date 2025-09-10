@@ -171,7 +171,7 @@ model StoreUser {
   resetToken     String?
   resetTokenExp  DateTime?
   lastLogin      DateTime?
-  orders         Order[]  @relation("UserToOrder")
+ // orders         Order[]  @relation("UserToOrder")
   
   @@index([storeId])
 }
@@ -520,8 +520,8 @@ model Order {
   id                 String      @id @default(cuid())
   storeId            String
   store              Store       @relation("StoreToOrder", fields: [storeId], references: [id])
-  userId             String?
-  user               StoreUser?  @relation("UserToOrder", fields: [userId], references: [id], onDelete: SetNull)
+ // userId             String?
+ // user               StoreUser?  @relation("UserToOrder", fields: [userId], references: [id], onDelete: SetNull)
   orderItems         OrderItem[]
   isPaid             Boolean     @default(false)
   phone              String      @default("")
@@ -530,13 +530,12 @@ model Order {
   paymentMethod      String?
   shippingMethod     String?
   shippingCost       Decimal?    @default(0)
-  tax                Decimal?    @default(0)
+ // tax                Decimal?    @default(0)
   discount           Decimal?    @default(0)
   total              Decimal?
   notes              String?     @db.Text
-  trackingNumber     String?
+ // trackingNumber     String?
   
-  // Additional customer fields
   customerName       String?
   customerEmail      String?
   billingAddress     String?     @db.Text
@@ -546,29 +545,25 @@ model Order {
   state              String?
   zipCode            String?
   
-  // Order fulfillment tracking
-  fulfillmentStatus  String?     @default("pending") // pending, processing, shipped, delivered
+  // fulfillmentStatus  String?     @default("pending") // pending, processing, shipped, delivered
   estimatedDelivery  DateTime?
   actualDelivery     DateTime?
   
-  // Payment details
-  transactionId      String?
+//  transactionId      String?
   paymentStatus      String?     @default("pending") // pending, completed, failed, refunded
   
-  // Credit card details (for credit_card payment method)
-  cardNumber         String?
-  expirationDate     String?     // MM/YY format
-  securityCode       String?     // CVC
-  cardCountry        String?
+//  cardNumber         String?
+//  expirationDate     String?     // MM/YY format
+//  securityCode       String?     // CVC
+// cardCountry        String?
   
-  // Timestamps
   createdAt          DateTime    @default(now())
   updatedAt          DateTime    @updatedAt
 
   @@index([storeId])
-  @@index([userId])
   @@index([status])
-  @@index([transactionId])
+ // @@index([userId])
+ // @@index([transactionId])
 }
 
 enum OrderStatus {

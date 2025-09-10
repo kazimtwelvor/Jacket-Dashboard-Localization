@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { Plus, Package, BarChart3, List, Filter, Search, X, CheckCircle, Users, Upload, RefreshCw, Download, FileText, File } from "lucide-react"
+import { Plus, Package, BarChart3, List, Filter, Search, X, CheckCircle, Users, Upload, RefreshCw, Download, FileText, File, Upload as UploadIcon } from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 import { toast } from "react-hot-toast"
@@ -20,6 +20,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
 import {
   Pagination,
   PaginationContent,
@@ -56,6 +67,11 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
   const [searchResults, setSearchResults] = useState<ProductColumn[]>([])
   const [isSearchActive, setIsSearchActive] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
+  const [isImporting, setIsImporting] = useState(false)
+  const [importDialogOpen, setImportDialogOpen] = useState(false)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [updateExisting, setUpdateExisting] = useState(false)
+  const [validateOnly, setValidateOnly] = useState(false)
 
   const publishedProducts = data.filter((product) => product.isPublished && !product.isArchived)
   const archivedProducts = data.filter((product) => product.isArchived)
@@ -240,6 +256,78 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
     } finally {
       setIsExporting(false)
     }
+  }
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      const fileName = file.name.toLowerCase()
+      if (!fileName.endsWith('.csv') && !fileName.endsWith('.xlsx')) {
+        toast.error('Please select a CSV or XLSX file')
+        return
+      }
+      setSelectedFile(file)
+    }
+  }
+
+  const handleImport = async () => {
+    if (!selectedFile) {
+      toast.error('Please select a file to import')
+      return
+    }
+
+    try {
+      setIsImporting(true)
+      toast.loading('Importing products...')
+
+      const formData = new FormData()
+      formData.append('file', selectedFile)
+      formData.append('updateExisting', updateExisting.toString())
+      formData.append('validateOnly', validateOnly.toString())
+
+      const response = await fetch(`/api/${storeId}/products/import-v2`, {
+        method: 'POST',
+        body: formData,
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Import failed')
+      }
+
+      toast.dismiss()
+      
+      if (validateOnly) {
+        toast.success(`Validation complete. ${result.validRows} valid rows, ${result.errors?.length || 0} errors found.`)
+        if (result.errors && result.errors.length > 0) {
+          console.log('Validation errors:', result.errors)
+        }
+      } else {
+        toast.success(result.message || 'Products imported successfully')
+        router.refresh()
+      }
+
+      // Reset form
+      setSelectedFile(null)
+      setUpdateExisting(false)
+      setValidateOnly(false)
+      setImportDialogOpen(false)
+    } catch (error) {
+      toast.dismiss()
+      toast.error(error instanceof Error ? error.message : 'Import failed')
+    } finally {
+      setIsImporting(false)
+    }
+  }
+
+  const downloadTemplate = (format: 'csv' | 'xlsx') => {
+    const link = document.createElement('a')
+    link.href = `/import-templates/products-import-template.${format}`
+    link.download = `products-import-template.${format}`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
   }
 
   const handleItemsPerPageChange = (value: string) => {
@@ -512,6 +600,139 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              
+              <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    disabled={isImporting}
+                    className="border-green-200 dark:border-green-800 hover:bg-green-50 dark:hover:bg-green-950 hover:border-green-300 dark:hover:border-green-700 text-green-700 dark:text-green-300"
+                  >
+                    {isImporting ? (
+                      <>
+                        <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                        Importing...
+                      </>
+                    ) : (
+                      <>
+                        <UploadIcon className="mr-2 h-4 w-4" />
+                        Import
+                      </>
+                    )}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[500px]">
+                  <DialogHeader>
+                    <DialogTitle>Import Products</DialogTitle>
+                    <DialogDescription>
+                      Upload a CSV or XLSX file to import products. Download a template to see the required format.
+                    </DialogDescription>
+                  </DialogHeader>
+                  
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="file">Select File</Label>
+                      <Input
+                        id="file"
+                        type="file"
+                        accept=".csv,.xlsx"
+                        onChange={handleFileSelect}
+                        disabled={isImporting}
+                      />
+                      {selectedFile && (
+                        <p className="text-sm text-muted-foreground">
+                          Selected: {selectedFile.name}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="updateExisting"
+                          checked={updateExisting}
+                          onCheckedChange={(checked) => setUpdateExisting(checked === true)}
+                          disabled={isImporting}
+                        />
+                        <Label htmlFor="updateExisting" className="text-sm">
+                          Update existing products (by SKU)
+                        </Label>
+                      </div>
+                      
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="validateOnly"
+                          checked={validateOnly}
+                          onCheckedChange={(checked) => setValidateOnly(checked === true)}
+                          disabled={isImporting}
+                        />
+                        <Label htmlFor="validateOnly" className="text-sm">
+                          Validate only (don't import)
+                        </Label>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Download Template</Label>
+                      <div className="flex flex-wrap gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => downloadTemplate('csv')}
+                          disabled={isImporting}
+                        >
+                          <FileText className="mr-2 h-4 w-4" />
+                          CSV (Full)
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const link = document.createElement('a')
+                            link.href = '/import-templates/products-import-template-simple.csv'
+                            link.download = 'products-import-template-simple.csv'
+                            document.body.appendChild(link)
+                            link.click()
+                            document.body.removeChild(link)
+                          }}
+                          disabled={isImporting}
+                        >
+                          <FileText className="mr-2 h-4 w-4" />
+                          CSV (Simple)
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => downloadTemplate('xlsx')}
+                          disabled={isImporting}
+                        >
+                          <File className="mr-2 h-4 w-4" />
+                          XLSX
+                        </Button>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Use "CSV (Simple)" for basic imports, "CSV (Full)" or "XLSX" for advanced features
+                      </p>
+                    </div>
+                  </div>
+
+                  <DialogFooter>
+                    <Button
+                      variant="outline"
+                      onClick={() => setImportDialogOpen(false)}
+                      disabled={isImporting}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleImport}
+                      disabled={!selectedFile || isImporting}
+                    >
+                      {validateOnly ? 'Validate' : 'Import'} Products
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
               {isOwner && (
                 <TooltipProvider>
                   <Tooltip>

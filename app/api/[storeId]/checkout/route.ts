@@ -26,17 +26,17 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       state,
       country,
       zipCode,
+      estimatedDelivery,
+      actualDelivery,
       city,
       customerName,
+      notes,
       embedded = false, 
     } = await req.json()
     const { storeId } = params
-
     if (!productIds || productIds.length === 0) {
       return new NextResponse("Product ids are required", { status: 400 })
     }
-
-    // Get store settings including payment configuration
     const store = await prismadb.store.findUnique({
       where: {
         id: storeId,
@@ -82,10 +82,8 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       },
     })
 
-    // Calculate total price once for all payment methods
     const totalPrice = products.reduce((sum, product) => sum + Number(product.price), 0)
 
-    // Create order data common to all payment methods
     const orderData = {
       storeId: storeId,
       isPaid: false,
@@ -131,6 +129,9 @@ export async function POST(req: Request, { params }: { params: { storeId: string
           state: state || null,
           zipCode: zipCode || null,
           customerName: customerName || null,
+          notes: notes || null,
+          estimatedDelivery: estimatedDelivery ? new Date(estimatedDelivery) : null,
+          actualDelivery: actualDelivery ? new Date(actualDelivery) : null,
         },
       })
 

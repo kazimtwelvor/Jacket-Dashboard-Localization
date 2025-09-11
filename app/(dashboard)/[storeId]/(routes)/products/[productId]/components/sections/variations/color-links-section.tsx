@@ -41,6 +41,7 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
   const [parentProducts, setParentProducts] = useState<Product[]>([])
   const [parentSearchTerm, setParentSearchTerm] = useState<string>("")
   const [selectedParentProduct, setSelectedParentProduct] = useState<Product | null>(null)
+  const [dropdownPositions, setDropdownPositions] = useState<Record<string, {top: number, left: number}>>({})
 
 
   useEffect(() => {
@@ -125,20 +126,40 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
     }
 
     const handleScroll = (event: Event) => {
+      const hasOpenDropdown = Object.values(showDropdown).some(isOpen => isOpen)
+      if (!hasOpenDropdown) return
+
+      const target = event.target as Element
+      
       const isScrollingInsideDropdown = Object.values(dropdownRefs.current).some(ref =>
-        ref && ref.contains(event.target as Node)
+        ref && ref.contains(target)
       )
 
-      if (!isScrollingInsideDropdown) {
+      const isDropdownElement = target?.closest('[data-dropdown="true"]')
+      
+      const isDropdownScrollArea = target?.classList.contains('dropdown-scroll-area') ||
+                                   target?.closest('.dropdown-scroll-area')
+
+      if (!isScrollingInsideDropdown && !isDropdownElement && !isDropdownScrollArea) {
+        setShowDropdown({})
+      }
+    }
+
+    const handleWindowScroll = () => {
+      const hasOpenDropdown = Object.values(showDropdown).some(isOpen => isOpen)
+      if (hasOpenDropdown) {
         setShowDropdown({})
       }
     }
 
     document.addEventListener('click', handleClickOutside)
     document.addEventListener('scroll', handleScroll, true)
+    window.addEventListener('scroll', handleWindowScroll, { passive: true })
+    
     return () => {
       document.removeEventListener('click', handleClickOutside)
       document.removeEventListener('scroll', handleScroll, true)
+      window.removeEventListener('scroll', handleWindowScroll)
     }
   }, [showDropdown])
 
@@ -153,12 +174,12 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
 
   const getFilteredProducts = (color: string) => {
     const term = searchTerms[color] || ""
-    if (!term) return products.slice(0, 10)
+    if (!term) return products
 
     return products.filter(p =>
       p.name?.toLowerCase().includes(term.toLowerCase()) ||
       p.sku?.toLowerCase().includes(term.toLowerCase())
-    ).slice(0, 10)
+    )
   }
 
   const fetchParentColorLinks = async (parentProductId: string) => {
@@ -193,6 +214,20 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
     const newLinks = { ...colorLinks, [color]: value }
     setColorLinks(newLinks)
     form.setValue("categories.colorVariationLinks", newLinks, { shouldDirty: true })
+  }
+
+  const updateDropdownPosition = (key: string) => {
+    const button = buttonRefs.current[key]
+    if (button) {
+      const rect = button.getBoundingClientRect()
+      setDropdownPositions(prev => ({
+        ...prev,
+        [key]: {
+          top: rect.bottom + 8,
+          left: rect.left
+        }
+      }))
+    }
   }
 
   const copyLink = (color: string, link: string) => {
@@ -248,17 +283,21 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
                 size="sm"
                 className="h-10 px-3"
                 type="button"
-                onClick={() => setShowDropdown(prev => ({ ...prev, parent: !prev.parent }))}
+                onClick={() => {
+                  updateDropdownPosition('parent')
+                  setShowDropdown(prev => ({ ...prev, parent: !prev.parent }))
+                }}
               >
                 <Search className="h-4 w-4" />
               </Button>
               {showDropdown['parent'] && typeof window !== 'undefined' && createPortal(
                 <div
+                  data-dropdown="true"
                   className="fixed w-96 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-[9999]"
                   style={{
                     maxHeight: '300px',
-                    top: buttonRefs.current['parent'] ? buttonRefs.current['parent']!.getBoundingClientRect().bottom + 8 : 0,
-                    left: buttonRefs.current['parent'] ? buttonRefs.current['parent']!.getBoundingClientRect().left : 0
+                    top: dropdownPositions['parent']?.top || 0,
+                    left: dropdownPositions['parent']?.left || 0
                   }}
                   ref={el => { dropdownRefs.current['parent'] = el }}
                   onClick={(e) => e.stopPropagation()}
@@ -275,8 +314,11 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
                         className="pl-10 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                     </div>
-                    <div className="max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
-                      {parentProducts.map((product) => (
+                            <div 
+                              className="max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 dropdown-scroll-area"
+                              onScroll={(e) => e.stopPropagation()}
+                            >
+                              {parentProducts.map((product) => (
                         <div
                           key={product.id}
                           onClick={() => {
@@ -399,17 +441,21 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
                         className="h-10 px-3"
                         type="button"
                         disabled={!!selectedParentProduct}
-                        onClick={() => setShowDropdown(prev => ({ ...prev, [color]: !prev[color] }))}
+                        onClick={() => {
+                          updateDropdownPosition(color)
+                          setShowDropdown(prev => ({ ...prev, [color]: !prev[color] }))
+                        }}
                       >
                         <Search className="h-4 w-4" />
                       </Button>
                       {showDropdown[color] && typeof window !== 'undefined' && createPortal(
                         <div
+                          data-dropdown="true"
                           className="fixed w-96 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-[9999]"
                           style={{
                             maxHeight: '300px',
-                            top: buttonRefs.current[color] ? buttonRefs.current[color]!.getBoundingClientRect().bottom + 8 : 0,
-                            left: buttonRefs.current[color] ? buttonRefs.current[color]!.getBoundingClientRect().left : 0
+                            top: dropdownPositions[color]?.top || 0,
+                            left: dropdownPositions[color]?.left || 0
                           }}
                           ref={el => { dropdownRefs.current[color] = el }}
                           onClick={(e) => e.stopPropagation()}
@@ -426,7 +472,10 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
                                 className="pl-10 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                               />
                             </div>
-                            <div className="max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
+                            <div 
+                              className="max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 dropdown-scroll-area"
+                              onScroll={(e) => e.stopPropagation()}
+                            >
                               {getFilteredProducts(color).map((product) => (
                                 <div
                                   key={product.id}

@@ -24,7 +24,7 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
         storeId: params.storeId,
         ...(status && { status: status as any }),
         ...(paymentStatus && { paymentStatus }),
-        ...(fulfillmentStatus && { fulfillmentStatus }),
+        // ...(fulfillmentStatus && { fulfillmentStatus }),
         ...(customerId && { userId: customerId }),
       },
       include: {
@@ -51,7 +51,7 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
         storeId: params.storeId,
         ...(status && { status: status as any }),
         ...(paymentStatus && { paymentStatus }),
-        ...(fulfillmentStatus && { fulfillmentStatus }),
+        // ...(fulfillmentStatus && { fulfillmentStatus }),
         ...(customerId && { userId: customerId }),
       },
     })
@@ -59,10 +59,10 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
     const serializedOrders = orders.map(order => ({
       ...order,
       shippingCost: Number(order.shippingCost),
-      tax: Number(order.tax),
+      // tax: Number(order.tax),
       discount: Number(order.discount),
       total: Number(order.total),
-      orderItems: order.orderItems.map(item => ({
+      orderItems: order?.orderItems?.map(item => ({
         ...item,
         price: Number(item.price),
         // originalPrice: Number(item.originalPrice),
@@ -99,11 +99,11 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       paymentMethod,
       shippingMethod,
       shippingCost,
-      tax,
+      // tax,
       discount,
       total,
       notes,
-      trackingNumber,
+      // trackingNumber,
       customerEmail,
       billingAddress,
       shippingAddress,
@@ -111,15 +111,15 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       country,
       state,
       zipCode,
-      fulfillmentStatus,
-      estimatedDelivery,
-      actualDelivery,
+      // fulfillmentStatus,
+      // estimatedDelivery,
+      // actualDelivery,
       transactionId,
       paymentStatus,
-      cardNumber,
-      expirationDate,
-      securityCode,
-      cardCountry,
+      // cardNumber,
+      // expirationDate,
+      // securityCode,
+      // cardCountry,
     } = body
 
     if (!userId) {
@@ -187,11 +187,11 @@ export async function POST(req: Request, { params }: { params: { storeId: string
         paymentMethod: paymentMethod ? paymentMethod.toUpperCase() : null,
         shippingMethod: shippingMethod || null,
         shippingCost: shippingCost || 0,
-        tax: tax || 0,
+        // tax: tax || 0,
         discount: discount || 0,
         total: total || 0,
         notes: notes || null,
-        trackingNumber: trackingNumber || null,
+        // trackingNumber: trackingNumber || null,
         customerEmail: customerEmail || null,
         billingAddress: billingAddress || null,
         shippingAddress: shippingAddress || null,
@@ -199,15 +199,15 @@ export async function POST(req: Request, { params }: { params: { storeId: string
         country: country || null,
         state: state || null,
         zipCode: zipCode || null,
-        fulfillmentStatus: fulfillmentStatus || "pending",
-        estimatedDelivery: estimatedDelivery ? new Date(estimatedDelivery) : null,
-        actualDelivery: actualDelivery ? new Date(actualDelivery) : null,
+        // fulfillmentStatus: fulfillmentStatus || "pending",
+        // estimatedDelivery: estimatedDelivery ? new Date(estimatedDelivery) : null,
+        // actualDelivery: actualDelivery ? new Date(actualDelivery) : null,
         transactionId: transactionId || null,
         paymentStatus: paymentStatus || "pending",
-        cardNumber: cardNumber || null,
-        expirationDate: expirationDate || null,
-        securityCode: securityCode || null,
-        cardCountry: cardCountry || null,
+        // cardNumber: cardNumber || null,
+        // expirationDate: expirationDate || null,
+        // securityCode: securityCode || null,
+        // cardCountry: cardCountry || null,
         orderItems: {
           createMany: {
             data: orderItems.map((item: any) => ({
@@ -235,7 +235,7 @@ export async function POST(req: Request, { params }: { params: { storeId: string
     const serializedOrder = {
       ...order,
       shippingCost: Number(order.shippingCost),
-      tax: Number(order.tax),
+      // tax: Number(order.tax),
       discount: Number(order.discount),
       total: Number(order.total),
       orderItems: order.orderItems.map(item => ({
@@ -249,6 +249,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
 
     return NextResponse.json(serializedOrder)
   } catch (error) {
-    return new NextResponse("Internal error", { status: 500 })
+    return new NextResponse(`Internal error: ${error.message}`, { status: 500 })
   }
 }

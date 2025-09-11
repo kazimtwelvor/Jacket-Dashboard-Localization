@@ -18,7 +18,7 @@ interface NewOrderNotificationEmailProps {
   orderItems: OrderItem[]
   subtotal: number
   shipping: number
-  tax: number
+  // tax: number
   total: number
   shippingAddress: {
     line1: string
@@ -42,7 +42,7 @@ export const NewOrderNotificationEmail = ({
   orderItems,
   subtotal,
   shipping,
-  tax,
+  // tax,
   total,
   shippingAddress,
   paymentMethod,
@@ -123,9 +123,9 @@ export const NewOrderNotificationEmail = ({
             <Column className="w-4/5 text-right">
               <Text className="text-base">Tax:</Text>
             </Column>
-            <Column className="w-1/5 text-right">
+            {/* <Column className="w-1/5 text-right">
               <Text className="text-base">${tax.toFixed(2)}</Text>
-            </Column>
+            </Column> */}
           </Row>
           <Row>
             <Column className="w-4/5 text-right">

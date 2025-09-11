@@ -26,8 +26,8 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       state,
       country,
       zipCode,
-      estimatedDelivery,
-      actualDelivery,
+      // estimatedDelivery,
+      // actualDelivery,
       city,
       customerName,
       notes,
@@ -130,8 +130,8 @@ export async function POST(req: Request, { params }: { params: { storeId: string
           zipCode: zipCode || null,
           customerName: customerName || null,
           notes: notes || null,
-          estimatedDelivery: estimatedDelivery ? new Date(estimatedDelivery) : null,
-          actualDelivery: actualDelivery ? new Date(actualDelivery) : null,
+          // estimatedDelivery: estimatedDelivery ? new Date(estimatedDelivery) : null,
+          // actualDelivery: actualDelivery ? new Date(actualDelivery) : null,
         },
       })
 

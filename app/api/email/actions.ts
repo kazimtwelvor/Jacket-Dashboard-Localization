@@ -43,7 +43,7 @@ export async function sendOrderConfirmationEmail(orderId: string) {
 
     const subtotal = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
     const shipping = Number.parseFloat(order.shippingFee?.toString() || "0")
-    const tax = Number.parseFloat(order.taxAmount?.toString() || "0")
+    // const tax = Number.parseFloat(order.taxAmount?.toString() || "0")
     const total = Number.parseFloat(order.totalPrice.toString())
 
     const result = await queueEmail({
@@ -66,7 +66,7 @@ export async function sendOrderConfirmationEmail(orderId: string) {
           country: order.country || "",
         },
         paymentMethod: order.paymentMethod || "Credit Card",
-        estimatedDelivery: "3-5 business days",
+        // estimatedDelivery: "3-5 business days",
         storeName: store.name,
         storeLogoUrl: store.logoUrl || undefined,
         storeUrl: process.env.NEXT_PUBLIC_APP_URL || "https://yourstore.com",
@@ -202,10 +202,10 @@ export async function sendWelcomeEmail(userId: string, storeId: string) {
 export async function sendShippingUpdateEmail(
   orderId: string,
   trackingInfo: {
-    trackingNumber: string
+    // trackingNumber: string
     trackingUrl: string
     carrier: string
-    estimatedDelivery?: string
+    // estimatedDelivery?: string
   },
 ) {
   try {
@@ -231,10 +231,10 @@ export async function sendShippingUpdateEmail(
         customerName: order.name,
         customerEmail: order.email,
         orderNumber: order.orderNumber || order.id,
-        trackingNumber: trackingInfo.trackingNumber,
+        // trackingNumber: trackingInfo.trackingNumber,
         trackingUrl: trackingInfo.trackingUrl,
         carrier: trackingInfo.carrier,
-        estimatedDelivery: trackingInfo.estimatedDelivery,
+        // estimatedDelivery: trackingInfo.estimatedDelivery,
         shippingAddress: {
           line1: order.address || "",
           city: order.city || "",

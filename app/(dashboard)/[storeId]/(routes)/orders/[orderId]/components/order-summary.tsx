@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator"
 interface OrderSummaryProps {
   subtotal: number
   shippingCost: number
-  tax: number
+  // tax: number
   discount: number
   total: number
 }
@@ -31,7 +31,7 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({ subtotal, shippingCo
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Tax</span>
-            <span>${tax.toFixed(2)}</span>
+            {/* <span>${tax.toFixed(2)}</span> */}
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Discount</span>

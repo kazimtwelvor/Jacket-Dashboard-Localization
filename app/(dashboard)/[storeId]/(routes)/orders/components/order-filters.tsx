@@ -10,7 +10,7 @@ interface OrderFiltersProps {
   filters: {
     status: string
     paymentStatus: string
-    fulfillmentStatus: string
+    // fulfillmentStatus: string
   }
   onFilterChange: (filterType: string, value: string) => void
   onResetFilters: () => void
@@ -53,7 +53,7 @@ export const OrderFilters: React.FC<OrderFiltersProps> = ({ filters, onFilterCha
         </Select>
       </div>
 
-      <div className="flex flex-col gap-1">
+      {/* <div className="flex flex-col gap-1">
         <span className="text-sm font-medium">Fulfillment Status</span>
         <Select value={filters.fulfillmentStatus} onValueChange={(value) => onFilterChange("fulfillmentStatus", value)}>
           <SelectTrigger className="w-[180px]">
@@ -67,7 +67,7 @@ export const OrderFilters: React.FC<OrderFiltersProps> = ({ filters, onFilterCha
             <SelectItem value="delivered">Delivered</SelectItem>
           </SelectContent>
         </Select>
-      </div>
+      </div> */}
 
       <Button variant="outline" size="sm" onClick={onResetFilters} className="ml-auto mt-auto">
         <RefreshCw className="mr-2 h-4 w-4" />

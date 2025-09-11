@@ -7,7 +7,7 @@ interface ShippingUpdateEmailProps {
   trackingNumber: string
   trackingUrl: string
   carrier: string
-  estimatedDelivery?: string
+  // estimatedDelivery?: string
   shippingAddress: {
     line1: string
     line2?: string
@@ -24,10 +24,10 @@ interface ShippingUpdateEmailProps {
 export const ShippingUpdateEmail = ({
   customerName,
   orderNumber,
-  trackingNumber,
+  // trackingNumber,
   trackingUrl,
   carrier,
-  estimatedDelivery,
+  // estimatedDelivery,
   shippingAddress,
   storeName = "Your Store",
   storeLogoUrl = "https://via.placeholder.com/150x50",
@@ -53,14 +53,14 @@ export const ShippingUpdateEmail = ({
         <Text style={trackingInfoStyle}>
           <strong>Carrier:</strong> {carrier}
           <br />
-          <strong>Tracking Number:</strong> {trackingNumber}
+          {/* <strong>Tracking Number:</strong> {trackingNumber} */}
           <br />
-          {estimatedDelivery && (
+          {/* {estimatedDelivery && (
             <>
               <strong>Estimated Delivery:</strong> {estimatedDelivery}
               <br />
             </>
-          )}
+          )} */}
         </Text>
 
         <Section style={ctaContainerStyle}>

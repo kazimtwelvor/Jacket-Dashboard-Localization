@@ -16,7 +16,7 @@ interface OrderConfirmationProps {
   orderItems: OrderItem[]
   subtotal: number
   shipping: number
-  tax: number
+  // tax: number
   total: number
   shippingAddress: {
     line1: string
@@ -27,7 +27,7 @@ interface OrderConfirmationProps {
     country: string
   }
   paymentMethod: string
-  estimatedDelivery?: string
+  // estimatedDelivery?: string
   storeName?: string
   storeLogoUrl?: string
   storeUrl?: string
@@ -40,11 +40,11 @@ export const OrderConfirmationEmail = ({
   orderItems,
   subtotal,
   shipping,
-  tax,
+  // tax,
   total,
   shippingAddress,
   paymentMethod,
-  estimatedDelivery,
+  // estimatedDelivery,
   storeName = "Your Store",
   storeLogoUrl = "https://via.placeholder.com/150x50",
   storeUrl = "https://yourstore.com",
@@ -76,12 +76,12 @@ export const OrderConfirmationEmail = ({
           <br />
           <strong>Order Date:</strong> {orderDate}
           <br />
-          {estimatedDelivery && (
+          {/* {estimatedDelivery && (
             <>
               <strong>Estimated Delivery:</strong> {estimatedDelivery}
               <br />
             </>
-          )}
+          )} */}
         </Text>
       </Section>
 
@@ -131,9 +131,9 @@ export const OrderConfirmationEmail = ({
           <Column>
             <Text style={summaryLabelStyle}>Tax</Text>
           </Column>
-          <Column style={{ width: "100px", textAlign: "right" as const }}>
+          {/* <Column style={{ width: "100px", textAlign: "right" as const }}>
             <Text style={summaryValueStyle}>{formatCurrency(tax)}</Text>
-          </Column>
+          </Column> */}
         </Row>
 
         <Row style={totalRowStyle}>

@@ -89,7 +89,7 @@ export async function GET(req: Request) {
     const serializedOrders = orders.map(order => ({
       ...order,
       shippingCost: Number(order.shippingCost),
-      tax: Number(order.tax),
+      // tax: Number(order.tax),
       discount: Number(order.discount),
       total: Number(order.total),
       orderItems: order.orderItems.map(item => ({

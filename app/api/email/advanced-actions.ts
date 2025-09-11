@@ -217,7 +217,7 @@ export async function sendNewOrderNotificationEmail(orderId: string) {
 
     const subtotal = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
     const shipping = Number.parseFloat(order.shippingFee?.toString() || "0")
-    const tax = Number.parseFloat(order.taxAmount?.toString() || "0")
+    // const tax = Number.parseFloat(order.taxAmount?.toString() || "0")
     const total = Number.parseFloat(order.totalPrice.toString())
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://yourstore.com"
     const dashboardUrl = `${baseUrl}/${order.storeId}`
@@ -234,7 +234,7 @@ export async function sendNewOrderNotificationEmail(orderId: string) {
           orderItems,
           subtotal,
           shipping,
-          tax,
+          // tax,
           total,
           shippingAddress: {
             line1: order.address || "",

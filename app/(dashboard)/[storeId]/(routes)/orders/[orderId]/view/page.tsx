@@ -82,9 +82,9 @@ const ViewOrderPage = async ({
                 <p className="text-sm text-muted-foreground">
                   Payment: <span className="font-medium">{order.paymentStatus}</span>
                 </p>
-                <p className="text-sm text-muted-foreground">
+                {/* <p className="text-sm text-muted-foreground">
                   Fulfillment: <span className="font-medium">{order.fulfillmentStatus}</span>
-                </p>
+                </p> */}
               </div>
             </CardContent>
           </Card>
@@ -124,7 +124,7 @@ const ViewOrderPage = async ({
                 <span className="font-medium">Shipping:</span> ${Number(order.shippingCost).toFixed(2)}
               </p>
               <p className="text-sm">
-                <span className="font-medium">Tax:</span> ${Number(order.tax).toFixed(2)}
+                {/* <span className="font-medium">Tax:</span> ${Number(order.tax).toFixed(2)} */}
               </p>
               <p className="text-sm">
                 <span className="font-medium">Discount:</span> ${Number(order.discount).toFixed(2)}
@@ -229,7 +229,7 @@ const ViewOrderPage = async ({
             <p className="text-sm">
               <span className="font-medium">Last Updated:</span> {format(new Date(order.updatedAt), 'PPP p')}
             </p>
-            {order.estimatedDelivery && (
+            {/* {order.estimatedDelivery && (
               <p className="text-sm">
                 <span className="font-medium">Estimated Delivery:</span> {format(new Date(order.estimatedDelivery), 'PPP')}
               </p>
@@ -238,7 +238,7 @@ const ViewOrderPage = async ({
               <p className="text-sm">
                 <span className="font-medium">Actual Delivery:</span> {format(new Date(order.actualDelivery), 'PPP')}
               </p>
-            )}
+            )} */}
           </CardContent>
         </Card>
       </div>

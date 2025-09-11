@@ -26,16 +26,16 @@ export const OrdersClient: React.FC<OrdersClientProps> = ({ data }) => {
   const [filters, setFilters] = useState({
     status: "",
     paymentStatus: "",
-    fulfillmentStatus: "",
+    // fulfillmentStatus: "",
   })
 
   useEffect(() => {
-    if (filters.status || filters.paymentStatus || filters.fulfillmentStatus) {
+    if (filters.status || filters.paymentStatus ) {
       const filtered = formatOrders(data).filter((order) => {
         return (
           (!filters.status || order.status === filters.status) &&
-          (!filters.paymentStatus || order.paymentStatus === filters.paymentStatus) &&
-          (!filters.fulfillmentStatus || order.fulfillmentStatus === filters.fulfillmentStatus)
+          (!filters.paymentStatus || order.paymentStatus === filters.paymentStatus) 
+          // (!filters.fulfillmentStatus || order.fulfillmentStatus === filters.fulfillmentStatus)
         )
       })
       setFilteredData(filtered)
@@ -55,7 +55,7 @@ export const OrdersClient: React.FC<OrdersClientProps> = ({ data }) => {
     setFilters({
       status: "",
       paymentStatus: "",
-      fulfillmentStatus: "",
+      // fulfillmentStatus: "",
     })
   }
 
@@ -92,7 +92,7 @@ function formatOrders(orders: any[]): OrderColumn[] {
     isPaid: item.isPaid,
     status: item.status,
     paymentStatus: item.paymentStatus || "pending",
-    fulfillmentStatus: item.fulfillmentStatus || "pending",
+    // fulfillmentStatus: item.fulfillmentStatus || "pending",
     createdAt: new Date(item.createdAt).toLocaleDateString(),
   }))
 }

@@ -171,7 +171,7 @@ model StoreUser {
   resetToken     String?
   resetTokenExp  DateTime?
   lastLogin      DateTime?
- // orders         Order[]  @relation("UserToOrder")
+  orders         Order[]  @relation("UserToOrder")
   
   @@index([storeId])
 }
@@ -520,8 +520,8 @@ model Order {
   id                 String      @id @default(cuid())
   storeId            String
   store              Store       @relation("StoreToOrder", fields: [storeId], references: [id])
- // userId             String?
- // user               StoreUser?  @relation("UserToOrder", fields: [userId], references: [id], onDelete: SetNull)
+  userId             String?
+  user               StoreUser?  @relation("UserToOrder", fields: [userId], references: [id], onDelete: SetNull)
   orderItems         OrderItem[]
   isPaid             Boolean     @default(false)
   phone              String      @default("")
@@ -530,11 +530,11 @@ model Order {
   paymentMethod      String?
   shippingMethod     String?
   shippingCost       Decimal?    @default(0)
- // tax                Decimal?    @default(0)
+// tax                Decimal?    @default(0)
   discount           Decimal?    @default(0)
   total              Decimal?
   notes              String?     @db.Text
- // trackingNumber     String?
+// trackingNumber     String?
   
   customerName       String?
   customerEmail      String?
@@ -545,25 +545,25 @@ model Order {
   state              String?
   zipCode            String?
   
-  // fulfillmentStatus  String?     @default("pending") // pending, processing, shipped, delivered
-  estimatedDelivery  DateTime?
-  actualDelivery     DateTime?
+ // fulfillmentStatus  String?     @default("pending") // pending, processing, shipped, delivered
+ // estimatedDelivery  DateTime?
+ // actualDelivery     DateTime?
   
-//  transactionId      String?
+  transactionId      String?
   paymentStatus      String?     @default("pending") // pending, completed, failed, refunded
   
 //  cardNumber         String?
 //  expirationDate     String?     // MM/YY format
 //  securityCode       String?     // CVC
-// cardCountry        String?
+//  cardCountry        String?
   
   createdAt          DateTime    @default(now())
   updatedAt          DateTime    @updatedAt
 
   @@index([storeId])
   @@index([status])
- // @@index([userId])
- // @@index([transactionId])
+  @@index([userId])
+  @@index([transactionId])
 }
 
 enum OrderStatus {

@@ -40,25 +40,25 @@ const formSchema = z.object({
   paymentMethod: z.string().optional(),
   shippingMethod: z.string().optional(),
   shippingCost: z.coerce.number().min(0).default(0),
-  tax: z.coerce.number().min(0).default(0),
+  // tax: z.coerce.number().min(0).default(0),
   discount: z.coerce.number().min(0).default(0),
   notes: z.string().optional(),
-  trackingNumber: z.string().optional(),
+  // trackingNumber: z.string().optional(),
   billingAddress: z.string().optional(),
   shippingAddress: z.string().optional(),
   city: z.string().optional(),
   country: z.string().optional(),
   state: z.string().optional(),
   zipCode: z.string().optional(),
-  fulfillmentStatus: z.string().min(1),
-  estimatedDelivery: z.date().optional().nullable(),
-  actualDelivery: z.date().optional().nullable(),
+  // fulfillmentStatus: z.string().min(1),
+  // estimatedDelivery: z.date().optional().nullable(),
+  // actualDelivery: z.date().optional().nullable(),
   transactionId: z.string().optional(),
   paymentStatus: z.string().min(1),
-  cardNumber: z.string().optional(),
-  expirationDate: z.string().optional(),
-  securityCode: z.string().optional(),
-  cardCountry: z.string().optional(),
+  // cardNumber: z.string().optional(),
+  // expirationDate: z.string().optional(),
+  // securityCode: z.string().optional(),
+  // cardCountry: z.string().optional(),
 })
 
 type OrderFormValues = z.infer<typeof formSchema>
@@ -107,25 +107,25 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
         paymentMethod: normalizedPaymentMethod,
         shippingMethod: initialData.shippingMethod || "",
         shippingCost: Number.parseFloat(String(initialData.shippingCost)) || 0,
-        tax: Number.parseFloat(String(initialData.tax)) || 0,
+        // tax: Number.parseFloat(String(initialData.tax)) || 0,
         discount: Number.parseFloat(String(initialData.discount)) || 0,
         notes: initialData.notes || "",
-        trackingNumber: initialData.trackingNumber || "",
+        // trackingNumber: initialData.trackingNumber || "",
         billingAddress: initialData.billingAddress || "",
         shippingAddress: initialData.shippingAddress || "",
         city: initialData.city || "",
         country: initialData.country || "",
         state: initialData.state || "",
         zipCode: initialData.zipCode || "",
-        fulfillmentStatus: initialData.fulfillmentStatus || "pending",
-        estimatedDelivery: initialData.estimatedDelivery ? new Date(initialData.estimatedDelivery) : null,
-        actualDelivery: initialData.actualDelivery ? new Date(initialData.actualDelivery) : null,
+        // fulfillmentStatus: initialData.fulfillmentStatus || "pending",
+        // estimatedDelivery: initialData.estimatedDelivery ? new Date(initialData.estimatedDelivery) : null,
+        // actualDelivery: initialData.actualDelivery ? new Date(initialData.actualDelivery) : null,
         transactionId: initialData.transactionId || "",
         paymentStatus: initialData.paymentStatus || "pending",
-        cardNumber: initialData.cardNumber || "",
-        expirationDate: initialData.expirationDate || "",
-        securityCode: initialData.securityCode || "",
-        cardCountry: initialData.cardCountry || "",
+        // cardNumber: initialData.cardNumber || "",
+        // expirationDate: initialData.expirationDate || "",
+        // securityCode: initialData.securityCode || "",
+        // cardCountry: initialData.cardCountry || "",
       }
     : {
         customerName: "",
@@ -137,25 +137,25 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
         paymentMethod: "",
         shippingMethod: "",
         shippingCost: 0,
-        tax: 0,
+        // tax: 0,
         discount: 0,
         notes: "",
-        trackingNumber: "",
+        // trackingNumber: "",
         billingAddress: "",
         shippingAddress: "",
         city: "",
         country: "",
         state: "",
         zipCode: "",
-        fulfillmentStatus: "pending",
-        estimatedDelivery: null,
-        actualDelivery: null,
+        // fulfillmentStatus: "pending",
+        // estimatedDelivery: null,
+        // actualDelivery: null,
         transactionId: "",
         paymentStatus: "pending",
-        cardNumber: "",
-        expirationDate: "",
-        securityCode: "",
-        cardCountry: "",
+        // cardNumber: "",
+        // expirationDate: "",
+        // securityCode: "",
+        // cardCountry: "",
       }
 
   const form = useForm<OrderFormValues>({
@@ -182,39 +182,52 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
     try {
       setLoading(true)
 
+      if (!orderItems || orderItems.length === 0) {
+        toast.error("Please add at least one item to the order")
+        setLoading(false)
+        return
+      }
+
       const subtotal = orderItems.reduce((acc: number, item: any) => {
         return acc + Number.parseFloat(String(item.price)) * item.quantity
       }, 0)
 
-      const total = subtotal + data.shippingCost + data.tax - data.discount
-      const formattedOrderItems = orderItems.map((item: any) => ({
-        id: item.id,
-        productId: item.productId || item.product.id,
-        quantity: item.quantity,
-        price: Number.parseFloat(String(item.price)),
-        discountAmount: Number.parseFloat(String(item.discountAmount || 0)),
-        total: Number.parseFloat(String(item.price)) * item.quantity,
-        sizeIds: item.sizeIds || [],
-        colorIds: item.colorIds || [],
-        selectedOptions: item.selectedOptions || {},
-        productSku: item.productSku || item.product?.sku || "",
-        productName: item.productName || item.product?.name || "",
-        customerName: "Customer",
-      }))
+      const total = subtotal + data.shippingCost - data.discount
+      const formattedOrderItems = orderItems.map((item: any) => {
+        const productId = item.productId || item.product?.id
+        if (!productId) {
+          throw new Error(`Product ID is required for item: ${item.product?.name || 'Unknown'}`)
+        }
+        
+        return {
+          id: item.id,
+          productId,
+          quantity: item.quantity || 1,
+          price: Number.parseFloat(String(item.price || 0)),
+          discountAmount: Number.parseFloat(String(item.discountAmount || 0)),
+          total: Number.parseFloat(String(item.price || 0)) * (item.quantity || 1),
+          sizeIds: item.sizeIds || [],
+          colorIds: item.colorIds || [],
+          selectedOptions: item.selectedOptions || {},
+          productSku: item.productSku || item.product?.sku || "",
+          productName: item.productName || item.product?.name || "",
+          customerName: "Customer",
+        }
+      })
+
+      const requestData = {
+        ...data,
+        total,
+        orderItems: formattedOrderItems,
+      }
+      
+      console.log("Sending order data:", JSON.stringify(requestData, null, 2))
 
       if (initialData) {
-        await axios.patch(`/api/${params.storeId}/orders/${params.orderId}`, {
-          ...data,
-          total,
-          orderItems: formattedOrderItems,
-        })
+        await axios.patch(`/api/${params?.storeId}/orders/${params?.orderId}`, requestData)
       } else {
-        const response = await axios.post(`/api/${params.storeId}/orders`, {
-          ...data,
-          total,
-          orderItems: formattedOrderItems,
-        })
-        router.push(`/${params.storeId}/orders/${response.data.id}`)
+        const response = await axios.post(`/api/${params?.storeId}/orders`, requestData)
+        router.push(`/${params?.storeId}/orders/${response.data.id}`)
       }
 
       router.refresh()
@@ -230,8 +243,8 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
   const onDelete = async () => {
     try {
       setLoading(true)
-      await axios.delete(`/api/${params.storeId}/orders/${params.orderId}`)
-      router.push(`/${params.storeId}/orders`)
+      await axios.delete(`/api/${params?.storeId}/orders/${params?.orderId}`)
+      router.push(`/${params?.storeId}/orders`)
       toast.success("Order deleted.")
     } catch (error: any) {
       toast.error("Something went wrong.")
@@ -276,9 +289,9 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
   }, 0)
 
   const shippingCost = form.watch("shippingCost") || 0
-  const tax = form.watch("tax") || 0
+  // const tax = form.watch("tax") || 0
   const discount = form.watch("discount") || 0
-  const total = subtotal + shippingCost + tax - discount
+  const total = subtotal + shippingCost - discount
 
   return (
     <>
@@ -446,7 +459,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
               <OrderSummary
                 subtotal={subtotal}
                 shippingCost={shippingCost}
-                tax={tax}
+                // tax={tax}
                 discount={discount}
                 total={total}
               />
@@ -605,7 +618,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
                       )}
                     />
 
-                    <FormField
+                    {/* <FormField
                       control={form.control}
                       name="trackingNumber"
                       render={({ field }) => (
@@ -617,8 +630,8 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
                           <FormMessage />
                         </FormItem>
                       )}
-                    />
-
+                    /> */}
+                    {/* 
                     <FormField
                       control={form.control}
                       name="fulfillmentStatus"
@@ -646,9 +659,9 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
                           <FormMessage />
                         </FormItem>
                       )}
-                    />
+                    /> */}
 
-                    <div className="grid grid-cols-2 gap-4">
+                    {/* <div className="grid grid-cols-2 gap-4">
                       <FormField
                         control={form.control}
                         name="estimatedDelivery"
@@ -719,7 +732,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
                           </FormItem>
                         )}
                       />
-                    </div>
+                    </div> */}
                   </CardContent>
                 </Card>
 
@@ -802,7 +815,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
                       )}
                     />
 
-                    <FormField
+                    {/* <FormField
                       control={form.control}
                       name="tax"
                       render={({ field }) => (
@@ -814,7 +827,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
                           <FormMessage />
                         </FormItem>
                       )}
-                    />
+                    /> */}
 
                     <FormField
                       control={form.control}
@@ -831,7 +844,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
                     />
 
                     {/* Credit Card Fields - Show only when payment method is credit_card */}
-                    {form.watch("paymentMethod") === "credit_card" && (
+                    {/* {form.watch("paymentMethod") === "credit_card" && (
                       <>
                         <FormField
                           control={form.control}
@@ -917,7 +930,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
                           )}
                         />
                       </>
-                    )}
+                    )} */}
                   </CardContent>
                 </Card>
               </div>

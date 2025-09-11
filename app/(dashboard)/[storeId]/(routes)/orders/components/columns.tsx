@@ -16,7 +16,7 @@ export type OrderColumn = {
   isPaid: boolean
   status: string
   paymentStatus: string
-  fulfillmentStatus: string
+  // fulfillmentStatus: string
   createdAt: string
 }
 
@@ -85,21 +85,21 @@ export const columns: ColumnDef<OrderColumn>[] = [
     },
   },
   {
-    accessorKey: "fulfillmentStatus",
+    // accessorKey: "fulfillmentStatus",
     header: "Fulfillment",
     cell: ({ row }) => {
-      const fulfillmentStatus = row.original.fulfillmentStatus
+      // const fulfillmentStatus = row.original.fulfillmentStatus
 
       let badgeVariant: "default" | "outline" | "secondary" | "destructive" = "default"
 
-      if (fulfillmentStatus === "pending") badgeVariant = "secondary"
-      if (fulfillmentStatus === "processing") badgeVariant = "secondary"
-      if (fulfillmentStatus === "shipped") badgeVariant = "default"
-      if (fulfillmentStatus === "delivered") badgeVariant = "default"
+      // if (fulfillmentStatus === "pending") badgeVariant = "secondary"
+      // if (fulfillmentStatus === "processing") badgeVariant = "secondary"
+      // if (fulfillmentStatus === "shipped") badgeVariant = "default"
+      // if (fulfillmentStatus === "delivered") badgeVariant = "default"
 
-      return (
-        <Badge variant={badgeVariant}>{fulfillmentStatus.charAt(0).toUpperCase() + fulfillmentStatus.slice(1)}</Badge>
-      )
+      // return (
+      //   <Badge variant={badgeVariant}>{fulfillmentStatus.charAt(0).toUpperCase() + fulfillmentStatus.slice(1)}</Badge>
+      // )
     },
   },
   {

@@ -84,17 +84,17 @@ export const validateCreateOrder = () => [
       }
       return true;
     }),
-  body('tax')
-    .optional()
-    .isDecimal()
-    .withMessage('Tax must be a decimal number')
-    .custom((value) => {
-      const num = parseFloat(value);
-      if (num < 0) {
-        throw new Error('Tax must be non-negative');
-      }
-      return true;
-    }),
+  // body('tax')
+  //   .optional()
+  //   .isDecimal()
+  //   .withMessage('Tax must be a decimal number')
+  //   .custom((value) => {
+  //     const num = parseFloat(value);
+  //     if (num < 0) {
+  //       throw new Error('Tax must be non-negative');
+  //     }
+  //     return true;
+  //   }),
   body('discount')
     .optional()
     .isDecimal()
@@ -122,11 +122,11 @@ export const validateCreateOrder = () => [
     .isString()
     .isLength({ min: 1, max: 1000 })
     .withMessage('Notes must be between 1 and 1000 characters'),
-  body('trackingNumber')
-    .optional()
-    .isString()
-    .isLength({ min: 1, max: 100 })
-    .withMessage('Tracking number must be between 1 and 100 characters'),
+  // body('trackingNumber')
+  //   .optional()
+  //   .isString()
+  //   .isLength({ min: 1, max: 100 })
+  //   .withMessage('Tracking number must be between 1 and 100 characters'),
   
   body('customerName')
     .optional()
@@ -178,18 +178,18 @@ export const validateCreateOrder = () => [
     .isLength({ min: 1, max: 100 })
     .withMessage('Country must be between 1 and 100 characters'),
   
-  body('fulfillmentStatus')
-    .optional()
-    .isIn(['pending', 'processing', 'shipped', 'delivered'])
-    .withMessage('Fulfillment status must be one of: pending, processing, shipped, delivered'),
-  body('estimatedDelivery')
-    .optional()
-    .isISO8601()
-    .withMessage('Estimated delivery must be a valid date'),
-  body('actualDelivery')
-    .optional()
-    .isISO8601()
-    .withMessage('Actual delivery must be a valid date'),
+  // body('fulfillmentStatus')
+  //   .optional()
+  //   .isIn(['pending', 'processing', 'shipped', 'delivered'])
+  //   .withMessage('Fulfillment status must be one of: pending, processing, shipped, delivered'),
+  // body('estimatedDelivery')
+  //   .optional()
+  //   .isISO8601()
+  //   .withMessage('Estimated delivery must be a valid date'),
+  // body('actualDelivery')
+  //   .optional()
+  //   .isISO8601()
+  //   .withMessage('Actual delivery must be a valid date'),
   
   body('transactionId')
     .optional()
@@ -201,25 +201,25 @@ export const validateCreateOrder = () => [
     .isIn(['pending', 'completed', 'failed', 'refunded'])
     .withMessage('Payment status must be one of: pending, completed, failed, refunded'),
   
-  body('cardNumber')
-    .optional()
-    .isString()
-    .isLength({ min: 13, max: 19 })
-    .withMessage('Card number must be between 13 and 19 characters'),
+  // body('cardNumber')
+  //   .optional()
+  //   .isString()
+  //   .isLength({ min: 13, max: 19 })
+  //   .withMessage('Card number must be between 13 and 19 characters'),
   body('expirationDate')
-    .optional()
-    .matches(/^(0[1-9]|1[0-2])\/\d{2}$/)
-    .withMessage('Expiration date must be in MM/YY format'),
-  body('securityCode')
-    .optional()
-    .isString()
-    .isLength({ min: 3, max: 4 })
-    .withMessage('Security code must be between 3 and 4 characters'),
-  body('cardCountry')
-    .optional()
-    .isString()
-    .isLength({ min: 1, max: 100 })
-    .withMessage('Card country must be between 1 and 100 characters')
+  //   .optional()
+  //   .matches(/^(0[1-9]|1[0-2])\/\d{2}$/)
+  //   .withMessage('Expiration date must be in MM/YY format'),
+  // body('securityCode')
+  //   .optional()
+  //   .isString()
+  //   .isLength({ min: 3, max: 4 })
+  //   .withMessage('Security code must be between 3 and 4 characters'),
+  // body('cardCountry')
+  //   .optional()
+  //   .isString()
+  //   .isLength({ min: 1, max: 100 })
+  //   .withMessage('Card country must be between 1 and 100 characters')
 ];
 
 export const validateUpdateOrder = () => [
@@ -250,17 +250,17 @@ export const validateUpdateOrder = () => [
       }
       return true;
     }),
-  body('tax')
-    .optional()
-    .isDecimal()
-    .withMessage('Tax must be a decimal number')
-    .custom((value) => {
-      const num = parseFloat(value);
-      if (num < 0) {
-        throw new Error('Tax must be non-negative');
-      }
-      return true;
-    }),
+  // body('tax')
+  //   .optional()
+  //   .isDecimal()
+  //   .withMessage('Tax must be a decimal number')
+  //   .custom((value) => {
+  //     const num = parseFloat(value);
+  //     if (num < 0) {
+  //       throw new Error('Tax must be non-negative');
+  //     }
+  //     return true;
+  //   }),
   body('discount')
     .optional()
     .isDecimal()
@@ -288,23 +288,23 @@ export const validateUpdateOrder = () => [
     .isString()
     .isLength({ min: 1, max: 1000 })
     .withMessage('Notes must be between 1 and 1000 characters'),
-  body('trackingNumber')
-    .optional()
-    .isString()
-    .isLength({ min: 1, max: 100 })
-    .withMessage('Tracking number must be between 1 and 100 characters'),
-  body('fulfillmentStatus')
-    .optional()
-    .isIn(['pending', 'processing', 'shipped', 'delivered'])
-    .withMessage('Fulfillment status must be one of: pending, processing, shipped, delivered'),
-  body('estimatedDelivery')
-    .optional()
-    .isISO8601()
-    .withMessage('Estimated delivery must be a valid date'),
-  body('actualDelivery')
-    .optional()
-    .isISO8601()
-    .withMessage('Actual delivery must be a valid date'),
+  // body('trackingNumber')
+  //   .optional()
+  //   .isString()
+  //   .isLength({ min: 1, max: 100 })
+  //   .withMessage('Tracking number must be between 1 and 100 characters'),
+  // body('fulfillmentStatus')
+  //   .optional()
+  //   .isIn(['pending', 'processing', 'shipped', 'delivered'])
+  //   .withMessage('Fulfillment status must be one of: pending, processing, shipped, delivered'),
+  // body('estimatedDelivery')
+  //   .optional()
+  //   .isISO8601()
+  //   .withMessage('Estimated delivery must be a valid date'),
+  // body('actualDelivery')
+  //   .optional()
+  //   .isISO8601()
+  //   .withMessage('Actual delivery must be a valid date'),
   body('transactionId')
     .optional()
     .isString()
@@ -351,10 +351,10 @@ export const validateGetOrders = () => [
     .optional()
     .isIn(['pending', 'completed', 'failed', 'refunded'])
     .withMessage('Payment status must be one of: pending, completed, failed, refunded'),
-  query('fulfillmentStatus')
-    .optional()
-    .isIn(['pending', 'processing', 'shipped', 'delivered'])
-    .withMessage('Fulfillment status must be one of: pending, processing, shipped, delivered'),
+  // query('fulfillmentStatus')
+  //   .optional()
+  //   .isIn(['pending', 'processing', 'shipped', 'delivered'])
+  //   .withMessage('Fulfillment status must be one of: pending, processing, shipped, delivered'),
   query('isPaid')
     .optional()
     .isBoolean()

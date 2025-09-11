@@ -38,7 +38,6 @@ interface SettingsFromProps {
     zipCode?: string
     country?: string
     currency?: string
-    taxRate?: number
     enableReviews?: boolean
     facebookUrl?: string
     instagramUrl?: string
@@ -60,7 +59,6 @@ const formSchema = z.object({
   zipCode: z.string().optional(),
   country: z.string().optional(),
   currency: z.string().optional(),
-  taxRate: z.coerce.number().min(0).max(100).optional(),
   enableReviews: z.boolean().default(true),
   facebookUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
   instagramUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
@@ -118,7 +116,6 @@ export const SettingsForm: React.FC<SettingsFromProps> = ({ initialData }) => {
       zipCode: initialData.zipCode || "",
       country: initialData.country || "",
       currency: initialData.currency || "USD",
-      taxRate: initialData.taxRate || 0,
       enableReviews: initialData.enableReviews !== false,
       facebookUrl: initialData.facebookUrl || "",
       instagramUrl: initialData.instagramUrl || "",
@@ -131,7 +128,7 @@ export const SettingsForm: React.FC<SettingsFromProps> = ({ initialData }) => {
   const onSubmit = async (data: SettingsFormValues) => {
     try {
       setLoading(true)
-      await axios.patch(`/api/stores/${params.storeId}`, data)
+      await axios.patch(`/api/stores/${params?.storeId}`, data)
       router.refresh()
       toast.success("Store settings updated.")
     } catch (err) {
@@ -145,7 +142,7 @@ export const SettingsForm: React.FC<SettingsFromProps> = ({ initialData }) => {
   const onDelete = async () => {
     try {
       setLoading(true)
-      await axios.delete(`/api/stores/${params.storeId}`)
+      await axios.delete(`/api/stores/${params?.storeId}`)
       router.refresh()
       router.push("/")
       toast.success("Store deleted.")
@@ -267,19 +264,6 @@ export const SettingsForm: React.FC<SettingsFromProps> = ({ initialData }) => {
                         )}
                       />
 
-                      <FormField
-                        control={form.control}
-                        name="taxRate"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Tax Rate (%)</FormLabel>
-                            <FormControl>
-                              <Input type="number" disabled={loading} placeholder="0.00" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
                     </div>
 
                     <FormField
@@ -544,7 +528,7 @@ export const SettingsForm: React.FC<SettingsFromProps> = ({ initialData }) => {
                   <h3 className="text-lg font-medium mb-4">API Information</h3>
                   <ApiAlert
                     title="NEXT_PUBLIC_API_URL"
-                    description={`${origin}/api/${params.storeId}`}
+                    description={`${origin}/api/${params?.storeId}`}
                     variant="public"
                   />
                 </CardContent>

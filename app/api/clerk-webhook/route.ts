@@ -45,7 +45,6 @@ export async function POST(req: Request) {
           role: "user", // Default role for new users
         },
       })
-
     } catch (error) {
     }
   }

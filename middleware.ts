@@ -43,6 +43,13 @@ export default clerkMiddleware(async (auth, req) => {
       response = NextResponse.next();
     }
   } else {
+    const pathname = req.nextUrl.pathname;
+    
+    if (pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up")) {
+      const homeUrl = new URL("/", req.url);
+      return NextResponse.redirect(homeUrl);
+    }
+
     // Get user role from metadata with proper type annotation
     const userRole = sessionClaims?.metadata?.role as UserRole;
 
@@ -61,7 +68,6 @@ export default clerkMiddleware(async (auth, req) => {
     }
 
     // Check store access permissions
-    const pathname = req.nextUrl.pathname;
 
     // Allow authenticated users to access the root page
     if (pathname === "/") {

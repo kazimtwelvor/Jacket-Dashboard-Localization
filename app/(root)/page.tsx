@@ -71,6 +71,9 @@ export default async function SetupPage() {
 
    return redirect("/create-store")
  } catch (error) {
+   if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
+     throw error;
+   }
    console.error("Error in SetupPage:", error)
    redirect("/sign-in")
  }

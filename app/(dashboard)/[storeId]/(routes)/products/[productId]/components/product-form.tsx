@@ -18,6 +18,21 @@ import { GeneralTab } from "./tabs/general-tab"
 import { SeoTab } from "./tabs/seo-tab"
 import { formSchema, type ProductFormValues } from "./product-form-schema"
 import { useFormattedSpecifications } from "./hooks/use-formatted-specifications"
+
+const safeJsonParse = (value: any, fallback: any = null) => {
+  if (typeof value === "object" && value !== null) {
+    return value
+  }
+  if (typeof value === "string") {
+    try {
+      return JSON.parse(value)
+    } catch (error) {
+      console.error("JSON parse error:", error, "value:", value)
+      return fallback
+    }
+  }
+  return fallback
+}
 import type { Product, Category, Size, Color } from "../../types"
 import axios from "axios"
 import { useStoreName } from "./store-name-provider"
@@ -202,19 +217,15 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       name: initialData.name,
       slug: initialData.slug || "",
       description: initialData.description || "",
-      specifications: initialData.specifications
-        ? typeof initialData.specifications === "string"
-          ? JSON.parse(initialData.specifications)
-          : initialData.specifications
-        : {
-          externalMaterial: [],
-          internalMaterial: [],
-          collar: [],
-          closure: [],
-          cuffs: [],
-          pockets: [],
-          color: [],
-        },
+      specifications: safeJsonParse(initialData.specifications, {
+        externalMaterial: [],
+        internalMaterial: [],
+        collar: [],
+        closure: [],
+        cuffs: [],
+        pockets: [],
+        color: [],
+      }),
       status: initialData.isArchived === true ? "draft" : "published",
       regularPrice: initialData.price.toString(),
       salePrice: initialData.salePrice ? initialData.salePrice.toString() : "",
@@ -244,12 +255,10 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
           }
           return Array.isArray(initialData.style) ? initialData.style : []
         })(),
-        variationColors: initialData.specifications
-          ? (typeof initialData.specifications === "string"
-            ? JSON.parse(initialData.specifications)
-            : initialData.specifications
-          ).color || []
-          : [],
+        variationColors: (() => {
+          const specs = safeJsonParse(initialData.specifications, {})
+          return specs.color || []
+        })(),
         sizes: initialData.sizeDetails
           ? Array.isArray(initialData.sizeDetails)
             ? initialData.sizeDetails.map((size) => (typeof size === "object" ? (size as any).id : size))

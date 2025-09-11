@@ -37,6 +37,7 @@ model Store {
   categoryPages       CategoryPage[] @relation("StoreToCategoryPage")
   contactForms        ContactForm[]
   newsletterForms     NewsletterForm[]
+  vouchers            Voucher[]   @relation("StoreToVoucher")
   // Payment fields
   paypalClientId      String?   @default("")
   paypalClientSecret  String?   @default("")

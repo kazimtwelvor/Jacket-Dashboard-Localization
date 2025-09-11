@@ -42,6 +42,8 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
   const [parentSearchTerm, setParentSearchTerm] = useState<string>("")
   const [selectedParentProduct, setSelectedParentProduct] = useState<Product | null>(null)
   const [dropdownPositions, setDropdownPositions] = useState<Record<string, {top: number, left: number}>>({})
+  const [searchResults, setSearchResults] = useState<Record<string, Product[]>>({})
+  const [isSearching, setIsSearching] = useState<Record<string, boolean>>({})
 
 
   useEffect(() => {
@@ -114,6 +116,62 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
     return () => clearTimeout(debounceTimer)
   }, [storeId, parentSearchTerm])
 
+  const searchProductsForColor = async (color: string, searchTerm: string) => {
+    if (!storeId) {
+      return
+    }
+    
+    if (!searchTerm.trim()) {
+      setIsSearching(prev => ({ ...prev, [color]: false }))
+      return
+    }
+
+    setIsSearching(prev => ({ ...prev, [color]: true }))
+    try {
+      const response = await fetch(`/api/${storeId}/products?search=${encodeURIComponent(searchTerm)}&admin=true&includeArchived=true`)
+      if (response.ok) {
+        const data = await response.json()
+        const formatted = (data.products || [])
+          .filter((p: any) => p.id !== currentProductId)
+          .map((p: any) => ({ 
+            id: p.id, 
+            name: p.name, 
+            sku: p.sku, 
+            slug: p.slug, 
+            image: p.images && p.images.length > 0 ? p.images[0].url : null 
+          }))
+        setSearchResults(prev => ({ ...prev, [color]: formatted }))
+      } else {
+        console.error('API response not ok:', response.status, response.statusText)
+        setSearchResults(prev => ({ ...prev, [color]: [] }))
+      }
+    } catch (error) {
+      console.error('Search error:', error)
+      setSearchResults(prev => ({ ...prev, [color]: [] }))
+    } finally {
+      setIsSearching(prev => ({ ...prev, [color]: false }))
+    }
+  }
+
+  useEffect(() => {
+    if (!storeId) return
+
+    const searchTimers: Record<string, NodeJS.Timeout> = {}
+
+    Object.keys(searchTerms).forEach(color => {
+      const searchTerm = searchTerms[color]
+      if (searchTerm !== undefined) {
+        searchTimers[color] = setTimeout(() => {
+          searchProductsForColor(color, searchTerm)
+        }, 300)
+      }
+    })
+
+    return () => {
+      Object.values(searchTimers).forEach(timer => clearTimeout(timer))
+    }
+  }, [storeId, searchTerms, currentProductId])
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       setTimeout(() => {
@@ -174,12 +232,12 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
 
   const getFilteredProducts = (color: string) => {
     const term = searchTerms[color] || ""
-    if (!term) return products
-
-    return products.filter(p =>
-      p.name?.toLowerCase().includes(term.toLowerCase()) ||
-      p.sku?.toLowerCase().includes(term.toLowerCase())
-    )
+    if (!term.trim()) {
+      return products
+    }
+    
+    const results = searchResults[color] || []
+    return results
   }
 
   const fetchParentColorLinks = async (parentProductId: string) => {
@@ -208,6 +266,8 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
     form.setValue("categories.colorVariationLinks", newLinks, { shouldDirty: true })
     setShowDropdown(prev => ({ ...prev, [color]: false }))
     setSearchTerms(prev => ({ ...prev, [color]: "" }))
+    setSearchResults(prev => ({ ...prev, [color]: [] }))
+    setIsSearching(prev => ({ ...prev, [color]: false }))
   }
 
   const updateLink = (color: string, value: string) => {
@@ -476,50 +536,63 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
                               className="max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 dropdown-scroll-area"
                               onScroll={(e) => e.stopPropagation()}
                             >
-                              {getFilteredProducts(color).map((product) => (
-                                <div
-                                  key={product.id}
-                                  onClick={() => selectProduct(color, product)}
-                                  className="flex items-center gap-3 p-3 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer rounded-lg transition-colors duration-150 border border-transparent hover:border-blue-200 dark:hover:border-blue-700"
-                                >
-                                  <div className="flex h-10 w-10 items-center justify-center rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
-                                    {product.image ? (
-                                      <img
-                                        src={product.image}
-                                        alt={product.name}
-                                        className="w-full h-full object-cover"
-                                      />
-                                    ) : (
-                                      <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 text-white text-sm font-semibold">
-                                        {product.name.charAt(0).toUpperCase()}
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <div className="font-medium text-gray-900 dark:text-gray-100 truncate">{product.name}</div>
-                                    <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                                        {product.sku}
-                                      </span>
-                                    </div>
-                                  </div>
-                                  <div className="text-gray-400 dark:text-gray-500">
-                                    <ExternalLink className="h-4 w-4" />
-                                  </div>
-                                </div>
-                              ))}
-                              {getFilteredProducts(color).length === 0 && (
+                              {isSearching[color] ? (
                                 <div className="flex flex-col items-center justify-center py-8 text-center">
                                   <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-3 mb-3">
-                                    <Search className="h-6 w-6 text-gray-400" />
+                                    <div className="animate-spin h-6 w-6 border-2 border-blue-500 border-t-transparent rounded-full"></div>
                                   </div>
                                   <p className="text-gray-500 dark:text-gray-400 font-medium">
-                                    {searchTerms[color] ? "No products found" : "Start typing to search products"}
-                                  </p>
-                                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                                    {searchTerms[color] ? "Try a different search term" : "Search by product name or SKU"}
+                                    Searching products...
                                   </p>
                                 </div>
+                              ) : (
+                                <>
+                                  {getFilteredProducts(color).map((product) => (
+                                    <div
+                                      key={product.id}
+                                      onClick={() => selectProduct(color, product)}
+                                      className="flex items-center gap-3 p-3 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer rounded-lg transition-colors duration-150 border border-transparent hover:border-blue-200 dark:hover:border-blue-700"
+                                    >
+                                      <div className="flex h-10 w-10 items-center justify-center rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
+                                        {product.image ? (
+                                          <img
+                                            src={product.image}
+                                            alt={product.name}
+                                            className="w-full h-full object-cover"
+                                          />
+                                        ) : (
+                                          <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 text-white text-sm font-semibold">
+                                            {product.name.charAt(0).toUpperCase()}
+                                          </div>
+                                        )}
+                                      </div>
+                                      <div className="flex-1 min-w-0">
+                                        <div className="font-medium text-gray-900 dark:text-gray-100 truncate">{product.name}</div>
+                                        <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                                            {product.sku}
+                                          </span>
+                                        </div>
+                                      </div>
+                                      <div className="text-gray-400 dark:text-gray-500">
+                                        <ExternalLink className="h-4 w-4" />
+                                      </div>
+                                    </div>
+                                  ))}
+                                  {!isSearching[color] && getFilteredProducts(color).length === 0 && (
+                                    <div className="flex flex-col items-center justify-center py-8 text-center">
+                                      <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-3 mb-3">
+                                        <Search className="h-6 w-6 text-gray-400" />
+                                      </div>
+                                      <p className="text-gray-500 dark:text-gray-400 font-medium">
+                                        {searchTerms[color] ? "No products found" : "No products available"}
+                                      </p>
+                                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                                        {searchTerms[color] ? "Try a different search term" : "Start typing to search or browse all products"}
+                                      </p>
+                                    </div>
+                                  )}
+                                </>
                               )}
                             </div>
                           </div>

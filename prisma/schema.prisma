@@ -797,3 +797,34 @@ enum NewsletterFormStatus {
   UNSUBSCRIBED
 }
 
+model Voucher {
+  id              String      @id @default(cuid())
+  storeId         String
+  store           Store       @relation("StoreToVoucher", fields: [storeId], references: [id], onDelete: Cascade)
+  code            String      @unique
+  type            VoucherType
+  value           Decimal     // Percentage or fixed amount
+  minOrderAmount  Decimal?    // Minimum order amount to use voucher
+  maxDiscount     Decimal?    // Maximum discount for percentage vouchers
+  usageLimit      Int?        // Maximum number of uses
+  usedCount       Int         @default(0)
+  isActive        Boolean     @default(true)
+  validFrom       DateTime    @default(now())
+  validUntil      DateTime?
+  description     String?     @db.Text
+  // For "Buy X Get Y" type vouchers
+  buyQuantity     Int?        // Buy X products
+  getQuantity     Int?        // Get Y products free
+  applicableProducts String[] @default([]) // Product IDs this voucher applies to
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([storeId])
+  @@index([code])
+}
+
+enum VoucherType {
+  PERCENTAGE  // FJ-30% - percentage discount
+  FIXED       // FJ-100 - fixed amount discount
+  BUY_X_GET_Y // Buy 2 get 1 free
+}

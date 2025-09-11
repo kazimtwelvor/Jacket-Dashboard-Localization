@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useParams, usePathname, useRouter } from "next/navigation"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { UserButton } from "@clerk/nextjs"
-import type { Store } from "@prisma/client"
+import { useState, useEffect } from "react";
+import { useParams, usePathname, useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { UserButton } from "@clerk/nextjs";
+import type { Store } from "@prisma/client";
 import {
   LayoutDashboard,
   LayoutTemplate,
@@ -26,8 +26,13 @@ import {
   FileText,
   FileType,
   ClipboardList,
-} from "lucide-react"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+  Ticket,
+} from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Command,
   CommandEmpty,
@@ -36,39 +41,50 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from "@/components/ui/command"
-import { useStoreModal } from "@/hooks/use-store-modal"
-import Link from "next/link"
-import { debugLog, logProps } from "@/lib/debug-utils"
-import StoreSwitcher from "./store-switcher"
+} from "@/components/ui/command";
+import { useStoreModal } from "@/hooks/use-store-modal";
+import Link from "next/link";
+import { debugLog, logProps } from "@/lib/debug-utils";
+import StoreSwitcher from "./store-switcher";
 
 interface SidebarProps {
-  className?: string
-  items: Store[]
-  memberStores?: Record<string, any>[]
+  className?: string;
+  items: Store[];
+  memberStores?: Record<string, any>[];
 }
 
-export const Sidebar = ({ className, items = [], memberStores = [] }: SidebarProps) => {
-  const params = useParams()
-  const pathname = usePathname()
-  const router = useRouter()
-  const [isMounted, setIsMounted] = useState(false)
-  const [isCollapsed, setIsCollapsed] = useState(false)
-  const [isMobileOpen, setIsMobileOpen] = useState(false)
-  const storeModal = useStoreModal()
+export const Sidebar = ({
+  className,
+  items = [],
+  memberStores = [],
+}: SidebarProps) => {
+  const params = useParams();
+  const pathname = usePathname();
+  const router = useRouter();
+  const [isMounted, setIsMounted] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const storeModal = useStoreModal();
 
   useEffect(() => {
     logProps("Sidebar", {
       ownedStoresCount: items.length,
       memberStoresCount: memberStores.length,
       ownedStores: items.map((store) => ({ id: store.id, name: store.name })),
-      memberStores: memberStores.map((store) => ({ id: store.id, name: store.name, role: store.role })),
-    })
-  }, [items, memberStores])
+      memberStores: memberStores.map((store) => ({
+        id: store.id,
+        name: store.name,
+        role: store.role,
+      })),
+    });
+  }, [items, memberStores]);
 
   useEffect(() => {
-    document.documentElement.style.setProperty("--sidebar-width", isCollapsed ? "70px" : "240px")
-  }, [isCollapsed])
+    document.documentElement.style.setProperty(
+      "--sidebar-width",
+      isCollapsed ? "70px" : "240px"
+    );
+  }, [isCollapsed]);
 
   const routes = [
     {
@@ -85,7 +101,6 @@ export const Sidebar = ({ className, items = [], memberStores = [] }: SidebarPro
     {
       category: "Content",
       items: [
-        
         {
           href: `/${params?.storeId}/pages`,
           label: "Pages",
@@ -154,11 +169,18 @@ export const Sidebar = ({ className, items = [], memberStores = [] }: SidebarPro
           icon: Star,
           active: pathname?.includes(`/${params?.storeId}/reviews`),
         },
+
         {
           href: `/${params?.storeId}/forms`,
           label: "Forms",
           icon: ClipboardList,
           active: pathname?.includes(`/${params?.storeId}/forms`),
+        },
+        {
+          href: `/${params?.storeId}/vouchers`,
+          label: "Vouchers",
+          icon: Ticket,
+          active: pathname?.includes(`/${params?.storeId}/vouchers`),
         },
       ],
     },
@@ -186,15 +208,15 @@ export const Sidebar = ({ className, items = [], memberStores = [] }: SidebarPro
         },
       ],
     },
-  ]
+  ];
 
   useEffect(() => {
-    setIsMounted(true)
-  }, [])
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
-    setIsMobileOpen(false)
-  }, [pathname])
+    setIsMobileOpen(false);
+  }, [pathname]);
 
   const allStores = [
     ...items.map((store) => ({
@@ -207,24 +229,24 @@ export const Sidebar = ({ className, items = [], memberStores = [] }: SidebarPro
       name: store.name,
       role: store.role || "Member",
     })),
-  ]
+  ];
 
   debugLog("Sidebar", "Rendering with stores", {
     ownedStores: items.length,
     memberStores: memberStores.length,
     allStores: allStores.length,
-  })
+  });
 
   const toggleSidebar = () => {
-    setIsCollapsed(!isCollapsed)
-  }
+    setIsCollapsed(!isCollapsed);
+  };
 
   const toggleMobileSidebar = () => {
-    setIsMobileOpen(!isMobileOpen)
-  }
+    setIsMobileOpen(!isMobileOpen);
+  };
 
   if (!isMounted) {
-    return null
+    return null;
   }
 
   return (
@@ -236,12 +258,19 @@ export const Sidebar = ({ className, items = [], memberStores = [] }: SidebarPro
         onClick={toggleMobileSidebar}
         className="fixed top-4 left-4 z-50 md:hidden text-white bg-[#243552] hover:bg-[#2d4266]"
       >
-        {isMobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        {isMobileOpen ? (
+          <X className="h-5 w-5" />
+        ) : (
+          <Menu className="h-5 w-5" />
+        )}
       </Button>
 
       {/* Mobile Overlay */}
       {isMobileOpen && (
-        <div className="fixed inset-0 bg-black/50 z-40 md:hidden" onClick={() => setIsMobileOpen(false)} />
+        <div
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={() => setIsMobileOpen(false)}
+        />
       )}
 
       {/* Sidebar */}
@@ -250,7 +279,7 @@ export const Sidebar = ({ className, items = [], memberStores = [] }: SidebarPro
           "fixed top-0 left-0 z-40 h-full transition-all duration-300 ease-in-out border-r",
           "bg-gradient-to-b from-[#1a2942] to-[#121f34] border-[#2a3a56] shadow-lg",
           isCollapsed ? "w-[70px]" : "w-[240px]",
-          isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
+          isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
       >
         <div className="flex flex-col h-full">
@@ -258,7 +287,7 @@ export const Sidebar = ({ className, items = [], memberStores = [] }: SidebarPro
           <div
             className={cn(
               "p-4 flex items-center border-b border-[#2a3a56]",
-              isCollapsed ? "justify-center" : "justify-between",
+              isCollapsed ? "justify-center" : "justify-between"
             )}
           >
             {!isCollapsed && <StoreSwitcher items={allStores} />}
@@ -273,14 +302,19 @@ export const Sidebar = ({ className, items = [], memberStores = [] }: SidebarPro
                     <ShoppingBag className="h-4 w-4 text-[#4cc9f0]" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent side="right" className="w-[200px] p-0 bg-[#243552] border-[#3a4d6b] shadow-xl">
+                <PopoverContent
+                  side="right"
+                  className="w-[200px] p-0 bg-[#243552] border-[#3a4d6b] shadow-xl"
+                >
                   <Command className="bg-[#243552]">
                     <CommandList>
                       <CommandInput
                         placeholder="Search store..."
                         className="bg-[#243552] text-white placeholder-[#8a9cb8]"
                       />
-                      <CommandEmpty className="text-[#8a9cb8]">No store found.</CommandEmpty>
+                      <CommandEmpty className="text-[#8a9cb8]">
+                        No store found.
+                      </CommandEmpty>
                       <CommandGroup heading="Stores" className="text-[#8a9cb8]">
                         {allStores.map((store) => (
                           <CommandItem
@@ -289,7 +323,9 @@ export const Sidebar = ({ className, items = [], memberStores = [] }: SidebarPro
                             className="text-sm text-white hover:bg-[#2d4266] aria-selected:bg-[#2d4266]"
                           >
                             {store.name}
-                            {store.id === params?.storeId && <span className="ml-auto text-[#4cc9f0]">✓</span>}
+                            {store.id === params?.storeId && (
+                              <span className="ml-auto text-[#4cc9f0]">✓</span>
+                            )}
                           </CommandItem>
                         ))}
                       </CommandGroup>
@@ -297,7 +333,7 @@ export const Sidebar = ({ className, items = [], memberStores = [] }: SidebarPro
                       <CommandGroup>
                         <CommandItem
                           onSelect={() => {
-                            storeModal.onOpen()
+                            storeModal.onOpen();
                           }}
                           className="text-white hover:bg-[#2d4266]"
                         >
@@ -316,7 +352,11 @@ export const Sidebar = ({ className, items = [], memberStores = [] }: SidebarPro
               onClick={toggleSidebar}
               className="hidden md:flex text-[#8a9cb8] hover:text-white hover:bg-[#2d4266] transition-colors"
             >
-              {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+              {isCollapsed ? (
+                <ChevronRight className="h-4 w-4" />
+              ) : (
+                <ChevronLeft className="h-4 w-4" />
+              )}
             </Button>
           </div>
 
@@ -340,10 +380,15 @@ export const Sidebar = ({ className, items = [], memberStores = [] }: SidebarPro
                             route.active
                               ? "bg-gradient-to-r from-[#4361ee] to-[#4cc9f0] text-white shadow-md"
                               : "text-[#cbd5e1] hover:bg-[#243552] hover:text-white",
-                            isCollapsed && "justify-center px-2",
+                            isCollapsed && "justify-center px-2"
                           )}
                         >
-                          <route.icon className={cn("h-5 w-5", isCollapsed ? "mr-0" : "mr-3")} />
+                          <route.icon
+                            className={cn(
+                              "h-5 w-5",
+                              isCollapsed ? "mr-0" : "mr-3"
+                            )}
+                          />
                           {!isCollapsed && <span>{route.label}</span>}
                         </Link>
                       </li>
@@ -356,14 +401,19 @@ export const Sidebar = ({ className, items = [], memberStores = [] }: SidebarPro
 
           {/* User Section */}
           <div
-            className={cn("border-t border-[#2a3a56] p-4", isCollapsed ? "flex justify-center" : "flex items-center")}
+            className={cn(
+              "border-t border-[#2a3a56] p-4",
+              isCollapsed ? "flex justify-center" : "flex items-center"
+            )}
           >
             <div className="bg-[#243552] rounded-full p-1 border border-[#3a4d6b] shadow-md">
               <UserButton afterSignOutUrl="/" />
             </div>
             {!isCollapsed && (
               <div className="ml-3 space-y-1">
-                <p className="text-sm font-medium leading-none text-white">Account</p>
+                <p className="text-sm font-medium leading-none text-white">
+                  Account
+                </p>
                 <p className="text-xs text-[#8a9cb8]">Manage your account</p>
               </div>
             )}
@@ -371,5 +421,5 @@ export const Sidebar = ({ className, items = [], memberStores = [] }: SidebarPro
         </div>
       </aside>
     </>
-  )
-}
+  );
+};

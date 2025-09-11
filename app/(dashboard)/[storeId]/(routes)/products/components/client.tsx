@@ -53,9 +53,11 @@ interface ProductsClientProps {
   trashedData: TrashProductColumn[]
   topCreators: { name: string; count: number }[]
   isOwner?: boolean
+  isAdmin?: boolean
 }
 
-export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedData, topCreators, isOwner = false }) => {
+export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedData, topCreators, isOwner = false, isAdmin = false }) => {
+
   const params = useParams()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("published")

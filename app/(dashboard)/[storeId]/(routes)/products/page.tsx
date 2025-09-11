@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server"
 
 import prismadb from "@/lib/prismadb"
 import { formatter } from "@/lib/utils"
+import { checkRole } from "@/utils/roles"
 
 import { ProductsClient } from "./components/client"
 
@@ -36,6 +37,7 @@ const ProductsPage: React.FC<ProductsPageProps> = async ({ params }) => {
     })
     
     const isOwner = store?.userId === userId
+    const isAdmin = await checkRole("admin")
 
     const products = await prismadb.product.findMany({
       where: {
@@ -185,6 +187,7 @@ const ProductsPage: React.FC<ProductsPageProps> = async ({ params }) => {
             trashedData={formattedTrashedProducts} 
             topCreators={topCreators}
             isOwner={isOwner}
+            isAdmin={isAdmin}
           />
         </div>
       </div>

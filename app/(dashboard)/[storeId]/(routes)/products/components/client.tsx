@@ -45,7 +45,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import type { ProductColumn } from "../types"
 import { type TrashProductColumn, trashColumns } from "./trash-columns"
 import { EnhancedProductList } from "./enhanced-product-list"
-import { DataTable } from "@/components/ui/data-table"
 import { TrashDataTable } from "./trash-data-table"
 
 interface ProductsClientProps {

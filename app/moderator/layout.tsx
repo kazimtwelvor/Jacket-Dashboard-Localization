@@ -38,10 +38,7 @@ export default async function DashboardLayout({
     redirect("/")
   }
 
-  const store = {
-    ...storeData,
-    taxRate: storeData.taxRate ? Number.parseFloat(storeData.taxRate.toString()) : 0,
-  }
+  const store = storeData
 
   const storesData = await db.store.findMany({
     where: {
@@ -58,10 +55,7 @@ export default async function DashboardLayout({
     },
   })
 
-  const stores = storesData.map((store) => ({
-    ...store,
-    taxRate: store.taxRate ? Number.parseFloat(store.taxRate.toString()) : 0,
-  }))
+  const stores = storesData
 
   return (
     <div className="h-full">

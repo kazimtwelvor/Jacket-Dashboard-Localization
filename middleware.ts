@@ -26,6 +26,8 @@ export default clerkMiddleware(async (auth, req) => {
     "/api/invitations/accept",
     "/accept-invitation",
     "/api/check-store-access", // New API route for checking store access
+    // "/sign-in",
+    // "/sign-up",
   ];
 
   const isPublicRoute = publicRoutes.some((route) => req.nextUrl.pathname.startsWith(route));
@@ -61,7 +63,7 @@ export default clerkMiddleware(async (auth, req) => {
     // Check store access permissions
     const pathname = req.nextUrl.pathname;
 
-    // Allow users to create a store
+    // Allow authenticated users to access the root page
     if (pathname === "/") {
       response = NextResponse.next();
     } else {

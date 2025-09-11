@@ -9,12 +9,13 @@ import { auth, currentUser } from "@clerk/nextjs/server"
 import prismadb from "@/lib/prismadb"
 
 export default async function SetupPage() {
- const { userId } = await auth()
- const user = await currentUser()
+ try {
+   const { userId } = await auth()
+   const user = await currentUser()
 
- if (!userId) {
-   redirect("/sign-in")
- }
+   if (!userId || !user) {
+     redirect("/sign-in")
+   }
 
  const userEmail = user?.emailAddresses[0]?.emailAddress
 
@@ -29,15 +30,20 @@ export default async function SetupPage() {
  })
 
  if (!dbUser) {
-   dbUser = await prismadb.user.create({
-     data: {
-       clerkId: userId,
-       name: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.username || "User",
-       email: userEmail,
-       password: "", 
-       role: "CUSTOMER", 
-     },
-   })
+   try {
+     dbUser = await prismadb.user.create({
+       data: {
+         clerkId: userId,
+         name: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.username || "User",
+         email: userEmail,
+         password: "", 
+         role: "CUSTOMER", 
+       },
+     })
+   } catch (error) {
+     console.error("Error creating user:", error)
+     redirect("/sign-in")
+   }
  }
 
  const store = await prismadb.store.findFirst({
@@ -63,5 +69,9 @@ export default async function SetupPage() {
    redirect(`/${storeMembership.storeId}`)
  }
 
- return redirect("/create-store")
+   return redirect("/create-store")
+ } catch (error) {
+   console.error("Error in SetupPage:", error)
+   redirect("/sign-in")
+ }
 }

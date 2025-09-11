@@ -45,11 +45,6 @@ export default async function DashboardLayout({ children, params }: DashboardLay
     })
 
     const serializedStore = store
-      ? {
-          ...store,
-          taxRate: store.taxRate ? Number.parseFloat(store.taxRate.toString()) : null,
-        }
-      : null
 
     if (!serializedStore) {
       const storeMember = await prismadb.storeUser.findFirst({
@@ -79,10 +74,7 @@ export default async function DashboardLayout({ children, params }: DashboardLay
       },
     })
 
-    const serializedOwnedStores = ownedStores.map((store) => ({
-      ...store,
-      taxRate: store.taxRate ? Number.parseFloat(store.taxRate.toString()) : null,
-    }))
+    const serializedOwnedStores = ownedStores
 
     const memberStores = await prismadb.storeUser.findMany({
       where: {
@@ -95,7 +87,6 @@ export default async function DashboardLayout({ children, params }: DashboardLay
 
     const serializedMemberStores = memberStores.map((membership) => ({
       ...membership.store,
-      taxRate: membership.store.taxRate ? Number.parseFloat(membership.store.taxRate.toString()) : null,
       role: membership.role,
     }))
 
@@ -109,7 +100,7 @@ export default async function DashboardLayout({ children, params }: DashboardLay
     console.log(`Dashboard layout: Found ${allStores.length} total stores for user`, {
       ownedStores: serializedOwnedStores.length,
       memberStores: serializedMemberStores.length,
-      allStores: allStores.map((store) => ({ id: store.id, name: store.name, role: store.role })),
+      allStores: allStores.map((store) => ({ id: store.id, name: store.name, role: (store as any).role })),
     })
 
     return (

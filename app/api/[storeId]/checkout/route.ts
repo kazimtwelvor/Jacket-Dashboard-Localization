@@ -1,19 +1,22 @@
-
-import prismadb from "@/lib/prismadb"
-import Stripe from "stripe"
-import { NextResponse } from "next/server"
+import prismadb from "@/lib/prismadb";
+import Stripe from "stripe";
+import { NextResponse } from "next/server";
+import { encrypt } from "@/lib/encryption";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
-}
+};
 
 export async function OPTIONS() {
-  return NextResponse.json({}, { headers: corsHeaders })
+  return NextResponse.json({}, { headers: corsHeaders });
 }
 
-export async function POST(req: Request, { params }: { params: { storeId: string } }) {
+export async function POST(
+  req: Request,
+  { params }: { params: { storeId: string } }
+) {
   try {
     const {
       productIds,
@@ -23,20 +26,23 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       address,
       billingAddress,
       shippingAddress,
+      embedded = false, // New parameter to determine if we should use embedded checkout
+      voucherCode, // Add voucher code parameter
+      discountAmount = 0, // Add discount amount parameter
       state,
       country,
-      zipCode,
-      // estimatedDelivery,
-      // actualDelivery,
       city,
+      zipCode,
       customerName,
       notes,
-      embedded = false, 
-    } = await req.json()
-    const { storeId } = params
+    } = await req.json();
+    const { storeId } = params;
+
     if (!productIds || productIds.length === 0) {
-      return new NextResponse("Product ids are required", { status: 400 })
+      return new NextResponse("Product ids are required", { status: 400 });
     }
+
+    // Get store settings including payment configuration
     const store = await prismadb.store.findUnique({
       where: {
         id: storeId,
@@ -49,29 +55,38 @@ export async function POST(req: Request, { params }: { params: { storeId: string
         cashOnDeliveryEnabled: true,
         bankTransferEnabled: true,
       },
-    })
+    });
 
     if (!store) {
-      return new NextResponse("Store not found", { status: 404 })
+      return new NextResponse("Store not found", { status: 404 });
     }
 
     // Validate that the selected payment method is enabled
     if (paymentMethod === "stripe" && !store.stripeEnabled) {
-      return new NextResponse("Stripe payments are not enabled for this store", {
-        status: 400,
-      })
+      return new NextResponse(
+        "Stripe payments are not enabled for this store",
+        {
+          status: 400,
+        }
+      );
     } else if (paymentMethod === "paypal" && !store.paypalEnabled) {
-      return new NextResponse("PayPal payments are not enabled for this store", {
-        status: 400,
-      })
+      return new NextResponse(
+        "PayPal payments are not enabled for this store",
+        {
+          status: 400,
+        }
+      );
     } else if (paymentMethod === "cash" && !store.cashOnDeliveryEnabled) {
-      return new NextResponse("Cash on delivery is not enabled for this store", {
-        status: 400,
-      })
+      return new NextResponse(
+        "Cash on delivery is not enabled for this store",
+        {
+          status: 400,
+        }
+      );
     } else if (paymentMethod === "bank" && !store.bankTransferEnabled) {
       return new NextResponse("Bank transfer is not enabled for this store", {
         status: 400,
-      })
+      });
     }
 
     const products = await prismadb.product.findMany({
@@ -80,14 +95,26 @@ export async function POST(req: Request, { params }: { params: { storeId: string
           in: productIds,
         },
       },
-    })
+    });
 
-    const totalPrice = products.reduce((sum, product) => sum + Number(product.price), 0)
+    // Calculate total price once for all payment methods
+    let totalPrice = products.reduce(
+      (sum, product) => sum + Number(product.price),
+      0
+    );
 
+    // Apply voucher discount if provided
+    let finalTotal = totalPrice;
+    if (voucherCode && discountAmount > 0) {
+      finalTotal = Math.max(0, totalPrice - discountAmount);
+    }
+
+    // Create order data common to all payment methods
     const orderData = {
       storeId: storeId,
       isPaid: false,
-      total: totalPrice,
+      total: finalTotal,
+      discount: discountAmount,
       orderItems: {
         create: products.map((product) => ({
           product: {
@@ -100,18 +127,21 @@ export async function POST(req: Request, { params }: { params: { storeId: string
           total: product.price,
         })),
       },
-    }
+    };
 
     // Handle different payment methods
     if (paymentMethod === "stripe") {
       if (!store.stripeSecretKey) {
-        return new NextResponse("Stripe is not properly configured for this store", { status: 400 })
+        return new NextResponse(
+          "Stripe is not properly configured for this store",
+          { status: 400 }
+        );
       }
 
       // Initialize Stripe with the store's secret key
       const stripe = new Stripe(store.stripeSecretKey, {
         apiVersion: "2025-02-24.acacia",
-      })
+      });
 
       // Create order in database
       const order = await prismadb.order.create({
@@ -124,35 +154,38 @@ export async function POST(req: Request, { params }: { params: { storeId: string
           address: address || "",
           billingAddress: billingAddress || null,
           shippingAddress: shippingAddress || null,
-          city: city || null,
-          country: country || null,
-          state: state || null,
-          zipCode: zipCode || null,
-          customerName: customerName || null,
-          notes: notes || null,
-          // estimatedDelivery: estimatedDelivery ? new Date(estimatedDelivery) : null,
-          // actualDelivery: actualDelivery ? new Date(actualDelivery) : null,
+          state,
+          country: country || "",
+          city: city || "",
+          zipCode: zipCode || "",
+          customerName: customerName || "",
+          notes: notes || "",
         },
-      })
+      });
 
+      // For embedded checkout, create a payment intent instead of a checkout session
       if (embedded) {
         // Create a PaymentIntent
         const paymentIntent = await stripe.paymentIntents.create({
-          amount: Math.round(Number(totalPrice) * 100), // Convert to cents
+          amount: Math.round(Number(finalTotal) * 100), // Convert to cents
           currency: "usd",
           metadata: {
             orderId: order.id,
             storeId: storeId,
+            voucherCode: voucherCode || "",
+            discountAmount: discountAmount.toString(),
           },
-        })
+        });
 
         return NextResponse.json(
           {
-            clientSecret: paymentIntent.client_secret,
+            clientSecret: paymentIntent.client_secret
+              ? encrypt(paymentIntent.client_secret)
+              : null,
             orderId: order.id,
           },
-          { headers: corsHeaders },
-        )
+          { headers: corsHeaders }
+        );
       } else {
         // Traditional redirect checkout flow
         // Prepare line items for Stripe checkout
@@ -165,7 +198,21 @@ export async function POST(req: Request, { params }: { params: { storeId: string
             },
             unit_amount: Math.round(Number(product.price) * 100), // Ensure integer
           },
-        }))
+        }));
+
+        // Add discount as a separate line item if applicable
+        if (voucherCode && discountAmount > 0) {
+          line_items.push({
+            quantity: 1,
+            price_data: {
+              currency: "USD",
+              product_data: {
+                name: `Discount (${voucherCode})`,
+              },
+              unit_amount: -Math.round(Number(discountAmount) * 100), // Negative amount for discount
+            },
+          });
+        }
 
         // Create Stripe checkout session
         const session = await stripe.checkout.sessions.create({
@@ -181,7 +228,8 @@ export async function POST(req: Request, { params }: { params: { storeId: string
           },
           custom_text: {
             shipping_address: {
-              message: "Please provide your complete shipping address for delivery",
+              message:
+                "Please provide your complete shipping address for delivery",
             },
             submit: {
               message: "We'll process your order right after payment",
@@ -195,39 +243,47 @@ export async function POST(req: Request, { params }: { params: { storeId: string
             orderId: order.id,
             storeId: storeId,
             source: "checkout_api",
+            voucherCode: voucherCode || "",
+            discountAmount: discountAmount.toString(),
           },
-        })
+        });
 
-        return NextResponse.json({ url: session.url }, { headers: corsHeaders })
+        return NextResponse.json(
+          { url: session.url },
+          { headers: corsHeaders }
+        );
       }
     } else if (paymentMethod === "cash" || paymentMethod === "bank") {
       // Create order for cash on delivery or bank transfer
       const order = await prismadb.order.create({
         data: {
           ...orderData,
-          paymentMethod: paymentMethod === "cash" ? "CASH_ON_DELIVERY" : "BANK_TRANSFER",
+          paymentMethod:
+            paymentMethod === "cash" ? "CASH_ON_DELIVERY" : "BANK_TRANSFER",
         },
-      })
+      });
 
       return NextResponse.json(
         {
           url: `${process.env.FRONTEND_STORE_URL}/checkout/confirmation?orderId=${order.id}&method=${paymentMethod}`,
         },
-        { headers: corsHeaders },
-      )
+        { headers: corsHeaders }
+      );
     } else {
       // Handle PayPal case
       return NextResponse.json(
         {
-          error: "For PayPal payments, please use the PayPal button on the checkout page",
+          error:
+            "For PayPal payments, please use the PayPal button on the checkout page",
         },
         {
           status: 400,
           headers: corsHeaders,
-        },
-      )
+        }
+      );
     }
   } catch (error) {
-    return new NextResponse("Internal error", { status: 500 })
+    console.error("[CHECKOUT_ERROR]", error);
+    return new NextResponse("Internal error", { status: 500 });
   }
 }

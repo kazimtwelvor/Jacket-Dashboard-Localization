@@ -686,9 +686,9 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
                           disabled={isImporting}
                         >
                           <FileText className="mr-2 h-4 w-4" />
-                          CSV (Full)
+                          CSV
                         </Button>
-                        <Button
+                        {/* <Button
                           variant="outline"
                           size="sm"
                           onClick={() => {
@@ -703,7 +703,7 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
                         >
                           <FileText className="mr-2 h-4 w-4" />
                           CSV (Simple)
-                        </Button>
+                        </Button> */}
                         <Button
                           variant="outline"
                           size="sm"

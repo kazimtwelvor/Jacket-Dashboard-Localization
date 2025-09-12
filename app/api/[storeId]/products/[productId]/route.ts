@@ -266,6 +266,7 @@ export async function GET(req: Request, { params }: { params: { productId: strin
 
 export async function PATCH(req: Request, { params }: { params: { storeId: string; productId: string } }) {
   try {
+    console.log("=== API PATCH REQUEST STARTED ===")
     const { userId } = await auth()
 
     if (!userId) {
@@ -273,8 +274,10 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
     }
 
     const { productId, storeId } = params
+    console.log("Product ID:", productId, "Store ID:", storeId)
 
     const body = await req.json()
+    console.log("Request body received:", Object.keys(body))
 
     const {
       name,
@@ -349,19 +352,49 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
     const tagsArray = Array.isArray(tags) ? tags : []
     const keywordsArray = Array.isArray(keywords) ? keywords : [] // Handle keywords array
 
-    const specificationsObject = typeof specifications === "object" ? specifications : {}
+    // Safe JSON parsing helper
+    const safeJsonParse = (value: any, fallback: any = {}) => {
+      if (typeof value === "object" && value !== null) {
+        return value
+      }
+      if (typeof value === "string") {
+        if (value === "[object Object]") {
+          console.warn("Found '[object Object]' string in API route, returning fallback:", fallback)
+          return fallback
+        }
+        if (value.trim() === "") {
+          return fallback
+        }
+        try {
+          return JSON.parse(value)
+        } catch (error) {
+          console.error("JSON parse error in API route:", error, "value:", value)
+          return fallback
+        }
+      }
+      return fallback
+    }
 
+    console.log("Raw specifications:", specifications)
+    const specificationsObject = safeJsonParse(specifications, {})
+    console.log("Parsed specifications:", specificationsObject)
+
+    console.log("Raw colorLinks:", colorLinks)
     let colorLinksObject = {}
     try {
-
       if (typeof colorLinks === "string") {
-        try {
-          colorLinksObject = JSON.parse(colorLinks)
-        } catch (parseError) {
+        if (colorLinks === "[object Object]") {
+          console.warn("Found '[object Object]' in colorLinks, using empty object")
+          colorLinksObject = {}
+        } else {
           try {
-            colorLinksObject = JSON.parse(JSON.parse(colorLinks))
-          } catch (doubleParseError) {
-            colorLinksObject = {}
+            colorLinksObject = JSON.parse(colorLinks)
+          } catch (parseError) {
+            try {
+              colorLinksObject = JSON.parse(JSON.parse(colorLinks))
+            } catch (doubleParseError) {
+              colorLinksObject = {}
+            }
           }
         }
       } else if (typeof colorLinks === "object" && colorLinks !== null) {
@@ -375,29 +408,37 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
 
     const schemaForDb = null
 
-    let schemaData = undefined
+      let schemaData = undefined
     if (body.schema) {
       schemaData = body.schema
     } else if (body.schema1 || body.schema2 || body.schema3) {
       const combinedSchema = {}
 
       try {
-        if (body.schema1) {
-          const parsed = typeof body.schema1 === "string" ? JSON.parse(body.schema1) : body.schema1
-          const schemaType = parsed["@type"] || "Product"
-          combinedSchema[schemaType] = parsed
+        if (body.schema1 && body.schema1 !== "[object Object]") {
+          const parsed = safeJsonParse(body.schema1, null)
+          if (parsed) {
+            const schemaType = parsed["@type"] || "Product"
+            combinedSchema[schemaType] = parsed
+          }
         }
 
-        if (body.schema2) {
-          const parsed = typeof body.schema2 === "string" ? JSON.parse(body.schema2) : body.schema2
-          const schemaType = parsed["@type"] || "FAQPage"
-          combinedSchema[schemaType] = parsed
+        if (body.schema2 && body.schema2 !== "[object Object]") {
+          const parsed = safeJsonParse(body.schema2, null)
+          if (parsed) {
+            const schemaType = parsed["@type"] || "FAQPage"
+            combinedSchema[schemaType] = parsed
+            console.log("Added schema2 as", schemaType)
+          }
         }
 
-        if (body.schema3) {
-          const parsed = typeof body.schema3 === "string" ? JSON.parse(body.schema3) : body.schema3
-          const schemaType = parsed["@type"] || "HowTo"
-          combinedSchema[schemaType] = parsed
+        if (body.schema3 && body.schema3 !== "[object Object]") {
+          const parsed = safeJsonParse(body.schema3, null)
+          if (parsed) {
+            const schemaType = parsed["@type"] || "HowTo"
+            combinedSchema[schemaType] = parsed
+            console.log("Added schema3 as", schemaType)
+          }
         }
 
         schemaData = Object.keys(combinedSchema).length > 0 ? JSON.stringify(combinedSchema) : undefined
@@ -405,49 +446,45 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       }
     }
 
-    const product = await prismadb.product.update({
-      where: {
-        id: productId,
-      },
-      data: {
-        name,
-        price,
-        categoryData,
-        colorDetails, // Use colorDetails directly
-        sizeDetails, // Use sizeDetails directly
-        isFeatured: isFeatured === true || isFeatured === "true",
-        isArchived: isArchived === true || isArchived === "true",
-        isPublished: isPublished === true || isPublished === "true",
-        sku,
-        stockStatus,
-        description,
-        salePrice,
-        // originalPrice,
-        isDiscounted: isDiscounted === true || isDiscounted === "true",
-        tags: tagsArray,
-        specifications: specificationsObject,
-        colorLinks: colorLinksForDb, // Use the properly formatted colorLinks
-        schema: schemaData,
-        gender,
-        metaTitle,
-        metaDescription,
-        slug,
-        keywords: keywordsArray, // Use the keywords array
-        // noIndex: noIndex === true || noIndex === "true",
-        brandName,
-        // ratingValue,
-        // reviewCount,
-        // purchaseNote,
-        // productType,
-        // isVirtual: isVirtual === true || isVirtual === "true",
-        // isDownloadable: isDownloadable === true || isDownloadable === "true",
-        relatedProducts: Array.isArray(relatedProducts) ? relatedProducts : [],
-        relatedProducts: Array.isArray(relatedProducts) ? relatedProducts : [],
-        updatedById: user?.id || null,
-        updatedByName: user?.name || "Unknown",
-        updatedByEmail: user?.email || null,
-      },
-    })
+   
+    try {
+      const product = await prismadb.product.update({
+        where: {
+          id: productId,
+        },
+        data: {
+          name,
+          price,
+          categoryData,
+          colorDetails, 
+          sizeDetails, 
+          isFeatured: isFeatured === true || isFeatured === "true",
+          isArchived: isArchived === true || isArchived === "true",
+          isPublished: isPublished === true || isPublished === "true",
+          sku,
+          stockStatus,
+          description,
+          salePrice,
+          isDiscounted: isDiscounted === true || isDiscounted === "true",
+          tags: tagsArray,
+          specifications: specificationsObject,
+          colorLinks: colorLinksForDb, 
+          schema: schemaData,
+          gender,
+          metaTitle,
+          metaDescription,
+          slug,
+          keywords: keywordsArray,
+          brandName,
+          relatedProducts: Array.isArray(relatedProducts) ? relatedProducts : [],
+          updatedById: user?.id || null,
+          updatedByName: user?.name || "Unknown",
+          updatedByEmail: user?.email || null,
+        },
+      })
+    } catch (dbError) {
+      throw new Error(`Database update failed: ${dbError instanceof Error ? dbError.message : "Unknown database error"}`)
+    }
 
     if (images && images.length > 0) {
       await prismadb.productImage.deleteMany({
@@ -546,7 +583,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
     const serializedProduct = {
       ...updatedProductWithReviews,
       price: updatedProductWithReviews.price.toString(),
-      // originalPrice: updatedProductWithReviews.originalPrice.toString(),
       salePrice: updatedProductWithReviews.salePrice ? updatedProductWithReviews.salePrice.toString() : null,
       reviews: updatedProductWithReviews.reviews.map((review) => ({
         id: review.id,
@@ -565,7 +601,14 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
 
     return NextResponse.json(serializedProduct)
   } catch (err) {
-    return new NextResponse("Internal error", { status: 500 })
+    console.error("=== API PATCH ERROR ===")
+    console.error("Error details:", err)
+    console.error("Error stack:", err instanceof Error ? err.stack : "No stack trace")
+    
+    const errorMessage = err instanceof Error ? err.message : "Unknown error occurred"
+    console.error("Final error message:", errorMessage)
+    
+    return new NextResponse(`Internal error: ${errorMessage}`, { status: 500 })
   }
 }
 

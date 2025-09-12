@@ -101,7 +101,13 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
     setIsSearching(true)
     try {
       const isTrashSearch = activeTab === "trash"
-      const apiUrl = `/api/${storeId}/products?search=${encodeURIComponent(searchQuery)}&admin=true${isTrashSearch ? '&trash=true' : ''}`
+      let apiUrl = `/api/${storeId}/products?search=${encodeURIComponent(searchQuery)}&admin=true`
+      
+      if (isTrashSearch) {
+        apiUrl += '&trash=true'
+      } else {
+        apiUrl += `&status=${activeTab}`
+      }
 
       const response = await fetch(apiUrl)
       if (response.ok) {

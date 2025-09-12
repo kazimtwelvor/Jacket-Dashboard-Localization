@@ -1162,6 +1162,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       formData.append("storeId", storeId)
 
       formData.append("submitType", "draft")
+      formData.append("isParentProduct", formValues.isParentProduct ? "true" : "false")
+      formData.append("parentProductId", formValues.parentProductId || "")
 
       formData.append("name", formValues.name || "")
       formData.append("slug", formValues.slug || "")
@@ -1493,6 +1495,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       formData.append("storeId", storeId)
 
       formData.append("submitType", type)
+      formData.append("isParentProduct", safeValues.isParentProduct ? "true" : "false")
+      formData.append("parentProductId", safeValues.parentProductId || "")
       const formattedSpecs = getFormattedSpecifications()
 
       const mainImage = safeValues.mainImage

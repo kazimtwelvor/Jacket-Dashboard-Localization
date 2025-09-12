@@ -276,6 +276,37 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
     form.setValue("categories.colorVariationLinks", newLinks, { shouldDirty: true })
   }
 
+  const removeColorCompletely = (color: string) => {
+    const newLinks = { ...colorLinks }
+    delete newLinks[color]
+    setColorLinks(newLinks)
+    form.setValue("categories.colorVariationLinks", newLinks, { shouldDirty: true })
+
+    const currentSpecColors = form.getValues("specifications.color") || []
+    const updatedSpecColors = currentSpecColors.filter(c => c !== color)
+    form.setValue("specifications.color", updatedSpecColors, { shouldDirty: true })
+
+    const currentVariationColors = form.getValues("categories.variationColors") || []
+    const updatedVariationColors = currentVariationColors.filter(c => c !== color)
+    form.setValue("categories.variationColors", updatedVariationColors, { shouldDirty: true })
+
+    setSearchTerms(prev => {
+      const newTerms = { ...prev }
+      delete newTerms[color]
+      return newTerms
+    })
+    setSearchResults(prev => {
+      const newResults = { ...prev }
+      delete newResults[color]
+      return newResults
+    })
+    setIsSearching(prev => {
+      const newSearching = { ...prev }
+      delete newSearching[color]
+      return newSearching
+    })
+  }
+
   const updateDropdownPosition = (key: string) => {
     const button = buttonRefs.current[key]
     if (button) {
@@ -613,7 +644,7 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
                         size="icon"
                         type="button"
                         disabled={!!selectedParentProduct}
-                        onClick={() => updateLink(color, "")}
+                        onClick={() => removeColorCompletely(color)}
                         className="h-10 w-10"
                       >
                         <X className="h-4 w-4" />

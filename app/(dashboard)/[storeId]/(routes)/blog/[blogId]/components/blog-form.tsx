@@ -809,8 +809,8 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
               <Trash className="h-4 w-4" />
             </Button>
           )}
-          <Button disabled={loading} onClick={handleManualSave} type="button">
-            Save Changes
+          <Button disabled={loading} onClick={initialData ? handleManualSave : () => onSubmit(form.getValues())} type="button">
+            {action}
           </Button>
         </div>
       </div>

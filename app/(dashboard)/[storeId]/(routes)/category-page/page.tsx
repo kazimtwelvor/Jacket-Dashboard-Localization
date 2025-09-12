@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
+import { useUser } from "@clerk/nextjs"
 import { Heading } from "@/components/ui/heading"
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
@@ -16,12 +17,41 @@ import { toast } from "react-hot-toast"
 export default function CategoryPage() {
   const params = useParams()
   const router = useRouter()
+  const { user } = useUser()
   const [loading, setLoading] = useState(true)
   const [categoryPages, setCategoryPages] = useState([])
   const [bestFilter, setBestFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [accessVerified, setAccessVerified] = useState(false)
+  useEffect(() => {
+    const checkAccess = async () => {
+      try {
+        const response = await axios.get(`/api/check-admin`)
+        const isAdmin = response.data.isAdmin
+        
+        const storeResponse = await axios.get(`/api/${params?.storeId}/store-access`)
+        const isOwner = storeResponse.data.isOwner
+        const memberRole = storeResponse.data.role
+        
+        // Only allow admin users or store owners, block editors and other roles
+        if (!isAdmin && !isOwner) {
+          router.push('/unauthorized')
+          return
+        }
+        
+        setAccessVerified(true)
+      } catch (error) {
+        router.push('/unauthorized')
+        return
+      }
+    }
+    
+    checkAccess()
+  }, [params?.storeId, router])
   
   useEffect(() => {
+    if (!accessVerified) return
+    
     const fetchCategoryPages = async () => {
       try {
         setLoading(true)
@@ -53,14 +83,14 @@ export default function CategoryPage() {
     }
     
     fetchCategoryPages()
-  }, [params?.storeId, bestFilter, statusFilter])
+  }, [params?.storeId, bestFilter, statusFilter, accessVerified])
   
   return (
     <div className="flex-col">
       <div className="flex-1 space-y-4 p-8 pt-6">
         <div className="flex items-center justify-between">
           <Heading
-            title="Category Pages"
+            title={`Category Pages (${categoryPages.length})`}
             description="Manage your category pages"
           />
           <div className="flex items-center gap-2">
@@ -74,16 +104,6 @@ export default function CategoryPage() {
                   <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="draft">Draft</SelectItem>
                   <SelectItem value="published">Published</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={bestFilter} onValueChange={setBestFilter}>
-                <SelectTrigger className="w-[140px]">
-                  <SelectValue placeholder="Filter by best" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Pages</SelectItem>
-                  <SelectItem value="best">Best Only</SelectItem>
-                  <SelectItem value="regular">Regular Only</SelectItem>
                 </SelectContent>
               </Select>
             </div>

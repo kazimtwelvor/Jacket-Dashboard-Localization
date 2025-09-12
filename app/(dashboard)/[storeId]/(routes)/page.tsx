@@ -25,7 +25,7 @@ interface Product {
   id: string
   name: string
   price: Decimal | number
-  images: { url: string }[]
+  images: { image: { url: string } }[]
   categoryData?: { material?: string; style?: string; gender?: string }
 }
 
@@ -94,6 +94,14 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
     },
     include: {
       orderItems: true,
+      images: {
+        include: {
+          image: true,
+        },
+        orderBy: {
+          order: 'asc',
+        },
+      },
     },
     orderBy: {
       createdAt: "desc",
@@ -174,7 +182,7 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
       name: product.name,
       price: new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(Number(product.price)),
       category: product.categoryData ? `${product.categoryData.material || ''} ${product.categoryData.style || ''}`.trim() || "Uncategorized" : "Uncategorized",
-      image: "/placeholder.svg",
+      image: product.images && product.images.length > 0 ? product.images[0].image.url : "/placeholder.svg",
       salesCount: productSalesMap.get(product.id) || 0,
     }))
     .sort((a, b) => b.salesCount - a.salesCount)

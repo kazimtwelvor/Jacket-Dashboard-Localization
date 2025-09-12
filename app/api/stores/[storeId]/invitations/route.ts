@@ -37,6 +37,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
 
     return NextResponse.json(invitations)
   } catch (error) {
-    return new NextResponse("Internal error", { status: 500 })
+    return new NextResponse(error as string, { status: 500 })
   }
 }

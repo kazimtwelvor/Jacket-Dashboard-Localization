@@ -12,19 +12,19 @@ export async function POST(req: Request, { params }: { params: { storeId: string
     const { email, role } = body
 
     if (!userId) {
-      return new NextResponse("Unauthenticated", { status: 401 })
+      return NextResponse.json({ error: "Unauthenticated" }, { status: 401 })
     }
 
     if (!email) {
-      return new NextResponse("Email is required", { status: 400 })
+      return NextResponse.json({ error: "Email is required" }, { status: 400 })
     }
 
     if (!role) {
-      return new NextResponse("Role is required", { status: 400 })
+      return NextResponse.json({ error: "Role is required" }, { status: 400 })
     }
 
     if (!storeId) {
-      return new NextResponse("Store ID is required", { status: 400 })
+      return NextResponse.json({ error: "Store ID is required" }, { status: 400 })
     }
 
     const store = await prismadb.store.findFirst({
@@ -35,7 +35,7 @@ export async function POST(req: Request, { params }: { params: { storeId: string
     })
 
     if (!store) {
-      return new NextResponse("Unauthorized", { status: 403 })
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
     }
 
     const existingUser = await prismadb.user.findUnique({
@@ -51,10 +51,11 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       })
 
       if (existingMember) {
-        return new NextResponse(JSON.stringify({ message: "User is already a member of this store" }), { status: 400 })
+        return NextResponse.json({ error: "User is already a member of this store" }, { status: 400 })
       }
     }
 
+    // Check for existing pending invitation
     const existingInvitation = await prismadb.invitation.findFirst({
       where: {
         storeId: storeId,
@@ -63,14 +64,27 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       },
     })
 
+    // If there's a pending invitation, update it with new token and role
     if (existingInvitation) {
-      return new NextResponse(
-        JSON.stringify({
-          message: "An invitation has already been sent to this email",
-          token: existingInvitation.token,
-        }),
-        { status: 200 },
-      )
+      const newToken = crypto.randomBytes(32).toString("hex")
+      const newExpiresDate = new Date()
+      newExpiresDate.setHours(newExpiresDate.getHours() + 48)
+
+      const updatedInvitation = await prismadb.invitation.update({
+        where: { id: existingInvitation.id },
+        data: {
+          token: newToken,
+          role: role,
+          expires: newExpiresDate,
+          updatedAt: new Date(),
+        },
+      })
+
+      return NextResponse.json({
+        message: "Invitation token regenerated successfully",
+        invitation: updatedInvitation,
+        token: newToken,
+      }, { status: 200 })
     }
 
     const token = crypto.randomBytes(32).toString("hex")
@@ -93,7 +107,8 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       token, // Include the token in the response
     })
   } catch (error) {
-    return new NextResponse("Internal error", { status: 500 })
+    console.error("Invitation creation error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
 
@@ -103,11 +118,11 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
     const storeId = params.storeId
 
     if (!userId) {
-      return new NextResponse("Unauthenticated", { status: 401 })
+      return NextResponse.json({ error: "Unauthenticated" }, { status: 401 })
     }
 
     if (!storeId) {
-      return new NextResponse("Store ID is required", { status: 400 })
+      return NextResponse.json({ error: "Store ID is required" }, { status: 400 })
     }
 
     const store = await prismadb.store.findFirst({
@@ -118,7 +133,7 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
     })
 
     if (!store) {
-      return new NextResponse("Unauthorized", { status: 403 })
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
     }
 
     const invitations = await prismadb.invitation.findMany({
@@ -133,6 +148,7 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
 
     return NextResponse.json(invitations)
   } catch (error) {
-    return new NextResponse("Internal error", { status: 500 })
+    console.error("Invitation creation error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

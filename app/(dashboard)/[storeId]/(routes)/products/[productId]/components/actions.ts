@@ -112,13 +112,7 @@ async function generateUniqueSku(storeId: string, manualSku: string | null): Pro
   }
 }
 
-async function logFormDataContents(formData: FormData, label: string) {
-  for (const [key, value] of Array.from(formData.entries())) {
-    if (typeof value === "string" && value.length > 100) {
-    } else {
-    }
-  }
-}
+
 
 function safeJsonParse(value: string | null | undefined, fallback: any = null) {
   if (!value || typeof value !== "string") {
@@ -126,7 +120,6 @@ function safeJsonParse(value: string | null | undefined, fallback: any = null) {
   }
   
   if (value.trim() === "[object Object]") {
-    console.warn("Found '[object Object]' string in server action, returning fallback:", fallback)
     return fallback
   }
   
@@ -137,14 +130,12 @@ function safeJsonParse(value: string | null | undefined, fallback: any = null) {
   try {
     return JSON.parse(value)
   } catch (error) {
-    console.error("JSON parse error in server action:", error, "value:", value)
     return fallback
   }
 }
 
 export async function createProduct(formData: FormData) {
   try {
-    console.log("=== CREATE PRODUCT SERVER ACTION STARTED ===")
     
     for (const [key, value] of Array.from(formData.entries())) {
       if (typeof value === "string") {
@@ -153,7 +144,6 @@ export async function createProduct(formData: FormData) {
         } else {
         }
       } else {
-        console.log(`FormData key: ${key}, value: [complex value]`)
       }
     }
 
@@ -217,10 +207,6 @@ export async function createProduct(formData: FormData) {
     const isArchived = submitType === "draft"
     const specifications = formData.get("specifications") as string
     
-    console.log("=== RAW SPECIFICATIONS FROM FORM DATA ===")
-    console.log("Raw specifications:", specifications)
-    console.log("Specifications type:", typeof specifications)
-    console.log("Is '[object Object]'?", specifications === "[object Object]")
     const materialJson = formData.get("material") as string
     const styleJson = formData.get("style") as string
     const gender = formData.get("gender") as string
@@ -534,7 +520,6 @@ export async function createProduct(formData: FormData) {
         color: [],
       })
     }
-    console.log("Clean specifications to save:", cleanSpecifications)
 
     const productData = {
       name,
@@ -569,8 +554,8 @@ export async function createProduct(formData: FormData) {
 
 
  
-    const specsParsed = cleanSpecifications ? safeJsonParse(cleanSpecifications, {}) : {}
-  
+    
+    const selectedColors = colorDetails && Array.isArray(colorDetails) ? colorDetails : []
     
     if (!selectedColors || selectedColors.length === 0) {
       throw new Error("At least one color must be selected before saving the product")
@@ -703,12 +688,10 @@ export async function createProduct(formData: FormData) {
               excludeFromSitemap: (image as any).excludeFromSitemap || false,
             }
           } else {
-            console.warn("Skipping invalid image data:", image);
             continue;
           }
           
           if (!imageUrl) {
-            console.warn("Skipping image with empty URL");
             continue;
           }
 
@@ -763,12 +746,10 @@ export async function createProduct(formData: FormData) {
               excludeFromSitemap: (image as any).excludeFromSitemap || false,
             }
           } else {
-             console.warn("Skipping invalid image data for new product:", image);
             continue;
           }
 
           if (!imageUrl) {
-            console.warn("Skipping image with empty URL for new product");
             continue;
           }
 

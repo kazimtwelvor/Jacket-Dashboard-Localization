@@ -15,7 +15,7 @@ async function syncColorVariations(currentProductId: string, storeId: string, sp
         storeId: storeId,
         isDeleted: false,
         id: { not: currentProductId },
-        OR: currentColors.map(color => ({
+        OR: currentColors.map((color: string) => ({
           specifications: {
             path: ['color'],
             array_contains: [color]
@@ -36,7 +36,7 @@ async function syncColorVariations(currentProductId: string, storeId: string, sp
             : relatedProduct.specifications
         }
         const existingColors = existingSpecs.color || []
-        existingColors.forEach(color => allUniqueColors.add(color))
+        existingColors.forEach((color: string) => allUniqueColors.add(color))
       } catch (error) {
       }
     }
@@ -266,7 +266,6 @@ export async function GET(req: Request, { params }: { params: { productId: strin
 
 export async function PATCH(req: Request, { params }: { params: { storeId: string; productId: string } }) {
   try {
-    console.log("=== API PATCH REQUEST STARTED ===")
     const { userId } = await auth()
 
     if (!userId) {
@@ -274,27 +273,23 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
     }
 
     const { productId, storeId } = params
-    console.log("Product ID:", productId, "Store ID:", storeId)
 
     const body = await req.json()
-    console.log("Request body received:", Object.keys(body))
 
     const {
       name,
       price,
       categoryData,
-      colorDetails, // Using colorDetails instead of colorIds
-      sizeDetails, // Using sizeDetails instead of sizeIds
+      colorDetails, 
+      sizeDetails, 
       images,
       isPublished,
       isArchived,
       isFeatured,
-      status,
       sku,
       stockStatus,
       description,
       salePrice,
-      // originalPrice,
       isDiscounted,
       specifications,
       tags,
@@ -303,19 +298,8 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       metaTitle,
       metaDescription,
       slug,
-      keywords, // Use a single keywords array instead of focusKeyword and additionalKeywords
-      // noIndex,
+      keywords, 
       brandName,
-      // ratingValue,
-      // reviewCount,
-      schema1, // Add schema field
-      schema2,
-      schema3,
-      // purchaseNote,
-      // productType,
-      // isVirtual,
-      // isDownloadable,
-      tempReviewsId,
       cachedReviews,
       relatedProducts,
     } = body
@@ -359,7 +343,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       }
       if (typeof value === "string") {
         if (value === "[object Object]") {
-          console.warn("Found '[object Object]' string in API route, returning fallback:", fallback)
           return fallback
         }
         if (value.trim() === "") {
@@ -368,23 +351,18 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
         try {
           return JSON.parse(value)
         } catch (error) {
-          console.error("JSON parse error in API route:", error, "value:", value)
           return fallback
         }
       }
       return fallback
     }
 
-    console.log("Raw specifications:", specifications)
     const specificationsObject = safeJsonParse(specifications, {})
-    console.log("Parsed specifications:", specificationsObject)
 
-    console.log("Raw colorLinks:", colorLinks)
     let colorLinksObject = {}
     try {
       if (typeof colorLinks === "string") {
         if (colorLinks === "[object Object]") {
-          console.warn("Found '[object Object]' in colorLinks, using empty object")
           colorLinksObject = {}
         } else {
           try {
@@ -406,7 +384,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
 
     const colorLinksForDb = typeof colorLinksObject === "object" ? JSON.stringify(colorLinksObject) : "{}"
 
-    const schemaForDb = null
 
       let schemaData = undefined
     if (body.schema) {
@@ -428,7 +405,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
           if (parsed) {
             const schemaType = parsed["@type"] || "FAQPage"
             combinedSchema[schemaType] = parsed
-            console.log("Added schema2 as", schemaType)
           }
         }
 
@@ -437,7 +413,6 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
           if (parsed) {
             const schemaType = parsed["@type"] || "HowTo"
             combinedSchema[schemaType] = parsed
-            console.log("Added schema3 as", schemaType)
           }
         }
 
@@ -601,12 +576,8 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
 
     return NextResponse.json(serializedProduct)
   } catch (err) {
-    console.error("=== API PATCH ERROR ===")
-    console.error("Error details:", err)
-    console.error("Error stack:", err instanceof Error ? err.stack : "No stack trace")
     
     const errorMessage = err instanceof Error ? err.message : "Unknown error occurred"
-    console.error("Final error message:", errorMessage)
     
     return new NextResponse(`Internal error: ${errorMessage}`, { status: 500 })
   }

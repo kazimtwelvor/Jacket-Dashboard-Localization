@@ -12,7 +12,7 @@ const ipRequestMap = new Map<string, { count: number; timestamp: number }>()
 
 export async function GET(req: NextRequest) {
   try {
-    const clientIp = getClientIp(headers()) || "unknown"
+    const clientIp = getClientIp(await headers()) || "unknown"
 
     const now = Date.now()
     const requestData = ipRequestMap.get(clientIp) || { count: 0, timestamp: now }

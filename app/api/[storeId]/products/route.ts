@@ -20,11 +20,34 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
     const genders = searchParams.get("genders")
     const search = searchParams.get("search")
     const trash = searchParams.get("trash") === "true"
-    const baseWhereClause = {
+    const status = searchParams.get("status") 
+    
+    let baseWhereClause: any = {
       storeId: storeId,
       ...(trash ? { isDeleted: true } : { isDeleted: false }),
-      ...(isAdmin ? {} : { isPublished: true, isArchived: false }),
     }
+    
+      if (!trash && status) {
+        switch (status.toLowerCase()) {
+          case "published":
+            baseWhereClause.isPublished = true
+            baseWhereClause.isArchived = false
+            break
+          case "archived":
+            baseWhereClause.isArchived = true
+            break
+          case "all":
+            break
+          default:
+            if (!isAdmin) {
+              baseWhereClause.isPublished = true
+              baseWhereClause.isArchived = false
+            }
+        }
+      } else if (!trash && !isAdmin) {
+        baseWhereClause.isPublished = true
+        baseWhereClause.isArchived = false
+      }
     const allProducts = await prismadb.product.findMany({
       where: baseWhereClause,
       include: {

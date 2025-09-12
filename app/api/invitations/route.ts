@@ -11,15 +11,15 @@ export async function POST(req: Request) {
     const { storeId, email, role, permissions } = body
 
     if (!userId) {
-      return new NextResponse("Unauthenticated", { status: 401 })
+      return NextResponse.json({ error: "Unauthenticated" }, { status: 401 })
     }
 
     if (!storeId) {
-      return new NextResponse("Store ID is required", { status: 400 })
+      return NextResponse.json({ error: "Store ID is required" }, { status: 400 })
     }
 
     if (!email) {
-      return new NextResponse("Email is required", { status: 400 })
+      return NextResponse.json({ error: "Email is required" }, { status: 400 })
     }
 
     const storeUser = await db.storeUser.findFirst({
@@ -33,25 +33,25 @@ export async function POST(req: Request) {
     })
 
     if (!storeUser) {
-      return new NextResponse("Unauthorized", { status: 403 })
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
     }
 
     const existingUser = await db.user.findUnique({
       where: { email },
     })
 
-    if (existingUser) {
-      const existingStoreUser = await db.storeUser.findFirst({
-        where: {
-          storeId,
-          userId: existingUser.id,
-        },
-      })
+    // if (existingUser) {
+    //   const existingStoreUser = await db.storeUser.findFirst({
+    //     where: {
+    //       storeId,
+    //       userId: existingUser.id,
+    //     },
+    //   })
 
-      if (existingStoreUser) {
-        return new NextResponse("User is already a member of this store", { status: 400 })
-      }
-    }
+    //   if (existingStoreUser) {
+    //     return NextResponse.json({ error: "User is already a member of this store" }, { status: 400 })
+    //   }
+    // }
 
     const existingInvitation = await db.invitation.findFirst({
       where: {
@@ -62,7 +62,26 @@ export async function POST(req: Request) {
     })
 
     if (existingInvitation) {
-      return new NextResponse("An invitation has already been sent to this email", { status: 400 })
+      const newToken = crypto.randomBytes(32).toString("hex")
+      const newExpires = new Date()
+      newExpires.setHours(newExpires.getHours() + 48)
+
+      const updatedInvitation = await db.invitation.update({
+        where: { id: existingInvitation.id },
+        data: {
+          token: newToken,
+          role: role || "VIEWER",
+          permissions: permissions || [],
+          expires: newExpires,
+          updatedAt: new Date(),
+        },
+      })
+
+      return NextResponse.json({
+        message: "Invitation token regenerated successfully",
+        invitation: updatedInvitation,
+        token: newToken,
+      }, { status: 200 })
     }
 
     const token = crypto.randomBytes(32).toString("hex")
@@ -83,6 +102,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json(invitation)
   } catch (error) {
-    return new NextResponse("Internal error", { status: 500 })
+    console.error("Invitation creation error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

@@ -6,7 +6,7 @@ import { headers } from "next/headers"
 import { getClientIp } from "@/lib/utils"
 
 
-const RATE_LIMIT_WINDOW = 60 * 1000 
+const RATE_LIMIT_WINDOW = 60 * 1000
 const MAX_REQUESTS = 5
 const ipRequestMap = new Map<string, { count: number; timestamp: number }>()
 
@@ -85,19 +85,6 @@ export async function GET(req: NextRequest) {
 }
 
 function validateOrigin(origin: string | null, referer: string | null): boolean {
-  const allowedOrigins = [process.env.NEXT_PUBLIC_APP_URL, process.env.NEXTAUTH_URL, "http://localhost:3000"].filter(
-    Boolean,
-  )
-
-  if (!origin && !referer) return false
-
-  if (origin) {
-    return allowedOrigins.some((allowed) => allowed && origin.startsWith(allowed))
-  }
-
-  if (referer) {
-    return allowedOrigins.some((allowed) => allowed && referer.startsWith(allowed))
-  }
-
-  return false
+  // Allow all origins - bypass origin validation
+  return true
 }

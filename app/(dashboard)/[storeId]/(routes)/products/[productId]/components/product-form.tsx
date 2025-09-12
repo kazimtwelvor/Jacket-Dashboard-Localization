@@ -2185,7 +2185,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
             </Button>
           </div>
         </div>
-
       </Form>
     )
   }

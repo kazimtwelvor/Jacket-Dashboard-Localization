@@ -17,61 +17,59 @@ import { toast } from "react-hot-toast"
 export default function CategoryPage() {
   const params = useParams()
   const router = useRouter()
-  const { user } = useUser()
   const [loading, setLoading] = useState(true)
   const [categoryPages, setCategoryPages] = useState([])
   const [bestFilter, setBestFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [accessVerified, setAccessVerified] = useState(false)
+
+
   useEffect(() => {
     const checkAccess = async () => {
       try {
         const response = await axios.get(`/api/check-admin`)
         const isAdmin = response.data.isAdmin
-        
         const storeResponse = await axios.get(`/api/${params?.storeId}/store-access`)
         const isOwner = storeResponse.data.isOwner
-        const memberRole = storeResponse.data.role
-        
-        // Only allow admin users or store owners, block editors and other roles
-        if (!isAdmin && !isOwner) {
+
+        if (!isAdmin || !isOwner) {
           router.push('/unauthorized')
           return
         }
-        
+
         setAccessVerified(true)
       } catch (error) {
         router.push('/unauthorized')
         return
       }
     }
-    
+
     checkAccess()
   }, [params?.storeId, router])
-  
+
   useEffect(() => {
     if (!accessVerified) return
-    
+
     const fetchCategoryPages = async () => {
       try {
         setLoading(true)
         let url = `/api/${params?.storeId}/category-pages`
-        const params_array = ["includeAll=true"] 
-        
+        const params_array = ["includeAll=true"]
+
         if (bestFilter === "best") {
           params_array.push("isBest=true")
         } else if (bestFilter === "regular") {
           params_array.push("isBest=false")
         }
-        
+
         if (statusFilter === "draft") {
           params_array.push("status=DRAFT")
         } else if (statusFilter === "published") {
           params_array.push("status=PUBLISHED")
         }
-        
+
         url += "?" + params_array.join("&")
-        
+
         const response = await axios.get(url)
         setCategoryPages(response.data)
       } catch (error) {
@@ -81,10 +79,10 @@ export default function CategoryPage() {
         setLoading(false)
       }
     }
-    
+
     fetchCategoryPages()
   }, [params?.storeId, bestFilter, statusFilter, accessVerified])
-  
+
   return (
     <div className="flex-col">
       <div className="flex-1 space-y-4 p-8 pt-6">
@@ -118,10 +116,10 @@ export default function CategoryPage() {
           <div>Loading category pages...</div>
         ) : (
           <>
-            <DataTable 
-              columns={columns} 
-              data={categoryPages} 
-              searchKey="name" 
+            <DataTable
+              columns={columns}
+              data={categoryPages}
+              searchKey="name"
             />
             <ApiCallsSection />
           </>

@@ -27,18 +27,19 @@ export default function CategoryPage() {
   useEffect(() => {
     const checkAccess = async () => {
       try {
-        const response = await axios.get(`/api/check-admin`)
-        const isAdmin = response.data.isAdmin
+        const storeAdminResponse = await axios.get(`/api/${params?.storeId}/check-store-admin`)
+        const isStoreAdmin = storeAdminResponse?.data?.isStoreAdmin
         const storeResponse = await axios.get(`/api/${params?.storeId}/store-access`)
-        const isOwner = storeResponse.data.isOwner
-
-        if (!isAdmin || !isOwner) {
+        const isOwner = storeResponse?.data?.isOwner
+        console.log(isStoreAdmin + "SA", isOwner + "O")
+        if (!isStoreAdmin && !isOwner) {
           router.push('/unauthorized')
           return
         }
 
         setAccessVerified(true)
       } catch (error) {
+        console.error('Access check failed:', error)
         router.push('/unauthorized')
         return
       }

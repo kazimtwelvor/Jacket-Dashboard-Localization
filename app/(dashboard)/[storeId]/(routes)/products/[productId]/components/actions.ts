@@ -112,18 +112,37 @@ async function generateUniqueSku(storeId: string, manualSku: string | null): Pro
   }
 }
 
-async function logFormDataContents(formData: FormData, label: string) {
-  for (const [key, value] of Array.from(formData.entries())) {
-    if (typeof value === "string" && value.length > 100) {
-    } else {
-    }
+
+
+function safeJsonParse(value: string | null | undefined, fallback: any = null) {
+  if (!value || typeof value !== "string") {
+    return fallback
+  }
+  
+  if (value.trim() === "[object Object]") {
+    return fallback
+  }
+  
+  if (value.trim() === "") {
+    return fallback
+  }
+  
+  try {
+    return JSON.parse(value)
+  } catch (error) {
+    return fallback
   }
 }
 
 export async function createProduct(formData: FormData) {
   try {
+    
     for (const [key, value] of Array.from(formData.entries())) {
-      if (typeof value === "string" && value.length > 100) {
+      if (typeof value === "string") {
+        if (value === "[object Object]") {
+        } else if (value.length > 100) {
+        } else {
+        }
       } else {
       }
     }
@@ -187,6 +206,7 @@ export async function createProduct(formData: FormData) {
     const stockStatus = formData.get("stockStatus") as string
     const isArchived = submitType === "draft"
     const specifications = formData.get("specifications") as string
+    
     const materialJson = formData.get("material") as string
     const styleJson = formData.get("style") as string
     const gender = formData.get("gender") as string
@@ -209,7 +229,7 @@ export async function createProduct(formData: FormData) {
     let tags = []
     try {
       if (tagsJson && tagsJson.trim() !== "") {
-        const parsedTags = JSON.parse(tagsJson)
+        const parsedTags = safeJsonParse(tagsJson, [])
         if (Array.isArray(parsedTags)) {
           tags = parsedTags
         } else {
@@ -222,7 +242,7 @@ export async function createProduct(formData: FormData) {
     let relatedProducts = []
     try {
       if (relatedProductsJson && relatedProductsJson.trim() !== "") {
-        const parsedRelatedProducts = JSON.parse(relatedProductsJson)
+        const parsedRelatedProducts = safeJsonParse(relatedProductsJson, [])
         if (Array.isArray(parsedRelatedProducts)) {
           relatedProducts = parsedRelatedProducts
         } else {
@@ -232,9 +252,9 @@ export async function createProduct(formData: FormData) {
       relatedProducts = []
     }
 
-    const materialParsed = materialJson ? JSON.parse(materialJson) : []
-    const styleParsed = styleJson ? JSON.parse(styleJson) : []
-    const images = imagesJson ? JSON.parse(imagesJson) : []
+    const materialParsed = safeJsonParse(materialJson, [])
+    const styleParsed = safeJsonParse(styleJson, [])
+    const images = safeJsonParse(imagesJson, [])
     const seoJson = formData.get("seo") as string
     let seoData = {
       metaTitle: "",
@@ -249,7 +269,7 @@ export async function createProduct(formData: FormData) {
 
     try {
       if (seoJson) {
-        const parsedSeo = JSON.parse(seoJson)
+        const parsedSeo = safeJsonParse(seoJson, {})
         seoData = {
           metaTitle: parsedSeo.metaTitle || name || "",
           metaDescription: parsedSeo.metaDescription || "",
@@ -304,15 +324,15 @@ export async function createProduct(formData: FormData) {
 
     if (schemaJson && schemaJson.trim() !== "") {
       try {
-        combinedSchema = JSON.parse(schemaJson)
+        combinedSchema = safeJsonParse(schemaJson, {})
       } catch (e) {
         combinedSchema = {}
       }
     }
 
     try {
-      if (schema1Json && schema1Json.trim() !== "") {
-        const parsedSchema1 = JSON.parse(schema1Json)
+      if (schema1Json && schema1Json.trim() !== "" && schema1Json.trim() !== "[object Object]") {
+        const parsedSchema1 = safeJsonParse(schema1Json, null)
         if (parsedSchema1) {
           const schemaType = parsedSchema1.templateName || parsedSchema1["@type"] || "Product"
           combinedSchema[schemaType] = parsedSchema1
@@ -322,8 +342,8 @@ export async function createProduct(formData: FormData) {
     }
 
     try {
-      if (schema2Json && schema2Json.trim() !== "") {
-        const parsedSchema2 = JSON.parse(schema2Json)
+      if (schema2Json && schema2Json.trim() !== "" && schema2Json.trim() !== "[object Object]") {
+        const parsedSchema2 = safeJsonParse(schema2Json, null)
         if (parsedSchema2) {
           const schemaType = parsedSchema2.templateName || parsedSchema2["@type"] || "FAQPage"
           combinedSchema[schemaType] = parsedSchema2
@@ -333,8 +353,8 @@ export async function createProduct(formData: FormData) {
     }
 
     try {
-      if (schema3Json && schema3Json.trim() !== "") {
-        const parsedSchema3 = JSON.parse(schema3Json)
+      if (schema3Json && schema3Json.trim() !== "" && schema3Json.trim() !== "[object Object]") {
+        const parsedSchema3 = safeJsonParse(schema3Json, null)
         if (parsedSchema3) {
           const schemaType = parsedSchema3.templateName || parsedSchema3["@type"] || "HowTo"
           combinedSchema[schemaType] = parsedSchema3
@@ -372,11 +392,12 @@ export async function createProduct(formData: FormData) {
 
         if (
           typeof colorLinksJson === "string" &&
+          colorLinksJson.trim() !== "[object Object]" &&
           colorLinksJson.trim().startsWith("{") &&
           colorLinksJson.trim().endsWith("}")
         ) {
           try {
-            const parsedData = JSON.parse(colorLinksJson)
+            const parsedData = safeJsonParse(colorLinksJson, {})
 
             if (typeof parsedData === "object" && parsedData !== null) {
               colorLinksData = parsedData
@@ -400,14 +421,14 @@ export async function createProduct(formData: FormData) {
 
     if (colorDetailsJson) {
       try {
-        colorDetails = JSON.parse(colorDetailsJson)
+        colorDetails = safeJsonParse(colorDetailsJson, null)
       } catch (e) {
       }
     }
 
     if (!colorDetails && colorIdsJson) {
       try {
-        const colorIds = JSON.parse(colorIdsJson)
+        const colorIds = safeJsonParse(colorIdsJson, [])
         if (Array.isArray(colorIds) && colorIds.length > 0) {
           const colorsFromDb = await prismadb.color.findMany({
             where: {
@@ -436,14 +457,14 @@ export async function createProduct(formData: FormData) {
 
     try {
       if (sizeDetailsJson) {
-        sizeDetailsData = JSON.parse(sizeDetailsJson)
+        sizeDetailsData = safeJsonParse(sizeDetailsJson, null)
          if (Array.isArray(sizeDetailsData)) {
             sizeIds = sizeDetailsData.map(sd => sd.id).filter(Boolean);
         }
       } else {
         const sizesJsonFallback = formData.get("sizes") as string 
         if (sizesJsonFallback) {
-          const parsedSizeIds = JSON.parse(sizesJsonFallback)
+          const parsedSizeIds = safeJsonParse(sizesJsonFallback, [])
 
           if (Array.isArray(parsedSizeIds) && parsedSizeIds.length > 0) {
              sizeIds = parsedSizeIds;
@@ -487,6 +508,19 @@ export async function createProduct(formData: FormData) {
       gender: gender || null
     }
 
+    let cleanSpecifications = specifications
+    if (specifications === "[object Object]") {
+      cleanSpecifications = JSON.stringify({
+        externalMaterial: [],
+        internalMaterial: [],
+        collar: [],
+        closure: [],
+        cuffs: [],
+        pockets: [],
+        color: [],
+      })
+    }
+
     const productData = {
       name,
       description,
@@ -495,7 +529,7 @@ export async function createProduct(formData: FormData) {
       stockStatus,
       isArchived,
       isPublished: !isArchived, 
-      specifications, 
+      specifications: cleanSpecifications, 
       gender,
       categoryData: categoryDataObject, 
       tags: Array.isArray(tags) ? tags : [],
@@ -504,11 +538,7 @@ export async function createProduct(formData: FormData) {
       metaDescription: seoData.metaDescription,
       slug: productSlugForDb, 
       keywords: Array.isArray(seoData.keywords) ? seoData.keywords : [],
-      // noIndex: seoData.noIndex,
       brandName: brandName || "Leather Jacket By Fineyst", 
-      // ratingValue: ratingValue || "4.5", 
-      // reviewCount: reviewCount || "0", 
-      // purchaseNote,
       isFeatured,
       isParentProduct,
       parentProductId,
@@ -523,7 +553,10 @@ export async function createProduct(formData: FormData) {
 
 
 
-    const selectedColors = specifications ? JSON.parse(specifications).color || [] : []
+ 
+    
+    const selectedColors = colorDetails && Array.isArray(colorDetails) ? colorDetails : []
+    
     if (!selectedColors || selectedColors.length === 0) {
       throw new Error("At least one color must be selected before saving the product")
     }
@@ -531,7 +564,7 @@ export async function createProduct(formData: FormData) {
     let cachedReviews = null
     if (cachedReviewsJson) {
       try {
-        cachedReviews = JSON.parse(cachedReviewsJson)
+        cachedReviews = safeJsonParse(cachedReviewsJson, null)
       } catch (e) {
         cachedReviews = null
       }
@@ -584,20 +617,25 @@ export async function createProduct(formData: FormData) {
 
         const { createdById, createdByName, createdByEmail, ...dataWithoutCreator } = productData
         
+     
 
-        const product = await prismadb.product.update({
-          where: {
-            id,
-          },
-          data: {
-            ...dataWithoutCreator,
-            sku: newSkuForUpdate, 
-            categoryData: productData.categoryData, 
-            updatedById: dbUser.id,
-            updatedByName: dbUser.name || "Unknown",
-            updatedByEmail: dbUser.email,
-          },
-        })
+        try {
+          const product = await prismadb.product.update({
+            where: {
+              id,
+            },
+            data: {
+              ...dataWithoutCreator,
+              sku: newSkuForUpdate, 
+              categoryData: productData.categoryData, 
+              updatedById: dbUser.id,
+              updatedByName: dbUser.name || "Unknown",
+              updatedByEmail: dbUser.email,
+            },
+          })
+        } catch (dbError) {
+          throw new Error(`Database update failed: ${dbError instanceof Error ? dbError.message : "Unknown database error"}`)
+        }
 
         await prismadb.productImage.deleteMany({
             where: {
@@ -650,12 +688,10 @@ export async function createProduct(formData: FormData) {
               excludeFromSitemap: (image as any).excludeFromSitemap || false,
             }
           } else {
-            console.warn("Skipping invalid image data:", image);
             continue;
           }
           
           if (!imageUrl) {
-            console.warn("Skipping image with empty URL");
             continue;
           }
 
@@ -710,12 +746,10 @@ export async function createProduct(formData: FormData) {
               excludeFromSitemap: (image as any).excludeFromSitemap || false,
             }
           } else {
-             console.warn("Skipping invalid image data for new product:", image);
             continue;
           }
 
           if (!imageUrl) {
-            console.warn("Skipping image with empty URL for new product");
             continue;
           }
 
@@ -797,7 +831,9 @@ export async function createProduct(formData: FormData) {
     // Log before returning
     return { success: true }
   } catch (error) {
+    
     const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
+    
     // Return a JSON error response instead of throwing, or ensure the client can handle thrown errors from server actions.
     // For now, re-throwing to match existing pattern, but this might need adjustment based on client-side error handling.
     throw new Error(`Failed to save product: ${errorMessage}`)

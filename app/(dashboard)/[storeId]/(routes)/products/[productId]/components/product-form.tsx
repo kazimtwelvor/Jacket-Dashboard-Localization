@@ -24,6 +24,14 @@ const safeJsonParse = (value: any, fallback: any = null) => {
     return value
   }
   if (typeof value === "string") {
+    if (value === "[object Object]" || value === "[object Object]" || value.trim() === "[object Object]") {
+      return fallback
+    }
+    
+    if (value.trim() === "") {
+      return fallback
+    }
+    
     try {
       return JSON.parse(value)
     } catch (error) {
@@ -307,13 +315,16 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       schema1: (() => {
         try {
           if (initialData.schema) {
+            if (typeof initialData.schema === "string" && initialData.schema.trim() === "[object Object]") {
+              return ""
+            }
+            
             const schemaObj =
               typeof initialData.schema === "string" ? JSON.parse(initialData.schema) : initialData.schema
             if (schemaObj.Product) {
               return JSON.stringify(schemaObj.Product, null, 2)
             }
 
-            // If no Product schema, look for any schema with @type = Product
             for (const key in schemaObj) {
               if (schemaObj[key]["@type"] === "Product") {
                 return JSON.stringify(schemaObj[key], null, 2)
@@ -335,6 +346,10 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       schema2: (() => {
         try {
           if (initialData.schema) {
+            if (typeof initialData.schema === "string" && initialData.schema.trim() === "[object Object]") {
+              return ""
+            }
+            
             const schemaObj =
               typeof initialData.schema === "string" ? JSON.parse(initialData.schema) : initialData.schema
 
@@ -365,6 +380,10 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       schema3: (() => {
         try {
           if (initialData.schema) {
+            if (typeof initialData.schema === "string" && initialData.schema.trim() === "[object Object]") {
+              return ""
+            }
+            
             const schemaObj =
               typeof initialData.schema === "string" ? JSON.parse(initialData.schema) : initialData.schema
 
@@ -530,8 +549,14 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       })
 
       if (typeof (initialData as any).keywords === "string" && (initialData as any).keywords.trim() !== "") {
+        const keywordsString = (initialData as any).keywords.trim()
+        
+        if (keywordsString === "[object Object]") {
+          return
+        }
+        
         try {
-          const parsedKeywords = JSON.parse((initialData as any).keywords)
+          const parsedKeywords = JSON.parse(keywordsString)
           console.log("Parsed keywords from string:", parsedKeywords)
 
           // Update the form with parsed keywords if needed
@@ -1323,7 +1348,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       const combinedSchema: any = {}
 
       try {
-        if (schema1) {
+        if (schema1 && schema1.trim() !== "" && schema1.trim() !== "[object Object]") {
           const parsedSchema1 = typeof schema1 === "string" ? JSON.parse(schema1) : schema1
           if (parsedSchema1) {
             const schemaType = parsedSchema1.templateName || parsedSchema1["@type"] || "Product"
@@ -1332,7 +1357,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
           }
         }
 
-        if (schema2) {
+        if (schema2 && schema2.trim() !== "" && schema2.trim() !== "[object Object]") {
           const parsedSchema2 = typeof schema2 === "string" ? JSON.parse(schema2) : schema2
           if (parsedSchema2) {
             const schemaType = parsedSchema2.templateName || parsedSchema2["@type"] || "FAQPage"
@@ -1341,7 +1366,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
           }
         }
 
-        if (schema3) {
+        if (schema3 && schema3.trim() !== "" && schema3.trim() !== "[object Object]") {
           const parsedSchema3 = typeof schema3 === "string" ? JSON.parse(schema3) : schema3
           if (parsedSchema3) {
             const schemaType = parsedSchema3.templateName || parsedSchema3["@type"] || "HowTo"
@@ -1631,12 +1656,13 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       console.log("Submitting form data...")
       if (!form.getValues("schema")) {
         const schema1 = form.getValues("schema1")
-        if (schema1) {
+        if (schema1 && schema1.trim() !== "" && schema1.trim() !== "[object Object]") {
           try {
             const parsedSchema1 = typeof schema1 === "string" ? JSON.parse(schema1) : schema1
             const combinedSchema = { Product: parsedSchema1 }
             formData.append("schema", JSON.stringify(combinedSchema))
           } catch (e) {
+            console.error("Error parsing schema1 in submission:", e)
           }
         }
       }
@@ -1648,7 +1674,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
 
         const combinedSchema: any = {}
 
-        if (schema1 && schema1.trim() !== "") {
+        if (schema1 && schema1.trim() !== "" && schema1.trim() !== "[object Object]") {
           try {
             const parsedSchema1 = typeof schema1 === "string" ? JSON.parse(schema1) : schema1
             if (parsedSchema1 && parsedSchema1.templateName) {
@@ -1661,7 +1687,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
           }
         }
 
-        if (schema2 && schema2.trim() !== "") {
+        if (schema2 && schema2.trim() !== "" && schema2.trim() !== "[object Object]") {
           try {
             const parsedSchema2 = typeof schema2 === "string" ? JSON.parse(schema2) : schema2
             if (parsedSchema2 && parsedSchema2.templateName) {
@@ -1672,7 +1698,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
           }
         }
 
-        if (schema3 && schema3.trim() !== "") {
+        if (schema3 && schema3.trim() !== "" && schema3.trim() !== "[object Object]") {
           try {
             const parsedSchema3 = typeof schema3 === "string" ? JSON.parse(schema3) : schema3
             if (parsedSchema3 && parsedSchema3.templateName) {

@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { Plus, Package, BarChart3, List, Filter, Search, X, CheckCircle, Users, Upload, RefreshCw, Download, FileText, File, Upload as UploadIcon } from "lucide-react"
+import { Plus, Package, List, Filter, Search, X, CheckCircle, Upload, RefreshCw, Download, FileText, File, Upload as UploadIcon } from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 import { toast } from "react-hot-toast"
@@ -48,14 +48,17 @@ import { EnhancedProductList } from "./enhanced-product-list"
 import { TrashDataTable } from "./trash-data-table"
 
 interface ProductsClientProps {
-  data: ProductColumn[]
-  trashedData: TrashProductColumn[]
-  topCreators: { name: string; count: number }[]
+  storeId: string
   isOwner?: boolean
   isAdmin?: boolean
+  initialCounts: {
+    published: number
+    archived: number
+    trash: number
+  }
 }
 
-export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedData, topCreators, isOwner = false, isAdmin = false }) => {
+export const ProductsClient: React.FC<ProductsClientProps> = ({ storeId, isOwner = false, isAdmin = false, initialCounts }) => {
 
   const params = useParams()
   const router = useRouter()
@@ -74,27 +77,155 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
   const [updateExisting, setUpdateExisting] = useState(false)
   const [validateOnly, setValidateOnly] = useState(false)
 
-  const publishedProducts = data.filter((product) => product.isPublished && !product.isArchived)
-  const archivedProducts = data.filter((product) => product.isArchived)
+  const [products, setProducts] = useState<ProductColumn[]>([])
+  const [trashedProducts, setTrashedProducts] = useState<TrashProductColumn[]>([])
+  const [loading, setLoading] = useState(false)
+  const [initialLoading, setInitialLoading] = useState(true)
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalProducts: 0,
+    hasNextPage: false,
+    hasPreviousPage: false
+  })
+  const [counts, setCounts] = useState(initialCounts)
 
-  const allCount = data.length
-  const publishedCount = publishedProducts.length
-  const archivedCount = archivedProducts.length
-  const trashCount = trashedData.length
+  const allCount = counts.published + counts.archived
+  const publishedCount = counts.published
+  const archivedCount = counts.archived
+  const trashCount = counts.trash
 
-  const totalValue = data.reduce((sum, product) => {
+  const totalValue = products.reduce((sum, product) => {
     const price = Number.parseFloat(product.price.replace(/[^0-9.-]+/g, ""))
     return sum + price
   }, 0)
 
-  const averagePrice = allCount > 0 ? totalValue / allCount : 0
+  const averagePrice = products.length > 0 ? totalValue / products.length : 0
 
-  const storeId = params?.storeId as string
+  const fetchProducts = async (page: number = 1, status: string = activeTab, search?: string) => {
+    try {
+      setLoading(true)
+      
+      const limit = typeof itemsPerPage === "number" ? itemsPerPage : 1000
+      let apiUrl = `/api/${storeId}/products?page=${page}&limit=${limit}&admin=true`
+      
+      if (search) {
+        apiUrl += `&search=${encodeURIComponent(search)}`
+      }
+      
+      if (status === "trash") {
+        apiUrl += '&trash=true'
+      } else {
+        apiUrl += `&status=${status}`
+      }
+
+      const response = await fetch(apiUrl)
+      if (response.ok) {
+        const result = await response.json()
+        
+        const formattedProducts = result.products.map((product: any) => ({
+          id: product.id,
+          name: product.name,
+          isFeatured: product.isFeatured,
+          isArchived: product.isArchived,
+          isPublished: product.isPublished,
+          price: product.price,
+          salePrice: product.salePrice,
+          category: product.categoryData && typeof product.categoryData === 'object' && product.categoryData !== null
+            ? `${product.categoryData.material || ''} ${product.categoryData.style || ''}`.trim() || "Uncategorized"
+            : "Uncategorized",
+          sku: product.sku,
+          stockStatus: product.stockStatus || "instock",
+          sizes: product.sizeDetails
+            ? JSON.parse(JSON.stringify(product.sizeDetails))
+              .map((size: any) => size.name)
+              .join(", ")
+            : "N/A",
+          colors: product.colorDetails
+            ? JSON.parse(JSON.stringify(product.colorDetails))
+              .map((color: any) => color.name)
+              .join(", ")
+            : "N/A",
+          imageUrl: product.images && product.images.length > 0 ? product.images[0].url : "/placeholder.svg",
+          createdAt: new Date(product.createdAt).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          }),
+          createdByName: product.createdByName || "Unknown",
+          updatedByName: product.updatedByName || undefined,
+          updatedAt: product.updatedAt ? new Date(product.updatedAt).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          }) : undefined,
+          publishedAt: new Date(product.createdAt).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          }),
+          description: product.description || "",
+        }))
+
+        if (status === "trash") {
+          setTrashedProducts(formattedProducts)
+        } else {
+          setProducts(formattedProducts)
+        }
+
+        setPagination({
+          currentPage: result.pagination.currentPage,
+          totalPages: result.pagination.totalPages,
+          totalProducts: result.pagination.totalProducts,
+          hasNextPage: result.pagination.hasNextPage,
+          hasPreviousPage: result.pagination.hasPreviousPage
+        })
+
+        setCounts(prev => ({
+          ...prev,
+          [status === "trash" ? "trash" : status]: result.pagination.totalProducts
+        }))
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    const loadInitialData = async () => {
+      setInitialLoading(true)
+      try {
+        await fetchProducts(1, "published")
+      } catch (error) {
+        console.error('Error loading initial data:', error)
+      } finally {
+        setInitialLoading(false)
+      }
+    }
+    
+    loadInitialData()
+  }, [storeId])
+
+  useEffect(() => {
+    if (!initialLoading) {
+      setCurrentPage(1)
+      fetchProducts(1, activeTab)
+    }
+  }, [activeTab])
+
+  useEffect(() => {
+    if (!initialLoading) {
+      fetchProducts(currentPage, activeTab)
+    }
+  }, [currentPage, itemsPerPage])
 
   const searchProducts = async (searchQuery: string) => {
     if (!searchQuery.trim()) {
       setSearchResults([])
       setIsSearchActive(false)
+      fetchProducts(currentPage, activeTab)
       return
     }
 
@@ -352,57 +483,22 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
       return searchResults
     }
 
-    let listToFilter: ProductColumn[] | TrashProductColumn[] = []
-    if (activeTab === "published") {
-      listToFilter = publishedProducts
-    } else if (activeTab === "archived") {
-      listToFilter = archivedProducts
-    } else if (activeTab === "trash") {
-      listToFilter = trashedData
+    if (activeTab === "trash") {
+      return trashedProducts as ProductColumn[]
+    } else {
+      return products
     }
-
-    return listToFilter as ProductColumn[]
   }
 
   const filteredProducts = getFilteredProductsForTab()
 
-  const totalItems = filteredProducts.length
-  let currentDisplayProducts: ProductColumn[]
-  let displayTotalPages: number
-  let displayStartIndex: number = 0
-  let displayEndIndex: number = 0
-  let showPaginationControls: boolean
+  const totalItems = isSearchActive ? filteredProducts.length : pagination.totalProducts
+  const currentDisplayProducts = filteredProducts
+  const displayTotalPages = isSearchActive ? Math.ceil(filteredProducts.length / (typeof itemsPerPage === "number" ? itemsPerPage : 20)) : pagination.totalPages
+  const displayStartIndex = isSearchActive ? 0 : (pagination.currentPage - 1) * (typeof itemsPerPage === "number" ? itemsPerPage : 20)
+  const displayEndIndex = isSearchActive ? filteredProducts.length : Math.min(displayStartIndex + (typeof itemsPerPage === "number" ? itemsPerPage : 20), totalItems)
+  const showPaginationControls = !isSearchActive && displayTotalPages > 1
 
-  if (itemsPerPage === "all") {
-    currentDisplayProducts = filteredProducts
-    displayTotalPages = 1
-    displayStartIndex = 0
-    displayEndIndex = totalItems
-    showPaginationControls = false
-  } else {
-    const numericItemsPerPage = Number(itemsPerPage)
-    displayTotalPages = totalItems > 0 ? Math.ceil(totalItems / numericItemsPerPage) : 1
-
-    const safeCurrentPage = Math.min(currentPage, displayTotalPages) || 1;
-    if (currentPage !== safeCurrentPage) {
-      setCurrentPage(safeCurrentPage);
-    }
-
-    displayStartIndex = (safeCurrentPage - 1) * numericItemsPerPage
-    displayEndIndex = displayStartIndex + numericItemsPerPage
-    currentDisplayProducts = filteredProducts.slice(displayStartIndex, displayEndIndex)
-    showPaginationControls = displayTotalPages > 1
-  }
-
-  useEffect(() => {
-    if (itemsPerPage !== "all") {
-      const numericItemsPerPage = Number(itemsPerPage);
-      const newTotalPages = totalItems > 0 ? Math.ceil(totalItems / numericItemsPerPage) : 1;
-      if (currentPage > newTotalPages) {
-        setCurrentPage(newTotalPages);
-      }
-    }
-  }, [totalItems, itemsPerPage, currentPage]);
 
 
   const renderPagination = () => {
@@ -489,9 +585,20 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
     )
   }
 
+  if (initialLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+          <p className="text-sm text-muted-foreground">Loading products...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/50 dark:to-blue-900/30 border-blue-200 dark:border-blue-800">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-blue-600 dark:text-blue-400">Total Products</CardTitle>
@@ -514,57 +621,6 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-950/50 dark:to-amber-900/30 border-amber-200 dark:border-amber-800">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-amber-600 dark:text-amber-400">Top Creators</CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0 pb-3">
-            {topCreators && topCreators.length > 0 ? (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex flex-col">
-                    <div className="text-lg font-bold truncate">{topCreators[0].name}</div>
-                    <div className="text-xs text-muted-foreground">{topCreators[0].count} products</div>
-                  </div>
-                  <Users className="h-5 w-5 text-amber-500 dark:text-amber-400" />
-                </div>
-                {topCreators.length > 1 && (
-                  <div className="pt-1 border-t border-amber-200 dark:border-amber-800/50">
-                    <div className="grid grid-cols-2 gap-2">
-                      {topCreators.slice(1, 3).map((creator, index) => (
-                        <div key={index} className="flex items-center gap-1">
-                          <div className="flex h-4 w-4 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400 text-[10px] font-medium">
-                            {index + 2}
-                          </div>
-                          <div className="flex flex-col">
-                            <div className="text-xs font-medium truncate">{creator.name}</div>
-                            <div className="text-[10px] text-muted-foreground">{creator.count} products</div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="flex items-center justify-between h-full">
-                <div className="text-sm text-muted-foreground">No creators found</div>
-                <Users className="h-5 w-5 text-amber-500/50 dark:text-amber-400/50" />
-              </div>
-            )}
-          </CardContent>
-        </Card>
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/50 dark:to-purple-900/30 border-purple-200 dark:border-purple-800">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-purple-600 dark:text-purple-400">Average Price</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div className="text-2xl font-bold">${averagePrice.toFixed(2)}</div>
-              <BarChart3 className="h-5 w-5 text-purple-500 dark:text-purple-400" />
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
 
@@ -581,7 +637,7 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      disabled={isExporting || data.length === 0}
+                      disabled={isExporting || products.length === 0}
                       className="border-purple-200 dark:border-purple-800 hover:bg-purple-50 dark:hover:bg-purple-950 hover:border-purple-300 dark:hover:border-purple-700 text-purple-700 dark:text-purple-300"
                     >
                       {isExporting ? (
@@ -875,7 +931,7 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ data, trashedDat
             </TabsContent>
 
             <TabsContent value="trash" className="space-y-4">
-              {trashedData.length === 0 ? (
+              {trashedProducts.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center bg-white dark:bg-gray-950 rounded-lg shadow-sm border">
                   <div className="rounded-full bg-gray-100 p-3 dark:bg-gray-800">
                     <svg

@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Search, Grid, List, Trash2, RotateCcw } from "lucide-react"
+import { X, Grid, List, Trash2, RotateCcw, Search } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Heading } from "@/components/ui/heading"
 import { Separator } from "@/components/ui/separator"
@@ -282,7 +282,6 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
   const dropdownStyles = dropdownOptionsLoaded ? allStyles : []
   const dropdownGenders = dropdownOptionsLoaded ? allGenders : []
 
-  // Clear all filters function
   const clearAllFilters = () => {
     setSearchTerm("")
     setCategoryFilter("all")
@@ -295,7 +294,6 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
     setCreatorFilter("all")
   }
 
-  // Show initial loader until data is loaded
   if (initialLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -358,7 +356,7 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
             onClick={clearAllFilters}
             className="flex items-center gap-2"
           >
-            <Search className="h-4 w-4" />
+            <X className="h-4 w-4" />
             Clear Filters
           </Button>
         </div>
@@ -549,7 +547,6 @@ const ProductsView: React.FC<ProductsViewProps> = ({
   staticStyles = [],
   staticGenders = []
 }) => {
-  // Using props instead of local state for filters
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [selectedProducts, setSelectedProducts] = useState<string[]>([])
   const itemsPerPage = 12
@@ -651,7 +648,6 @@ const ProductsView: React.FC<ProductsViewProps> = ({
     }
   }).filter(Boolean)))
 
-  // Use static styles and genders if available, otherwise fall back to computed ones
   const styles = staticStyles.length > 0 ? staticStyles : Array.from(new Set(data.map(product => {
     try {
       if (product.categoryData && typeof product.categoryData === 'object') {

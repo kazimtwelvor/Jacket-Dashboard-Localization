@@ -25,12 +25,12 @@ const DraftPage = async ({
     redirect('/')
   }
 
-  const store = await prismadb.store.findFirst({
+  const store = user.clerkId ? await prismadb.store.findFirst({
     where: {
       id: storeId,
       userId: user.clerkId
     }
-  })
+  }) : null
 
   const storeUser = await prismadb.storeUser.findFirst({
     where: {
@@ -48,46 +48,15 @@ const DraftPage = async ({
     redirect('/')
   }
 
-  const products = await prismadb.product.findMany({
-    where: {
-      storeId: storeId,
-      isDeleted: false,
-    },
-    include: {
-      images: {
-        include: {
-          image: true,
-        },
-      },
-    },
-    orderBy: {
-      createdAt: 'desc'
-    }
-  })
-
-  const trashedProducts = await prismadb.product.findMany({
-    where: {
-      storeId: storeId,
-      isDeleted: true,
-    },
-    include: {
-      images: {
-        include: {
-          image: true,
-        },
-      },
-    },
-    orderBy: {
-      deletedAt: 'desc'
-    }
-  })
-
   const userRole = store ? 'OWNER' : storeUser?.role || 'VIEWER'
 
   return (
     <div className="flex-col">
       <div className="flex-1 space-y-4 p-8 pt-6">
-        <DraftClient data={products} trashedData={trashedProducts} userRole={userRole} />
+        <DraftClient 
+          storeId={storeId}
+          userRole={userRole} 
+        />
       </div>
     </div>
   )

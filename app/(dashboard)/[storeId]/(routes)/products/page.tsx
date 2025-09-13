@@ -39,155 +39,42 @@ const ProductsPage: React.FC<ProductsPageProps> = async ({ params }) => {
     const isOwner = store?.userId === userId
     const isAdmin = await checkRole("admin")
 
-    const products = await prismadb.product.findMany({
-      where: {
-        storeId: storeId,
-        isDeleted: false,
-      },
-      include: {
-        images: {
-          include: {
-            image: true,
-          },
-          orderBy: {
-            order: "asc",
-          },
+    const [publishedCount, archivedCount, trashedCount] = await Promise.all([
+      prismadb.product.count({
+        where: {
+          storeId: storeId,
+          isDeleted: false,
+          isPublished: true,
+          isArchived: false,
         },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    })
-
-    if (products.length > 0) {
-      console.log("First product from database:", {
-        id: products[0].id,
-        name: products[0].name,
-        updatedByName: products[0].updatedByName,
-        updatedAt: products[0].updatedAt,
-      })
-    }
-
-    const trashedProducts = await prismadb.product.findMany({
-      where: {
-        storeId: storeId,
-        isDeleted: true,
-      },
-      include: {
-        images: {
-          include: {
-            image: true,
-          },
-          orderBy: {
-            order: "asc",
-          },
+      }),
+      prismadb.product.count({
+        where: {
+          storeId: storeId,
+          isDeleted: false,
+          isArchived: true,
         },
-      },
-      orderBy: {
-        deletedAt: "desc",
-      },
-    })
-
-    const formattedProducts = products.map((product) => ({
-      id: product.id,
-      name: product.name,
-      isFeatured: product.isFeatured,
-      isArchived: product.isArchived,
-      isPublished: product.isPublished,
-      price: formatter.format(Number(product.price)),
-      salePrice: product.salePrice ? formatter.format(Number(product.salePrice)) : null,
-      category: product.categoryData && typeof product.categoryData === 'object' && product.categoryData !== null 
-        ? `${(product.categoryData as any).material || ''} ${(product.categoryData as any).style || ''}`.trim() || "Uncategorized" 
-        : "Uncategorized",
-      sku: product.sku,
-      stockStatus: product.stockStatus || "instock",
-      sizes: product.sizeDetails
-        ? JSON.parse(JSON.stringify(product.sizeDetails))
-            .map((size: any) => size.name)
-            .join(", ")
-        : "N/A",
-      colors: product.colorDetails
-        ? JSON.parse(JSON.stringify(product.colorDetails))
-            .map((color: any) => color.name)
-            .join(", ")
-        : "N/A",
-      imageUrl:
-        product.images && product.images.length > 0 && product.images[0].image
-          ? product.images[0].image.url
-          : "/placeholder.svg",
-      createdAt: format(product.createdAt, "MMMM do, yyyy"),
-      createdByName: product.createdByName || "Unknown",
-      updatedByName: product.updatedByName || undefined,
-      updatedAt: product.updatedAt ? format(product.updatedAt, "MMMM do, yyyy") : undefined,
-      publishedAt: format(product.createdAt, "MMMM do, yyyy"),
-      description: product.description || "",
-    }))
-
-    const formattedTrashedProducts = trashedProducts.map((product) => ({
-      id: product.id,
-      name: product.name,
-      price: formatter.format(Number(product.price)),
-      salePrice: product.salePrice ? formatter.format(Number(product.salePrice)) : null,
-      category: product.categoryData && typeof product.categoryData === 'object' && product.categoryData !== null 
-        ? `${(product.categoryData as any).material || ''} ${(product.categoryData as any).style || ''}`.trim() || "Uncategorized" 
-        : "Uncategorized",
-      sku: product.sku,
-      stockStatus: product.stockStatus || "instock",
-      deletedAt: product.deletedAt ? format(product.deletedAt, "MMMM do, yyyy") : "Unknown",
-      sizes: product.sizeDetails
-        ? JSON.parse(JSON.stringify(product.sizeDetails))
-            .map((size: any) => size.name)
-            .join(", ")
-        : "N/A",
-      colors: product.colorDetails
-        ? JSON.parse(JSON.stringify(product.colorDetails))
-            .map((color: any) => color.name)
-            .join(", ")
-        : "N/A",
-      imageUrl:
-        product.images && product.images.length > 0 && product.images[0].image
-          ? product.images[0].image.url
-          : "/placeholder.svg",
-      createdAt: format(product.createdAt, "MMMM do, yyyy"),
-      createdByName: product.createdByName || "Unknown",
-      updatedByName: product.updatedByName || undefined,
-      updatedAt: product.updatedAt ? format(product.updatedAt, "MMMM do, yyyy") : undefined,
-      publishedAt: format(product.createdAt, "MMMM do, yyyy"),
-      description: product.description || "",
-      isFeatured: product.isFeatured,
-      isArchived: product.isArchived,
-      isPublished: product.isPublished,
-    }))
-
-    const creatorCounts = formattedProducts.reduce(
-      (acc, product) => {
-        const creator = product.createdByName
-        if (creator && creator !== "Unknown") {
-          acc[creator] = (acc[creator] || 0) + 1
-        }
-        return acc
-      },
-      {} as Record<string, number>,
-    )
-
-    const topCreators = Object.entries(creatorCounts)
-      .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 3)
-
-    while (topCreators.length < 3) {
-      topCreators.push({ name: "None", count: 0 })
-    }
+      }),
+      prismadb.product.count({
+        where: {
+          storeId: storeId,
+          isDeleted: true,
+        },
+      }),
+    ])
 
     return (
       <div className="flex-col">
         <div className="flex-1 space-y-4 p-8 pt-6">
           <ProductsClient 
-            data={formattedProducts} 
-            trashedData={formattedTrashedProducts} 
-            topCreators={topCreators}
+            storeId={storeId}
             isOwner={isOwner}
             isAdmin={isAdmin}
+            initialCounts={{
+              published: publishedCount,
+              archived: archivedCount,
+              trash: trashedCount,
+            }}
           />
         </div>
       </div>

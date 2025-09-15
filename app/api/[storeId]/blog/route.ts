@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
-
 import prismadb from "@/lib/prismadb"
+import { checkApiPermission } from "@/lib/api-permissions"
+import { Permission } from "@/types/permissions"
 
 export async function POST(req: Request, { params }: { params: { storeId: string } }) {
   try {
@@ -24,15 +25,12 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       return new NextResponse("Store ID is required", { status: 400 })
     }
 
-    const storeByUserId = await prismadb.store.findFirst({
-      where: {
-        id: params.storeId,
-        userId,
-      },
-    })
-
-    if (!storeByUserId) {
-      return new NextResponse("Unauthorized", { status: 405 })
+    const permissionCheck = await checkApiPermission(params.storeId, Permission.CREATE_BLOGS, 'POST')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to create blogs.", { status: 403 })
     }
 
     const existingBlogBySlug = await prismadb.blog.findFirst({
@@ -266,6 +264,14 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
   try {
     if (!params.storeId) {
       return new NextResponse("Store ID is required", { status: 400 })
+    }
+
+    const permissionCheck = await checkApiPermission(params.storeId, Permission.VIEW_BLOGS, 'GET')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to view blogs.", { status: 403 })
     }
 
     const blogs = await prismadb.blog.findMany({

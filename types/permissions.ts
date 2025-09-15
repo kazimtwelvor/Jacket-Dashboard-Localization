@@ -47,6 +47,23 @@ export enum Permission {
   VIEW_DASHBOARD = "VIEW_DASHBOARD",
   VIEW_ANALYTICS = "VIEW_ANALYTICS",
   VIEW_SALES = "VIEW_SALES",
+
+  VIEW_PAGES = "VIEW_PAGES",
+  CREATE_PAGES = "CREATE_PAGES",
+  EDIT_PAGES = "EDIT_PAGES",
+  DELETE_PAGES = "DELETE_PAGES",
+
+  VIEW_BLOGS = "VIEW_BLOGS",
+  CREATE_BLOGS = "CREATE_BLOGS",
+  EDIT_BLOGS = "EDIT_BLOGS",
+  DELETE_BLOGS = "DELETE_BLOGS",
+
+  VIEW_FORMS = "VIEW_FORMS",
+  CREATE_FORMS = "CREATE_FORMS",
+  EDIT_FORMS = "EDIT_FORMS",
+  DELETE_FORMS = "DELETE_FORMS",
+
+  
 }
 
 export type RolePermissions = {
@@ -60,18 +77,30 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     Permission.VIEW_PRODUCTS,
     Permission.CREATE_PRODUCTS,
     Permission.EDIT_PRODUCTS,
+    Permission.MANAGE_ORDERS,
     Permission.VIEW_CATEGORIES,
     Permission.CREATE_CATEGORIES,
     Permission.EDIT_CATEGORIES,
     Permission.VIEW_ORDERS,
     Permission.VIEW_USERS,
+    Permission.VIEW_PAGES,
+    Permission.CREATE_PAGES,
+    Permission.EDIT_PAGES,
+    Permission.DELETE_PAGES,
+    Permission.VIEW_BLOGS,
+    Permission.CREATE_BLOGS,
+    Permission.EDIT_BLOGS,
+    Permission.DELETE_BLOGS,
+    Permission.VIEW_FORMS,
+    Permission.CREATE_FORMS,
+    Permission.EDIT_FORMS,
+    Permission.DELETE_FORMS,
   ],
   [Role.EDITOR]: [
     Permission.VIEW_PRODUCTS,
     Permission.CREATE_PRODUCTS,
     Permission.EDIT_PRODUCTS,
     Permission.VIEW_CATEGORIES,
-    Permission.VIEW_ORDERS,
   ],
   [Role.VIEWER]: [Permission.VIEW_PRODUCTS, Permission.VIEW_CATEGORIES, Permission.VIEW_ORDERS],
 }

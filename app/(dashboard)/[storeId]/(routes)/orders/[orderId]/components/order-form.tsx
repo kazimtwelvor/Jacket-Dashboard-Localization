@@ -91,7 +91,6 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
 
   const title = initialData ? "Edit order" : "Create order"
   const description = initialData ? "Edit order details" : "Create a new order"
-  const toastMessage = initialData ? "Order updated." : "Order created."
   const action = initialData ? "Save changes" : "Create"
   const normalizedPaymentMethod = normalizePaymentMethod(initialData?.paymentMethod)
 
@@ -169,7 +168,6 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
 
       form.setValue("paymentMethod", normalizedPaymentMethod)
 
-      form.setValue("userId", initialData.userId || "")
       form.setValue("customerEmail", initialData.customerEmail || "")
       form.setValue("isPaid", initialData.isPaid || false)
       form.setValue("status", initialData.status || "PENDING")
@@ -220,21 +218,36 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
         total,
         orderItems: formattedOrderItems,
       }
-      
-      console.log("Sending order data:", JSON.stringify(requestData, null, 2))
 
       if (initialData) {
         await axios.patch(`/api/${params?.storeId}/orders/${params?.orderId}`, requestData)
+        toast.success("Order updated successfully!")
+        router.push(`/${params?.storeId}/orders`)
       } else {
-        const response = await axios.post(`/api/${params?.storeId}/orders`, requestData)
-        router.push(`/${params?.storeId}/orders/${response.data.id}`)
+        await axios.post(`/api/${params?.storeId}/orders`, requestData)
+        toast.success("Order created successfully!")
+        router.push(`/${params?.storeId}/orders`)
       }
 
       router.refresh()
-      toast.success(toastMessage)
     } catch (error: any) {
-      toast.error("Something went wrong.")
-      console.error(error)
+      console.error("Order submission error:", error)
+      
+      if (error.response?.data?.error) {
+        toast.error(`Failed to ${initialData ? 'update' : 'create'} order: ${error.response.data.error}`)
+      } else if (error.response?.status === 400) {
+        toast.error("Invalid order data. Please check all fields and try again.")
+      } else if (error.response?.status === 401) {
+        toast.error("You are not authorized to perform this action.")
+      } else if (error.response?.status === 403) {
+        toast.error(`Access denied. You don't have permission to ${initialData ? 'update' : 'create'} orders.`)
+      } else if (error.response?.status === 404) {
+        toast.error("Order not found. Please refresh the page and try again.")
+      } else if (error.response?.status >= 500) {
+        toast.error("Server error. Please try again later.")
+      } else {
+        toast.error(`Failed to ${initialData ? 'update' : 'create'} order. Please try again.`)
+      }
     } finally {
       setLoading(false)
     }
@@ -245,9 +258,23 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
       setLoading(true)
       await axios.delete(`/api/${params?.storeId}/orders/${params?.orderId}`)
       router.push(`/${params?.storeId}/orders`)
-      toast.success("Order deleted.")
+      toast.success("Order deleted successfully!")
     } catch (error: any) {
-      toast.error("Something went wrong.")
+      console.error("Order deletion error:", error)
+      
+      if (error.response?.data?.error) {
+        toast.error(`Failed to delete order: ${error.response.data.error}`)
+      } else if (error.response?.status === 401) {
+        toast.error("You are not authorized to delete this order.")
+      } else if (error.response?.status === 403) {
+        toast.error("Access denied. You don't have permission to delete orders.")
+      } else if (error.response?.status === 404) {
+        toast.error("Order not found. It may have already been deleted.")
+      } else if (error.response?.status >= 500) {
+        toast.error("Server error. Please try again later.")
+      } else {
+        toast.error("Failed to delete order. Please try again.")
+      }
     } finally {
       setLoading(false)
       setOpen(false)
@@ -288,9 +315,8 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
     return acc + Number.parseFloat(String(item.price)) * item.quantity
   }, 0)
 
-  const shippingCost = form.watch("shippingCost") || 0
-  // const tax = form.watch("tax") || 0
-  const discount = form.watch("discount") || 0
+  const shippingCost = Number(form.watch("shippingCost")) || 0
+  const discount = Number(form.watch("discount")) || 0
   const total = subtotal + shippingCost - discount
 
   return (

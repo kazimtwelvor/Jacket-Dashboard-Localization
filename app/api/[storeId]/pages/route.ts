@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import prismadb from "@/lib/prismadb"
+import { checkApiPermission } from "@/lib/api-permissions"
+import { Permission } from "@/types/permissions"
 
 export async function POST(req: Request, { params }: { params: { storeId: string } }) {
   try {
@@ -29,6 +31,14 @@ export async function POST(req: Request, { params }: { params: { storeId: string
 
     if (!params.storeId) {
       return new NextResponse("Store ID is required", { status: 400 })
+    }
+
+    const permissionCheck = await checkApiPermission(params.storeId, Permission.CREATE_PAGES, 'POST')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to create pages.", { status: 403 })
     }
 
     const storeByUserId = await prismadb.store.findFirst({
@@ -90,6 +100,14 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
   try {
     if (!params.storeId) {
       return new NextResponse("Store ID is required", { status: 400 })
+    }
+
+    const permissionCheck = await checkApiPermission(params.storeId, Permission.VIEW_PAGES, 'GET')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to view pages.", { status: 403 })
     }
 
     const pages = await prismadb.page.findMany({

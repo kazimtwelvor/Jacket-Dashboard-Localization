@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server"
 import prismadb from "@/lib/prismadb"
+import { checkApiPermission } from "@/lib/api-permissions"
+import { Permission } from "@/types/permissions"
 
 function corsHeaders() {
   const allowedOrigins = [
@@ -26,6 +28,20 @@ export async function GET(
   { params }: { params: { storeId: string } }
 ) {
   try {
+    const permissionCheck = await checkApiPermission(params.storeId, Permission.VIEW_FORMS, 'GET')
+    if (permissionCheck.error) {
+      return new NextResponse(permissionCheck.error.body, { 
+        status: permissionCheck.error.status,
+        headers: corsHeaders(),
+      })
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to view forms.", { 
+        status: 403,
+        headers: corsHeaders(),
+      })
+    }
+
     const newsletterForms = await prismadb.newsletterForm.findMany({
       where: {
         storeId: params.storeId,
@@ -58,6 +74,20 @@ export async function POST(
     if (!email) {
       return new NextResponse("Email is required", { 
         status: 400,
+        headers: corsHeaders(),
+      })
+    }
+
+    const permissionCheck = await checkApiPermission(params.storeId, Permission.CREATE_FORMS, 'POST')
+    if (permissionCheck.error) {
+      return new NextResponse(permissionCheck.error.body, { 
+        status: permissionCheck.error.status,
+        headers: corsHeaders(),
+      })
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to create forms.", { 
+        status: 403,
         headers: corsHeaders(),
       })
     }

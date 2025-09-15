@@ -3,12 +3,22 @@
 import prismadb from "@/lib/prismadb"
 import { auth } from "@clerk/nextjs/server"
 import { NextResponse } from "next/server"
+import { checkApiPermission } from "@/lib/api-permissions"
+import { Permission } from "@/types/permissions"
 
-export async function GET(req: Request, { params }: { params: Promise<{ billboardId: string }> }) {
+export async function GET(req: Request, { params }: { params: Promise<{ storeId: string; billboardId: string }> }) {
   try {
-    const { billboardId } = await params
+    const { storeId, billboardId } = await params
     if (!billboardId) {
       return new NextResponse("Billboard id is required", { status: 400 })
+    }
+
+    const permissionCheck = await checkApiPermission(storeId, Permission.VIEW_BILLBOARDS, 'GET')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to view billboards.", { status: 403 })
     }
 
     const billboard = await prismadb.billboard.findUnique({
@@ -46,6 +56,14 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
 
     if (!billboardId) {
       return new NextResponse("Billboard id is required", { status: 400 })
+    }
+
+    const permissionCheck = await checkApiPermission(storeId, Permission.EDIT_BILLBOARDS, 'PATCH')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to edit billboards.", { status: 403 })
     }
 
     const storeByUserId = await prismadb.store.findFirst({
@@ -97,6 +115,14 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ store
 
     if (!billboardId) {
       return new NextResponse("Billboard id is required", { status: 400 })
+    }
+
+    const permissionCheck = await checkApiPermission(storeId, Permission.DELETE_BILLBOARDS, 'DELETE')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to delete billboards.", { status: 403 })
     }
 
     const storeByUserId = await prismadb.store.findFirst({

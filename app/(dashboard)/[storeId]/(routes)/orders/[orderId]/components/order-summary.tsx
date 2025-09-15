@@ -8,12 +8,16 @@ import { Separator } from "@/components/ui/separator"
 interface OrderSummaryProps {
   subtotal: number
   shippingCost: number
-  // tax: number
   discount: number
   total: number
 }
 
 export const OrderSummary: React.FC<OrderSummaryProps> = ({ subtotal, shippingCost, tax, discount, total }) => {
+  const safeSubtotal = Number(subtotal) || 0
+  const safeShippingCost = Number(shippingCost) || 0
+  const safeDiscount = Number(discount) || 0
+  const safeTotal = Number(total) || 0
+
   return (
     <Card>
       <CardHeader>
@@ -23,11 +27,11 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({ subtotal, shippingCo
         <div className="space-y-2">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Subtotal</span>
-            <span>${subtotal.toFixed(2)}</span>
+            <span>${safeSubtotal.toFixed(2)}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Shipping</span>
-            <span>${shippingCost.toFixed(2)}</span>
+            <span>${safeShippingCost.toFixed(2)}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Tax</span>
@@ -35,12 +39,12 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({ subtotal, shippingCo
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Discount</span>
-            <span>-${discount.toFixed(2)}</span>
+            <span>-${safeDiscount.toFixed(2)}</span>
           </div>
           <Separator className="my-2" />
           <div className="flex justify-between font-medium">
             <span>Total</span>
-            <span>${total.toFixed(2)}</span>
+            <span>${safeTotal.toFixed(2)}</span>
           </div>
         </div>
       </CardContent>

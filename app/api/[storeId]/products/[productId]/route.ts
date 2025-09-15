@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import prismadb from "@/lib/prismadb"
+import { checkApiPermission } from "@/lib/api-permissions"
+import { Permission } from "@/types/permissions"
 
 async function syncColorVariations(currentProductId: string, storeId: string, specifications: any) {
   try {
@@ -87,11 +89,19 @@ async function syncColorVariations(currentProductId: string, storeId: string, sp
   }
 }
 
-export async function GET(req: Request, { params }: { params: { productId: string } }) {
+export async function GET(req: Request, { params }: { params: { storeId: string; productId: string } }) {
   try {
-    const { productId } = params
+    const { storeId, productId } = params
     if (!productId) {
       return new NextResponse("Product id is required", { status: 400 })
+    }
+
+    const permissionCheck = await checkApiPermission(storeId, Permission.VIEW_PRODUCTS, 'GET')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to view products.", { status: 403 })
     }
 
     const product = await prismadb.product.findUnique({
@@ -273,6 +283,14 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
     }
 
     const { productId, storeId } = params
+
+    const permissionCheck = await checkApiPermission(storeId, Permission.EDIT_PRODUCTS, 'PATCH')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to edit products.", { status: 403 })
+    }
 
     const body = await req.json()
 
@@ -593,6 +611,14 @@ export async function DELETE(req: Request, { params }: { params: { productId: st
 
     if (!params.productId) {
       return new NextResponse("Product ID is required", { status: 400 })
+    }
+
+    const permissionCheck = await checkApiPermission(params.storeId, Permission.DELETE_PRODUCTS, 'DELETE')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to delete products.", { status: 403 })
     }
 
     const storeByUserId = await prismadb.store.findFirst({

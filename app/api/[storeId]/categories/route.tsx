@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import prismadb from "@/lib/prismadb"
+import { checkApiPermission } from "@/lib/api-permissions"
+import { Permission } from "@/types/permissions"
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -38,6 +40,14 @@ export async function POST(req: Request, { params }: { params: { storeId: string
 
     if (!storeId) {
       return new NextResponse("Store Id is required", { status: 400 })
+    }
+
+    const permissionCheck = await checkApiPermission(storeId, Permission.CREATE_CATEGORIES, 'POST')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to create categories.", { status: 403 })
     }
 
     const storeByUserId = await prismadb.store.findFirst({
@@ -97,6 +107,14 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
 
     if (!storeId) {
       return new NextResponse("Store Id is required", { status: 400 })
+    }
+
+    const permissionCheck = await checkApiPermission(storeId, Permission.VIEW_CATEGORIES, 'GET')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to view categories.", { status: 403 })
     }
 
     if (forTemplate) {

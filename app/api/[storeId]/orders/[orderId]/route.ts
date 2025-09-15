@@ -1,17 +1,24 @@
-
-
-
 import { NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 
 import prismadb from "@/lib/prismadb"
+import { checkApiPermission, getPermissionForMethod } from "@/lib/api-permissions"
+import { Permission } from "@/types/permissions"
 
 export async function GET(req: Request, { params }: { params: Promise<{ storeId: string; orderId: string }> }) {
   try {
-    const { orderId } = await params
+    const { storeId, orderId } = await params
     
     if (!orderId) {
       return new NextResponse("Order ID is required", { status: 400 })
+    }
+
+    const permissionCheck = await checkApiPermission(storeId, Permission.VIEW_ORDERS, 'GET')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to view orders.", { status: 403 })
     }
 
     const order = await prismadb.order.findUnique({
@@ -105,6 +112,14 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
       return new NextResponse("Order ID is required", { status: 400 })
     }
 
+    const permissionCheck = await checkApiPermission(storeId, Permission.MANAGE_ORDERS, 'PATCH')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to update orders.", { status: 403 })
+    }
+
     let finalUserId = null
     if (customerId) {
       const existingUser = await prismadb.user.findUnique({
@@ -141,9 +156,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
         },
       })
 
-      if (!storeMember || !storeMember.permissions.includes("MANAGE_ORDERS")) {
-        return new NextResponse("Unauthorized", { status: 403 })
-      }
+       if (!storeMember || !storeMember.permissions.includes("MANAGE_ORDERS")) {
+         return new NextResponse("Unauthorized", { status: 403 })
+       }
     }
 
     let order = await prismadb.order.update({
@@ -279,6 +294,14 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ store
       return new NextResponse("Order ID is required", { status: 400 })
     }
 
+    const permissionCheck = await checkApiPermission(storeId, Permission.MANAGE_ORDERS, 'DELETE')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to delete orders.", { status: 403 })
+    }
+
     const storeByUserId = await prismadb.store.findFirst({
       where: {
         id: storeId,
@@ -304,9 +327,9 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ store
         },
       })
 
-      if (!storeMember || !storeMember.permissions.includes("MANAGE_ORDERS")) {
-        return new NextResponse("Unauthorized", { status: 403 })
-      }
+       if (!storeMember || !storeMember.permissions.includes("MANAGE_ORDERS")) {
+         return new NextResponse("Unauthorized", { status: 403 })
+       }
     }
 
     await prismadb.orderItem.deleteMany({

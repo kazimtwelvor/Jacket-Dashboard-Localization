@@ -41,7 +41,7 @@ export const OrderItemsTable: React.FC<OrderItemsTableProps> = ({
     <div className="space-y-4">
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button>
+          <Button type="button">
             <Plus className="mr-2 h-4 w-4" /> Add Product
           </Button>
         </DialogTrigger>
@@ -93,7 +93,7 @@ export const OrderItemsTable: React.FC<OrderItemsTableProps> = ({
       {orderItems.length === 0 ? (
         <div className="flex flex-col items-center justify-center p-8 border rounded-md">
           <p className="text-muted-foreground mb-4">No items in this order yet</p>
-          <Button onClick={() => setOpen(true)}>
+          <Button type="button" onClick={() => setOpen(true)}>
             <Plus className="mr-2 h-4 w-4" /> Add Product
           </Button>
         </div>
@@ -146,7 +146,7 @@ export const OrderItemsTable: React.FC<OrderItemsTableProps> = ({
                   </TableCell>
                   <TableCell>${(Number.parseFloat(String(item.price)) * item.quantity).toFixed(2)}</TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="icon" onClick={() => onRemoveItem(index)}>
+                    <Button type="button" variant="ghost" size="icon" onClick={() => onRemoveItem(index)}>
                       <Trash className="h-4 w-4" />
                     </Button>
                   </TableCell>

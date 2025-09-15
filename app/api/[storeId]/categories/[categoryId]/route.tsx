@@ -1,12 +1,22 @@
 import prismadb from "@/lib/prismadb"
 import { auth } from "@clerk/nextjs/server"
 import { NextResponse } from "next/server"
+import { checkApiPermission } from "@/lib/api-permissions"
+import { Permission } from "@/types/permissions"
 
-export async function GET(req: Request, { params }: { params: Promise<{ categoryId: string }> }) {
+export async function GET(req: Request, { params }: { params: Promise<{ storeId: string; categoryId: string }> }) {
   try {
-    const { categoryId } = await params
+    const { storeId, categoryId } = await params
     if (!categoryId) {
       return new NextResponse("Category id is required", { status: 400 })
+    }
+
+    const permissionCheck = await checkApiPermission(storeId, Permission.VIEW_CATEGORIES, 'GET')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to view categories.", { status: 403 })
     }
 
     const category = await prismadb.category.findUnique({
@@ -46,6 +56,14 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
 
     if (!type || !["material", "style", "gender", "regular"].includes(type)) {
       return new NextResponse("Valid type is required (material, style, gender, or regular)", { status: 400 })
+    }
+
+    const permissionCheck = await checkApiPermission(storeId, Permission.EDIT_CATEGORIES, 'PATCH')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to edit categories.", { status: 403 })
     }
 
     if (!categoryId) {
@@ -113,6 +131,14 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ store
 
     if (!categoryId) {
       return new NextResponse("Category id is required", { status: 400 })
+    }
+
+    const permissionCheck = await checkApiPermission(storeId, Permission.DELETE_CATEGORIES, 'DELETE')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to delete categories.", { status: 403 })
     }
 
     const storeByUserId = await prismadb.store.findFirst({

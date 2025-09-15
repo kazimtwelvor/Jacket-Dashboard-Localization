@@ -55,6 +55,7 @@ export async function GET(
     const search = searchParams.get('search') || ''
     const categoryFilter = searchParams.get('category') || 'all'
     const colorFilter = searchParams.get('color') || 'all'
+
     const materialFilter = searchParams.get('material') || 'all'
     const styleFilter = searchParams.get('style') || 'all'
     const genderFilter = searchParams.get('gender') || 'all'
@@ -63,8 +64,8 @@ export async function GET(
     const priceMin = parseFloat(searchParams.get('priceMin') || '0')
     const priceMax = parseFloat(searchParams.get('priceMax') || '999999')
     const status = searchParams.get('status') || 'all'
-    const type = searchParams.get('type') || 'products' 
-
+    const type = searchParams.get('type') || 'products'
+    
     const offset = (page - 1) * limit
 
     const whereClause: any = {
@@ -99,7 +100,7 @@ export async function GET(
           },
           {
             categoryData: {
-              path: ['style'], 
+              path: ['style'],
               string_contains: categoryParts[1]
             }
           }
@@ -124,13 +125,14 @@ export async function GET(
 
     if (colorFilter !== 'all') {
       whereClause.colorDetails = {
-        string_contains: `"name":"${colorFilter}"`
+        array_contains: [{ name: colorFilter }]
       }
+      
     }
 
     if (materialFilter !== 'all' || styleFilter !== 'all') {
       const categoryConditions = []
-      
+
       if (materialFilter !== 'all') {
         categoryConditions.push({
           categoryData: {
@@ -139,7 +141,7 @@ export async function GET(
           }
         })
       }
-      
+
       if (styleFilter !== 'all') {
         categoryConditions.push({
           categoryData: {
@@ -148,7 +150,7 @@ export async function GET(
           }
         })
       }
-      
+
       if (categoryConditions.length > 0) {
         if (categoryConditions.length === 1) {
           Object.assign(whereClause, categoryConditions[0])
@@ -169,7 +171,7 @@ export async function GET(
     if (dateFilter !== 'all') {
       const now = new Date()
       let startDate: Date
-      
+
       switch (dateFilter) {
         case 'today':
           startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate())
@@ -184,9 +186,9 @@ export async function GET(
           startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000)
           break
         default:
-          startDate = new Date(0) 
+          startDate = new Date(0)
       }
-      
+
       whereClause.createdAt = {
         gte: startDate
       }
@@ -217,7 +219,7 @@ export async function GET(
             take: 1
           },
         },
-        orderBy: type === 'trashed' 
+        orderBy: type === 'trashed'
           ? { deletedAt: 'desc' }
           : { createdAt: 'desc' },
         skip: offset,

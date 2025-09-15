@@ -53,16 +53,16 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       return new NextResponse("Access denied. You don't have permission to edit pages.", { status: 403 })
     }
 
-    const storeByUserId = await prismadb.store.findFirst({
-      where: {
-        id: params.storeId,
-        userId,
-      },
-    })
+    // const storeByUserId = await prismadb.store.findFirst({
+    //   where: {
+    //     id: params.storeId,
+    //     userId,
+    //   },
+    // })
 
-    if (!storeByUserId) {
-      return new NextResponse("Unauthorized", { status: 403 })
-    }
+    // if (!storeByUserId) {
+    //   return new NextResponse("Unauthorized", { status: 403 })
+    // }
 
     const existingPageBySlug = await prismadb.page.findFirst({
       where: {
@@ -136,16 +136,16 @@ export async function DELETE(req: Request, { params }: { params: { storeId: stri
       return new NextResponse("Access denied. You don't have permission to delete pages.", { status: 403 })
     }
 
-    const storeByUserId = await prismadb.store.findFirst({
-      where: {
-        id: params.storeId,
-        userId,
-      },
-    })
+    // const storeByUserId = await prismadb.store.findFirst({
+    //   where: {
+    //     id: params.storeId,
+    //     userId,
+    //   },
+    // })
 
-    if (!storeByUserId) {
-      return new NextResponse("Unauthorized", { status: 403 })
-    }
+    // if (!storeByUserId) {
+    //   return new NextResponse("Unauthorized", { status: 403 })
+    // }
 
     const page = await prismadb.page.delete({
       where: {

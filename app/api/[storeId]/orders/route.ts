@@ -153,35 +153,35 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       return new NextResponse("Order items are required", { status: 400 })
     }
 
-    const storeByUserId = await prismadb.store.findFirst({
-      where: {
-        id: params.storeId,
-        userId,
-      },
-    })
+    // const storeByUserId = await prismadb.store.findFirst({
+    //   where: {
+    //     id: params.storeId,
+    //     userId,
+    //   },
+    // })
 
-    if (!storeByUserId) {
-      const dbUser = await prismadb.user.findFirst({
-        where: {
-          clerkId: userId,
-        },
-      })
+    // if (!storeByUserId) {
+    //   const dbUser = await prismadb.user.findFirst({
+    //     where: {
+    //       clerkId: userId,
+    //     },
+    //   })
 
-      if (!dbUser) {
-        return new NextResponse("Unauthorized", { status: 403 })
-      }
+    //   if (!dbUser) {
+    //     return new NextResponse("Unauthorized", { status: 403 })
+    //   }
 
-      const storeMember = await prismadb.storeUser.findFirst({
-        where: {
-          storeId: params.storeId,
-          userId: dbUser.id,
-        },
-      })
+    //   const storeMember = await prismadb.storeUser.findFirst({
+    //     where: {
+    //       storeId: params.storeId,
+    //       userId: dbUser.id,
+    //     },
+    //   })
 
-       if (!storeMember || !storeMember.permissions.includes("MANAGE_ORDERS")) {
-         return new NextResponse("Unauthorized", { status: 403 })
-       }
-    }
+    //    if (!storeMember || !storeMember.permissions.includes("MANAGE_ORDERS")) {
+    //      return new NextResponse("Unauthorized", { status: 403 })
+    //    }
+    // }
 
     let finalUserId = null
     if (customerId) {

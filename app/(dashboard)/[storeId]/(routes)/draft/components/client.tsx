@@ -80,6 +80,10 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
         category: categoryFilter,
         color: colorFilter,
         material: materialFilter,
+        style: styleFilter,
+        gender: genderFilter,
+        date: dateFilter,
+        creator: creatorFilter,
         status: statusFilter,
       })
 
@@ -754,9 +758,8 @@ const ProductsView: React.FC<ProductsViewProps> = ({
            matchesCreator && matchesStatus
   })
 
-  // Use API pagination instead of client-side filtering
   const totalPages = pagination?.totalPages || 1
-  const paginatedProducts = data // Data is already paginated from API
+  const paginatedProducts = data 
 
   return (
     <>
@@ -831,8 +834,6 @@ const ProductsView: React.FC<ProductsViewProps> = ({
               className="pl-8"
             />
           </div>
-          
-
         </div>
         
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">

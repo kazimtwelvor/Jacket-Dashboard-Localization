@@ -347,7 +347,7 @@ export const ReviewsSection = () => {
               <div className="flex items-center space-x-2">
                 <Slider
                   id="review-count"
-                  min={5}
+                  min={1}
                   max={15}
                   step={1}
                   value={[reviewCount]}

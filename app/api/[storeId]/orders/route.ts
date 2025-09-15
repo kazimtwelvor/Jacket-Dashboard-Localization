@@ -159,9 +159,9 @@ export async function POST(req: Request, { params }: { params: { storeId: string
         },
       })
 
-      if (!storeMember || !storeMember.permissions.includes("MANAGE_ORDERS")) {
-        return new NextResponse("Unauthorized", { status: 403 })
-      }
+       if (!storeMember || !storeMember.permissions.includes("MANAGE_ORDERS")) {
+         return new NextResponse("Unauthorized", { status: 403 })
+       }
     }
 
     let finalUserId = null

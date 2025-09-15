@@ -1,6 +1,3 @@
-
-
-
 import { NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 
@@ -141,9 +138,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
         },
       })
 
-      if (!storeMember || !storeMember.permissions.includes("MANAGE_ORDERS")) {
-        return new NextResponse("Unauthorized", { status: 403 })
-      }
+       if (!storeMember || !storeMember.permissions.includes("MANAGE_ORDERS")) {
+         return new NextResponse("Unauthorized", { status: 403 })
+       }
     }
 
     let order = await prismadb.order.update({
@@ -304,9 +301,9 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ store
         },
       })
 
-      if (!storeMember || !storeMember.permissions.includes("MANAGE_ORDERS")) {
-        return new NextResponse("Unauthorized", { status: 403 })
-      }
+       if (!storeMember || !storeMember.permissions.includes("MANAGE_ORDERS")) {
+         return new NextResponse("Unauthorized", { status: 403 })
+       }
     }
 
     await prismadb.orderItem.deleteMany({

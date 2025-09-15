@@ -89,19 +89,11 @@ async function syncColorVariations(currentProductId: string, storeId: string, sp
   }
 }
 
-export async function GET(req: Request, { params }: { params: { storeId: string; productId: string } }) {
+export async function GET(req: Request, { params }: { params: { productId: string } }) {
   try {
-    const { storeId, productId } = params
+    const { productId } = params
     if (!productId) {
       return new NextResponse("Product id is required", { status: 400 })
-    }
-
-    const permissionCheck = await checkApiPermission(storeId, Permission.VIEW_PRODUCTS, 'GET')
-    if (permissionCheck.error) {
-      return permissionCheck.error
-    }
-    if (!permissionCheck.hasPermission) {
-      return new NextResponse("Access denied. You don't have permission to view products.", { status: 403 })
     }
 
     const product = await prismadb.product.findUnique({

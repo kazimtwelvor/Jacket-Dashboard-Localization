@@ -9,18 +9,10 @@ export async function GET(
   { params }: { params: { storeId: string; categoryPageId: string } }
 ) {
   try {
-    const { storeId, categoryPageId } = params;
-    
+    const { categoryPageId } = params;
+
     if (!categoryPageId) {
       return new NextResponse("Category page ID is required", { status: 400 })
-    }
-
-    const permissionCheck = await checkApiPermission(storeId, Permission.VIEW_CATEGORIES, 'GET')
-    if (permissionCheck.error) {
-      return permissionCheck.error
-    }
-    if (!permissionCheck.hasPermission) {
-      return new NextResponse("Access denied. You don't have permission to view category pages.", { status: 403 })
     }
 
     const categoryPage = await prismadb.categoryPage.findUnique({
@@ -28,14 +20,14 @@ export async function GET(
         id: categoryPageId,
       },
     })
-    
+
     if (!categoryPage) {
       return new NextResponse("Category page not found", { status: 404 })
     }
-    
+
     const { searchParams } = new URL(req.url)
     const forTemplate = searchParams.get("forTemplate") === "true"
-    
+
     if (forTemplate) {
       const name = categoryPage.name.toLowerCase();
       const commonMaterials = ["cotton", "polyester", "wool", "silk", "linen", "denim", "leather", "cashmere", "nylon", "spandex"];
@@ -46,7 +38,7 @@ export async function GET(
       }
     }
 
-    
+
     const responseData = {
       ...categoryPage,
       currentCategory: {
@@ -68,11 +60,11 @@ export async function PATCH(
 ) {
   try {
     const { storeId, categoryPageId } = params;
-    
+
     const { userId } = await auth()
     const body = await req.json()
-    
-    
+
+
     if (!userId) {
       return new NextResponse("Unauthenticated", { status: 401 })
     }
@@ -224,10 +216,10 @@ export async function PATCH(
       },
       data: updateData,
     });
-    
+
     const { searchParams } = new URL(req.url)
     const forTemplate = searchParams.get("forTemplate") === "true"
-    
+
     const responseData = {
       ...categoryPage,
       currentCategory: {
@@ -236,18 +228,18 @@ export async function PATCH(
         imageUrl: categoryPage.imageUrl || ""
       }
     };
-    
+
     if (forTemplate) {
       const name = categoryPage.name.toLowerCase();
       const commonMaterials = ["cotton", "polyester", "wool", "silk", "linen", "denim", "leather", "cashmere", "nylon", "spandex"];
       const commonStyles = ["bomber", "puffer", "varsity", "letterman", "biker", "aviator", "quilted", "blazer", "cropped", "long coat", "casual", "formal"];
       const commonGenders = ["men", "women", "unisex", "boys", "girls"];
-      
+
       if (commonMaterials.includes(name) || commonStyles.includes(name) || commonGenders.includes(name)) {
         return new NextResponse("This is a regular category, not a category page", { status: 400 })
       }
     }
-    
+
     return NextResponse.json(responseData);
   } catch (error: any) {
     return new NextResponse(`Internal error: ${error.message}`, { status: 500 })

@@ -109,14 +109,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       return new NextResponse("Store Id is required", { status: 400 })
     }
 
-    const permissionCheck = await checkApiPermission(storeId, Permission.VIEW_CATEGORIES, 'GET')
-    if (permissionCheck.error) {
-      return permissionCheck.error
-    }
-    if (!permissionCheck.hasPermission) {
-      return new NextResponse("Access denied. You don't have permission to view categories.", { status: 403 })
-    }
-
     if (forTemplate) {
       const categoryPages = await prismadb.categoryPage.findMany({
         where: {

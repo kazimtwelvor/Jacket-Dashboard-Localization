@@ -28,19 +28,6 @@ export async function GET(
   { params }: { params: { storeId: string } }
 ) {
   try {
-    const permissionCheck = await checkApiPermission(params.storeId, Permission.VIEW_FORMS, 'GET')
-    if (permissionCheck.error) {
-      return new NextResponse(permissionCheck.error.body, { 
-        status: permissionCheck.error.status,
-        headers: corsHeaders(),
-      })
-    }
-    if (!permissionCheck.hasPermission) {
-      return new NextResponse("Access denied. You don't have permission to view forms.", { 
-        status: 403,
-        headers: corsHeaders(),
-      })
-    }
 
     const contactForms = await prismadb.contactForm.findMany({
       where: {
@@ -55,7 +42,7 @@ export async function GET(
       headers: corsHeaders(),
     })
   } catch (error) {
-    return new NextResponse("Internal error", { 
+    return new NextResponse("Internal error", {
       status: 500,
       headers: corsHeaders(),
     })
@@ -72,7 +59,7 @@ export async function POST(
     const { firstName, lastName, email, subject, message, agreeToPrivacyPolicy, status } = body
 
     if (!firstName || !lastName || !email || !subject || !message) {
-      return new NextResponse("Missing required fields", { 
+      return new NextResponse("Missing required fields", {
         status: 400,
         headers: corsHeaders(),
       })
@@ -80,13 +67,13 @@ export async function POST(
 
     const permissionCheck = await checkApiPermission(params.storeId, Permission.CREATE_FORMS, 'POST')
     if (permissionCheck.error) {
-      return new NextResponse(permissionCheck.error.body, { 
+      return new NextResponse(permissionCheck.error.body, {
         status: permissionCheck.error.status,
         headers: corsHeaders(),
       })
     }
     if (!permissionCheck.hasPermission) {
-      return new NextResponse("Access denied. You don't have permission to create forms.", { 
+      return new NextResponse("Access denied. You don't have permission to create forms.", {
         status: 403,
         headers: corsHeaders(),
       })
@@ -109,7 +96,7 @@ export async function POST(
       headers: corsHeaders(),
     })
   } catch (error) {
-    return new NextResponse("Internal error", { 
+    return new NextResponse("Internal error", {
       status: 500,
       headers: corsHeaders(),
     })

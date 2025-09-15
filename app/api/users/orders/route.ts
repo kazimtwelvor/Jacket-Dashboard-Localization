@@ -3,7 +3,7 @@ import prismadb from "@/lib/prismadb";
 import jwt from "jsonwebtoken";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*", // Change this to a specific domain for production
+  "Access-Control-Allow-Origin": "*", 
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With, Accept, Origin, Cache-Control, X-File-Name, X-Store-Id",
   "Access-Control-Allow-Credentials": "true",

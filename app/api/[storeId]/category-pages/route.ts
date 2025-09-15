@@ -150,19 +150,6 @@ export async function GET(
 ) {
   try {
     const { storeId } = params;
-
-    if (!storeId) {
-      return new NextResponse("Store ID is required", { status: 400, headers: corsHeaders })
-    }
-
-    const permissionCheck = await checkApiPermission(storeId, Permission.VIEW_CATEGORIES, 'GET')
-    if (permissionCheck.error) {
-      return permissionCheck.error
-    }
-    if (!permissionCheck.hasPermission) {
-      return new NextResponse("Access denied. You don't have permission to view category pages.", { status: 403, headers: corsHeaders })
-    }
-
     const { searchParams } = new URL(req.url)
     const slug = searchParams.get("slug")
     const forTemplate = searchParams.get("forTemplate") === "true"

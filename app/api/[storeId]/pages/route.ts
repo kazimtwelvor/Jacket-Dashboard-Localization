@@ -102,13 +102,6 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       return new NextResponse("Store ID is required", { status: 400 })
     }
 
-    const permissionCheck = await checkApiPermission(params.storeId, Permission.VIEW_PAGES, 'GET')
-    if (permissionCheck.error) {
-      return permissionCheck.error
-    }
-    if (!permissionCheck.hasPermission) {
-      return new NextResponse("Access denied. You don't have permission to view pages.", { status: 403 })
-    }
 
     const pages = await prismadb.page.findMany({
       where: {

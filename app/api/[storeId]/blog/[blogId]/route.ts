@@ -4,18 +4,10 @@ import prismadb from "@/lib/prismadb"
 import { checkApiPermission } from "@/lib/api-permissions"
 import { Permission } from "@/types/permissions"
 
-export async function GET(req: Request, { params }: { params: { storeId: string; blogId: string } }) {
+export async function GET(req: Request, { params }: { params: { blogId: string } }) {
   try {
     if (!params.blogId) {
       return new NextResponse("Blog ID is required", { status: 400 })
-    }
-
-    const permissionCheck = await checkApiPermission(params.storeId, Permission.VIEW_BLOGS, 'GET')
-    if (permissionCheck.error) {
-      return permissionCheck.error
-    }
-    if (!permissionCheck.hasPermission) {
-      return new NextResponse("Access denied. You don't have permission to view blogs.", { status: 403 })
     }
 
     const blog = await prismadb.blog.findUnique({
@@ -318,7 +310,6 @@ export async function DELETE(req: Request, { params }: { params: { storeId: stri
       return new NextResponse("Blog ID is required", { status: 400 })
     }
 
-    // Check permission for deleting blogs
     const permissionCheck = await checkApiPermission(params.storeId, Permission.DELETE_BLOGS, 'DELETE')
     if (permissionCheck.error) {
       return permissionCheck.error

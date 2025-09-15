@@ -320,25 +320,7 @@ export const CategoryPageForm: React.FC<CategoryPageFormProps> = ({ initialData 
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Description</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Category page description"
-                          {...field}
-                          disabled={loading}
-                          className="resize-none"
-                          rows={4}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+
                 <FormField
                   control={form.control}
                   name="imageUrl"

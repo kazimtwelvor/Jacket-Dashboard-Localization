@@ -3,6 +3,8 @@ import { NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 
 import prismadb from "@/lib/prismadb"
+import { checkApiPermission } from "@/lib/api-permissions"
+import { Permission } from "@/types/permissions"
 
 export async function GET(req: Request, { params }: { params: { storeId: string } }) {
   try {
@@ -17,6 +19,14 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
 
     if (!params.storeId) {
       return new NextResponse("Store ID is required", { status: 400 })
+    }
+
+    const permissionCheck = await checkApiPermission(params.storeId, Permission.VIEW_ORDERS, 'GET')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to view orders.", { status: 403 })
     }
 
     const orders = await prismadb.order.findMany({
@@ -128,6 +138,15 @@ export async function POST(req: Request, { params }: { params: { storeId: string
 
     if (!params.storeId) {
       return new NextResponse("Store ID is required", { status: 400 })
+    }
+
+    const permissionCheck = await checkApiPermission(params.storeId, Permission.MANAGE_ORDERS, 'POST')
+    
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to create orders.", { status: 403 })
     }
 
     if (!orderItems || !orderItems.length) {

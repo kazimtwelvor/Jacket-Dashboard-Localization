@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import prismadb from "@/lib/prismadb"
+import { checkApiPermission } from "@/lib/api-permissions"
+import { Permission } from "@/types/permissions"
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -23,6 +25,14 @@ export async function POST(
 
     if (!userId) {
       return new NextResponse("Unauthenticated", { status: 401, headers: corsHeaders })
+    }
+
+    const permissionCheck = await checkApiPermission(storeId, Permission.CREATE_CATEGORIES, 'POST')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to create category pages.", { status: 403, headers: corsHeaders })
     }
 
     const {
@@ -143,6 +153,14 @@ export async function GET(
 
     if (!storeId) {
       return new NextResponse("Store ID is required", { status: 400, headers: corsHeaders })
+    }
+
+    const permissionCheck = await checkApiPermission(storeId, Permission.VIEW_CATEGORIES, 'GET')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to view category pages.", { status: 403, headers: corsHeaders })
     }
 
     const { searchParams } = new URL(req.url)

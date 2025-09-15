@@ -3,6 +3,8 @@
 import { NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import prismadb from "@/lib/prismadb"
+import { checkApiPermission } from "@/lib/api-permissions"
+import { Permission } from "@/types/permissions"
 
 export async function POST(req: Request, { params }: { params: Promise<{ storeId: string }> }) {
   try {
@@ -26,6 +28,14 @@ export async function POST(req: Request, { params }: { params: Promise<{ storeId
 
     if (!storeId) {
       return new NextResponse("Store Id is required", { status: 400 })
+    }
+
+    const permissionCheck = await checkApiPermission(storeId, Permission.CREATE_BILLBOARDS, 'POST')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to create billboards.", { status: 403 })
     }
 
     const storeByUserId = await prismadb.store.findFirst({
@@ -73,6 +83,14 @@ export async function GET(req: Request, { params }: { params: Promise<{ storeId:
 
     if (!storeId) {
       return new NextResponse("Store Id is required", { status: 400 })
+    }
+
+    const permissionCheck = await checkApiPermission(storeId, Permission.VIEW_BILLBOARDS, 'GET')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to view billboards.", { status: 403 })
     }
 
     const billboards = await prismadb.billboard.findMany({

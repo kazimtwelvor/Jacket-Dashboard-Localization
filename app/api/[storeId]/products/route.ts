@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import prismadb from "@/lib/prismadb"
 import { corsHeaders, handleCors, withCors } from "@/lib/cors"
+import { checkApiPermission } from "@/lib/api-permissions"
+import { Permission } from "@/types/permissions"
 
 export async function OPTIONS() {
   return handleCors()
@@ -20,7 +22,15 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
     const genders = searchParams.get("genders")
     const search = searchParams.get("search")
     const trash = searchParams.get("trash") === "true"
-    const status = searchParams.get("status") 
+    const status = searchParams.get("status")
+
+    const permissionCheck = await checkApiPermission(storeId, Permission.VIEW_PRODUCTS, 'GET')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to view products.", { status: 403 })
+    } 
     
     let baseWhereClause: any = {
       storeId: storeId,

@@ -1,16 +1,26 @@
 import { NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import prismadb from "@/lib/prismadb"
+import { checkApiPermission } from "@/lib/api-permissions"
+import { Permission } from "@/types/permissions"
 
 export async function GET(
   req: Request,
-  { params }: { params: { categoryPageId: string } }
+  { params }: { params: { storeId: string; categoryPageId: string } }
 ) {
   try {
-    const { categoryPageId } = params;
+    const { storeId, categoryPageId } = params;
     
     if (!categoryPageId) {
       return new NextResponse("Category page ID is required", { status: 400 })
+    }
+
+    const permissionCheck = await checkApiPermission(storeId, Permission.VIEW_CATEGORIES, 'GET')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to view category pages.", { status: 403 })
     }
 
     const categoryPage = await prismadb.categoryPage.findUnique({
@@ -65,6 +75,14 @@ export async function PATCH(
     
     if (!userId) {
       return new NextResponse("Unauthenticated", { status: 401 })
+    }
+
+    const permissionCheck = await checkApiPermission(storeId, Permission.EDIT_CATEGORIES, 'PATCH')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to edit category pages.", { status: 403 })
     }
 
     const {
@@ -250,6 +268,14 @@ export async function DELETE(
 
     if (!categoryPageId) {
       return new NextResponse("Category page ID is required", { status: 400 })
+    }
+
+    const permissionCheck = await checkApiPermission(storeId, Permission.DELETE_CATEGORIES, 'DELETE')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to delete category pages.", { status: 403 })
     }
 
 

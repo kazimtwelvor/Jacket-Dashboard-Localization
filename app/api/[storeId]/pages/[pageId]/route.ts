@@ -1,11 +1,21 @@
 import { NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import prismadb from "@/lib/prismadb"
+import { checkApiPermission } from "@/lib/api-permissions"
+import { Permission } from "@/types/permissions"
 
-export async function GET(req: Request, { params }: { params: { pageId: string } }) {
+export async function GET(req: Request, { params }: { params: { storeId: string; pageId: string } }) {
   try {
     if (!params.pageId) {
       return new NextResponse("Page ID is required", { status: 400 })
+    }
+
+    const permissionCheck = await checkApiPermission(params.storeId, Permission.VIEW_PAGES, 'GET')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to view pages.", { status: 403 })
     }
 
     const page = await prismadb.page.findUnique({
@@ -41,6 +51,14 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
 
     if (!params.pageId) {
       return new NextResponse("Page ID is required", { status: 400 })
+    }
+
+    const permissionCheck = await checkApiPermission(params.storeId, Permission.EDIT_PAGES, 'PATCH')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to edit pages.", { status: 403 })
     }
 
     const storeByUserId = await prismadb.store.findFirst({
@@ -116,6 +134,14 @@ export async function DELETE(req: Request, { params }: { params: { storeId: stri
 
     if (!params.pageId) {
       return new NextResponse("Page ID is required", { status: 400 })
+    }
+
+    const permissionCheck = await checkApiPermission(params.storeId, Permission.DELETE_PAGES, 'DELETE')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to delete pages.", { status: 403 })
     }
 
     const storeByUserId = await prismadb.store.findFirst({

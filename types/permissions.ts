@@ -62,8 +62,6 @@ export enum Permission {
   CREATE_FORMS = "CREATE_FORMS",
   EDIT_FORMS = "EDIT_FORMS",
   DELETE_FORMS = "DELETE_FORMS",
-
-  
 }
 
 export type RolePermissions = {

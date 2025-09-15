@@ -41,16 +41,16 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       return new NextResponse("Access denied. You don't have permission to create pages.", { status: 403 })
     }
 
-    const storeByUserId = await prismadb.store.findFirst({
-      where: {
-        id: params.storeId,
-        userId,
-      },
-    })
+    // const storeByUserId = await prismadb.store.findFirst({
+    //   where: {
+    //     id: params.storeId,
+    //     userId,
+    //   },
+    // })
 
-    if (!storeByUserId) {
-      return new NextResponse("Unauthorized", { status: 403 })
-    }
+    // if (!storeByUserId) {
+    //   return new NextResponse("Unauthorized", { status: 403 })
+    // }
 
     const existingPageBySlug = await prismadb.page.findFirst({
       where: {

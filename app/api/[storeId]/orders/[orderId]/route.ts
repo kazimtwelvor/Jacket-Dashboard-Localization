@@ -136,35 +136,35 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
       }
     }
 
-    const storeByUserId = await prismadb.store.findFirst({
-      where: {
-        id: storeId,
-        userId,
-      },
-    })
+    // const storeByUserId = await prismadb.store.findFirst({
+    //   where: {
+    //     id: storeId,
+    //     userId,
+    //   },
+    // })
 
-    if (!storeByUserId) {
-      const dbUser = await prismadb.user.findFirst({
-        where: {
-          clerkId: userId,
-        },
-      })
+    // if (!storeByUserId) {
+    //   const dbUser = await prismadb.user.findFirst({
+    //     where: {
+    //       clerkId: userId,
+    //     },
+    //   })
 
-      if (!dbUser) {
-        return new NextResponse("Unauthorized", { status: 403 })
-      }
+    //   if (!dbUser) {
+    //     return new NextResponse("Unauthorized", { status: 403 })
+    //   }
 
-      const storeMember = await prismadb.storeUser.findFirst({
-        where: {
-          storeId: storeId,
-          userId: dbUser.id,
-        },
-      })
+    //   const storeMember = await prismadb.storeUser.findFirst({
+    //     where: {
+    //       storeId: storeId,
+    //       userId: dbUser.id,
+    //     },
+    //   })
 
-      if (!storeMember || !storeMember.permissions.includes("MANAGE_ORDERS")) {
-        return new NextResponse("Unauthorized", { status: 403 })
-      }
-    }
+    //   if (!storeMember || !storeMember.permissions.includes("MANAGE_ORDERS")) {
+    //     return new NextResponse("Unauthorized", { status: 403 })
+    //   }
+    // }
 
     let order = await prismadb.order.update({
       where: {

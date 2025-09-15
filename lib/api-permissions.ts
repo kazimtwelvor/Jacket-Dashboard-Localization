@@ -10,13 +10,13 @@ export interface PermissionCheckResult {
   error?: NextResponse
 }
 
-
 export async function checkApiPermission(
   storeId: string,
   permission: Permission,
   method: 'GET' | 'POST' | 'PATCH' | 'DELETE' = 'GET'
 ): Promise<PermissionCheckResult> {
   try {
+
     const { userId } = await auth()
     
     if (!userId) {
@@ -37,6 +37,8 @@ export async function checkApiPermission(
       where: { clerkId: userId }
     })
 
+    console.log("dbUser", dbUser)
+
     if (!dbUser) {
       return {
         hasPermission: false,
@@ -50,6 +52,7 @@ export async function checkApiPermission(
         userId: dbUser.id
       }
     })
+    console.log("store", store)
 
     if (store) {
       return {
@@ -65,6 +68,7 @@ export async function checkApiPermission(
         userId: dbUser.id
       }
     })
+    console.log("storeUser", storeUser)
 
     if (!storeUser) {
       return {
@@ -74,6 +78,7 @@ export async function checkApiPermission(
     }
 
     const userRole = storeUser.role as Role
+    console.log("userRole", userRole)
     const userPermissions = DEFAULT_ROLE_PERMISSIONS[userRole] || []
     const hasPermission = userPermissions.includes(permission)
 

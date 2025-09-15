@@ -7,10 +7,22 @@ import { Permission } from "@/types/permissions"
 
 export async function GET(req: Request, { params }: { params: Promise<{ storeId: string; orderId: string }> }) {
   try {
-    const { orderId } = await params
+    const { storeId, orderId } = await params
 
     if (!orderId) {
       return new NextResponse("Order ID is required", { status: 400 })
+    }
+
+    if (!storeId) {
+      return new NextResponse("Store ID is required", { status: 400 })
+    }
+
+    const permissionCheck = await checkApiPermission(storeId, Permission.VIEW_ORDERS, 'GET')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to view orders.", { status: 403 })
     }
 
 

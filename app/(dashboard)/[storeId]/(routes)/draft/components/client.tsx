@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { X, Grid, List, Trash2, RotateCcw, Search } from "lucide-react"
+import { X, Grid, List, Trash2, RotateCcw, Search, Edit } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Heading } from "@/components/ui/heading"
 import { Separator } from "@/components/ui/separator"
@@ -278,6 +278,10 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
     }
   }
 
+  const onEdit = (product: any) => {
+    router.push(`/${params?.storeId}/products/${product.id}`)
+  }
+
   // Get current data and use static dropdown options 
   const currentData = activeTab === 'all' ? products : trashedProducts
   const dropdownCategories = dropdownOptionsLoaded ? allCategories : []
@@ -369,6 +373,7 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
           <ProductsView
             data={products}
             onTrash={userRole !== 'EDITOR' ? onTrash : undefined}
+            onEdit={onEdit}
             loading={loading}
             isTrash={false}
             userRole={userRole}
@@ -424,6 +429,7 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
               setSelectedProduct(product)
               setDeleteModalOpen(true)
             }}
+            onEdit={undefined} 
             showAllProducts={showAllProducts}
             pagination={trashedPagination}
             currentPage={trashedPage}
@@ -480,6 +486,7 @@ interface ProductsViewProps {
   onRestore?: (product: any) => void
   onDelete?: (product: any) => void
   onPreview?: (product: any) => void
+  onEdit?: (product: any) => void
   loading: boolean
   isTrash?: boolean
   userRole?: string
@@ -521,6 +528,7 @@ const ProductsView: React.FC<ProductsViewProps> = ({
   onRestore,
   onDelete,
   onPreview,
+  onEdit,
   loading,
   isTrash = false,
   userRole,
@@ -1066,6 +1074,34 @@ const ProductsView: React.FC<ProductsViewProps> = ({
                   </div>
                 </div>
 
+                <div className="flex gap-2 mt-3">
+                  {onEdit && userRole !== 'VIEWER' && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onEdit(product)
+                      }}
+                      className="flex-1"
+                    >
+                      <Edit className="h-4 w-4 mr-1" />
+                      Edit
+                    </Button>
+                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onPreview?.(product)
+                    }}
+                    className="flex-1"
+                  >
+                    Preview
+                  </Button>
+                </div>
+
               </CardContent>
             </Card>
           ))}
@@ -1163,6 +1199,32 @@ const ProductsView: React.FC<ProductsViewProps> = ({
                           {product.isArchived && (
                             <Badge variant="secondary" className="text-xs">Archived</Badge>
                           )}
+                        </div>
+
+                        <div className="flex gap-2 mt-2">
+                          {onEdit && userRole !== 'VIEWER' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                onEdit(product)
+                              }}
+                            >
+                              <Edit className="h-4 w-4 mr-1" />
+                              Edit
+                            </Button>
+                          )}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              onPreview?.(product)
+                            }}
+                          >
+                            Preview
+                          </Button>
                         </div>
 
                       </div>

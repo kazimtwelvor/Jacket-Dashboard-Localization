@@ -55,12 +55,17 @@ export async function GET(
     const search = searchParams.get('search') || ''
     const categoryFilter = searchParams.get('category') || 'all'
     const colorFilter = searchParams.get('color') || 'all'
+
     const materialFilter = searchParams.get('material') || 'all'
+    const styleFilter = searchParams.get('style') || 'all'
+    const genderFilter = searchParams.get('gender') || 'all'
+    const dateFilter = searchParams.get('date') || 'all'
+    const creatorFilter = searchParams.get('creator') || 'all'
     const priceMin = parseFloat(searchParams.get('priceMin') || '0')
     const priceMax = parseFloat(searchParams.get('priceMax') || '999999')
     const status = searchParams.get('status') || 'all'
-    const type = searchParams.get('type') || 'products' 
-
+    const type = searchParams.get('type') || 'products'
+    
     const offset = (page - 1) * limit
 
     const whereClause: any = {
@@ -95,13 +100,12 @@ export async function GET(
           },
           {
             categoryData: {
-              path: ['style'], 
+              path: ['style'],
               string_contains: categoryParts[1]
             }
           }
         ]
       } else {
-        // Single category filter - check both material and style
         whereClause.OR = [
           {
             categoryData: {
@@ -119,19 +123,74 @@ export async function GET(
       }
     }
 
-    // Add color filter (checks colorDetails JSON field)
     if (colorFilter !== 'all') {
-      // JSON array contains check for colors
       whereClause.colorDetails = {
-        string_contains: `"name":"${colorFilter}"`
+        array_contains: [{ name: colorFilter }]
+      }
+      
+    }
+
+    if (materialFilter !== 'all' || styleFilter !== 'all') {
+      const categoryConditions = []
+
+      if (materialFilter !== 'all') {
+        categoryConditions.push({
+          categoryData: {
+            path: ['material'],
+            string_contains: materialFilter
+          }
+        })
+      }
+
+      if (styleFilter !== 'all') {
+        categoryConditions.push({
+          categoryData: {
+            path: ['style'],
+            string_contains: styleFilter
+          }
+        })
+      }
+
+      if (categoryConditions.length > 0) {
+        if (categoryConditions.length === 1) {
+          Object.assign(whereClause, categoryConditions[0])
+        } else {
+          whereClause.AND = whereClause.AND ? [...whereClause.AND, ...categoryConditions] : categoryConditions
+        }
       }
     }
 
-    // Add material filter (checks categoryData.material specifically)
-    if (materialFilter !== 'all') {
-      whereClause.categoryData = {
-        path: ['material'],
-        string_contains: materialFilter
+    if (genderFilter !== 'all') {
+      whereClause.gender = genderFilter
+    }
+
+    if (creatorFilter !== 'all') {
+      whereClause.createdByName = creatorFilter
+    }
+
+    if (dateFilter !== 'all') {
+      const now = new Date()
+      let startDate: Date
+
+      switch (dateFilter) {
+        case 'today':
+          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+          break
+        case 'week':
+          startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+          break
+        case 'month':
+          startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+          break
+        case 'year':
+          startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000)
+          break
+        default:
+          startDate = new Date(0)
+      }
+
+      whereClause.createdAt = {
+        gte: startDate
       }
     }
 
@@ -160,7 +219,7 @@ export async function GET(
             take: 1
           },
         },
-        orderBy: type === 'trashed' 
+        orderBy: type === 'trashed'
           ? { deletedAt: 'desc' }
           : { createdAt: 'desc' },
         skip: offset,

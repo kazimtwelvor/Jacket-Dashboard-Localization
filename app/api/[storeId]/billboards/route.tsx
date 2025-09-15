@@ -85,14 +85,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ storeId:
       return new NextResponse("Store Id is required", { status: 400 })
     }
 
-    const permissionCheck = await checkApiPermission(storeId, Permission.VIEW_BILLBOARDS, 'GET')
-    if (permissionCheck.error) {
-      return permissionCheck.error
-    }
-    if (!permissionCheck.hasPermission) {
-      return new NextResponse("Access denied. You don't have permission to view billboards.", { status: 403 })
-    }
-
     const billboards = await prismadb.billboard.findMany({
       where: {
         storeId: storeId,

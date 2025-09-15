@@ -4,19 +4,11 @@ import { NextResponse } from "next/server"
 import { checkApiPermission } from "@/lib/api-permissions"
 import { Permission } from "@/types/permissions"
 
-export async function GET(req: Request, { params }: { params: Promise<{ storeId: string; categoryId: string }> }) {
+export async function GET(req: Request, { params }: { params: Promise<{ categoryId: string }> }) {
   try {
-    const { storeId, categoryId } = await params
+    const { categoryId } = await params
     if (!categoryId) {
       return new NextResponse("Category id is required", { status: 400 })
-    }
-
-    const permissionCheck = await checkApiPermission(storeId, Permission.VIEW_CATEGORIES, 'GET')
-    if (permissionCheck.error) {
-      return permissionCheck.error
-    }
-    if (!permissionCheck.hasPermission) {
-      return new NextResponse("Access denied. You don't have permission to view categories.", { status: 403 })
     }
 
     const category = await prismadb.category.findUnique({

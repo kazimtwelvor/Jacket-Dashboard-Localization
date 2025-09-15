@@ -7,19 +7,12 @@ import { Permission } from "@/types/permissions"
 
 export async function GET(req: Request, { params }: { params: Promise<{ storeId: string; orderId: string }> }) {
   try {
-    const { storeId, orderId } = await params
-    
+    const { orderId } = await params
+
     if (!orderId) {
       return new NextResponse("Order ID is required", { status: 400 })
     }
 
-    const permissionCheck = await checkApiPermission(storeId, Permission.VIEW_ORDERS, 'GET')
-    if (permissionCheck.error) {
-      return permissionCheck.error
-    }
-    if (!permissionCheck.hasPermission) {
-      return new NextResponse("Access denied. You don't have permission to view orders.", { status: 403 })
-    }
 
     const order = await prismadb.order.findUnique({
       where: {
@@ -125,7 +118,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
       const existingUser = await prismadb.user.findUnique({
         where: { id: customerId }
       })
-      
+
       if (existingUser) {
         finalUserId = customerId
       }
@@ -156,9 +149,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
         },
       })
 
-       if (!storeMember || !storeMember.permissions.includes("MANAGE_ORDERS")) {
-         return new NextResponse("Unauthorized", { status: 403 })
-       }
+      if (!storeMember || !storeMember.permissions.includes("MANAGE_ORDERS")) {
+        return new NextResponse("Unauthorized", { status: 403 })
+      }
     }
 
     let order = await prismadb.order.update({
@@ -327,9 +320,9 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ store
         },
       })
 
-       if (!storeMember || !storeMember.permissions.includes("MANAGE_ORDERS")) {
-         return new NextResponse("Unauthorized", { status: 403 })
-       }
+      if (!storeMember || !storeMember.permissions.includes("MANAGE_ORDERS")) {
+        return new NextResponse("Unauthorized", { status: 403 })
+      }
     }
 
     await prismadb.orderItem.deleteMany({

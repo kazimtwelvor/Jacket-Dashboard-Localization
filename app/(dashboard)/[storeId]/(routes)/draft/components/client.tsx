@@ -37,7 +37,7 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
   const [activeTab, setActiveTab] = useState("all")
   const [previewModalOpen, setPreviewModalOpen] = useState(false)
   const [previewProduct, setPreviewProduct] = useState<any>(null)
-  
+
   // API-driven state
   const [products, setProducts] = useState<any[]>([])
   const [trashedProducts, setTrashedProducts] = useState<any[]>([])
@@ -45,7 +45,7 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
   const [trashedPage, setTrashedPage] = useState(1)
   const [pagination, setPagination] = useState<any>({})
   const [trashedPagination, setTrashedPagination] = useState<any>({})
-  
+
   // Store complete dropdown options (never filtered)
   const [allCategories, setAllCategories] = useState<string[]>([])
   const [allColors, setAllColors] = useState<string[]>([])
@@ -53,7 +53,7 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
   const [allStyles, setAllStyles] = useState<string[]>([])
   const [allGenders, setAllGenders] = useState<string[]>([])
   const [dropdownOptionsLoaded, setDropdownOptionsLoaded] = useState(false)
-  
+
   // Filter state
   const [searchTerm, setSearchTerm] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("all")
@@ -96,10 +96,10 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
 
       const url = `/api/${storeId}/draft-products?${params}`
       console.log(`Fetching ${type}:`, url.toString())
-      
+
       const response = await axios.get(url)
       const { products: fetchedProducts, pagination: fetchedPagination } = response.data
-      
+
       console.log(`Fetched ${fetchedProducts.length} ${type} products, total: ${fetchedPagination.totalCount}`)
 
       if (type === 'products') {
@@ -133,7 +133,7 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
         setInitialLoading(false)
       }
     }
-    
+
     loadInitialData()
   }, [storeId])
 
@@ -153,17 +153,17 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
   // Fetch all dropdown options once on component mount
   const fetchDropdownOptions = async () => {
     if (dropdownOptionsLoaded) return
-    
+
     try {
       // Fetch all products without filters to get complete dropdown options
       const params = new URLSearchParams()
       params.append('page', '1')
       params.append('limit', '1000') // Large limit to get all products for dropdown options
       params.append('type', 'products')
-      
+
       const response = await axios.get(`/api/${storeId}/draft-products?${params}`)
       const allProducts = response.data.products || []
-      
+
       // Extract categories
       const categories = Array.from(new Set(allProducts.map((product: any) => {
         try {
@@ -176,7 +176,7 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
           return 'Uncategorized'
         }
       }).filter(Boolean))) as string[]
-      
+
       // Extract colors
       const colors = Array.from(new Set(allProducts.flatMap((product: any) => {
         try {
@@ -192,7 +192,7 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
           return []
         }
       }).filter(Boolean))) as string[]
-      
+
       // Extract materials
       const materials = Array.from(new Set(allProducts.map((product: any) => {
         try {
@@ -204,7 +204,7 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
           return null
         }
       }).filter(Boolean))) as string[]
-      
+
       // Extract styles
       const styles = Array.from(new Set(allProducts.map((product: any) => {
         try {
@@ -216,17 +216,17 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
           return null
         }
       }).filter(Boolean))) as string[]
-      
+
       // Extract genders
       const genders = Array.from(new Set(allProducts.map((product: any) => product.gender).filter(Boolean))) as string[]
-      
+
       setAllCategories(categories)
       setAllColors(colors)
       setAllMaterials(materials)
       setAllStyles(styles)
       setAllGenders(genders)
       setDropdownOptionsLoaded(true)
-      
+
     } catch (error) {
       console.error('Error fetching dropdown options:', error)
     }
@@ -317,29 +317,29 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
         onConfirm={onDelete}
         loading={loading}
       />
-      
+
       <ProductPreviewModal
         isOpen={previewModalOpen}
         onClose={() => setPreviewModalOpen(false)}
         product={previewProduct}
       />
-      
+
       <div className="flex items-center justify-between">
-        <Heading 
-          title={`Draft Shop (${pagination.totalCount || 0} active, ${trashedPagination.totalCount || 0} trashed)`} 
-          description="Preview your store like customers see it" 
+        <Heading
+          title={`Draft Shop (${pagination.totalCount || 0} active, ${trashedPagination.totalCount || 0} trashed)`}
+          description="Preview your store like customers see it"
         />
       </div>
       <Separator />
-      
+
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList>
           <TabsTrigger value="all">All Products ({pagination.totalCount || 0})</TabsTrigger>
           <TabsTrigger value="trash">Trash ({trashedPagination.totalCount || 0})</TabsTrigger>
         </TabsList>
-        
+
         <div className="flex items-center justify-between mt-4">
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
           <Button
             variant={showAllProducts ? "default" : "outline"}
             size="sm"
@@ -353,8 +353,8 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
             </span>
           )}
           </div>
-          
-          <Button
+           */}
+          {/* <Button
             variant="outline"
             size="sm"
             onClick={clearAllFilters}
@@ -362,14 +362,14 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
           >
             <X className="h-4 w-4" />
             Clear Filters
-          </Button>
+          </Button> */}
         </div>
-        
+
         <TabsContent value="all" className="space-y-4">
-          <ProductsView 
-            data={products} 
-            onTrash={userRole !== 'EDITOR' ? onTrash : undefined} 
-            loading={loading} 
+          <ProductsView
+            data={products}
+            onTrash={userRole !== 'EDITOR' ? onTrash : undefined}
+            loading={loading}
             isTrash={false}
             userRole={userRole}
             showAllProducts={showAllProducts}
@@ -401,6 +401,7 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
             staticMaterials={dropdownMaterials}
             staticStyles={dropdownStyles}
             staticGenders={dropdownGenders}
+            onClearFilters={clearAllFilters}
             onPreview={async (product) => {
               try {
                 const response = await fetch(`/api/${params?.storeId}/products/${product.id}`)
@@ -414,10 +415,10 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
             }}
           />
         </TabsContent>
-        
+
         <TabsContent value="trash" className="space-y-4">
-          <ProductsView 
-            data={trashedProducts} 
+          <ProductsView
+            data={trashedProducts}
             onRestore={onRestore}
             onDelete={(product) => {
               setSelectedProduct(product)
@@ -452,6 +453,7 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
             staticMaterials={dropdownMaterials}
             staticStyles={dropdownStyles}
             staticGenders={dropdownGenders}
+            onClearFilters={clearAllFilters}
             onPreview={async (product) => {
               try {
                 const response = await fetch(`/api/${params?.storeId}/products/${product.id}`)
@@ -463,7 +465,7 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
               } catch (error) {
               }
             }}
-            loading={loading} 
+            loading={loading}
             isTrash={true}
           />
         </TabsContent>
@@ -510,15 +512,16 @@ interface ProductsViewProps {
   staticMaterials?: string[]
   staticStyles?: string[]
   staticGenders?: string[]
+  onClearFilters?: () => void
 }
 
-const ProductsView: React.FC<ProductsViewProps> = ({ 
-  data, 
-  onTrash, 
-  onRestore, 
-  onDelete, 
-  onPreview, 
-  loading, 
+const ProductsView: React.FC<ProductsViewProps> = ({
+  data,
+  onTrash,
+  onRestore,
+  onDelete,
+  onPreview,
+  loading,
   isTrash = false,
   userRole,
   showAllProducts = false,
@@ -529,7 +532,7 @@ const ProductsView: React.FC<ProductsViewProps> = ({
   onSearchChange,
   categoryFilter = "all",
   onCategoryChange,
-  colorFilter = "all", 
+  colorFilter = "all",
   onColorChange,
   materialFilter = "all",
   onMaterialChange,
@@ -549,22 +552,23 @@ const ProductsView: React.FC<ProductsViewProps> = ({
   staticColors = [],
   staticMaterials = [],
   staticStyles = [],
-  staticGenders = []
+  staticGenders = [],
+  onClearFilters
 }) => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [selectedProducts, setSelectedProducts] = useState<string[]>([])
   const itemsPerPage = 12
 
   const toggleProduct = (productId: string) => {
-    setSelectedProducts(prev => 
-      prev.includes(productId) 
+    setSelectedProducts(prev =>
+      prev.includes(productId)
         ? prev.filter(id => id !== productId)
         : [...prev, productId]
     )
   }
 
   const toggleAll = () => {
-    setSelectedProducts(prev => 
+    setSelectedProducts(prev =>
       prev.length === data.length ? [] : data.map(p => p.id)
     )
   }
@@ -668,7 +672,7 @@ const ProductsView: React.FC<ProductsViewProps> = ({
 
   const filteredProducts = data.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase())
-    
+
     const productCategory = (() => {
       try {
         if (product.categoryData && typeof product.categoryData === 'object') {
@@ -680,7 +684,7 @@ const ProductsView: React.FC<ProductsViewProps> = ({
         return 'Uncategorized'
       }
     })()
-    
+
     const productColors = (() => {
       try {
         if (product.colorDetails) {
@@ -695,7 +699,7 @@ const ProductsView: React.FC<ProductsViewProps> = ({
         return []
       }
     })()
-    
+
     const productMaterial = (() => {
       try {
         if (product.categoryData && typeof product.categoryData === 'object') {
@@ -706,7 +710,7 @@ const ProductsView: React.FC<ProductsViewProps> = ({
         return ''
       }
     })()
-    
+
     const productStyle = (() => {
       try {
         if (product.categoryData && typeof product.categoryData === 'object') {
@@ -717,10 +721,10 @@ const ProductsView: React.FC<ProductsViewProps> = ({
         return ''
       }
     })()
-    
+
     const productPrice = parseFloat(product.price.replace(/[^0-9.]/g, ''))
     const productStatus = product.isArchived ? 'archived' : 'published'
-    
+
     const matchesCategory = categoryFilter === "all" || productCategory === categoryFilter
     const matchesColor = colorFilter === "all" || productColors.includes(colorFilter)
     const matchesMaterial = materialFilter === "all" || productMaterial === materialFilter
@@ -728,7 +732,7 @@ const ProductsView: React.FC<ProductsViewProps> = ({
     const matchesGender = genderFilter === "all" || product.gender === genderFilter
     const matchesCreator = creatorFilter === "all" || product.createdByName === creatorFilter
     const matchesStatus = statusFilter === "all" || productStatus === statusFilter
-    
+
     // Price filter commented out for now
     const matchesPrice = true // Always return true since price filter is disabled
     // const matchesPrice = (() => {
@@ -739,27 +743,27 @@ const ProductsView: React.FC<ProductsViewProps> = ({
     //   if (priceFilter === "over-200" && productPrice > 200) return true
     //   return false
     // })()
-    
+
     const matchesDate = (() => {
       if (dateFilter === "all") return true
       const productDate = new Date(product.createdAt)
       const now = new Date()
       const daysDiff = Math.floor((now.getTime() - productDate.getTime()) / (1000 * 60 * 60 * 24))
-      
+
       if (dateFilter === "today" && daysDiff === 0) return true
       if (dateFilter === "week" && daysDiff <= 7) return true
       if (dateFilter === "month" && daysDiff <= 30) return true
       if (dateFilter === "year" && daysDiff <= 365) return true
       return false
     })()
-    
-    return matchesSearch && matchesCategory && matchesColor && matchesMaterial && 
-           matchesStyle && matchesGender && matchesPrice && matchesDate && 
-           matchesCreator && matchesStatus
+
+    return matchesSearch && matchesCategory && matchesColor && matchesMaterial &&
+      matchesStyle && matchesGender && matchesPrice && matchesDate &&
+      matchesCreator && matchesStatus
   })
 
   const totalPages = pagination?.totalPages || 1
-  const paginatedProducts = data 
+  const paginatedProducts = data
 
   return (
     <>
@@ -785,7 +789,7 @@ const ProductsView: React.FC<ProductsViewProps> = ({
               {selectedProducts.length} selected
             </span>
           </div>
-          
+
           {selectedProducts.length > 0 && (
             <div className="flex gap-2">
               {isTrash ? (
@@ -824,7 +828,7 @@ const ProductsView: React.FC<ProductsViewProps> = ({
               )}
             </div>
           )}
-          
+
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
@@ -835,7 +839,7 @@ const ProductsView: React.FC<ProductsViewProps> = ({
             />
           </div>
         </div>
-        
+
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
           <Select value={categoryFilter} onValueChange={onCategoryChange}>
             <SelectTrigger>
@@ -850,7 +854,7 @@ const ProductsView: React.FC<ProductsViewProps> = ({
               ))}
             </SelectContent>
           </Select>
-          
+
           <Select value={colorFilter} onValueChange={onColorChange}>
             <SelectTrigger>
               <SelectValue placeholder="Color" />
@@ -864,7 +868,7 @@ const ProductsView: React.FC<ProductsViewProps> = ({
               ))}
             </SelectContent>
           </Select>
-          
+
           <Select value={materialFilter} onValueChange={onMaterialChange}>
             <SelectTrigger>
               <SelectValue placeholder="Material" />
@@ -878,7 +882,7 @@ const ProductsView: React.FC<ProductsViewProps> = ({
               ))}
             </SelectContent>
           </Select>
-          
+
           <Select value={styleFilter} onValueChange={onStyleChange}>
             <SelectTrigger>
               <SelectValue placeholder="Style" />
@@ -892,7 +896,7 @@ const ProductsView: React.FC<ProductsViewProps> = ({
               ))}
             </SelectContent>
           </Select>
-          
+
           <Select value={genderFilter} onValueChange={onGenderChange}>
             <SelectTrigger>
               <SelectValue placeholder="Gender" />
@@ -906,7 +910,7 @@ const ProductsView: React.FC<ProductsViewProps> = ({
               ))}
             </SelectContent>
           </Select>
-          
+
           {/* Price filter commented out for now */}
           {/* <Select value={priceFilter} onValueChange={onPriceChange}>
             <SelectTrigger>
@@ -920,7 +924,7 @@ const ProductsView: React.FC<ProductsViewProps> = ({
               <SelectItem value="over-200">Over $200</SelectItem>
             </SelectContent>
           </Select> */}
-          
+
           <Select value={dateFilter} onValueChange={onDateChange}>
             <SelectTrigger>
               <SelectValue placeholder="Date" />
@@ -933,7 +937,7 @@ const ProductsView: React.FC<ProductsViewProps> = ({
               <SelectItem value="year">This Year</SelectItem>
             </SelectContent>
           </Select>
-          
+
           <Select value={statusFilter} onValueChange={onStatusChange}>
             <SelectTrigger>
               <SelectValue placeholder="Status" />
@@ -945,22 +949,32 @@ const ProductsView: React.FC<ProductsViewProps> = ({
             </SelectContent>
           </Select>
         </div>
-        
-        {creators.length > 0 && (
-          <Select value={creatorFilter} onValueChange={onCreatorChange}>
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="All Creators" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Creators</SelectItem>
-              {creators.map((creator: string) => (
-                <SelectItem key={creator} value={creator}>
-                  {creator}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
+        <div className="flex items-center gap-2">
+          {creators.length > 0 && (
+            <Select value={creatorFilter} onValueChange={onCreatorChange}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="All Creators" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Creators</SelectItem>
+                {creators.map((creator: string) => (
+                  <SelectItem key={creator} value={creator}>
+                    {creator}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onClearFilters}
+            className="flex items-center gap-2"
+          >
+            <X className="h-4 w-4" />
+            Clear Filters
+          </Button>
+        </div>
       </div>
 
       {/* Products Grid/List */}
@@ -1173,14 +1187,14 @@ const ProductsView: React.FC<ProductsViewProps> = ({
           const maxVisible = 5
           let start = Math.max(1, currentPage - Math.floor(maxVisible / 2))
           let end = Math.min(totalPages, start + maxVisible - 1)
-          
+
           if (end - start + 1 < maxVisible) {
             start = Math.max(1, end - maxVisible + 1)
           }
-          
+
           return Array.from({ length: end - start + 1 }, (_, i) => start + i)
         }
-        
+
         return (
           <div className="flex items-center justify-center gap-2 mt-6">
             <Button
@@ -1191,7 +1205,7 @@ const ProductsView: React.FC<ProductsViewProps> = ({
             >
               Previous
             </Button>
-            
+
             {getVisiblePages().map(page => (
               <Button
                 key={page}
@@ -1202,7 +1216,7 @@ const ProductsView: React.FC<ProductsViewProps> = ({
                 {page}
               </Button>
             ))}
-            
+
             <Button
               variant="outline"
               size="sm"

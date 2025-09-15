@@ -8,6 +8,13 @@ export async function GET(
   { params }: { params: { storeId: string; contactFormId: string } }
 ) {
   try {
+    const permissionCheck = await checkApiPermission(params.storeId, Permission.VIEW_FORMS, 'GET')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to view forms.", { status: 403 })
+    }
  
     const contactForm = await prismadb.contactForm.findUnique({
       where: {

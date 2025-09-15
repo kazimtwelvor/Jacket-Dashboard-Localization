@@ -21,6 +21,14 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       return new NextResponse("Store ID is required", { status: 400 })
     }
 
+    const permissionCheck = await checkApiPermission(params.storeId, Permission.VIEW_ORDERS, 'GET')
+    if (permissionCheck.error) {
+      return permissionCheck.error
+    }
+    if (!permissionCheck.hasPermission) {
+      return new NextResponse("Access denied. You don't have permission to view orders.", { status: 403 })
+    }
+
     const orders = await prismadb.order.findMany({
       where: {
         storeId: params.storeId,
@@ -260,6 +268,6 @@ export async function POST(req: Request, { params }: { params: { storeId: string
 
     return NextResponse.json(serializedOrder)
   } catch (error) {
-    return new NextResponse(`Internal error: ${error.message}`, { status: 500 })
+    return new NextResponse(`Internal error: ${error instanceof Error ? error.message : 'Unknown error'}`, { status: 500 })
   }
 }

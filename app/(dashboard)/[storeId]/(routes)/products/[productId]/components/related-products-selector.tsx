@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/popover"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import axios from "axios"
+
 
 interface Product {
   id: string
@@ -45,40 +45,79 @@ export const RelatedProductsSelector: React.FC<RelatedProductsSelectorProps> = (
   const [open, setOpen] = useState(false)
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [selectedProducts, setSelectedProducts] = useState<Product[]>([])
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    if (!storeId) return
+
+    const searchProducts = async () => {
+      // Only search if there's a search term
+      if (!searchTerm.trim()) {
+        setProducts([])
+        return
+      }
+
       try {
         setLoading(true)
-        const response = await axios.get(`/api/${storeId}/products?admin=true&limit=1000`)
-        const allProducts = response.data.products || response.data || []
+        const searchQuery = searchTerm.trim() ? `&search=${encodeURIComponent(searchTerm)}` : ''
+        const response = await fetch(`/api/${storeId}/products?admin=true${searchQuery}`)
+        const data = await response.json()
+        const allProducts = data.products || data || []
         const filteredProducts = currentProductId 
           ? allProducts.filter((product: Product) => product.id !== currentProductId)
           : allProducts
         setProducts(filteredProducts)
+        
+
       } catch (error) {
       } finally {
         setLoading(false)
       }
     }
 
-    if (storeId) {
-      fetchProducts()
-    }
-  }, [storeId, currentProductId])
+    const debounceTimer = setTimeout(searchProducts, 300)
+    return () => clearTimeout(debounceTimer)
+  }, [storeId, currentProductId, searchTerm])
 
-  const selectedProducts = products.filter((product) => value.includes(product.id))
+  // Load selected products when value changes
+  useEffect(() => {
+    if (!storeId || !value.length) {
+      setSelectedProducts([])
+      return
+    }
+
+    const loadSelectedProducts = async () => {
+      try {
+        const response = await fetch(`/api/${storeId}/products?admin=true&limit=2000`)
+        const data = await response.json()
+        const allProducts = data.products || data || []
+        const selectedProductsData = allProducts.filter((product: Product) => value.includes(product.id))
+        setSelectedProducts(selectedProductsData)
+      } catch (error) {
+        console.error('Error loading selected products:', error)
+      }
+    }
+
+    loadSelectedProducts()
+  }, [storeId, value])
 
   const handleSelect = (productId: string) => {
     if (value.includes(productId)) {
       onChange(value.filter((id) => id !== productId))
     } else {
       onChange([...value, productId])
+      // Add the selected product to selectedProducts if it's not already there
+      const selectedProduct = products.find(p => p.id === productId)
+      if (selectedProduct && !selectedProducts.find(p => p.id === productId)) {
+        setSelectedProducts(prev => [...prev, selectedProduct])
+      }
     }
   }
 
   const handleRemove = (productId: string) => {
     onChange(value.filter((id) => id !== productId))
+    setSelectedProducts(prev => prev.filter(p => p.id !== productId))
   }
 
   return (
@@ -100,16 +139,20 @@ export const RelatedProductsSelector: React.FC<RelatedProductsSelectorProps> = (
         </PopoverTrigger>
         <PopoverContent className="w-full p-0" align="start">
           <Command>
-            <CommandInput placeholder="Search products..." />
+            <CommandInput 
+              placeholder="Search products by name or SKU..." 
+              value={searchTerm}
+              onValueChange={setSearchTerm}
+            />
             <CommandEmpty>
-              {loading ? "Loading products..." : "No products found."}
+              {loading ? "Loading products..." : searchTerm.trim() ? "No products found" : "Start typing to search all products"}
             </CommandEmpty>
             <CommandGroup>
               <ScrollArea className="h-72">
                 {products.map((product) => (
                   <CommandItem
                     key={product.id}
-                    value={product.name}
+                    value={`${product.name} ${product.sku}`}
                     onSelect={() => handleSelect(product.id)}
                     className="flex items-center gap-3 p-3"
                   >

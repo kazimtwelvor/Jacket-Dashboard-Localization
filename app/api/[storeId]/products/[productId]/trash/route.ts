@@ -43,8 +43,6 @@ export async function POST(req: Request, { params }: { params: { productId: stri
           },
         })
 
-
-
         hasPermission = true
       } catch (error) {
         hasPermission = true

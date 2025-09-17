@@ -105,14 +105,14 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ storeId, isOwner
   const fetchProducts = async (page: number = 1, status: string = activeTab, search?: string) => {
     try {
       setLoading(true)
-      
+
       const limit = typeof itemsPerPage === "number" ? itemsPerPage : 1000
       let apiUrl = `/api/${storeId}/products?page=${page}&limit=${limit}&admin=true`
-      
+
       if (search) {
         apiUrl += `&search=${encodeURIComponent(search)}`
       }
-      
+
       if (status === "trash") {
         apiUrl += '&trash=true'
       } else {
@@ -122,7 +122,7 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ storeId, isOwner
       const response = await fetch(apiUrl)
       if (response.ok) {
         const result = await response.json()
-        
+
         const formattedProducts = result.products.map((product: any) => ({
           id: product.id,
           name: product.name,
@@ -204,7 +204,7 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ storeId, isOwner
         setInitialLoading(false)
       }
     }
-    
+
     loadInitialData()
   }, [storeId])
 
@@ -233,7 +233,7 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ storeId, isOwner
     try {
       const isTrashSearch = activeTab === "trash"
       let apiUrl = `/api/${storeId}/products?search=${encodeURIComponent(searchQuery)}&admin=true`
-      
+
       if (isTrashSearch) {
         apiUrl += '&trash=true'
       } else {
@@ -324,7 +324,7 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ storeId, isOwner
         setSearchResults([])
         setIsSearchActive(false)
       }
-    }, 500) 
+    }, 500)
 
     return () => clearTimeout(timeoutId)
   }, [searchTerm, storeId, activeTab])
@@ -366,7 +366,7 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ storeId, isOwner
       toast.loading(`Preparing ${format.toUpperCase()} export...`)
 
       const response = await fetch(`/api/${storeId}/products/export?format=${format}`)
-      
+
       if (!response.ok) {
         const errorText = await response.text()
         throw new Error(errorText || `Failed to export ${format.toUpperCase()}`)
@@ -377,10 +377,10 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ storeId, isOwner
       const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
-      
+
       const filename = `products-export-${new Date().toISOString().split('T')[0]}.${format}`
       link.download = filename
-      
+
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
@@ -435,7 +435,7 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ storeId, isOwner
       }
 
       toast.dismiss()
-      
+
       if (validateOnly) {
         toast.success(`Validation complete. ${result.validRows} valid rows, ${result.errors?.length || 0} errors found.`)
         if (result.errors && result.errors.length > 0) {
@@ -665,7 +665,7 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ storeId, isOwner
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}
-              
+
               {(isOwner || isAdmin) && (
                 <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
                   <DialogTrigger asChild>
@@ -687,70 +687,70 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ storeId, isOwner
                       )}
                     </Button>
                   </DialogTrigger>
-                <DialogContent className="sm:max-w-[500px]">
-                  <DialogHeader>
-                    <DialogTitle>Import Products</DialogTitle>
-                    <DialogDescription>
-                      Upload a CSV or XLSX file to import products. Download a template to see the required format.
-                    </DialogDescription>
-                  </DialogHeader>
-                  
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="file">Select File</Label>
-                      <Input
-                        id="file"
-                        type="file"
-                        accept=".csv,.xlsx"
-                        onChange={handleFileSelect}
-                        disabled={isImporting}
-                      />
-                      {selectedFile && (
-                        <p className="text-sm text-muted-foreground">
-                          Selected: {selectedFile.name}
-                        </p>
-                      )}
-                    </div>
+                  <DialogContent className="sm:max-w-[500px]">
+                    <DialogHeader>
+                      <DialogTitle>Import Products</DialogTitle>
+                      <DialogDescription>
+                        Upload a CSV or XLSX file to import products. Download a template to see the required format.
+                      </DialogDescription>
+                    </DialogHeader>
 
-                    <div className="space-y-3">
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id="updateExisting"
-                          checked={updateExisting}
-                          onCheckedChange={(checked) => setUpdateExisting(checked === true)}
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="file">Select File</Label>
+                        <Input
+                          id="file"
+                          type="file"
+                          accept=".csv,.xlsx"
+                          onChange={handleFileSelect}
                           disabled={isImporting}
                         />
-                        <Label htmlFor="updateExisting" className="text-sm">
-                          Update existing products (by SKU)
-                        </Label>
+                        {selectedFile && (
+                          <p className="text-sm text-muted-foreground">
+                            Selected: {selectedFile.name}
+                          </p>
+                        )}
                       </div>
-                      
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id="validateOnly"
-                          checked={validateOnly}
-                          onCheckedChange={(checked) => setValidateOnly(checked === true)}
-                          disabled={isImporting}
-                        />
-                        <Label htmlFor="validateOnly" className="text-sm">
-                          Validate only (don't import)
-                        </Label>
-                      </div>
-                    </div>
 
-                    <div className="space-y-2">
-                      <Label>Download Template</Label>
-                      <div className="flex flex-wrap gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => downloadTemplate('csv')}
-                          disabled={isImporting}
-                        >
-                          <FileText className="mr-2 h-4 w-4" />
-                          CSV
-                        </Button>
-                        {/* <Button
+                      <div className="space-y-3">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="updateExisting"
+                            checked={updateExisting}
+                            onCheckedChange={(checked) => setUpdateExisting(checked === true)}
+                            disabled={isImporting}
+                          />
+                          <Label htmlFor="updateExisting" className="text-sm">
+                            Update existing products (by SKU)
+                          </Label>
+                        </div>
+
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="validateOnly"
+                            checked={validateOnly}
+                            onCheckedChange={(checked) => setValidateOnly(checked === true)}
+                            disabled={isImporting}
+                          />
+                          <Label htmlFor="validateOnly" className="text-sm">
+                            Validate only (don't import)
+                          </Label>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Download Template</Label>
+                        <div className="flex flex-wrap gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => downloadTemplate('csv')}
+                            disabled={isImporting}
+                          >
+                            <FileText className="mr-2 h-4 w-4" />
+                            CSV
+                          </Button>
+                          {/* <Button
                           variant="outline"
                           size="sm"
                           onClick={() => {
@@ -766,39 +766,39 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ storeId, isOwner
                           <FileText className="mr-2 h-4 w-4" />
                           CSV (Simple)
                         </Button> */}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => downloadTemplate('xlsx')}
-                          disabled={isImporting}
-                        >
-                          <File className="mr-2 h-4 w-4" />
-                          XLSX
-                        </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => downloadTemplate('xlsx')}
+                            disabled={isImporting}
+                          >
+                            <File className="mr-2 h-4 w-4" />
+                            XLSX
+                          </Button>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Use "CSV (Simple)" for basic imports, "CSV (Full)" or "XLSX" for advanced features
+                        </p>
                       </div>
-                      <p className="text-xs text-muted-foreground">
-                        Use "CSV (Simple)" for basic imports, "CSV (Full)" or "XLSX" for advanced features
-                      </p>
                     </div>
-                  </div>
 
-                  <DialogFooter>
-                    <Button
-                      variant="outline"
-                      onClick={() => setImportDialogOpen(false)}
-                      disabled={isImporting}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      onClick={handleImport}
-                      disabled={!selectedFile || isImporting}
-                    >
-                      {validateOnly ? 'Validate' : 'Import'} Products
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+                    <DialogFooter>
+                      <Button
+                        variant="outline"
+                        onClick={() => setImportDialogOpen(false)}
+                        disabled={isImporting}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        onClick={handleImport}
+                        disabled={!selectedFile || isImporting}
+                      >
+                        {validateOnly ? 'Validate' : 'Import'} Products
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               )}
               {isOwner && (
                 <TooltipProvider>

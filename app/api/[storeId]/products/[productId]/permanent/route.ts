@@ -86,13 +86,6 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ store
 
     // Delete all related records first to avoid foreign key constraints
     await prismadb.$transaction(async (tx) => {
-      // Delete wishlist items
-      await tx.wishlistItem.deleteMany({
-        where: {
-          productId: resolvedParams.productId,
-        },
-      })
-
       // Delete reviews
       await tx.review.deleteMany({
         where: {

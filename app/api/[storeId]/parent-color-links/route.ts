@@ -48,7 +48,37 @@ export async function GET(
       }
     }
 
-    return NextResponse.json({ colorLinks })
+    const colorSkus: Record<string, string> = {}
+    
+    for (const [color, url] of Object.entries(colorLinks)) {
+      if (typeof url === 'string' && url.includes('jacket.us.com/us/product/')) {
+        try {
+          const slug = url.split('/us/product/')[1]
+          if (slug) {
+            const variantProduct = await prismadb.product.findFirst({
+              where: {
+                storeId: params.storeId,
+                slug: slug,
+                isDeleted: false
+              },
+              select: {
+                sku: true
+              }
+            })
+            
+            if (variantProduct && variantProduct.sku) {
+              colorSkus[color] = variantProduct.sku
+            }
+          }
+        } catch (error) {
+        }
+      }
+    }
+
+    return NextResponse.json({ 
+      colorLinks,
+      colorSkus 
+    })
   } catch (error) {
     return new NextResponse("Internal error", { status: 500 })
   }

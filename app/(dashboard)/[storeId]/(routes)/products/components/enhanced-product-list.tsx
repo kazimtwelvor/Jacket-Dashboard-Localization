@@ -107,8 +107,14 @@ export const EnhancedProductList = ({ products, storeId, onSelectItems, searchTe
     }
   }
 
-  const onEdit = (id: string) => {
-    router.push(`/${storeId}/products/${id}`)
+  const onEdit = (id: string, event?: React.MouseEvent) => {
+    const url = `/${storeId}/products/${id}`
+    
+    if (event && (event.ctrlKey || event.metaKey)) {
+      window.open(url, '_blank')
+    } else {
+      router.push(url)
+    }
   }
 
   const onPreview = async (id: string) => {
@@ -508,12 +514,12 @@ export const EnhancedProductList = ({ products, storeId, onSelectItems, searchTe
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button variant="ghost" size="icon" onClick={() => onEdit(product.id)}>
+                          <Button variant="ghost" size="icon" onClick={(e) => onEdit(product.id, e)}>
                             <Edit className="h-4 w-4" />
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>Edit</p>
+                          <p>Edit (Ctrl+click to open in new tab)</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -663,7 +669,7 @@ export const EnhancedProductList = ({ products, storeId, onSelectItems, searchTe
                           <div className="md:col-span-3 mt-4">
                             <h4 className="font-medium mb-2">Quick Actions</h4>
                             <div className="flex flex-wrap gap-2">
-                              <Button size="sm" variant="outline" onClick={() => onEdit(product.id)}>
+                              <Button size="sm" variant="outline" onClick={(e) => onEdit(product.id, e)}>
                                 <Edit className="mr-2 h-3.5 w-3.5" />
                                 Edit
                               </Button>

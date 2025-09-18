@@ -33,6 +33,7 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
   const variationColors = form.watch("categories.variationColors") || []
   const displayColors = selectedColors.length > 0 ? selectedColors : variationColors
   const [colorLinks, setColorLinks] = useState<Record<string, string>>({})
+  const [colorSkus, setColorSkus] = useState<Record<string, string>>({})
   const [products, setProducts] = useState<Product[]>([])
   const [searchTerms, setSearchTerms] = useState<Record<string, string>>({})
   const [showDropdown, setShowDropdown] = useState<Record<string, boolean>>({})
@@ -67,6 +68,11 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
         fetchParentColorLinks(parentProductIdValue)
       }
     }
+
+    if (initialData?.colorLinks && Object.keys(initialData.colorLinks).length > 0) {
+      setColorLinks(initialData.colorLinks)
+      form.setValue("categories.colorVariationLinks", initialData.colorLinks, { shouldDirty: false })
+    }
   }, [form, initialData, products, selectedParentProduct])
 
   useEffect(() => {
@@ -99,6 +105,39 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
       })
       .catch(console.error)
   }, [storeId, currentProductId])
+
+  useEffect(() => {
+    const fetchMissingSkus = async () => {
+      const newSkus: Record<string, string> = { ...colorSkus }
+      
+      for (const [color, url] of Object.entries(colorLinks)) {
+        if (typeof url === 'string' && url.includes('jacket.us.com/us/product/') && !colorSkus[color]) {
+          try {
+            const slug = url.split('/us/product/')[1]
+            if (slug) {
+              const productResponse = await fetch(`/api/${storeId}/products?search=${encodeURIComponent(slug)}&admin=true`)
+              const productData = await productResponse.json()
+              if (productData.products && productData.products.length > 0) {
+                const foundProduct = productData.products.find((p: Product) => p.slug === slug)
+                if (foundProduct && foundProduct.sku) {
+                  newSkus[color] = foundProduct.sku
+                }
+              }
+            }
+          } catch (error) {
+          }
+        }
+      }
+      
+      if (Object.keys(newSkus).length !== Object.keys(colorSkus).length) {
+        setColorSkus(newSkus)
+      }
+    }
+
+    if (Object.keys(colorLinks).length > 0) {
+      fetchMissingSkus()
+    }
+  }, [colorLinks, storeId])
 
   useEffect(() => {
     if (!storeId) return
@@ -248,6 +287,9 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
         setColorLinks(data.colorLinks)
         form.setValue("categories.colorVariationLinks", data.colorLinks, { shouldDirty: true })
 
+        if (data.colorSkus) {
+          setColorSkus(data.colorSkus)
+        }
         const parentColors = Object.keys(data.colorLinks)
 
         form.setValue("specifications.color", parentColors, { shouldDirty: true })
@@ -262,7 +304,9 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
   const selectProduct = (color: string, product: Product) => {
     const url = `https://jacket.us.com/us/product/${product.slug}`
     const newLinks = { ...colorLinks, [color]: url }
+    const newSkus = { ...colorSkus, [color]: product.sku || "" }
     setColorLinks(newLinks)
+    setColorSkus(newSkus)
     form.setValue("categories.colorVariationLinks", newLinks, { shouldDirty: true })
     setShowDropdown(prev => ({ ...prev, [color]: false }))
     setSearchTerms(prev => ({ ...prev, [color]: "" }))
@@ -278,8 +322,11 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
 
   const removeColorCompletely = (color: string) => {
     const newLinks = { ...colorLinks }
+    const newSkus = { ...colorSkus }
     delete newLinks[color]
+    delete newSkus[color]
     setColorLinks(newLinks)
+    setColorSkus(newSkus)
     form.setValue("categories.colorVariationLinks", newLinks, { shouldDirty: true })
 
     const currentSpecColors = form.getValues("specifications.color") || []
@@ -495,6 +542,7 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
                       form.setValue("specifications.color", [], { shouldDirty: true })
                       form.setValue("categories.variationColors", [], { shouldDirty: true })
                       setColorLinks({})
+                      setColorSkus({})
                     }}
                     className="p-1 hover:bg-red-100 rounded text-red-600 hover:text-red-800 transition-colors"
                   >
@@ -520,8 +568,13 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
                       borderColor: ["White", "Yellow", "Beige"].includes(color) ? "#999" : "transparent",
                     }}
                   />
-                  <span className="text-sm font-medium min-w-[80px]">{color}:</span>
-                </div>
+                   <span className="text-sm font-medium min-w-[80px]">{color}:</span>
+                   {colorSkus[color] && (
+                     <span className="text-xs text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                       SKU: {colorSkus[color]}
+                     </span>
+                   )}
+                 </div>
                 <div className="flex-1 relative">
                   <div className="flex gap-2">
                     <div className="relative" ref={el => { dropdownRefs.current[color] = el }}>

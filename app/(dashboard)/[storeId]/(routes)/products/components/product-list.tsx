@@ -34,8 +34,15 @@ export const ProductList = ({ products, storeId, onSelectItems }: ProductListPro
   const [productToDelete, setProductToDelete] = useState<string | null>(null)
   const router = useRouter()
 
-  const onEdit = (id: string) => {
-    router.push(`/${storeId}/products/${id}`)
+  const onEdit = (id: string, event?: React.MouseEvent) => {
+    const url = `/${storeId}/products/${id}`
+    
+    // Check if Ctrl/Cmd key is pressed for opening in new tab
+    if (event && (event.ctrlKey || event.metaKey)) {
+      window.open(url, '_blank')
+    } else {
+      router.push(url)
+    }
   }
 
   const onPreview = (id: string) => {
@@ -176,7 +183,7 @@ export const ProductList = ({ products, storeId, onSelectItems }: ProductListPro
                 <TableCell>{product.category}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end gap-2">
-                    <Button variant="outline" size="icon" onClick={() => onEdit(product.id)}>
+                    <Button variant="outline" size="icon" onClick={(e) => onEdit(product.id, e)}>
                       <Edit className="h-4 w-4" />
                     </Button>
                     <Button variant="outline" size="icon" onClick={() => onPreview(product.id)}>
@@ -190,7 +197,7 @@ export const ProductList = ({ products, storeId, onSelectItems }: ProductListPro
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => onEdit(product.id)}>
+                        <DropdownMenuItem onClick={(e) => onEdit(product.id, e)}>
                           <Edit className="mr-2 h-4 w-4" />
                           Edit
                         </DropdownMenuItem>

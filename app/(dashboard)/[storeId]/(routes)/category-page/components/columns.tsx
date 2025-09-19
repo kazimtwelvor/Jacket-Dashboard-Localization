@@ -10,6 +10,7 @@ export type CategoryPageColumn = {
   status: string
   isPublished: boolean
   isBest: boolean
+  productCount: number
   createdAt: string
 }
 
@@ -23,11 +24,15 @@ export const columns: ColumnDef<CategoryPageColumn>[] = [
     header: "Slug",
   },
   {
-    accessorKey: "description",
-    header: "Description",
+    accessorKey: "productCount",
+    header: "Product Count",
     cell: ({ row }) => {
-      const description = row.original.description || ""
-      return <div className="truncate max-w-[200px]">{description}</div>
+      const count = row.original.productCount || 0
+      return (
+        <Badge variant="outline" className="font-medium">
+          {count} products
+        </Badge>
+      )
     }
   },
   {

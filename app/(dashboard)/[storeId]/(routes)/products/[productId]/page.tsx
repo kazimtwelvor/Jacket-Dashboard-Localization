@@ -35,6 +35,7 @@ const ProductPage: React.FC<ProductPageProps> = async ({ params }) => {
       isArchived: true,
       isPublished: true,
       colorDetails: true,
+      baseColor: true,
       sizeDetails: true,
       images: {
         include: {
@@ -98,6 +99,7 @@ const ProductPage: React.FC<ProductPageProps> = async ({ params }) => {
             : ""
           : "",
         colorDetails: product.colorDetails,
+        baseColor: product.baseColor,
         images: (product as any).images.map(
           (pi: any): Image => ({
             id: pi.image.id,

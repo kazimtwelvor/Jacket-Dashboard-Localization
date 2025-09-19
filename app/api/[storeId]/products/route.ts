@@ -275,6 +275,7 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       price: product.price.toString(),
       // originalPrice: product.originalPrice ? product.originalPrice.toString() : "0",
       salePrice: product.salePrice ? product.salePrice.toString() : null,
+      baseColor: product.baseColor || null,
       images: product.images.map(productImage => ({
         id: productImage.imageId,
         url: productImage.image.url,

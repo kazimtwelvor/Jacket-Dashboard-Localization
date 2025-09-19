@@ -10,6 +10,7 @@ export interface Product {
   isPublished: boolean
   colorId: string
   colorDetails?: any
+  baseColor?: { id: string; name: string; value: string }
   images: Image[]
   sku: string
   stockStatus?: string

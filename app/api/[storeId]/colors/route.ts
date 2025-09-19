@@ -26,16 +26,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ storeId
       return new NextResponse("Store Id is required", { status: 400 })
     }
 
-    const storeByUserId = await prismadb.store.findFirst({
-      where: {
-        id: storeId,
-        userId,
-      },
-    })
 
-    if (!storeByUserId) {
-      return new NextResponse("Unauthorized", { status: 403 })
-    }
 
     const color = await prismadb.color.create({
       data: {

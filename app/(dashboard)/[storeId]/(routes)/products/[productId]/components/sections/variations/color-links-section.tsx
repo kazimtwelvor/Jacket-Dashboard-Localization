@@ -568,7 +568,14 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
                       borderColor: ["White", "Yellow", "Beige"].includes(color) ? "#999" : "transparent",
                     }}
                   />
-                   <span className="text-sm font-medium min-w-[80px]">{color}:</span>
+                    <span className="text-sm font-medium min-w-[80px] flex items-center gap-1">
+                      {color}:
+                      {form.getValues("baseColor")?.name === color && (
+                        <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-1.5 py-0.5 rounded font-semibold">
+                          BASE
+                        </span>
+                      )}
+                    </span>
                    {colorSkus[color] && (
                      <span className="text-xs text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
                        SKU: {colorSkus[color]}

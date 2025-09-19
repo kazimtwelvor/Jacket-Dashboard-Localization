@@ -241,6 +241,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       stockStatus: initialData.stockStatus || "instock",
       isFeatured: initialData.isFeatured || false,
       brandName: initialData.brandName || "Leather Jacket By Fineyst",
+      baseColor: initialData.baseColor || undefined,
       // ratingValue: initialData.ratingValue || "4.5",
       // reviewCount: initialData.reviewCount || "0",
       categories: {
@@ -439,6 +440,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       sku: "",
       stockStatus: "instock",
       brandName: "Leather Jacket By Fineyst",
+      baseColor: undefined,
       // ratingValue: "4.5",
       reviewCount: "0",
       categories: {
@@ -977,6 +979,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       formData.append("sku", formValues.sku || "")
       formData.append("stockStatus", formValues.stockStatus || "instock")
       formData.append("isFeatured", formValues.isFeatured ? "true" : "false")
+      formData.append("baseColor", formValues.baseColor ? JSON.stringify(formValues.baseColor) : "")
 
       if (formValues.specifications) {
         formData.append("specifications", JSON.stringify(formValues.specifications))
@@ -1173,6 +1176,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       formData.append("sku", formValues.sku || "")
       formData.append("stockStatus", formValues.stockStatus || "instock")
       formData.append("isFeatured", formValues.isFeatured ? "true" : "false")
+      formData.append("baseColor", formValues.baseColor ? JSON.stringify(formValues.baseColor) : "")
 
       if (formValues.specifications) {
         formData.append("specifications", JSON.stringify(formValues.specifications))
@@ -1634,6 +1638,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       }
 
       formData.append("isFeatured", safeValues.isFeatured.toString())
+      formData.append("baseColor", safeValues.baseColor ? JSON.stringify(safeValues.baseColor) : "")
 
       if (initialData) {
         formData.append("categoryId", (initialData as any).categoryId || "")

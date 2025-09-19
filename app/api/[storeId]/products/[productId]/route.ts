@@ -203,6 +203,7 @@ export async function GET(req: Request, { params }: { params: { productId: strin
         price: product.price.toString(),
         // originalPrice: product.originalPrice.toString(),
         salePrice: product.salePrice ? product.salePrice.toString() : null,
+        baseColor: product.baseColor || null,
         images: formattedImages,
         sizeDetails: sizeDetails,
         colorDetails: colorDetails,
@@ -310,6 +311,7 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       slug,
       keywords, 
       brandName,
+      baseColor,
       cachedReviews,
       relatedProducts,
     } = body
@@ -461,6 +463,7 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
           slug,
           keywords: keywordsArray,
           brandName,
+          baseColor,
           relatedProducts: Array.isArray(relatedProducts) ? relatedProducts : [],
           updatedById: user?.id || null,
           updatedByName: user?.name || "Unknown",
@@ -569,6 +572,7 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       ...updatedProductWithReviews,
       price: updatedProductWithReviews.price.toString(),
       salePrice: updatedProductWithReviews.salePrice ? updatedProductWithReviews.salePrice.toString() : null,
+      baseColor: updatedProductWithReviews.baseColor || null,
       reviews: updatedProductWithReviews.reviews.map((review) => ({
         id: review.id,
         userId: review.userId,

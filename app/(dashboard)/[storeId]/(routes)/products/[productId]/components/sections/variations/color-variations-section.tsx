@@ -6,6 +6,7 @@ import { FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/for
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ColorDisplay } from "@/components/ui/color-display"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useEffect } from "react"
 import type { Color } from "../../../../types"
 import type { ProductFormValues } from "../../product-form-schema"
@@ -110,6 +111,54 @@ export const ColorVariationsSection: React.FC<ColorVariationsSectionProps> = ({ 
           </FormItem>
         )}
       />
+
+      {/* Base Color Selection */}
+      {colorSpecifications.length > 0 && (
+        <FormField
+          control={form.control}
+          name="baseColor"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-base font-medium">
+                Base Color (Optional)
+              </FormLabel>
+              <p className="text-sm text-muted-foreground">
+                Select the primary color for this product. This will be stored as the base color.
+              </p>
+              <RadioGroup
+                value={field.value || ""}
+                onValueChange={field.onChange}
+                className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-2"
+              >
+                {colorSpecifications.map((colorName) => {
+                  const color = colors.find(c => c.name === colorName)
+                  if (!color) return null
+
+                  return (
+                    <label
+                      key={color.id}
+                      className={`flex items-center p-3 rounded-md border cursor-pointer transition-colors hover:bg-primary/5 ${
+                        field.value === color.name ? "bg-primary/10 border-primary" : "border-gray-200"
+                      }`}
+                    >
+                      <RadioGroupItem value={color.name} className="mr-2" />
+                      <div className="flex items-center gap-2">
+                        <ColorDisplay 
+                          color1={color.value} 
+                          color2={color.value2}
+                          size="sm"
+                        />
+                        <span>{color.name}</span>
+                      </div>
+                    </label>
+                  )
+                })}
+              </RadioGroup>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      )}
     </div>
   )
 }

@@ -118,7 +118,7 @@ export const ColorVariationsSection: React.FC<ColorVariationsSectionProps> = ({ 
          render={({ field }) => (
            <FormItem>
              <FormLabel className="text-base font-medium">
-               Base Color (Optional)
+               Base Color
              </FormLabel>
              <p className="text-sm text-muted-foreground">
                Select the primary color for this product. This will be stored as the base color and is independent of color variations.

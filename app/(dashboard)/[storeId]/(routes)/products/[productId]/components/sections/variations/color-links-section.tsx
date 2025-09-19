@@ -570,7 +570,7 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
                   />
                     <span className="text-sm font-medium min-w-[80px] flex items-center gap-1">
                       {color}:
-                      {form.getValues("baseColor") === color && (
+                      {form.getValues("baseColor")?.name === color && (
                         <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-1.5 py-0.5 rounded font-semibold">
                           BASE
                         </span>

@@ -300,7 +300,7 @@ model Product {
   isArchived    Boolean        @default(false)
   sizeDetails   Json?        
   colorDetails  Json?          
-  baseColor     String?        // Base color for the product
+  baseColor     Json?        
   images        ProductImage[]
   orderItems    OrderItem[]
   isDiscounted  Boolean        @default(false)

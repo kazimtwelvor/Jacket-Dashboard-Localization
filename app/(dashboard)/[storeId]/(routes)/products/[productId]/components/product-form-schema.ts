@@ -43,7 +43,11 @@ export const formSchema = z.object({
     .optional()
     .default([]),
 
-  baseColor: z.string().optional(),
+  baseColor: z.object({
+    id: z.string(),
+    name: z.string(),
+    value: z.string(),
+  }).optional(),
 
   specifications: z
     .object({

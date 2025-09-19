@@ -126,8 +126,19 @@ export const ColorVariationsSection: React.FC<ColorVariationsSectionProps> = ({ 
                 Select the primary color for this product. This will be stored as the base color.
               </p>
               <RadioGroup
-                value={field.value || ""}
-                onValueChange={field.onChange}
+                value={field.value?.name || ""}
+                onValueChange={(colorName) => {
+                  const color = colors.find(c => c.name === colorName)
+                  if (color) {
+                    field.onChange({
+                      id: color.id,
+                      name: color.name,
+                      value: color.value
+                    })
+                  } else {
+                    field.onChange(null)
+                  }
+                }}
                 className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-2"
               >
                 {colorSpecifications.map((colorName) => {
@@ -138,7 +149,7 @@ export const ColorVariationsSection: React.FC<ColorVariationsSectionProps> = ({ 
                     <label
                       key={color.id}
                       className={`flex items-center p-3 rounded-md border cursor-pointer transition-colors hover:bg-primary/5 ${
-                        field.value === color.name ? "bg-primary/10 border-primary" : "border-gray-200"
+                        field.value?.name === color.name ? "bg-primary/10 border-primary" : "border-gray-200"
                       }`}
                     >
                       <RadioGroupItem value={color.name} className="mr-2" />

@@ -17,24 +17,24 @@ export async function GET(req: NextRequest, { params }: { params: { orderId: str
   try {
     const { userId } = await auth()
 
-    if (!userId) {
-      return new NextResponse("Unauthorized", { status: 401 })
-    }
+    // if (!userId) {
+    //   return new NextResponse("Unauthorized", { status: 401 })
+    // }
 
-    const dbUser = await prismadb.user.findFirst({
-      where: {
-        clerkId: userId,
-      },
-    })
+    // const dbUser = await prismadb.user.findFirst({
+    //   where: {
+    //     clerkId: userId,
+    //   },
+    // })
 
-    if (!dbUser) {
-      return new NextResponse("User not found", { status: 404 })
-    }
+    // if (!dbUser) {
+    //   return new NextResponse("User not found", { status: 404 })
+    // }
 
     const order = await prismadb.order.findFirst({
       where: {
         id: params.orderId,
-        userId: dbUser.id,
+        // userId: dbUser.id,
       },
       include: {
         orderItems: {

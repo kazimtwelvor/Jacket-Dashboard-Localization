@@ -739,7 +739,6 @@ enum CategoryPageStatus {
   PUBLISHED
 }
 
-
 model ContactForm {
   id                    String            @id @default(cuid())
   storeId               String

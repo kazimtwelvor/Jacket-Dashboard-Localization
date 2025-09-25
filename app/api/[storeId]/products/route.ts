@@ -170,35 +170,28 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
           deletedAtMatch
         )
       })
-
     }
-
 
 
     if (colors) {
       const colorsList = colors.toLowerCase().split(',')
       filteredProducts = filteredProducts.filter(product => {
-        if (!product.colorDetails) return false
+        if (!product.baseColor) return false
 
-        let colorData = product.colorDetails
-        if (typeof colorData === 'string') {
+        let baseColorData = product.baseColor
+        if (typeof baseColorData === 'string') {
           try {
-            colorData = JSON.parse(colorData)
+            baseColorData = JSON.parse(baseColorData)
           } catch (e) {
             return false
           }
         }
 
-        if (Array.isArray(colorData)) {
-          return colorData.some(color =>
-            color && typeof color === 'object' && color !== null && 'name' in color &&
-            typeof color.name === 'string' && colorsList.includes(color.name.toLowerCase())
-          )
+        if (baseColorData && typeof baseColorData === 'object' && baseColorData !== null && 'name' in baseColorData) {
+          return typeof baseColorData.name === 'string' && colorsList.includes(baseColorData.name.toLowerCase())
         }
-
         return false
       })
-
     }
 
     if (materials) {

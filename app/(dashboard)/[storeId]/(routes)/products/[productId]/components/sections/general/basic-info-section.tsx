@@ -12,6 +12,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { useFormContext } from "react-hook-form"
 import { useParams } from "next/navigation"
 import { ColorDisplay } from "@/components/ui/color-display"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 interface BasicInfoSectionProps {
   getFormattedSpecifications: () => string
@@ -305,7 +306,7 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
                     </div>
                   </div>
 
-                  <div className="mb-6">
+                  {/* <div className="mb-6">
                     <h4 className="text-sm font-medium mb-3 flex items-center">
                       Color
                       <span className="text-red-500 ml-1">*</span>
@@ -357,6 +358,71 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
                         )
                       })}
                     </div>
+                  </div> */}
+
+                  <div className="mb-6">
+                    <h4 className="text-sm font-medium mb-3 flex items-center">
+                      Base Color
+                    </h4>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Select the primary color for this product. This will be stored as the base color and is independent of color specifications.
+                    </p>
+                    
+                    <FormField
+                      control={form.control}
+                      name="baseColor"
+                      render={({ field }) => (
+                        <FormItem>
+                          <RadioGroup
+                            value={field.value?.name || ""}
+                            onValueChange={(colorName) => {
+                              const color = colors.find(c => c.name === colorName)
+                              if (color) {
+                                field.onChange({
+                                  id: color.id,
+                                  name: color.name,
+                                  value: color.value
+                                })
+                              } else {
+                                field.onChange(undefined)
+                              }
+                            }}
+                            className="grid grid-cols-2 gap-3"
+                          >
+                            {colors.map((color) => (
+                              <label
+                                key={color.id}
+                                className={`flex items-center space-x-2 rounded-md border p-3 cursor-pointer transition-colors hover:bg-primary/5 ${
+                                  field.value?.name === color.name ? "bg-primary/10 border-primary" : "border-gray-200"
+                                }`}
+                              >
+                                <RadioGroupItem value={color.name} className="mr-2" />
+                                <div className="flex items-center gap-2">
+                                  <ColorDisplay 
+                                    color1={color.value} 
+                                    color2={color.value2}
+                                    size="sm"
+                                  />
+                                  <span className="text-sm">{color.name}</span>
+                                </div>
+                              </label>
+                            ))}
+                          </RadioGroup>
+                          {field.value && (
+                            <div className="flex justify-end mt-2">
+                              <button
+                                type="button"
+                                onClick={() => field.onChange(undefined)}
+                                className="text-xs text-muted-foreground hover:text-foreground underline"
+                              >
+                                Clear Base Color
+                              </button>
+                            </div>
+                          )}
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
 
                   {safeSpecOptions &&

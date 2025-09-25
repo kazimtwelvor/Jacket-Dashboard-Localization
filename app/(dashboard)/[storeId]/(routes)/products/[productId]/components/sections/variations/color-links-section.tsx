@@ -42,6 +42,8 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
   const [parentProducts, setParentProducts] = useState<Product[]>([])
   const [parentSearchTerm, setParentSearchTerm] = useState<string>("")
   const [selectedParentProduct, setSelectedParentProduct] = useState<Product | null>(null)
+  const [parentProductDetails, setParentProductDetails] = useState<Product | null>(null)
+  const [userRemovedParent, setUserRemovedParent] = useState<boolean>(false)
   const [dropdownPositions, setDropdownPositions] = useState<Record<string, {top: number, left: number}>>({})
   const [searchResults, setSearchResults] = useState<Record<string, Product[]>>({})
   const [isSearching, setIsSearching] = useState<Record<string, boolean>>({})
@@ -76,21 +78,25 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
   }, [form, initialData, products, selectedParentProduct])
 
   useEffect(() => {
-    if (initialData?.parentProductId && !selectedParentProduct && storeId) {
-      fetch(`/api/${storeId}/parent-products?search=`)
-        .then(res => res.json())
-        .then(data => {
-          const foundParent = data.find((p: Product) => p.id === initialData.parentProductId)
-          if (foundParent) {
-            setSelectedParentProduct(foundParent)
-            fetchParentColorLinks(initialData.parentProductId)
-          } else {
-          }
-        })
-        .catch(error => {
-        })
+    if (initialData?.parentProductId && storeId && !userRemovedParent) {
+      fetchParentProductDetails(initialData.parentProductId)
+      
+      if (!selectedParentProduct) {
+        fetch(`/api/${storeId}/parent-products?search=`)
+          .then(res => res.json())
+          .then(data => {
+            const foundParent = data.find((p: Product) => p.id === initialData.parentProductId)
+            if (foundParent) {
+              setSelectedParentProduct(foundParent)
+              fetchParentColorLinks(initialData.parentProductId)
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching parent products:', error)
+          })
+      }
     }
-  }, [initialData, selectedParentProduct, storeId])
+  }, [initialData, selectedParentProduct, storeId, userRemovedParent])
 
   useEffect(() => {
     if (!storeId) return
@@ -279,6 +285,21 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
     return results
   }
 
+  const fetchParentProductDetails = async (parentProductId: string) => {
+    try {
+      const response = await fetch(`/api/${storeId}/parent-products?search=`)
+      const data = await response.json()
+      if (data && Array.isArray(data)) {
+        const foundParent = data.find((p: Product) => p.id === parentProductId)
+        if (foundParent) {
+          setParentProductDetails(foundParent)
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching parent product details:', error)
+    }
+  }
+
   const fetchParentColorLinks = async (parentProductId: string) => {
     try {
       const response = await fetch(`/api/${storeId}/parent-color-links?parentProductId=${parentProductId}`)
@@ -412,7 +433,28 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
 
       {!form.watch("isParentProduct") && (
         <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-900/20 rounded-md border">
-          <h4 className="text-sm font-medium mb-3">Select Parent Product</h4>
+          <h4 className="text-sm font-medium mb-3">Parent Product</h4>
+          
+          {/* Show existing parent product info when editing */}
+          {/* {initialData?.parentProductId && parentProductDetails && (
+            <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded border border-blue-200 dark:border-blue-800 mb-4">
+              <div className="text-sm">
+                <div className="font-medium text-blue-900 dark:text-blue-100">
+                  Current Parent Product: {parentProductDetails.sku}
+                </div>
+                <div className="text-blue-700 dark:text-blue-300 mt-1">
+                  Name: {parentProductDetails.name}
+                </div>
+              </div>
+            </div>
+          )} */}
+          
+          {/* Always show selection interface */}
+          {initialData?.parentProductId && parentProductDetails && (
+            <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
+              You can change the parent product by selecting a different one below:
+            </p>
+          )}
           <div className="flex items-center gap-2">
             <div className="relative" ref={el => { dropdownRefs.current['parent'] = el }}>
               <Button
@@ -459,13 +501,14 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
                               {parentProducts.map((product) => (
                         <div
                           key={product.id}
-                          onClick={() => {
-                            setSelectedParentProduct(product)
-                            form.setValue("parentProductId", product.id, { shouldDirty: true })
-                            setParentSearchTerm("")
-                            setShowDropdown(prev => ({ ...prev, parent: false }))
-                            fetchParentColorLinks(product.id)
-                          }}
+                            onClick={() => {
+                              setSelectedParentProduct(product)
+                              setUserRemovedParent(false)
+                              form.setValue("parentProductId", product.id, { shouldDirty: true })
+                              setParentSearchTerm("")
+                              setShowDropdown(prev => ({ ...prev, parent: false }))
+                              fetchParentColorLinks(product.id)
+                            }}
                           className="flex items-center gap-3 p-3 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer rounded-lg transition-colors duration-150 border border-transparent hover:border-blue-200 dark:hover:border-blue-700"
                         >
                           <div className="flex h-10 w-10 items-center justify-center rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
@@ -537,6 +580,7 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
                       e.preventDefault()
                       e.stopPropagation()
                       setSelectedParentProduct(null)
+                      setUserRemovedParent(true)
                       form.setValue("parentProductId", "", { shouldDirty: true })
                       form.setValue("categories.colorVariationLinks", {}, { shouldDirty: true })
                       form.setValue("specifications.color", [], { shouldDirty: true })

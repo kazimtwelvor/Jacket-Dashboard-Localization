@@ -33,6 +33,7 @@ interface GeneralTabProps {
   }
   storeId?: string
   currentProductId?: string
+  initialData?: any
 }
 
 export const GeneralTab: React.FC<GeneralTabProps> = ({
@@ -44,6 +45,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
   categories,
   storeId,
   currentProductId,
+  initialData,
 }) => {
   const getCategoriesCompletion = () => {
     const gender = form.watch("categories.gender")
@@ -260,7 +262,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
           </div>
         </CardHeader>
         <CardContent className="p-6">
-          <ColorLinksSection form={form} storeId={storeId} currentProductId={currentProductId} />
+          <ColorLinksSection form={form} storeId={storeId} currentProductId={currentProductId} initialData={initialData} />
         </CardContent>
       </Card>
 

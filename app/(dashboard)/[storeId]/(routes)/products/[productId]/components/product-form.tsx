@@ -2142,6 +2142,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
                 categories={categorizedCategories}
                 storeId={params?.storeId?.toString()}
                 currentProductId={initialData?.id}
+                initialData={initialData}
               />
             </TabsContent>
 

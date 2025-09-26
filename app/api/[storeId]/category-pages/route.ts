@@ -195,7 +195,8 @@ export async function GET(
           select: {
             id: true,
             categoryData: true,
-            specifications: true
+            specifications: true,
+            baseColor: true
           }
         })
 
@@ -271,23 +272,25 @@ export async function GET(
         if (categoryPage.colors && categoryPage.colors.length > 0) {
           const beforeCount = filteredProducts.length
           filteredProducts = filteredProducts.filter(product => {
-            if (!product.specifications) return false
+            if (!product.baseColor) return false
 
-            let specifications = product.specifications
-            if (typeof specifications === 'string') {
+            let baseColorData = product.baseColor
+            if (typeof baseColorData === 'string') {
               try {
-                specifications = JSON.parse(specifications)
+                baseColorData = JSON.parse(baseColorData)
               } catch (e) {
                 return false
               }
             }
 
-            const productColors = (specifications as any).color
-            if (!productColors || !Array.isArray(productColors)) return false
-
-            return categoryPage.colors.some((categoryColor: string) =>
-              productColors.includes(categoryColor)
-            )
+            if (baseColorData && typeof baseColorData === 'object' && baseColorData !== null && 'name' in baseColorData) {
+              const colorName = (baseColorData as any).name
+              return typeof colorName === 'string' && 
+                     categoryPage.colors.some((categoryColor: string) => 
+                       colorName.toLowerCase() === categoryColor.toLowerCase()
+                     )
+            }
+            return false
           })
           console.log(`After color filter: ${filteredProducts.length} products (was ${beforeCount})`)
         }

@@ -263,30 +263,69 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
   const totalProducts = filteredProducts.length
   const paginatedProducts = filteredProducts.slice(skip, skip + limit)
 
-  const serializedProducts = paginatedProducts.map(product => ({
-    ...product,
-    price: product.price.toString(),
-    // originalPrice: product.originalPrice ? product.originalPrice.toString() : "0",
-    salePrice: product.salePrice ? product.salePrice.toString() : null,
-    baseColor: product.baseColor || null,
-    images: product.images.map(productImage => ({
-      id: productImage.imageId,
-      url: productImage.image.url,
-    })),
-    schema: product.schema ? JSON.parse(product.schema) : null,
-    reviews: product.reviews.map(review => ({
-      id: review.id,
-      userId: review.userId,
-      userName: review.userName,
-      email: review.email,
-      rating: review.rating,
-      title: review.title,
-      comment: review.comment,
-      photoUrl: review.photoUrl,
-      createdAt: review.createdAt,
-      updatedAt: review.updatedAt,
-    })),
-  }))
+  const serializedProducts = paginatedProducts.map(product => {
+    let colorDetails = []
+    if (product.colorDetails) {
+      try {
+        colorDetails = typeof product.colorDetails === 'string' 
+          ? JSON.parse(product.colorDetails) 
+          : product.colorDetails
+      } catch (e) {
+        colorDetails = []
+      }
+    }
+
+    let baseColor = null
+    if (product.baseColor) {
+      try {
+        baseColor = typeof product.baseColor === 'string' 
+          ? JSON.parse(product.baseColor) 
+          : product.baseColor
+      } catch (e) {
+        baseColor = null
+      }
+    }
+
+    let combinedColorDetails = []
+    
+    if (baseColor && baseColor.id) {
+      combinedColorDetails.push(baseColor)
+    }
+    
+    if (Array.isArray(colorDetails)) {
+      colorDetails.forEach(color => {
+        if (color && color.id && (!baseColor || color.id !== baseColor.id)) {
+          combinedColorDetails.push(color)
+        }
+      })
+    }
+
+    return {
+      ...product,
+      price: product.price.toString(),
+      // originalPrice: product.originalPrice ? product.originalPrice.toString() : "0",
+      salePrice: product.salePrice ? product.salePrice.toString() : null,
+      baseColor: baseColor,
+      colorDetails: combinedColorDetails,
+      images: product.images.map(productImage => ({
+        id: productImage.imageId,
+        url: productImage.image.url,
+      })),
+      schema: product.schema ? JSON.parse(product.schema) : null,
+      reviews: product.reviews.map(review => ({
+        id: review.id,
+        userId: review.userId,
+        userName: review.userName,
+        email: review.email,
+        rating: review.rating,
+        title: review.title,
+        comment: review.comment,
+        photoUrl: review.photoUrl,
+        createdAt: review.createdAt,
+        updatedAt: review.updatedAt,
+      })),
+    }
+  })
 
   const totalPages = Math.ceil(totalProducts / limit)
   const hasNextPage = page < totalPages

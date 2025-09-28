@@ -51,7 +51,12 @@
       const colorSkus: Record<string, string> = {}
       
       for (const [color, url] of Object.entries(colorLinks)) {
-        if (typeof url === 'string' && url.includes('jacket.us.com/us/product/')) {
+        const frontendStoreUrl = process.env.FRONTEND_STORE_URL?.replace(/\/$/, ''); // remove trailing slash if any
+        if (
+          typeof url === 'string' &&
+          frontendStoreUrl &&
+          url.includes(`${frontendStoreUrl}/product/`)
+        ) {
           try {
             const slug = url.split('/us/product/')[1]
             if (slug) {

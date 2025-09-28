@@ -183,137 +183,140 @@ export async function GET(
       },
     })
 
-    const getProductCount = async (categoryPage: any) => {
-      try {
+    // Check if product counts should be included
+    const includeProductCounts = searchParams.get("includeProductCounts") === "true"
 
-        const allProducts = await prismadb.product.findMany({
-          where: {
-            storeId: storeId,
-            isDeleted: false,
-            isPublished: true
-          },
-          select: {
-            id: true,
-            categoryData: true,
-            specifications: true
-          }
-        })
-
-
-        let filteredProducts = allProducts
-
-        if (categoryPage.materials && categoryPage.materials.length > 0) {
-          const beforeCount = filteredProducts.length
-          filteredProducts = filteredProducts.filter(product => {
-            if (!product.categoryData) return false
-
-            let categoryData = product.categoryData
-            if (typeof categoryData === 'string') {
-              try {
-                categoryData = JSON.parse(categoryData)
-              } catch (e) {
-                return false
-              }
-            }
-
-            const productMaterial = (categoryData as any).material
-            if (!productMaterial) return false
-
-            return categoryPage.materials.includes(productMaterial.toString())
-          })
-          console.log(`After material filter: ${filteredProducts.length} products (was ${beforeCount})`)
-        }
-
-        if (categoryPage.styles && categoryPage.styles.length > 0) {
-          const beforeCount = filteredProducts.length
-          filteredProducts = filteredProducts.filter(product => {
-            if (!product.categoryData) return false
-
-            let categoryData = product.categoryData
-            if (typeof categoryData === 'string') {
-              try {
-                categoryData = JSON.parse(categoryData)
-              } catch (e) {
-                return false
-              }
-            }
-
-            const productStyle = (categoryData as any).style
-            if (!productStyle) return false
-
-            return categoryPage.styles.includes(productStyle.toString())
-          })
-          console.log(`After style filter: ${filteredProducts.length} products (was ${beforeCount})`)
-        }
-
-        if (categoryPage.genders && categoryPage.genders.length > 0) {
-          const beforeCount = filteredProducts.length
-          filteredProducts = filteredProducts.filter(product => {
-            if (!product.categoryData) return false
-
-            let categoryData = product.categoryData
-            if (typeof categoryData === 'string') {
-              try {
-                categoryData = JSON.parse(categoryData)
-              } catch (e) {
-                return false
-              }
-            }
-
-            const productGender = (categoryData as any).gender
-            if (!productGender) return false
-
-            return categoryPage.genders.includes(productGender.toString())
-          })
-          console.log(`After gender filter: ${filteredProducts.length} products (was ${beforeCount})`)
-        }
-
-        if (categoryPage.colors && categoryPage.colors.length > 0) {
-          const beforeCount = filteredProducts.length
-          filteredProducts = filteredProducts.filter(product => {
-            if (!product.specifications) return false
-
-            let specifications = product.specifications
-            if (typeof specifications === 'string') {
-              try {
-                specifications = JSON.parse(specifications)
-              } catch (e) {
-                return false
-              }
-            }
-
-            const productColors = (specifications as any).color
-            if (!productColors || !Array.isArray(productColors)) return false
-
-            return categoryPage.colors.some((categoryColor: string) =>
-              productColors.includes(categoryColor)
-            )
-          })
-          console.log(`After color filter: ${filteredProducts.length} products (was ${beforeCount})`)
-        }
-
-        console.log(`Final count for ${categoryPage.name}: ${filteredProducts.length} products`)
-        return filteredProducts.length
-      } catch (error) {
-        console.error('Error counting products for category:', error)
-        return 0
-      }
-    }
-
-    const responseData = await Promise.all(
-      categoryPages.map(async (page) => {
-        const productCount = await getProductCount(page)
-        return {
-          ...page,
-          productCount,
-          currentCategory: {
-            categoryId: page.id,
-            categoryName: page.name,
-            imageUrl: page.imageUrl || ""
-          }
+    let responseData
+    if (includeProductCounts) {
+      // Fetch all products once to avoid multiple database connections
+      const allProducts = await prismadb.product.findMany({
+        where: {
+          storeId: storeId,
+          isDeleted: false,
+          isPublished: true
+        },
+        select: {
+          id: true,
+          categoryData: true,
+          specifications: true
         }
       })
-    )
+
+      const getProductCount = (categoryPage: any, products: any[]) => {
+        try {
+          let filteredProducts = products
+
+          if (categoryPage.materials && categoryPage.materials.length > 0) {
+            filteredProducts = filteredProducts.filter(product => {
+              if (!product.categoryData) return false
+
+              let categoryData = product.categoryData
+              if (typeof categoryData === 'string') {
+                try {
+                  categoryData = JSON.parse(categoryData)
+                } catch (e) {
+                  return false
+                }
+              }
+
+              const productMaterial = (categoryData as any).material
+              if (!productMaterial) return false
+
+              return categoryPage.materials.includes(productMaterial.toString())
+            })
+          }
+
+          if (categoryPage.styles && categoryPage.styles.length > 0) {
+            filteredProducts = filteredProducts.filter(product => {
+              if (!product.categoryData) return false
+
+              let categoryData = product.categoryData
+              if (typeof categoryData === 'string') {
+                try {
+                  categoryData = JSON.parse(categoryData)
+                } catch (e) {
+                  return false
+                }
+              }
+
+              const productStyle = (categoryData as any).style
+              if (!productStyle) return false
+
+              return categoryPage.styles.includes(productStyle.toString())
+            })
+          }
+
+          if (categoryPage.genders && categoryPage.genders.length > 0) {
+            filteredProducts = filteredProducts.filter(product => {
+              if (!product.categoryData) return false
+
+              let categoryData = product.categoryData
+              if (typeof categoryData === 'string') {
+                try {
+                  categoryData = JSON.parse(categoryData)
+                } catch (e) {
+                  return false
+                }
+              }
+
+              const productGender = (categoryData as any).gender
+              if (!productGender) return false
+
+              return categoryPage.genders.includes(productGender.toString())
+            })
+          }
+
+          if (categoryPage.colors && categoryPage.colors.length > 0) {
+            filteredProducts = filteredProducts.filter(product => {
+              if (!product.specifications) return false
+
+              let specifications = product.specifications
+              if (typeof specifications === 'string') {
+                try {
+                  specifications = JSON.parse(specifications)
+                } catch (e) {
+                  return false
+                }
+              }
+
+              const productColors = (specifications as any).color
+              if (!productColors || !Array.isArray(productColors)) return false
+
+              return categoryPage.colors.some((categoryColor: string) =>
+                productColors.includes(categoryColor)
+              )
+            })
+          }
+
+          return filteredProducts.length
+        } catch (error) {
+          console.error('Error counting products for category:', error)
+          return 0
+        }
+      }
+
+      // Process all category pages using the same product data (no database calls)
+      responseData = categoryPages.map(page => ({
+        ...page,
+        productCount: getProductCount(page, allProducts),
+        currentCategory: {
+          categoryId: page.id,
+          categoryName: page.name,
+          imageUrl: page.imageUrl || ""
+        }
+      }))
+    } else {
+      // Return category pages without product counts for faster loading
+      responseData = categoryPages.map((page) => ({
+        ...page,
+        productCount: null, // Indicate that product count is not loaded
+        currentCategory: {
+          categoryId: page.id,
+          categoryName: page.name,
+          imageUrl: page.imageUrl || ""
+        }
+      }))
+    }
 
     if (forTemplate) {
       const filteredData = responseData.filter(item => {

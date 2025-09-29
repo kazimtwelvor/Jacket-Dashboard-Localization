@@ -55,7 +55,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   const [localSelectedImageForDetail, setLocalSelectedImageForDetail] = useState<string | null>(null)
   const [localIsDetailModalOpen, setLocalIsDetailModalOpen] = useState(false)
   const params = useParams()
-  const storeId = params.storeId as string
+  const storeId = params?.storeId as string
   const [showImageDetails, setShowImageDetails] = useState(false)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const effectiveSelectedImage = selectedImageForDetail || localSelectedImageForDetail
@@ -119,7 +119,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
           formData.append("file", file)
 
           const baseUrl = storeUrl.endsWith("/") ? storeUrl.slice(0, -1) : storeUrl
-          const uploadUrl = `${baseUrl}/api/upload`
+          const uploadUrl = `${baseUrl}/api/${storeId}/upload`
 
           const response = await fetch(uploadUrl, {
             method: "POST",

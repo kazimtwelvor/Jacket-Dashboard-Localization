@@ -51,7 +51,7 @@
       const colorSkus: Record<string, string> = {}
       
       for (const [color, url] of Object.entries(colorLinks)) {
-        if (typeof url === 'string' && url.includes('jacket.us.com/us/product/')) {
+        if (typeof url === 'string' && url.includes('/us/product/')) {
           try {
             const slug = url.split('/us/product/')[1]
             if (slug) {

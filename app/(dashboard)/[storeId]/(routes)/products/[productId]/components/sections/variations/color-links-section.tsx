@@ -117,7 +117,7 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
       const newSkus: Record<string, string> = { ...colorSkus }
       
       for (const [color, url] of Object.entries(colorLinks)) {
-        if (typeof url === 'string' && url.includes('jacket.us.com/us/product/') && !colorSkus[color]) {
+        if (typeof url === 'string' && url.includes('/us/product/') && !colorSkus[color]) {
           try {
             const slug = url.split('/us/product/')[1]
             if (slug) {
@@ -312,7 +312,6 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
           setColorSkus(data.colorSkus)
         }
         const parentColors = Object.keys(data.colorLinks)
-
         form.setValue("specifications.color", parentColors, { shouldDirty: true })
         form.setValue("categories.variationColors", parentColors, { shouldDirty: true })
 
@@ -323,7 +322,8 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
   }
 
   const selectProduct = (color: string, product: Product) => {
-    const url = `https://jacket.us.com/us/product/${product.slug}`
+    const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_STORE_URL || 'https://www.fineystjackets.com'
+    const url = `${frontendUrl}/us/product/${product.slug}`
     const newLinks = { ...colorLinks, [color]: url }
     const newSkus = { ...colorSkus, [color]: product.sku || "" }
     setColorLinks(newLinks)
@@ -736,11 +736,11 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
                       )}
                     </div>
                     <Input
-                      className={`flex-1 ${selectedParentProduct || colorLinks[color]?.includes('jacket.us.com') ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                      placeholder={selectedParentProduct ? `Inherited from parent: ${selectedParentProduct.name}` : colorLinks[color]?.includes('jacket.us.com') ? 'Generated from product selection' : `Enter URL for ${color} variation or use search`}
+                      className={`flex-1 ${selectedParentProduct || colorLinks[color]?.includes('/us/product/') ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                      placeholder={selectedParentProduct ? `Inherited from parent: ${selectedParentProduct.name}` : colorLinks[color]?.includes('/us/product/') ? 'Generated from product selection' : `Enter URL for ${color} variation or use search`}
                       value={colorLinks[color] || ""}
                       onChange={(e) => updateLink(color, e.target.value)}
-                      readOnly={!!selectedParentProduct || colorLinks[color]?.includes('jacket.us.com')}
+                      readOnly={!!selectedParentProduct || colorLinks[color]?.includes('/us/product/')}
                     />
                     {colorLinks[color] && (
                       <Button
@@ -799,7 +799,7 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
           <div className="text-xs text-muted-foreground mt-4 p-2 bg-muted/20 rounded-md">
             <p><strong>Search:</strong> Click the search icon to find products by name or SKU</p>
             <p className="mt-1"><strong>Manual:</strong> Or enter the complete URL directly</p>
-            <p className="mt-1">Example: https://jacket.us.com/us/product/product-name-in-red-color</p>
+            <p className="mt-1">Example: https://www.fineystjackets.com/us/product/product-name-in-red-color</p>
           </div>
         </div>
       ) : (

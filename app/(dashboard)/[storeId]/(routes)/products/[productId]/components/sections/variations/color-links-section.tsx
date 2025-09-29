@@ -312,7 +312,6 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
           setColorSkus(data.colorSkus)
         }
         const parentColors = Object.keys(data.colorLinks)
-
         form.setValue("specifications.color", parentColors, { shouldDirty: true })
         form.setValue("categories.variationColors", parentColors, { shouldDirty: true })
 

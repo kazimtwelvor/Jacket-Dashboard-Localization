@@ -935,6 +935,26 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       })
     }
 
+    if (values.isParentProduct && values.baseColor && values.baseColor.name) {
+      const colorVariationLinks = values.categories?.colorVariationLinks || {}
+      const baseColorLink = colorVariationLinks[values.baseColor.name]
+      
+      if (!baseColorLink || baseColorLink.trim() === "") {
+        errors.push({
+          field: "categories.colorVariationLinks",
+          message: `Base color variation link for "${values.baseColor.name}" is required when product is set as parent`,
+        })
+      } else {
+        const expectedSlug = values.slug
+        if (expectedSlug && !baseColorLink.includes(`/us/product/${expectedSlug}`)) {
+          errors.push({
+            field: "categories.colorVariationLinks",
+            message: `Base color variation link for "${values.baseColor.name}" must point to this product's URL`,
+          })
+        }
+      }
+    }
+
     return errors
   }
 
@@ -942,6 +962,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
   const switchToTabWithError = (fieldName: string) => {
     if (fieldName.startsWith("seo.")) {
       setActiveTab("seo")
+    } else if (fieldName.startsWith("categories.colorVariationLinks")) {
+      setActiveTab("general")
     } else {
       setActiveTab("general")
     }

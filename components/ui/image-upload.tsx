@@ -119,7 +119,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
           formData.append("file", file)
 
           const baseUrl = storeUrl.endsWith("/") ? storeUrl.slice(0, -1) : storeUrl
-          const uploadUrl = `${baseUrl}/api/${storeId}/upload`
+          const uploadUrl = `${baseUrl}/api/upload`
 
           const response = await fetch(uploadUrl, {
             method: "POST",

@@ -84,7 +84,7 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
 
     if (isParentProduct && baseColor && baseColor.name && productSlug) {
       const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_STORE_URL || 'https://www.fineystjackets.com'
-      const baseColorUrl = `${frontendUrl}/us/product/${productSlug}`
+      const baseColorUrl = `${frontendUrl}/product/${productSlug}`
       
       const currentColorLinks = form.getValues("categories.colorVariationLinks") || {}
       const hasBaseColorInForm = currentColorLinks[baseColor.name] === baseColorUrl
@@ -152,9 +152,9 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
       const newSkus: Record<string, string> = { ...colorSkus }
       
       for (const [color, url] of Object.entries(colorLinks)) {
-        if (typeof url === 'string' && url.includes('/us/product/') && !colorSkus[color]) {
+        if (typeof url === 'string' && url.includes('/product/') && !colorSkus[color]) {
           try {
-            const slug = url.split('/us/product/')[1]
+            const slug = url.split('/product/')[1]
             if (slug) {
               const productResponse = await fetch(`/api/${storeId}/products?search=${encodeURIComponent(slug)}&admin=true`)
               const productData = await productResponse.json()
@@ -337,7 +337,7 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
 
     if (isParentProduct && baseColor && baseColor.name && productSlug) {
       const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_STORE_URL || 'https://www.fineystjackets.com'
-      const baseColorUrl = `${frontendUrl}/us/product/${productSlug}`
+      const baseColorUrl = `${frontendUrl}/product/${productSlug}`
       
       const currentColorLinks = form.getValues("categories.colorVariationLinks") || {}
       if (currentColorLinks[baseColor.name] !== baseColorUrl) {
@@ -401,7 +401,7 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
 
   const selectProduct = (color: string, product: Product) => {
     const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_STORE_URL || 'https://www.fineystjackets.com'
-    const url = `${frontendUrl}/us/product/${product.slug}`
+    const url = `${frontendUrl}/product/${product.slug}`
     const newLinks = { ...colorLinks, [color]: url }
     const newSkus = { ...colorSkus, [color]: product.sku || "" }
     setColorLinks(newLinks)
@@ -819,11 +819,11 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
                       )}
                     </div>
                     <Input
-                      className={`flex-1 ${selectedParentProduct || colorLinks[color]?.includes('/us/product/') || (form.getValues("isParentProduct") && form.getValues("baseColor")?.name === color) ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                      className={`flex-1 ${selectedParentProduct || colorLinks[color]?.includes('/product/') || (form.getValues("isParentProduct") && form.getValues("baseColor")?.name === color) ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                       placeholder={
                         selectedParentProduct 
                           ? `Inherited from parent: ${selectedParentProduct.name}` 
-                          : colorLinks[color]?.includes('/us/product/') 
+                          : colorLinks[color]?.includes('/product/') 
                             ? 'Generated from product selection' 
                             : form.getValues("isParentProduct") && form.getValues("baseColor")?.name === color
                               ? 'Auto-generated base color link for parent product'
@@ -831,7 +831,7 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
                       }
                       value={colorLinks[color] || ""}
                       onChange={(e) => updateLink(color, e.target.value)}
-                      readOnly={!!selectedParentProduct || colorLinks[color]?.includes('/us/product/') || (form.getValues("isParentProduct") && form.getValues("baseColor")?.name === color)}
+                      readOnly={!!selectedParentProduct || colorLinks[color]?.includes('/product/') || (form.getValues("isParentProduct") && form.getValues("baseColor")?.name === color)}
                     />
                     {colorLinks[color] && (
                       <Button
@@ -890,7 +890,7 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
           <div className="text-xs text-muted-foreground mt-4 p-2 bg-muted/20 rounded-md">
             <p><strong>Search:</strong> Click the search icon to find products by name or SKU</p>
             <p className="mt-1"><strong>Manual:</strong> Or enter the complete URL directly</p>
-            <p className="mt-1">Example: https://www.fineystjackets.com/us/product/product-name-in-red-color</p>
+            <p className="mt-1">Example: https://www.fineystjackets.com/product/product-name-in-red-color</p>
             {form.getValues("isParentProduct") && form.getValues("baseColor") && (
               <p className="mt-2 p-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded text-green-800 dark:text-green-200">
                 <strong>Parent Product:</strong> Base color variation link is automatically generated and required for parent products.

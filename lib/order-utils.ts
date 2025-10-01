@@ -1,7 +1,7 @@
 import prismadb from "./prismadb";
 
 /**
- * Generates the next sequential order ID in format ord-4560, ord-4561, etc.
+ * Generates the next sequential order ID in format ORD-04560, ORD-04561, etc.
  * @param storeId - The store ID to generate order ID for
  * @returns Promise<string> - The next sequential order ID
  */
@@ -10,15 +10,15 @@ export async function generateNextOrderId(storeId: string): Promise<string> {
     // Get the latest order for this store
     const latestOrder = await prismadb.order.findFirst({
       where: { storeId },
-      orderBy: { createdAt: 'desc' },
-      select: { id: true }
+      orderBy: { createdAt: "desc" },
+      select: { id: true },
     });
 
-    let nextNumber = 4560; // Start from 4560
-    
+    let nextNumber = 45600; // Start from 45600
+
     if (latestOrder && latestOrder.id) {
-      // Extract the number from the ID (assuming format like "ord-4560")
-      const match = latestOrder.id.match(/ord-(\d+)/);
+      // Extract the number from the ID (assuming format like "ORD-04560")
+      const match = latestOrder.id.match(/ORD-(\d+)/);
       if (match) {
         const currentNumber = parseInt(match[1]);
         if (!isNaN(currentNumber)) {
@@ -27,12 +27,12 @@ export async function generateNextOrderId(storeId: string): Promise<string> {
       }
     }
 
-    // Format as ord-XXXX
-    return `ord-${nextNumber}`;
+    // Format as ORD-XXXXX
+    return `ORD-${nextNumber}`;
   } catch (error) {
-    console.error('Error generating order ID:', error);
+    console.error("Error generating order ID:", error);
     // Fallback to timestamp-based ID if there's an error
-    return `ord-${Date.now()}`;
+    return `ORD-${Date.now()}`;
   }
 }
 
@@ -42,5 +42,5 @@ export async function generateNextOrderId(storeId: string): Promise<string> {
  * @returns boolean - True if valid format
  */
 export function isValidOrderId(orderId: string): boolean {
-  return /^ord-\d+$/.test(orderId);
+  return /^ORD-\d+$/.test(orderId);
 }

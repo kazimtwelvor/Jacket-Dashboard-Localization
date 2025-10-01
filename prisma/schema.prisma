@@ -518,7 +518,7 @@ enum PageStatus {
 }
 
 model Order {
-  id                 String      @id @default(cuid())
+  id                 String      @id
   storeId            String
   store              Store       @relation("StoreToOrder", fields: [storeId], references: [id])
   userId             String?

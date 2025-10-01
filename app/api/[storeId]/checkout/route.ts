@@ -2,6 +2,8 @@ import prismadb from "@/lib/prismadb";
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { encrypt } from "@/lib/encryption";
+import { getPaymentProviderConfig } from "@/lib/payment-config";
+import { generateNextOrderId } from "@/lib/order-utils";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -20,7 +22,7 @@ export async function POST(
   try {
     const {
       productIds,
-      paymentMethod = "stripe",
+      paymentMethod = "auto", // Default to auto-detection
       customerEmail,
       phone,
       address,
@@ -37,6 +39,9 @@ export async function POST(
       notes,
     } = await req.json();
     const { storeId } = params;
+
+    // Get payment provider configuration
+    const paymentConfig = getPaymentProviderConfig();
 
     if (!productIds || productIds.length === 0) {
       return new NextResponse("Product ids are required", { status: 400 });
@@ -61,29 +66,49 @@ export async function POST(
       return new NextResponse("Store not found", { status: 404 });
     }
 
+    // Determine the actual payment method based on configuration
+    let actualPaymentMethod = paymentMethod;
+    if (paymentMethod === "auto") {
+      // Auto-detect based on environment configuration
+      if (paymentConfig.useStripe && store.stripeEnabled) {
+        actualPaymentMethod = "stripe";
+      } else if (paymentConfig.usePayPal && store.paypalEnabled) {
+        actualPaymentMethod = "paypal";
+      } else if (store.cashOnDeliveryEnabled) {
+        actualPaymentMethod = "cash";
+      } else if (store.bankTransferEnabled) {
+        actualPaymentMethod = "bank";
+      } else {
+        return new NextResponse(
+          "No payment methods are currently enabled for this store",
+          { status: 400 }
+        );
+      }
+    }
+
     // Validate that the selected payment method is enabled
-    if (paymentMethod === "stripe" && !store.stripeEnabled) {
+    if (actualPaymentMethod === "stripe" && (!paymentConfig.useStripe || !store.stripeEnabled)) {
       return new NextResponse(
         "Stripe payments are not enabled for this store",
         {
           status: 400,
         }
       );
-    } else if (paymentMethod === "paypal" && !store.paypalEnabled) {
+    } else if (actualPaymentMethod === "paypal" && (!paymentConfig.usePayPal || !store.paypalEnabled)) {
       return new NextResponse(
         "PayPal payments are not enabled for this store",
         {
           status: 400,
         }
       );
-    } else if (paymentMethod === "cash" && !store.cashOnDeliveryEnabled) {
+    } else if (actualPaymentMethod === "cash" && !store.cashOnDeliveryEnabled) {
       return new NextResponse(
         "Cash on delivery is not enabled for this store",
         {
           status: 400,
         }
       );
-    } else if (paymentMethod === "bank" && !store.bankTransferEnabled) {
+    } else if (actualPaymentMethod === "bank" && !store.bankTransferEnabled) {
       return new NextResponse("Bank transfer is not enabled for this store", {
         status: 400,
       });
@@ -130,7 +155,7 @@ export async function POST(
     };
 
     // Handle different payment methods
-    if (paymentMethod === "stripe") {
+    if (actualPaymentMethod === "stripe") {
       if (!store.stripeSecretKey) {
         return new NextResponse(
           "Stripe is not properly configured for this store",
@@ -143,9 +168,13 @@ export async function POST(
         apiVersion: "2025-02-24.acacia",
       });
 
+      // Generate sequential order ID
+      const orderId = await generateNextOrderId(storeId)
+
       // Create order in database
       const order = await prismadb.order.create({
         data: {
+          id: orderId,
           ...orderData,
           paymentMethod: "stripe", // Ensure this is lowercase to match the form value
           paymentStatus: "pending",
@@ -253,28 +282,39 @@ export async function POST(
           { headers: corsHeaders }
         );
       }
-    } else if (paymentMethod === "cash" || paymentMethod === "bank") {
+    } else if (actualPaymentMethod === "paypal") {
+      // For PayPal, redirect to use PayPal API endpoints
+      return NextResponse.json(
+        {
+          usePayPal: true,
+          message: "Please use PayPal card fields or PayPal button for payment",
+        },
+        { headers: corsHeaders }
+      );
+    } else if (actualPaymentMethod === "cash" || actualPaymentMethod === "bank") {
+      // Generate sequential order ID
+      const orderId = await generateNextOrderId(storeId)
+
       // Create order for cash on delivery or bank transfer
       const order = await prismadb.order.create({
         data: {
+          id: orderId,
           ...orderData,
           paymentMethod:
-            paymentMethod === "cash" ? "CASH_ON_DELIVERY" : "BANK_TRANSFER",
+            actualPaymentMethod === "cash" ? "CASH_ON_DELIVERY" : "BANK_TRANSFER",
         },
       });
 
       return NextResponse.json(
         {
-          url: `${process.env.FRONTEND_STORE_URL}/checkout/confirmation?orderId=${order.id}&method=${paymentMethod}`,
+          url: `${process.env.FRONTEND_STORE_URL}/checkout/confirmation?orderId=${order.id}&method=${actualPaymentMethod}`,
         },
         { headers: corsHeaders }
       );
     } else {
-      // Handle PayPal case
       return NextResponse.json(
         {
-          error:
-            "For PayPal payments, please use the PayPal button on the checkout page",
+          error: "Invalid payment method selected",
         },
         {
           status: 400,

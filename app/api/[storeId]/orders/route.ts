@@ -5,6 +5,7 @@ import { auth } from "@clerk/nextjs/server"
 import prismadb from "@/lib/prismadb"
 import { checkApiPermission } from "@/lib/api-permissions"
 import { Permission } from "@/types/permissions"
+import { generateNextOrderId } from "@/lib/order-utils"
 
 export async function GET(req: Request, { params }: { params: { storeId: string } }) {
   try {
@@ -194,8 +195,12 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       }
     }
 
+    // Generate sequential order ID
+    const orderId = await generateNextOrderId(params.storeId)
+
     const order = await prismadb.order.create({
       data: {
+        id: orderId,
         storeId: params.storeId,
         userId: finalUserId,
         customerName: customerName || null,

@@ -47,6 +47,7 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
   const [dropdownPositions, setDropdownPositions] = useState<Record<string, {top: number, left: number}>>({})
   const [searchResults, setSearchResults] = useState<Record<string, Product[]>>({})
   const [isSearching, setIsSearching] = useState<Record<string, boolean>>({})
+  const [hasLoadedInitialColorLinks, setHasLoadedInitialColorLinks] = useState(false)
 
 
   useEffect(() => {
@@ -71,11 +72,12 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
       }
     }
 
-    if (initialData?.colorLinks && Object.keys(initialData.colorLinks).length > 0) {
+    if (initialData?.colorLinks && Object.keys(initialData.colorLinks).length > 0 && !hasLoadedInitialColorLinks) {
       setColorLinks(initialData.colorLinks)
       form.setValue("categories.colorVariationLinks", initialData.colorLinks, { shouldDirty: false })
+      setHasLoadedInitialColorLinks(true)
     }
-  }, [form, initialData, products, selectedParentProduct])
+  }, [form, initialData, products, selectedParentProduct, hasLoadedInitialColorLinks])
 
   useEffect(() => {
     const isParentProduct = form.watch("isParentProduct")
@@ -305,30 +307,42 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
     const links = form.getValues("categories.colorVariationLinks") || {}
     const cleanLinks: Record<string, string> = {}
     
-    Object.keys(colorLinks).forEach(color => {
+    displayColors.forEach(color => {
       if (colorLinks[color]) {
         cleanLinks[color] = colorLinks[color]
-      }
-    })
-    
-    displayColors.forEach(color => {
-      if (links[color]) {
+      } else if (links[color]) {
         cleanLinks[color] = links[color]
-      } else if (!cleanLinks[color]) {
+      } else {
         cleanLinks[color] = ""
       }
     })
     
+    const currentLinkKeys = Object.keys(colorLinks)
+    const shouldRemoveKeys = currentLinkKeys.filter(key => !displayColors.includes(key))
+    
     const hasChanges = Object.keys(cleanLinks).length !== Object.keys(colorLinks).length ||
-      Object.keys(cleanLinks).some(color => cleanLinks[color] !== colorLinks[color])
+      Object.keys(cleanLinks).some(color => cleanLinks[color] !== colorLinks[color]) ||
+      shouldRemoveKeys.length > 0
     
     if (hasChanges) {
       console.log(`[Color Links] Updating color links state. Display colors:`, displayColors)
+      console.log(`[Color Links] Removing colors:`, shouldRemoveKeys)
       console.log(`[Color Links] Previous state:`, colorLinks)
       console.log(`[Color Links] New state:`, cleanLinks)
       setColorLinks(cleanLinks)
+      form.setValue("categories.colorVariationLinks", cleanLinks, { shouldDirty: true })
+      
+      const cleanSkus: Record<string, string> = {}
+      displayColors.forEach(color => {
+        if (colorSkus[color]) {
+          cleanSkus[color] = colorSkus[color]
+        }
+      })
+      if (Object.keys(cleanSkus).length !== Object.keys(colorSkus).length) {
+        setColorSkus(cleanSkus)
+      }
     }
-  }, [form, displayColors])
+  }, [form, displayColors, colorLinks, colorSkus])
 
   useEffect(() => {
     const isParentProduct = form.getValues("isParentProduct")

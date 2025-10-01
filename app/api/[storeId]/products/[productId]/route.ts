@@ -198,15 +198,40 @@ export async function GET(req: Request, { params }: { params: { productId: strin
       } catch (error) {
       }
 
+      let baseColor = null
+      if (product.baseColor) {
+        try {
+          baseColor = typeof product.baseColor === 'string' 
+            ? JSON.parse(product.baseColor) 
+            : product.baseColor
+        } catch (e) {
+          baseColor = null
+        }
+      }
+
+      let combinedColorDetails = []
+      
+      if (baseColor && baseColor.id) {
+        combinedColorDetails.push(baseColor)
+      }
+      
+      if (Array.isArray(colorDetails)) {
+        colorDetails.forEach(color => {
+          if (color && color.id && (!baseColor || color.id !== baseColor.id)) {
+            combinedColorDetails.push(color)
+          }
+        })
+      }
+
       const serializedProduct = {
         ...product,
         price: product.price.toString(),
         // originalPrice: product.originalPrice.toString(),
         salePrice: product.salePrice ? product.salePrice.toString() : null,
-        baseColor: product.baseColor || null,
+        baseColor: baseColor,
         images: formattedImages,
         sizeDetails: sizeDetails,
-        colorDetails: colorDetails,
+        colorDetails: combinedColorDetails,
         colorLinks: colorLinks,
         specifications: specifications,
         schema: schemaData,

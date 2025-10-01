@@ -221,7 +221,10 @@ export async function GET(
         },
         orderBy: type === 'trashed'
           ? { deletedAt: 'desc' }
-          : { createdAt: 'desc' },
+          : [
+              { isBest: 'desc' },
+              { createdAt: 'desc' }
+            ],
         skip: offset,
         take: limit,
       }),

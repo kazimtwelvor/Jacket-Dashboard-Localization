@@ -34,6 +34,7 @@ export async function GET(
         name: true,
         sku: true,
         slug: true,
+        isBest: true,
         images: {
           take: 1,
           include: {
@@ -43,7 +44,10 @@ export async function GET(
         }
       },
       take: 20,
-      orderBy: { name: "asc" }
+      orderBy: [
+        { isBest: "desc" },
+        { name: "asc" }
+      ]
     })
 
     const formattedProducts = products.map(product => ({
@@ -51,6 +55,7 @@ export async function GET(
       name: product.name,
       sku: product.sku,
       slug: product.slug,
+      isBest: product.isBest,
       image: product.images[0]?.image?.url || null
     }))
 

@@ -68,9 +68,14 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
           },
         },
       },
-      orderBy: {
-        createdAt: "desc",
-      }
+      orderBy: [
+        {
+          isBest: "desc",
+        },
+        {
+          createdAt: "desc",
+        },
+      ]
     })
 
 

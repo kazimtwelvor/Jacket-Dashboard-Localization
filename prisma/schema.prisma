@@ -297,6 +297,7 @@ model Product {
   name          String
   price         Decimal
   isFeatured    Boolean        @default(false)
+  isBest        Boolean        @default(false) 
   isArchived    Boolean        @default(false)
   sizeDetails   Json?        
   colorDetails  Json?          

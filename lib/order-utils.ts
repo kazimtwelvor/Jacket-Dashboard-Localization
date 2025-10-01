@@ -1,4 +1,4 @@
-import { prismadb } from "./prismadb";
+import prismadb from "./prismadb";
 
 /**
  * Generates the next sequential order ID in format ord-4560, ord-4561, etc.

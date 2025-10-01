@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { X, Grid, List, Trash2, RotateCcw, Search, Edit } from "lucide-react"
+import { X, Grid, List, Trash2, RotateCcw, Search, Edit, Star } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Heading } from "@/components/ui/heading"
 import { Separator } from "@/components/ui/separator"
@@ -282,6 +282,28 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
     router.push(`/${params?.storeId}/products/${product.id}`)
   }
 
+  const onToggleIsBest = async (product: any) => {
+    try {
+      setLoading(true)
+      const newIsBestValue = !product.isBest
+      await axios.post(`/api/${params?.storeId}/products/${product.id}/is-best`, {
+        isBest: newIsBestValue
+      })
+      
+      setProducts(prevProducts => 
+        prevProducts.map(p => 
+          p.id === product.id ? { ...p, isBest: newIsBestValue } : p
+        )
+      )
+      
+      toast.success(`Product ${newIsBestValue ? 'marked as best' : 'unmarked as best'}`)
+    } catch (error) {
+      toast.error("Something went wrong")
+    } finally {
+      setLoading(false)
+    }
+  }
+
   // Get current data and use static dropdown options 
   const currentData = activeTab === 'all' ? products : trashedProducts
   const dropdownCategories = dropdownOptionsLoaded ? allCategories : []
@@ -374,6 +396,7 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
             data={products}
             onTrash={userRole !== 'EDITOR' ? onTrash : undefined}
             onEdit={onEdit}
+            onToggleIsBest={(userRole === 'ADMIN' || userRole === 'OWNER') ? onToggleIsBest : undefined}
             loading={loading}
             isTrash={false}
             userRole={userRole}
@@ -487,6 +510,7 @@ interface ProductsViewProps {
   onDelete?: (product: any) => void
   onPreview?: (product: any) => void
   onEdit?: (product: any) => void
+  onToggleIsBest?: (product: any) => void
   loading: boolean
   isTrash?: boolean
   userRole?: string
@@ -529,6 +553,7 @@ const ProductsView: React.FC<ProductsViewProps> = ({
   onDelete,
   onPreview,
   onEdit,
+  onToggleIsBest,
   loading,
   isTrash = false,
   userRole,
@@ -1009,9 +1034,12 @@ const ProductsView: React.FC<ProductsViewProps> = ({
                     <span className="text-gray-400">No Image</span>
                   </div>
                 )}
-                {/* {product.isFeatured && (
-                  <Badge className="absolute top-2 left-2">Featured</Badge>
-                )} */}
+                {product.isBest && (
+                  <Badge className="absolute top-2 right-2 bg-yellow-500 hover:bg-yellow-600">
+                    <Star className="h-3 w-3 mr-1 fill-current" />
+                    Best
+                  </Badge>
+                )}
                 {product.isArchived && (
                   <Badge variant="secondary" className="absolute top-2 right-2">Archived</Badge>
                 )}
@@ -1075,6 +1103,20 @@ const ProductsView: React.FC<ProductsViewProps> = ({
                 </div>
 
                 <div className="flex gap-2 mt-3">
+                  {onToggleIsBest && (
+                    <Button
+                      variant={product.isBest ? "default" : "outline"}
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onToggleIsBest(product)
+                      }}
+                      className="flex-1"
+                    >
+                      <Star className={`h-4 w-4 mr-1 ${product.isBest ? 'fill-current' : ''}`} />
+                      {product.isBest ? 'Best' : 'Mark Best'}
+                    </Button>
+                  )}
                   {onEdit && userRole !== 'VIEWER' && (
                     <Button
                       variant="outline"
@@ -1193,6 +1235,12 @@ const ProductsView: React.FC<ProductsViewProps> = ({
                           {formatPrice(product.price)}
                         </span>
                         <div className="flex gap-1 mt-1 mb-2">
+                          {product.isBest && (
+                            <Badge className="text-xs bg-yellow-500 hover:bg-yellow-600">
+                              <Star className="h-3 w-3 mr-1 fill-current" />
+                              Best
+                            </Badge>
+                          )}
                           {product.isFeatured && (
                             <Badge className="text-xs">Featured</Badge>
                           )}
@@ -1202,6 +1250,19 @@ const ProductsView: React.FC<ProductsViewProps> = ({
                         </div>
 
                         <div className="flex gap-2 mt-2">
+                          {onToggleIsBest && (
+                            <Button
+                              variant={product.isBest ? "default" : "outline"}
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                onToggleIsBest(product)
+                              }}
+                            >
+                              <Star className={`h-4 w-4 mr-1 ${product.isBest ? 'fill-current' : ''}`} />
+                              {product.isBest ? 'Best' : 'Mark Best'}
+                            </Button>
+                          )}
                           {onEdit && userRole !== 'VIEWER' && (
                             <Button
                               variant="outline"

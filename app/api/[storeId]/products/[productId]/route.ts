@@ -198,14 +198,40 @@ export async function GET(req: Request, { params }: { params: { productId: strin
       } catch (error) {
       }
 
+      let baseColor = null
+      if (product.baseColor) {
+        try {
+          baseColor = typeof product.baseColor === 'string' 
+            ? JSON.parse(product.baseColor) 
+            : product.baseColor
+        } catch (e) {
+          baseColor = null
+        }
+      }
+
+      let combinedColorDetails = []
+      
+      if (baseColor && baseColor.id) {
+        combinedColorDetails.push(baseColor)
+      }
+      
+      if (Array.isArray(colorDetails)) {
+        colorDetails.forEach(color => {
+          if (color && color.id && (!baseColor || color.id !== baseColor.id)) {
+            combinedColorDetails.push(color)
+          }
+        })
+      }
+
       const serializedProduct = {
         ...product,
         price: product.price.toString(),
         // originalPrice: product.originalPrice.toString(),
         salePrice: product.salePrice ? product.salePrice.toString() : null,
+        baseColor: baseColor,
         images: formattedImages,
         sizeDetails: sizeDetails,
-        colorDetails: colorDetails,
+        colorDetails: combinedColorDetails,
         colorLinks: colorLinks,
         specifications: specifications,
         schema: schemaData,
@@ -310,6 +336,7 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       slug,
       keywords, 
       brandName,
+      baseColor,
       cachedReviews,
       relatedProducts,
     } = body
@@ -461,6 +488,7 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
           slug,
           keywords: keywordsArray,
           brandName,
+          baseColor,
           relatedProducts: Array.isArray(relatedProducts) ? relatedProducts : [],
           updatedById: user?.id || null,
           updatedByName: user?.name || "Unknown",
@@ -569,6 +597,7 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       ...updatedProductWithReviews,
       price: updatedProductWithReviews.price.toString(),
       salePrice: updatedProductWithReviews.salePrice ? updatedProductWithReviews.salePrice.toString() : null,
+      baseColor: updatedProductWithReviews.baseColor || null,
       reviews: updatedProductWithReviews.reviews.map((review) => ({
         id: review.id,
         userId: review.userId,

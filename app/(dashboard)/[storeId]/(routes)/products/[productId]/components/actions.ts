@@ -222,6 +222,8 @@ export async function createProduct(formData: FormData) {
     const isParentProduct = isParentProductValue === "true" || String(isParentProductValue) === "true"
     
     const parentProductId = formData.get("parentProductId") as string || null
+    const baseColorJson = formData.get("baseColor") as string || ""
+    const baseColor = baseColorJson && baseColorJson.trim() !== "" ? JSON.parse(baseColorJson) : null
   
 
     const imagesJson = formData.get("images") as string
@@ -542,6 +544,7 @@ export async function createProduct(formData: FormData) {
       isFeatured,
       isParentProduct,
       parentProductId,
+      baseColor,
       colorDetails, 
       sizeDetails: sizeDetailsData || [], 
       colorLinks: colorLinksToSave,

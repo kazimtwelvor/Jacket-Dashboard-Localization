@@ -297,52 +297,39 @@ model Product {
   name          String
   price         Decimal
   isFeatured    Boolean        @default(false)
+  isBest        Boolean        @default(false) 
   isArchived    Boolean        @default(false)
-// purchaseNote  String?
-  sizeDetails   Json?          // Will store array of {id, name, value} objects
-  colorDetails  Json?          // Will store array of {id, name, value} objects
+  sizeDetails   Json?        
+  colorDetails  Json?          
+  baseColor     Json?        
   images        ProductImage[]
   orderItems    OrderItem[]
-//  originalPrice Decimal        @default(0)
   isDiscounted  Boolean        @default(false)
   isPublished   Boolean        @default(true)
   isDeleted     Boolean        @default(false)
   deletedAt     DateTime?
   reviews       Review[]
-// wishlistItems WishlistItem[]
 
-  // Product details
   sku            String   @unique
   stockStatus    String?  @default("instock") // instock, outofstock, onbackorder
   description    String?  @db.Text
   salePrice      Decimal?
-  specifications Json?    //need to be fix
+  specifications Json?   
   tags           String[]
   gender         String?
   colorLinks     Json?
   relatedProducts String[] @default([]) // Array of product IDs
 
-  // SEO fields
   metaTitle          String?
   metaDescription    String?  @db.Text
   slug               String?
   keywords           String[]
- // noIndex            Boolean  @default(false)
   brandName          String?
- // ratingValue        String?
- // reviewCount        String?
   schema             String?  @db.Text  // Add this field to store JSON-LD schema data
 
-  // Product classification
- // productType  String? @default("variable") // simple, variable, grouped, etc.
   isParentProduct Boolean? @default(false)
   parentProductId String? // Reference to parent product
 
-  // Virtual/downloadable
- // isVirtual      Boolean? @default(false)
- // isDownloadable Boolean? @default(false)
-
-  // Timestamps
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -752,7 +739,6 @@ enum CategoryPageStatus {
   DRAFT
   PUBLISHED
 }
-
 
 model ContactForm {
   id                    String            @id @default(cuid())

@@ -43,6 +43,12 @@ export const formSchema = z.object({
     .optional()
     .default([]),
 
+  baseColor: z.object({
+    id: z.string(),
+    name: z.string(),
+    value: z.string(),
+  }).optional(),
+
   specifications: z
     .object({
       externalMaterial: z.array(z.string()).default([]),

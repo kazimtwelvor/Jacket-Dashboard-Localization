@@ -241,6 +241,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       stockStatus: initialData.stockStatus || "instock",
       isFeatured: initialData.isFeatured || false,
       brandName: initialData.brandName || "Leather Jacket By Fineyst",
+      baseColor: initialData.baseColor || undefined,
       // ratingValue: initialData.ratingValue || "4.5",
       // reviewCount: initialData.reviewCount || "0",
       categories: {
@@ -439,6 +440,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       sku: "",
       stockStatus: "instock",
       brandName: "Leather Jacket By Fineyst",
+      baseColor: undefined,
       // ratingValue: "4.5",
       reviewCount: "0",
       categories: {
@@ -933,6 +935,26 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       })
     }
 
+    if (values.isParentProduct && values.baseColor && values.baseColor.name) {
+      const colorVariationLinks = values.categories?.colorVariationLinks || {}
+      const baseColorLink = colorVariationLinks[values.baseColor.name]
+      
+      if (!baseColorLink || baseColorLink.trim() === "") {
+        errors.push({
+          field: "categories.colorVariationLinks",
+          message: `Base color variation link for "${values.baseColor.name}" is required when product is set as parent`,
+        })
+      } else {
+        const expectedSlug = values.slug
+        if (expectedSlug && !baseColorLink.includes(`/us/product/${expectedSlug}`)) {
+          errors.push({
+            field: "categories.colorVariationLinks",
+            message: `Base color variation link for "${values.baseColor.name}" must point to this product's URL`,
+          })
+        }
+      }
+    }
+
     return errors
   }
 
@@ -940,6 +962,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
   const switchToTabWithError = (fieldName: string) => {
     if (fieldName.startsWith("seo.")) {
       setActiveTab("seo")
+    } else if (fieldName.startsWith("categories.colorVariationLinks")) {
+      setActiveTab("general")
     } else {
       setActiveTab("general")
     }
@@ -977,6 +1001,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       formData.append("sku", formValues.sku || "")
       formData.append("stockStatus", formValues.stockStatus || "instock")
       formData.append("isFeatured", formValues.isFeatured ? "true" : "false")
+      formData.append("baseColor", formValues.baseColor ? JSON.stringify(formValues.baseColor) : "")
 
       if (formValues.specifications) {
         formData.append("specifications", JSON.stringify(formValues.specifications))
@@ -1173,6 +1198,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       formData.append("sku", formValues.sku || "")
       formData.append("stockStatus", formValues.stockStatus || "instock")
       formData.append("isFeatured", formValues.isFeatured ? "true" : "false")
+      formData.append("baseColor", formValues.baseColor ? JSON.stringify(formValues.baseColor) : "")
 
       if (formValues.specifications) {
         formData.append("specifications", JSON.stringify(formValues.specifications))
@@ -1634,6 +1660,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       }
 
       formData.append("isFeatured", safeValues.isFeatured.toString())
+      formData.append("baseColor", safeValues.baseColor ? JSON.stringify(safeValues.baseColor) : "")
 
       if (initialData) {
         formData.append("categoryId", (initialData as any).categoryId || "")
@@ -1879,6 +1906,30 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
         }
 
         data = ensureSchemaIsIncluded(data)
+
+        const colorDetails = data.colorDetails || []
+        const baseColor = data.baseColor
+        const validColorNames = new Set<string>()
+        
+        colorDetails.forEach((c: any) => {
+          if (c.name) validColorNames.add(c.name)
+        })
+        
+        if (baseColor && baseColor.name) {
+          validColorNames.add(baseColor.name)
+        }
+        
+        if (data.categories?.colorVariationLinks) {
+          const cleanedColorLinks: Record<string, string> = {}
+          Object.keys(data.categories.colorVariationLinks).forEach((colorName) => {
+            if (validColorNames.has(colorName)) {
+              cleanedColorLinks[colorName] = data.categories.colorVariationLinks[colorName]
+            }
+          })
+          data.categories.colorVariationLinks = cleanedColorLinks
+          console.log("[Color Links Validation] Cleaned color links:", cleanedColorLinks)
+          console.log("[Color Links Validation] Valid colors:", Array.from(validColorNames))
+        }
 
         const toastMessage = initialData ? "Product updated!" : "Product created!"
 
@@ -2137,6 +2188,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
                 categories={categorizedCategories}
                 storeId={params?.storeId?.toString()}
                 currentProductId={initialData?.id}
+                initialData={initialData}
               />
             </TabsContent>
 

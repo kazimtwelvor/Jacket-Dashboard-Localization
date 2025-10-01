@@ -17,13 +17,13 @@ export async function GET(req: Request, { params }: { params: Promise<{ storeId:
       return new NextResponse("Store ID is required", { status: 400 })
     }
 
-    const permissionCheck = await checkApiPermission(storeId, Permission.VIEW_ORDERS, 'GET')
-    if (permissionCheck.error) {
-      return permissionCheck.error
-    }
-    if (!permissionCheck.hasPermission) {
-      return new NextResponse("Access denied. You don't have permission to view orders.", { status: 403 })
-    }
+    // const permissionCheck = await checkApiPermission(storeId, Permission.VIEW_ORDERS, 'GET')
+    // if (permissionCheck.error) {
+    //   return permissionCheck.error
+    // }
+    // if (!permissionCheck.hasPermission) {
+    //   return new NextResponse("Access denied. You don't have permission to view orders.", { status: 403 })
+    // }
 
 
     const order = await prismadb.order.findUnique({

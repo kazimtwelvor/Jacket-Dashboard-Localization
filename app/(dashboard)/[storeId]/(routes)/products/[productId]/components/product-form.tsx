@@ -1907,6 +1907,30 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
 
         data = ensureSchemaIsIncluded(data)
 
+        const colorDetails = data.colorDetails || []
+        const baseColor = data.baseColor
+        const validColorNames = new Set<string>()
+        
+        colorDetails.forEach((c: any) => {
+          if (c.name) validColorNames.add(c.name)
+        })
+        
+        if (baseColor && baseColor.name) {
+          validColorNames.add(baseColor.name)
+        }
+        
+        if (data.categories?.colorVariationLinks) {
+          const cleanedColorLinks: Record<string, string> = {}
+          Object.keys(data.categories.colorVariationLinks).forEach((colorName) => {
+            if (validColorNames.has(colorName)) {
+              cleanedColorLinks[colorName] = data.categories.colorVariationLinks[colorName]
+            }
+          })
+          data.categories.colorVariationLinks = cleanedColorLinks
+          console.log("[Color Links Validation] Cleaned color links:", cleanedColorLinks)
+          console.log("[Color Links Validation] Valid colors:", Array.from(validColorNames))
+        }
+
         const toastMessage = initialData ? "Product updated!" : "Product created!"
 
         const selectedColors = form.getValues("specifications.color") || []

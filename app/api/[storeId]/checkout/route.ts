@@ -2,6 +2,7 @@ import prismadb from "@/lib/prismadb";
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { encrypt } from "@/lib/encryption";
+import { generateNextOrderId } from "@/lib/order-utils";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -142,10 +143,11 @@ export async function POST(
       const stripe = new Stripe(store.stripeSecretKey, {
         apiVersion: "2025-02-24.acacia",
       });
-
+      const orderId = await generateNextOrderId(storeId);
       // Create order in database
       const order = await prismadb.order.create({
         data: {
+          id: orderId,
           ...orderData,
           paymentMethod: "stripe", // Ensure this is lowercase to match the form value
           paymentStatus: "pending",

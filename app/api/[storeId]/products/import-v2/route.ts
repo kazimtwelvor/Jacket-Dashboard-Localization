@@ -271,7 +271,7 @@ export async function POST(
           metaDescription: row.metaDescription || null,
           slug: row.slug || null,
           schema: row.schema || null,
-          priority: 4, // Set default priority to 4
+          priority: 4, 
           storeId: storeId,
           createdById: user?.id || null,
           createdByName: user?.name || "Import",

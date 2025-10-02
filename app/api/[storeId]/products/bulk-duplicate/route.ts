@@ -63,6 +63,7 @@ export async function POST(req: Request, { params }: { params: { storeId: string
             isFeatured: product.isFeatured || false,
             isArchived: false,
             isPublished: false,
+            priority: 4, // Set default priority to 4
             ...(product.description ? { description: product.description } : {}),
             ...(product.sku ? { sku: `${product.sku}-copy` } : {}),
           },

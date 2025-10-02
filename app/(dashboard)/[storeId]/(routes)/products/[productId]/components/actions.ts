@@ -549,6 +549,7 @@ export async function createProduct(formData: FormData) {
       sizeDetails: sizeDetailsData || [], 
       colorLinks: colorLinksToSave,
       schema: schemaDataString, 
+      priority: 4, 
       createdById: dbUser.id,
       createdByName: dbUser.name || "Unknown",
       createdByEmail: dbUser.email,

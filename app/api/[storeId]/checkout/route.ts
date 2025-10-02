@@ -21,7 +21,7 @@ export async function POST(
   try {
     const {
       productIds,
-      paymentMethod = "stripe",
+      paymentMethod,
       customerEmail,
       phone,
       address,
@@ -36,6 +36,7 @@ export async function POST(
       zipCode,
       customerName,
       notes,
+      paymentStatus,
     } = await req.json();
     const { storeId } = params;
 
@@ -149,8 +150,8 @@ export async function POST(
         data: {
           id: orderId,
           ...orderData,
-          paymentMethod: "stripe", // Ensure this is lowercase to match the form value
-          paymentStatus: "pending",
+          paymentMethod: paymentMethod, // Ensure this is lowercase to match the form value
+          paymentStatus: paymentStatus,
           customerEmail: customerEmail || null,
           phone: phone || "",
           address: address || "",

@@ -282,21 +282,21 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
     router.push(`/${params?.storeId}/products/${product.id}`)
   }
 
-  const onToggleIsBest = async (product: any) => {
+  const onSetPriority = async (product: any, priority: number | null) => {
     try {
       setLoading(true)
-      const newIsBestValue = !product.isBest
-      await axios.post(`/api/${params?.storeId}/products/${product.id}/is-best`, {
-        isBest: newIsBestValue
+      await axios.post(`/api/${params?.storeId}/products/priority`, {
+        productId: product.id,
+        priority: priority
       })
       
       setProducts(prevProducts => 
         prevProducts.map(p => 
-          p.id === product.id ? { ...p, isBest: newIsBestValue } : p
+          p.id === product.id ? { ...p, priority: priority } : p
         )
       )
       
-      toast.success(`Product ${newIsBestValue ? 'marked as best' : 'unmarked as best'}`)
+      toast.success(`Product priority ${priority ? `set to ${priority}` : 'removed'}`)
     } catch (error) {
       toast.error("Something went wrong")
     } finally {
@@ -396,7 +396,7 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
             data={products}
             onTrash={userRole !== 'EDITOR' ? onTrash : undefined}
             onEdit={onEdit}
-            onToggleIsBest={(userRole === 'ADMIN' || userRole === 'OWNER') ? onToggleIsBest : undefined}
+            onSetPriority={(userRole === 'ADMIN' || userRole === 'OWNER') ? onSetPriority : undefined}
             loading={loading}
             isTrash={false}
             userRole={userRole}
@@ -510,7 +510,7 @@ interface ProductsViewProps {
   onDelete?: (product: any) => void
   onPreview?: (product: any) => void
   onEdit?: (product: any) => void
-  onToggleIsBest?: (product: any) => void
+  onSetPriority?: (product: any, priority: number | null) => void
   loading: boolean
   isTrash?: boolean
   userRole?: string
@@ -553,7 +553,7 @@ const ProductsView: React.FC<ProductsViewProps> = ({
   onDelete,
   onPreview,
   onEdit,
-  onToggleIsBest,
+  onSetPriority,
   loading,
   isTrash = false,
   userRole,
@@ -1034,10 +1034,10 @@ const ProductsView: React.FC<ProductsViewProps> = ({
                     <span className="text-gray-400">No Image</span>
                   </div>
                 )}
-                {product.isBest && (
+                {product.priority && (
                   <Badge className="absolute top-2 right-2 bg-yellow-500 hover:bg-yellow-600">
                     <Star className="h-3 w-3 mr-1 fill-current" />
-                    Best
+                    P{product.priority}
                   </Badge>
                 )}
                 {product.isArchived && (
@@ -1103,20 +1103,25 @@ const ProductsView: React.FC<ProductsViewProps> = ({
                 </div>
 
                 <div className="flex gap-2 mt-3">
-                  {onToggleIsBest && (
-                    <Button
-                      variant={product.isBest ? "default" : "outline"}
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        onToggleIsBest(product)
-                      }}
-                      className="flex-1"
-                    >
-                      <Star className={`h-4 w-4 mr-1 ${product.isBest ? 'fill-current' : ''}`} />
-                      {product.isBest ? 'Best' : 'Mark Best'}
-                    </Button>
-                  )}
+                  <Select
+                    value={product.priority ? product.priority.toString() : 'none'}
+                    onValueChange={(value) => {
+                      const priority = value === 'none' ? null : parseInt(value)
+                      onSetPriority?.(product, priority)
+                    }}
+                  >
+                    <SelectTrigger className="flex-1 text-xs h-8">
+                      <SelectValue placeholder="No Priority" />
+                    </SelectTrigger>
+                    <SelectContent onClick={(e) => e.stopPropagation()}>
+                      <SelectItem value="none">No Priority</SelectItem>
+                      {Array.from({ length: parseInt(process.env.PRODUCT_PRIORITY_LEVELS || "5") }, (_, i) => (
+                        <SelectItem key={i + 1} value={(i + 1).toString()}>
+                          Priority {i + 1}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   {onEdit && userRole !== 'VIEWER' && (
                     <Button
                       variant="outline"
@@ -1235,10 +1240,10 @@ const ProductsView: React.FC<ProductsViewProps> = ({
                           {formatPrice(product.price)}
                         </span>
                         <div className="flex gap-1 mt-1 mb-2">
-                          {product.isBest && (
+                          {product.priority && (
                             <Badge className="text-xs bg-yellow-500 hover:bg-yellow-600">
                               <Star className="h-3 w-3 mr-1 fill-current" />
-                              Best
+                              P{product.priority}
                             </Badge>
                           )}
                           {product.isFeatured && (
@@ -1250,19 +1255,25 @@ const ProductsView: React.FC<ProductsViewProps> = ({
                         </div>
 
                         <div className="flex gap-2 mt-2">
-                          {onToggleIsBest && (
-                            <Button
-                              variant={product.isBest ? "default" : "outline"}
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                onToggleIsBest(product)
-                              }}
-                            >
-                              <Star className={`h-4 w-4 mr-1 ${product.isBest ? 'fill-current' : ''}`} />
-                              {product.isBest ? 'Best' : 'Mark Best'}
-                            </Button>
-                          )}
+                          <Select
+                            value={product.priority ? product.priority.toString() : 'none'}
+                            onValueChange={(value) => {
+                              const priority = value === 'none' ? null : parseInt(value)
+                              onSetPriority?.(product, priority)
+                            }}
+                          >
+                            <SelectTrigger className="flex-1 text-xs h-8">
+                              <SelectValue placeholder="No Priority" />
+                            </SelectTrigger>
+                            <SelectContent onClick={(e) => e.stopPropagation()}>
+                              <SelectItem value="none">No Priority</SelectItem>
+                              {Array.from({ length: parseInt(process.env.PRODUCT_PRIORITY_LEVELS || "5") }, (_, i) => (
+                                <SelectItem key={i + 1} value={(i + 1).toString()}>
+                                  Priority {i + 1}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                           {onEdit && userRole !== 'VIEWER' && (
                             <Button
                               variant="outline"

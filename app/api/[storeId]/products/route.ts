@@ -70,7 +70,7 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       },
       orderBy: [
         {
-          isBest: "desc",
+          priority: "asc",
         },
         {
           createdAt: "desc",

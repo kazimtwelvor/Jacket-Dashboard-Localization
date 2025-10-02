@@ -34,7 +34,7 @@ export async function GET(
         name: true,
         sku: true,
         slug: true,
-        isBest: true,
+        priority: true,
         images: {
           take: 1,
           include: {
@@ -45,7 +45,7 @@ export async function GET(
       },
       take: 20,
       orderBy: [
-        { isBest: "desc" },
+        { priority: "asc" },
         { name: "asc" }
       ]
     })
@@ -55,7 +55,7 @@ export async function GET(
       name: product.name,
       sku: product.sku,
       slug: product.slug,
-      isBest: product.isBest,
+      priority: product.priority,
       image: product.images[0]?.image?.url || null
     }))
 

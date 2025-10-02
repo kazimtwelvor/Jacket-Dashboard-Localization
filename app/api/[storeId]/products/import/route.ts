@@ -513,6 +513,7 @@ export async function POST(req: NextRequest, { params }: { params: { storeId: st
                 isDeleted: processBooleanField(row.isDeleted),
                 isDiscounted: processBooleanField(row.isDiscounted),
                 stockStatus: row.stockStatus || "instock",
+                priority: 4, // Set default priority to 4
                 storeId,
                 categoryId: categoryId,
                 colorDetails,

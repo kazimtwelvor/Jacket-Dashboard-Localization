@@ -243,7 +243,25 @@ export const EditableCategoryTemplate: React.FC<EditableCategoryTemplateProps> =
             </DialogTrigger>
             <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Edit Category Content</DialogTitle>
+                <div className="flex justify-between items-center">
+                  <DialogTitle>Edit Category Content</DialogTitle>
+                  <Button className="mr-4" onClick={() => {
+                    const templateData = {
+                      mainContent,
+                      learnMoreContent,
+                      faqs,
+                      popularSearches,
+                      selectedBlogs,
+                      otherCategories
+                    }
+
+                    const jsonString = JSON.stringify(templateData);
+                    form.setValue("categoryContent", jsonString);
+                    setIsModalOpen(false);
+                  }}>
+                    Save Changes
+                  </Button>
+                </div>
               </DialogHeader>
               <Tabs defaultValue="content" className="w-full">
                 <TabsList className="grid w-full grid-cols-6">
@@ -551,25 +569,6 @@ export const EditableCategoryTemplate: React.FC<EditableCategoryTemplateProps> =
                   </div>
                 </TabsContent>
               </Tabs>
-              
-              <div className="flex justify-end mt-6 pt-4 border-t">
-                <Button onClick={() => {
-                  const templateData = {
-                    mainContent,
-                    learnMoreContent,
-                    faqs,
-                    popularSearches,
-                    selectedBlogs,
-                    otherCategories
-                  }
-
-                  const jsonString = JSON.stringify(templateData);
-                  form.setValue("categoryContent", jsonString);
-                  setIsModalOpen(false);
-                }}>
-                  Save Changes
-                </Button>
-              </div>
             </DialogContent>
           </Dialog>
         </div>

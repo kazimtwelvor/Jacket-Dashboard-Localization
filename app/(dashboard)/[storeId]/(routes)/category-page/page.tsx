@@ -6,7 +6,7 @@ import { useUser } from "@clerk/nextjs"
 import { Heading } from "@/components/ui/heading"
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
-import { Plus, Filter } from "lucide-react"
+import { Plus, Filter, BarChart3 } from "lucide-react"
 import { DataTable } from "@/components/ui/data-table"
 import { columns } from "./components/columns"
 import { ApiCallsSection } from "./components/api-calls-section"
@@ -18,10 +18,12 @@ export default function CategoryPage() {
   const params = useParams()
   const router = useRouter()
   const [loading, setLoading] = useState(true)
-  const [categoryPages, setCategoryPages] = useState([])
+  const [categoryPages, setCategoryPages] = useState<any[]>([])
   const [bestFilter, setBestFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [accessVerified, setAccessVerified] = useState(false)
+  const [loadingProductCounts, setLoadingProductCounts] = useState(false)
+  const [productCountsLoaded, setProductCountsLoaded] = useState(false)
 
 
   useEffect(() => {
@@ -72,7 +74,7 @@ export default function CategoryPage() {
         url += "?" + params_array.join("&")
 
         const response = await axios.get(url)
-        setCategoryPages(response.data)
+        setCategoryPages(response.data as any[])
       } catch (error) {
         toast.error("Failed to load category pages")
         console.error(error)
@@ -83,6 +85,39 @@ export default function CategoryPage() {
 
     fetchCategoryPages()
   }, [params?.storeId, bestFilter, statusFilter, accessVerified])
+
+  const loadProductCounts = async () => {
+    if (categoryPages.length === 0) return
+    
+    try {
+      setLoadingProductCounts(true)
+      
+      const categoryPageIds = categoryPages.map((page: any) => page.id)
+      const response = await axios.post(`/api/${params?.storeId}/category-pages/product-counts`, {
+        categoryPageIds
+      })
+      
+      const productCountsMap = response.data.reduce((acc: any, item: any) => {
+        acc[item.id] = item.productCount
+        return acc
+      }, {})
+      
+      setCategoryPages((prevPages: any[]) => 
+        prevPages.map((page: any) => ({
+          ...page,
+          productCount: productCountsMap[page.id] || 0
+        }))
+      )
+      
+      setProductCountsLoaded(true)
+      toast.success("Product counts loaded successfully")
+    } catch (error) {
+      toast.error("Failed to load product counts")
+      console.error(error)
+    } finally {
+      setLoadingProductCounts(false)
+    }
+  }
 
   return (
     <div className="flex-col">
@@ -106,6 +141,16 @@ export default function CategoryPage() {
                 </SelectContent>
               </Select>
             </div>
+            {!productCountsLoaded && categoryPages.length > 0 && (
+              <Button 
+                variant="outline" 
+                onClick={loadProductCounts}
+                disabled={loadingProductCounts}
+              >
+                <BarChart3 className="mr-2 h-4 w-4" />
+                {loadingProductCounts ? "Loading..." : "Load Product Counts"}
+              </Button>
+            )}
             <Button onClick={() => router.push(`/${params?.storeId}/category-page/new`)}>
               <Plus className="mr-2 h-4 w-4" />
               Add New
@@ -121,6 +166,7 @@ export default function CategoryPage() {
               columns={columns}
               data={categoryPages}
               searchKey="name"
+              searchFields={["name", "slug", "description"]}
             />
             <ApiCallsSection />
           </>

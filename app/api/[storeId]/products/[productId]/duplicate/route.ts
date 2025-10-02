@@ -108,6 +108,7 @@ export async function POST(req: Request, { params }: { params: { storeId: string
         isArchived: originalProduct.isArchived,
         isPublished: originalProduct.isPublished,
         isDeleted: false,
+        priority: 4, 
         storeId: storeId,
         // Connect the same category if it exists
         categoryId: originalProduct.categoryId,

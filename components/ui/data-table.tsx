@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -16,19 +16,31 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
+import { smartSearch } from "@/lib/search-utils"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   searchKey: string
+  searchFields?: (keyof TData)[] // Additional fields to search in
 }
 
-export function DataTable<TData, TValue>({ columns, data, searchKey }: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({ columns, data, searchKey, searchFields }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [globalFilter, setGlobalFilter] = useState("")
+
+  // Apply smart search to data
+  const filteredData = useMemo(() => {
+    if (!globalFilter.trim()) return data
+    
+    const fieldsToSearch = searchFields || [searchKey as keyof TData]
+    return smartSearch(data, globalFilter, fieldsToSearch)
+  }, [data, globalFilter, searchKey, searchFields])
 
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -46,9 +58,9 @@ export function DataTable<TData, TValue>({ columns, data, searchKey }: DataTable
     <div className="px-4">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Search"
-          value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
-          onChange={(event) => table.getColumn(searchKey)?.setFilterValue(event.target.value)}
+          placeholder="Search (e.g., 'mens jackets' finds 'men jacket' too)"
+          value={globalFilter}
+          onChange={(event) => setGlobalFilter(event.target.value)}
           className="max-w-sm"
         />
       </div>
@@ -58,9 +70,36 @@ export function DataTable<TData, TValue>({ columns, data, searchKey }: DataTable
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
+                  const canSort = header.column.getCanSort()
+                  const isSorted = header.column.getIsSorted()
+                  
                   return (
                     <TableHead key={header.id}>
-                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                      {header.isPlaceholder ? null : (
+                        <div className="flex items-center">
+                          {canSort ? (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 px-2 lg:px-3 font-medium hover:bg-transparent"
+                              onClick={() => header.column.toggleSorting(isSorted === "asc")}
+                            >
+                              {flexRender(header.column.columnDef.header, header.getContext())}
+                              <div className="ml-2">
+                                {isSorted === "asc" ? (
+                                  <ArrowUp className="h-4 w-4" />
+                                ) : isSorted === "desc" ? (
+                                  <ArrowDown className="h-4 w-4" />
+                                ) : (
+                                  <ArrowUpDown className="h-4 w-4" />
+                                )}
+                              </div>
+                            </Button>
+                          ) : (
+                            flexRender(header.column.columnDef.header, header.getContext())
+                          )}
+                        </div>
+                      )}
                     </TableHead>
                   )
                 })}

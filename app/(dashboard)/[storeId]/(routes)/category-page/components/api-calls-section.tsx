@@ -57,6 +57,22 @@ export const ApiCallsSection = () => {
       code: `fetch('/api/${params?.storeId}/products?materials=leather&colors=black')
   .then(response => response.json())
   .then(data => console.log(data))`
+    },
+    {
+      id: "get-product-counts",
+      title: "Get Product Counts for Category Pages",
+      endpoint: `/api/${params?.storeId}/category-pages/product-counts`,
+      method: "POST",
+      description: "Fetch product counts for multiple category pages",
+      code: `fetch('/api/${params?.storeId}/category-pages/product-counts', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    categoryPageIds: ['id1', 'id2', 'id3']
+  })
+})
+  .then(response => response.json())
+  .then(data => console.log(data))`
     }
   ]
   
@@ -67,7 +83,7 @@ export const ApiCallsSection = () => {
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="get-all">
-          <TabsList className="grid grid-cols-4 mb-4">
+          <TabsList className="grid grid-cols-5 mb-4">
             {apiCalls.map(call => (
               <TabsTrigger key={call.id} value={call.id}>
                 {call.title}

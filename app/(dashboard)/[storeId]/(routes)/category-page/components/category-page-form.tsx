@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -77,6 +77,7 @@ export const CategoryPageForm: React.FC<CategoryPageFormProps> = ({ initialData 
   const params = useParams()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [shouldScrollToTop, setShouldScrollToTop] = useState(false)
   
   
   const processedInitialData = initialData ? {
@@ -138,6 +139,17 @@ export const CategoryPageForm: React.FC<CategoryPageFormProps> = ({ initialData 
       status: "DRAFT",
     }
   })
+
+  // Handle scroll to top after successful operations
+  useEffect(() => {
+    if (shouldScrollToTop) {
+      // Use multiple methods to ensure scroll works
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      setShouldScrollToTop(false);
+    }
+  }, [shouldScrollToTop]);
   
 
   const onSubmit = async (data: CategoryPageFormValues, action: 'save' | 'publish' = 'save') => {
@@ -220,6 +232,9 @@ export const CategoryPageForm: React.FC<CategoryPageFormProps> = ({ initialData 
           const updateUrl = `/api/${params?.storeId}/category-pages/${initialData.id}`;
           const response = await axios.patch(updateUrl, formData);
           toast.success(status === 'PUBLISHED' ? "Category page published successfully" : "Category page updated successfully");
+          
+          // Trigger scroll to top after successful update
+          setShouldScrollToTop(true);
         } catch (updateError: any) {
           throw updateError;
         }
@@ -227,12 +242,19 @@ export const CategoryPageForm: React.FC<CategoryPageFormProps> = ({ initialData 
         try {
           const response = await axios.post(`/api/${params?.storeId}/category-pages`, formData);
           toast.success(status === 'PUBLISHED' ? "Category page published successfully" : "Category page created successfully");
+          
+          // If creating a new page, redirect to the edit page
+          if (response.data?.id) {
+            router.push(`/${params?.storeId}/category-page/${response.data.id}`);
+            // Trigger scroll to top after redirect
+            setTimeout(() => setShouldScrollToTop(true), 500);
+            return; // Exit early to prevent double refresh
+          }
         } catch (createError: any) {
           throw createError;
         }
       }
       router.refresh()
-      router.push(`/${params?.storeId}/category-page`) 
     } catch (error: any) {
       const errorMessage = error.response?.data || error.message || "Failed to save category page"
       toast.error(errorMessage)

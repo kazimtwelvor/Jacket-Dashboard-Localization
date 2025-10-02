@@ -222,7 +222,7 @@ export async function GET(
         orderBy: type === 'trashed'
           ? { deletedAt: 'desc' }
           : [
-              { isBest: 'desc' },
+              { priority: 'asc' },
               { createdAt: 'desc' }
             ],
         skip: offset,

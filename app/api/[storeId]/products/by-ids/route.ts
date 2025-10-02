@@ -37,7 +37,7 @@
         },
         orderBy: [
           {
-            isBest: "desc",
+            priority: "asc",
           },
           {
             createdAt: "desc",
@@ -49,7 +49,7 @@
         id: product.id,
         name: product.name,
         slug: product.slug,
-        isBest: product.isBest,
+        priority: product.priority,
         images: product.images.map(img => img.image.url),
         regularPrice: product.price.toString(),
         salePrice: product.salePrice ? product.salePrice.toString() : null,

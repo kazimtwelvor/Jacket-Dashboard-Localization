@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ArrowRight, Tag, Truck, Award, ThumbsUp, Edit, Plus, X, Upload } from "lucide-react"
+import { ArrowRight, Tag, Truck, Award, ThumbsUp, Edit, Plus, X, Upload, GripVertical, Search } from "lucide-react"
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -95,15 +96,16 @@ export const EditableCategoryTemplate: React.FC<EditableCategoryTemplateProps> =
 
   const [categoryPages, setCategoryPages] = useState<any[]>([])
   const [availableBlogs, setAvailableBlogs] = useState<any[]>([])
+  const [categorySearchTerm, setCategorySearchTerm] = useState<string>("")
   
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const categoryPagesResponse = await axios.get(`/api/${params.storeId}/category-pages`)
+        const categoryPagesResponse = await axios.get(`/api/${params?.storeId}/category-pages`)
         const pages = categoryPagesResponse.data
         setCategoryPages(pages)
         
-        const blogsResponse = await axios.get(`/api/${params.storeId}/blog`)
+        const blogsResponse = await axios.get(`/api/${params?.storeId}/blog`)
         const blogs = blogsResponse.data
         setAvailableBlogs(blogs)
         
@@ -114,19 +116,22 @@ export const EditableCategoryTemplate: React.FC<EditableCategoryTemplateProps> =
         }))
         
         setAllCategories(categoryPagesAsCategories)
+        console.log('Available categories loaded:', categoryPagesAsCategories.length)
         
-        if (otherCategories.length > 0) {
-          const updatedCategories = otherCategories.map(cat => {
+        // Update image URLs for existing selected categories
+        setOtherCategories(prevCategories => {
+          if (prevCategories.length === 0) return prevCategories
+          
+          return prevCategories.map(cat => {
             const matchingPage = pages.find(page => page.id === cat.categoryId)
             if (matchingPage?.imageUrl) {
               return { ...cat, imageUrl: matchingPage.imageUrl }
             }
             return cat
           })
-          
-          setOtherCategories(updatedCategories)
-        }
+        })
       } catch (error) {
+        console.error('Error fetching data:', error)
       }
     }
     if (params.storeId) {
@@ -136,6 +141,11 @@ export const EditableCategoryTemplate: React.FC<EditableCategoryTemplateProps> =
 
   const categoryName = form.watch("name") || "Category"
   const categoryDescription = form.watch("description") || "Discover our premium collection of products designed with quality and style in mind."
+
+  // Filter categories based on search term
+  const filteredCategories = allCategories.filter(category =>
+    category.name.toLowerCase().includes(categorySearchTerm.toLowerCase())
+  )
 
   const addFaq = () => {
     setFaqs([...faqs, { question: "", answer: "" }])
@@ -184,6 +194,24 @@ export const EditableCategoryTemplate: React.FC<EditableCategoryTemplateProps> =
       cat.categoryId === categoryId ? { ...cat, imageUrl } : cat
     )
     setOtherCategories(updated)
+  }
+
+  const moveCategory = (fromIndex: number, toIndex: number) => {
+    const updated = [...otherCategories]
+    const [movedCategory] = updated.splice(fromIndex, 1)
+    updated.splice(toIndex, 0, movedCategory)
+    setOtherCategories(updated)
+  }
+
+  const handleDragEnd = (result: any) => {
+    if (!result.destination) return
+
+    const sourceIndex = result.source.index
+    const destinationIndex = result.destination.index
+
+    if (sourceIndex === destinationIndex) return
+
+    moveCategory(sourceIndex, destinationIndex)
   }
 
   const toggleBlog = (blog: any, checked: boolean) => {
@@ -380,10 +408,106 @@ export const EditableCategoryTemplate: React.FC<EditableCategoryTemplateProps> =
                 <TabsContent value="categories" className="space-y-4">
                   <div>
                     <h3 className="text-lg font-semibold mb-4">Related Category Pages</h3>
-                    <p className="text-sm text-muted-foreground mb-4">Select other category pages to feature on this page</p>
+                    <p className="text-sm text-muted-foreground mb-4">Select other category pages to feature on this page. You can reorder them by dragging.</p>
                     
+                    {/* Selected Categories with Sorting */}
+                    {otherCategories?.length > 0 && (
+                      <div className="mb-6">
+                        <h4 className="text-md font-medium mb-3">Selected Categories (Drag to reorder)</h4>
+                        <DragDropContext onDragEnd={handleDragEnd}>
+                          <Droppable droppableId="categories">
+                            {(provided) => (
+                              <div 
+                                {...provided.droppableProps} 
+                                ref={provided.innerRef}
+                                className="space-y-2"
+                              >
+                                {otherCategories.map((category, index) => (
+                                  <Draggable 
+                                    key={category.categoryId} 
+                                    draggableId={category.categoryId} 
+                                    index={index}
+                                  >
+                                    {(provided, snapshot) => (
+                                      <div
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
+                                        className={`border p-3 rounded-lg bg-gray-50 transition-shadow ${
+                                          snapshot.isDragging ? 'shadow-lg' : ''
+                                        }`}
+                                      >
+                                        <div className="flex items-center space-x-3">
+                                          <div 
+                                            {...provided.dragHandleProps}
+                                            className="flex items-center space-x-2 cursor-move"
+                                          >
+                                            <GripVertical className="h-4 w-4 text-gray-400" />
+                                            <span className="text-sm font-medium text-gray-600">#{index + 1}</span>
+                                          </div>
+                                          <div className="flex-1">
+                                            <div className="font-medium">{category.categoryName}</div>
+                                            {category.imageUrl && (
+                                              <div className="mt-2">
+                                                <div className="relative w-[100px] h-[100px] rounded-md overflow-hidden">
+                                                  <img 
+                                                    src={category.imageUrl} 
+                                                    alt={category.categoryName}
+                                                    className="w-full h-full object-cover"
+                                                  />
+                                                </div>
+                                              </div>
+                                            )}
+                                          </div>
+                                          <div className="flex space-x-1">
+                                            {index > 0 && (
+                                              <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => moveCategory(index, index - 1)}
+                                                className="text-xs"
+                                              >
+                                                ↑
+                                              </Button>
+                                            )}
+                                            {index < otherCategories.length - 1 && (
+                                              <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => moveCategory(index, index + 1)}
+                                                className="text-xs"
+                                              >
+                                                ↓
+                                              </Button>
+                                            )}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </Draggable>
+                                ))}
+                                {provided.placeholder}
+                              </div>
+                            )}
+                          </Droppable>
+                        </DragDropContext>
+                      </div>
+                    )}
+                    
+                    {/* Available Categories to Select */}
                     <div className="space-y-4">
-                      {allCategories.map((category) => {
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Input
+                          placeholder="Search categories..."
+                          value={categorySearchTerm}
+                          onChange={(e) => setCategorySearchTerm(e.target.value)}
+                          className="pl-10"
+                        />
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        Showing {filteredCategories.length} of {allCategories.length} categories
+                      </div>
+                      {filteredCategories.map((category) => {
                         const isSelected = otherCategories.some(c => c.categoryId === category.id)
                         const selectedCategory = otherCategories.find(c => c.categoryId === category.id)
                         

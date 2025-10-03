@@ -20,18 +20,18 @@ const sanitizeSlug = (slugStr: string | null | undefined): string => {
   if (!slugStr || typeof slugStr !== 'string') return "";
   return slugStr
     .toLowerCase()
-    .replace(/[^\w\s-]/g, "") 
-    .trim()                   
-    .replace(/\s+/g, "-")    
-    .replace(/-+/g, "-");   
+    .replace(/[^\w\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
 };
 
 const generateSlugFromNameIfEmpty = (slugVal: string, nameVal: string | null | undefined): string => {
-    if (slugVal && slugVal.trim() !== "") {
-        return slugVal; 
-    }
-    if (!nameVal || typeof nameVal !== 'string') return ""; 
-    return sanitizeSlug(nameVal); 
+  if (slugVal && slugVal.trim() !== "") {
+    return slugVal;
+  }
+  if (!nameVal || typeof nameVal !== 'string') return "";
+  return sanitizeSlug(nameVal);
 };
 
 
@@ -46,7 +46,7 @@ async function generateUniqueSku(storeId: string, manualSku: string | null): Pro
       })
 
       if (!existingProduct) {
-        return manualSku 
+        return manualSku
       }
 
       let counter = 1
@@ -118,15 +118,15 @@ function safeJsonParse(value: string | null | undefined, fallback: any = null) {
   if (!value || typeof value !== "string") {
     return fallback
   }
-  
+
   if (value.trim() === "[object Object]") {
     return fallback
   }
-  
+
   if (value.trim() === "") {
     return fallback
   }
-  
+
   try {
     return JSON.parse(value)
   } catch (error) {
@@ -136,7 +136,7 @@ function safeJsonParse(value: string | null | undefined, fallback: any = null) {
 
 export async function createProduct(formData: FormData) {
   try {
-    
+
     for (const [key, value] of Array.from(formData.entries())) {
       if (typeof value === "string") {
         if (value === "[object Object]") {
@@ -152,7 +152,7 @@ export async function createProduct(formData: FormData) {
     let storeId = formData.get("storeId") as string
 
     if (!storeId) {
-      const urlPath = formData.get("url") as string 
+      const urlPath = formData.get("url") as string
 
       if (urlPath) {
         const urlParts = urlPath.split("/")
@@ -163,7 +163,7 @@ export async function createProduct(formData: FormData) {
 
         if (potentialStoreId) {
           storeId = potentialStoreId;
-          formData.set("storeId", potentialStoreId) 
+          formData.set("storeId", potentialStoreId)
         }
       }
 
@@ -171,7 +171,7 @@ export async function createProduct(formData: FormData) {
         throw new Error("Store ID is required and could not be determined")
       }
     }
-     storeId = formData.get("storeId") as string; 
+    storeId = formData.get("storeId") as string;
 
 
     const { userId } = await auth()
@@ -183,18 +183,18 @@ export async function createProduct(formData: FormData) {
     const id = formData.get("id") as string | null
     const tempReviewsId = formData.get("tempReviewsId") as string | null
     const cachedReviewsJson = formData.get("cachedReviews") as string | null
-    
-    if (!storeId) { 
+
+    if (!storeId) {
       throw new Error("Store ID is required")
     }
 
     const submitType = formData.get("submitType") as string
     const name = formData.get("name") as string
     const description = formData.get("description") as string
-    
+
     const submittedSlug = formData.get("slug") as string;
-    let productSlugForDb = sanitizeSlug(submittedSlug); 
-    productSlugForDb = generateSlugFromNameIfEmpty(productSlugForDb, name); 
+    let productSlugForDb = sanitizeSlug(submittedSlug);
+    productSlugForDb = generateSlugFromNameIfEmpty(productSlugForDb, name);
 
 
     const regularPriceStr = formData.get("regularPrice") as string
@@ -206,25 +206,25 @@ export async function createProduct(formData: FormData) {
     const stockStatus = formData.get("stockStatus") as string
     const isArchived = submitType === "draft"
     const specifications = formData.get("specifications") as string
-    
+
     const materialJson = formData.get("material") as string
     const styleJson = formData.get("style") as string
     const gender = formData.get("gender") as string
 
     const tagsJson = formData.get("tags") as string
-    
+
     const relatedProductsJson = formData.get("relatedProducts") as string
 
     const isFeaturedValue = formData.get("isFeatured")
     const isFeatured = isFeaturedValue === "true" || String(isFeaturedValue) === "true"
-    
+
     const isParentProductValue = formData.get("isParentProduct")
     const isParentProduct = isParentProductValue === "true" || String(isParentProductValue) === "true"
-    
+
     const parentProductId = formData.get("parentProductId") as string || null
     const baseColorJson = formData.get("baseColor") as string || ""
     const baseColor = baseColorJson && baseColorJson.trim() !== "" ? JSON.parse(baseColorJson) : null
-  
+
 
     const imagesJson = formData.get("images") as string
 
@@ -240,7 +240,7 @@ export async function createProduct(formData: FormData) {
     } catch (e) {
       tags = []
     }
-    
+
     let relatedProducts = []
     try {
       if (relatedProductsJson && relatedProductsJson.trim() !== "") {
@@ -261,7 +261,7 @@ export async function createProduct(formData: FormData) {
     let seoData = {
       metaTitle: "",
       metaDescription: "",
-      slug: "", 
+      slug: "",
       keywords: [],
       isPillarContent: false,
       // noIndex: false,
@@ -275,7 +275,7 @@ export async function createProduct(formData: FormData) {
         seoData = {
           metaTitle: parsedSeo.metaTitle || name || "",
           metaDescription: parsedSeo.metaDescription || "",
-          slug: parsedSeo.slug ? sanitizeSlug(parsedSeo.slug) : productSlugForDb, 
+          slug: parsedSeo.slug ? sanitizeSlug(parsedSeo.slug) : productSlugForDb,
           keywords: Array.isArray(parsedSeo.keywords) ? parsedSeo.keywords : [],
           isPillarContent: !!parsedSeo.isPillarContent,
           // noIndex: !!parsedSeo.noIndex,
@@ -283,40 +283,40 @@ export async function createProduct(formData: FormData) {
           canonicalUrl: parsedSeo.canonicalUrl || "",
         }
       } else {
-        
+
         seoData.slug = productSlugForDb;
       }
     } catch (e) {
-      
+
       seoData.slug = productSlugForDb;
     }
-    
-    
+
+
     if (!seoData.slug) {
-        seoData.slug = productSlugForDb;
+      seoData.slug = productSlugForDb;
     }
 
 
-    const { metaTitle, metaDescription, keywords,} = seoData
+    const { metaTitle, metaDescription, keywords, } = seoData
 
 
     const brandName = (formData.get("brandName") as string) || "Leather Jacket By Fineyst"
     // const ratingValue = (formData.get("ratingValue") as string) || "4.5"
     // const reviewCount = (formData.get("reviewCount") as string) || "0"
 
-  
+
 
     // const purchaseNote = formData.get("purchaseNote") as string
-    const categoryData = formData.get("categoryData") as string | null 
+    const categoryData = formData.get("categoryData") as string | null
 
     let colorDetails = null
     const colorDetailsJson = formData.get("colorDetails") as string | null
     const colorIdsJson = formData.get("colorIds") as string | null
 
-    
+
     const colorLinksJson = formData.get("colorLinks") as string
 
-    
+
     const schema1Json = formData.get("schema1") as string
     const schema2Json = formData.get("schema2") as string
     const schema3Json = formData.get("schema3") as string
@@ -455,21 +455,21 @@ export async function createProduct(formData: FormData) {
     let sizeIds: string[] = []
 
     const sizeDetailsJson = formData.get("sizeDetails") as string | null
-    let sizeDetailsData = null 
+    let sizeDetailsData = null
 
     try {
       if (sizeDetailsJson) {
         sizeDetailsData = safeJsonParse(sizeDetailsJson, null)
-         if (Array.isArray(sizeDetailsData)) {
-            sizeIds = sizeDetailsData.map(sd => sd.id).filter(Boolean);
+        if (Array.isArray(sizeDetailsData)) {
+          sizeIds = sizeDetailsData.map(sd => sd.id).filter(Boolean);
         }
       } else {
-        const sizesJsonFallback = formData.get("sizes") as string 
+        const sizesJsonFallback = formData.get("sizes") as string
         if (sizesJsonFallback) {
           const parsedSizeIds = safeJsonParse(sizesJsonFallback, [])
 
           if (Array.isArray(parsedSizeIds) && parsedSizeIds.length > 0) {
-             sizeIds = parsedSizeIds;
+            sizeIds = parsedSizeIds;
             const sizesFromDb = await prismadb.size.findMany({
               where: {
                 id: {
@@ -488,7 +488,7 @@ export async function createProduct(formData: FormData) {
         }
       }
     } catch (e) {
-      sizeDetailsData = [] 
+      sizeDetailsData = []
     }
 
 
@@ -530,26 +530,26 @@ export async function createProduct(formData: FormData) {
       salePrice: isNaN(salePrice) ? 0 : salePrice,
       stockStatus,
       isArchived,
-      isPublished: !isArchived, 
-      specifications: cleanSpecifications, 
+      isPublished: !isArchived,
+      specifications: cleanSpecifications,
       gender,
-      categoryData: categoryDataObject, 
+      categoryData: categoryDataObject,
       tags: Array.isArray(tags) ? tags : [],
       relatedProducts: Array.isArray(relatedProducts) ? relatedProducts : [],
       metaTitle: seoData.metaTitle,
       metaDescription: seoData.metaDescription,
-      slug: productSlugForDb, 
+      slug: productSlugForDb,
       keywords: Array.isArray(seoData.keywords) ? seoData.keywords : [],
-      brandName: brandName || "Leather Jacket By Fineyst", 
+      brandName: brandName || "Leather Jacket By Fineyst",
       isFeatured,
       isParentProduct,
       parentProductId,
       baseColor,
-      colorDetails, 
-      sizeDetails: sizeDetailsData || [], 
+      colorDetails,
+      sizeDetails: sizeDetailsData || [],
       colorLinks: colorLinksToSave,
-      schema: schemaDataString, 
-      priority: 4, 
+      schema: schemaDataString,
+      priority: 4,
       createdById: dbUser.id,
       createdByName: dbUser.name || "Unknown",
       createdByEmail: dbUser.email,
@@ -557,10 +557,10 @@ export async function createProduct(formData: FormData) {
 
 
 
- 
-    
+
+
     const selectedColors = colorDetails && Array.isArray(colorDetails) ? colorDetails : []
-    
+
     if (!selectedColors || selectedColors.length === 0) {
       throw new Error("At least one color must be selected before saving the product")
     }
@@ -604,24 +604,27 @@ export async function createProduct(formData: FormData) {
             createdById: true,
             createdByName: true,
             createdByEmail: true,
-            categoryData: true, 
+            categoryData: true,
+            priority: true,
           },
         })
 
-        let newSkuForUpdate = currentProduct?.sku; 
+        let newSkuForUpdate = currentProduct?.sku;
 
         if (manualSku && manualSku.trim() !== "" && currentProduct && manualSku !== currentProduct.sku) {
           newSkuForUpdate = await generateUniqueSku(storeId, manualSku)
         } else if (!currentProduct?.sku && manualSku && manualSku.trim() !== "") {
-           newSkuForUpdate = await generateUniqueSku(storeId, manualSku);
+          newSkuForUpdate = await generateUniqueSku(storeId, manualSku);
         } else if (!currentProduct?.sku && (!manualSku || manualSku.trim() === "")) {
-            newSkuForUpdate = await generateUniqueSku(storeId, null);
+          newSkuForUpdate = await generateUniqueSku(storeId, null);
         }
 
 
-        const { createdById, createdByName, createdByEmail, ...dataWithoutCreator } = productData
-        
-     
+        const { createdById, createdByName, createdByEmail, priority, ...dataWithoutCreator } = productData
+
+        const priorityToUse = currentProduct?.priority !== null && currentProduct?.priority !== undefined
+          ? currentProduct.priority
+          : (priority || 4)
 
         try {
           const product = await prismadb.product.update({
@@ -630,8 +633,9 @@ export async function createProduct(formData: FormData) {
             },
             data: {
               ...dataWithoutCreator,
-              sku: newSkuForUpdate, 
-              categoryData: productData.categoryData, 
+              priority: priorityToUse,
+              sku: newSkuForUpdate,
+              categoryData: productData.categoryData,
               updatedById: dbUser.id,
               updatedByName: dbUser.name || "Unknown",
               updatedByEmail: dbUser.email,
@@ -642,17 +646,17 @@ export async function createProduct(formData: FormData) {
         }
 
         await prismadb.productImage.deleteMany({
-            where: {
-                productId: id,
-            },
+          where: {
+            productId: id,
+          },
         });
-        
+
         if (cachedReviews && Array.isArray(cachedReviews) && cachedReviews.length > 0) {
           try {
-            
+
             for (let i = 0; i < cachedReviews.length; i++) {
               const review = cachedReviews[i]
-              
+
               const reviewData = {
                 storeId: storeId,
                 productId: id,
@@ -664,23 +668,23 @@ export async function createProduct(formData: FormData) {
                 isApproved: false,
                 createdAt: review.date ? new Date(review.date) : new Date(),
               }
-              
-              
+
+
               const savedReview = await prismadb.review.create({
                 data: reviewData,
               })
-              
+
             }
           } catch (reviewError) {
           }
         } else {
         }
 
-        for (const image of images) { 
+        for (const image of images) {
           let imageUrl = ""
           let imageMetadata = {}
 
-          if (typeof image === "string") { 
+          if (typeof image === "string") {
             imageUrl = image
           } else if (typeof image === "object" && image !== null && (image as any).url) {
             imageUrl = (image as any).url
@@ -694,14 +698,14 @@ export async function createProduct(formData: FormData) {
           } else {
             continue;
           }
-          
+
           if (!imageUrl) {
             continue;
           }
 
-          let dbImage = await prismadb.image.findFirst({ where: { url: imageUrl } }); 
+          let dbImage = await prismadb.image.findFirst({ where: { url: imageUrl } });
           if (dbImage) {
-             dbImage = await prismadb.image.update({ where: { id: dbImage.id }, data: { ...imageMetadata } });
+            dbImage = await prismadb.image.update({ where: { id: dbImage.id }, data: { ...imageMetadata } });
           } else {
             dbImage = await prismadb.image.create({ data: { url: imageUrl, ...imageMetadata } });
           }
@@ -720,25 +724,25 @@ export async function createProduct(formData: FormData) {
 
       try {
         const uniqueSku = await generateUniqueSku(storeId, manualSku)
-        
+
         const resolvedCategoryData = productData.categoryData;
 
 
         const product = await prismadb.product.create({
           data: {
             ...productData,
-            sku: uniqueSku, 
+            sku: uniqueSku,
             storeId: storeId,
             categoryData: resolvedCategoryData,
           },
         })
 
 
-        for (const image of images) { 
+        for (const image of images) {
           let imageUrl = ""
           let imageMetadata = {}
 
-           if (typeof image === "string") { 
+          if (typeof image === "string") {
             imageUrl = image
           } else if (typeof image === "object" && image !== null && (image as any).url) {
             imageUrl = (image as any).url
@@ -763,9 +767,9 @@ export async function createProduct(formData: FormData) {
             dbImage = await prismadb.image.create({ data: { url: imageUrl, ...imageMetadata } });
           } else {
             // Optionally update metadata if it changed (though for new product, this image might be new to this product)
-             dbImage = await prismadb.image.update({ where: { id: dbImage.id }, data: { ...imageMetadata } });
+            dbImage = await prismadb.image.update({ where: { id: dbImage.id }, data: { ...imageMetadata } });
           }
-          
+
           // Then create the product-image relationship
           await prismadb.productImage.create({
             data: {
@@ -775,14 +779,14 @@ export async function createProduct(formData: FormData) {
           })
         }
 
-        
+
         // Handle cached reviews for new products
         if (cachedReviews && Array.isArray(cachedReviews) && cachedReviews.length > 0) {
           try {
-            
+
             for (let i = 0; i < cachedReviews.length; i++) {
               const review = cachedReviews[i]
-              
+
               const reviewData = {
                 storeId: storeId,
                 productId: product.id,
@@ -794,22 +798,22 @@ export async function createProduct(formData: FormData) {
                 isApproved: false,
                 createdAt: review.date ? new Date(review.date) : new Date(),
               }
-              
-              
+
+
               const savedReview = await prismadb.review.create({
                 data: reviewData,
               })
-              
+
             }
           } catch (reviewError) {
           }
         } else {
         }
-        
+
         // Handle temporary reviews for new products (legacy support)
         if (tempReviewsId) {
           try {
-            
+
             // Update all temporary reviews to use the actual product ID
             const updatedReviews = await prismadb.review.updateMany({
               where: {
@@ -820,7 +824,7 @@ export async function createProduct(formData: FormData) {
                 productId: product.id,
               },
             })
-            
+
           } catch (reviewError) {
             // Don't fail the entire product creation if review moving fails
           }
@@ -835,9 +839,9 @@ export async function createProduct(formData: FormData) {
     // Log before returning
     return { success: true }
   } catch (error) {
-    
+
     const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
-    
+
     // Return a JSON error response instead of throwing, or ensure the client can handle thrown errors from server actions.
     // For now, re-throwing to match existing pattern, but this might need adjustment based on client-side error handling.
     throw new Error(`Failed to save product: ${errorMessage}`)
@@ -913,9 +917,8 @@ export async function generateDescription(productInfo: {
     }
 
     // Create a detailed prompt based on product specifications
-    const prompt = `Write a detailed, professional product description for an e-commerce website. The product is a ${
-      productInfo.name
-    } with the following specifications:
+    const prompt = `Write a detailed, professional product description for an e-commerce website. The product is a ${productInfo.name
+      } with the following specifications:
   ${productInfo.specifications.externalMaterial.length > 0 ? `External Material: ${productInfo.specifications.externalMaterial.join(", ")}` : ""}
   ${productInfo.specifications.internalMaterial.length > 0 ? `Internal Material: ${productInfo.specifications.internalMaterial.join(", ")}` : ""}
   ${productInfo.specifications.collar.length > 0 ? `Collar: ${productInfo.specifications.collar.join(", ")}` : ""}

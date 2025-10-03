@@ -80,6 +80,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
       customerName,
       phone,
       address,
+      paymentValidation,
       isPaid,
       status,
       paymentMethod,
@@ -109,33 +110,35 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
       orderItems,
     } = body
 
-    if (!userId) {
-      return new NextResponse("Unauthenticated", { status: 401 })
-    }
-
-    if (!orderId) {
-      return new NextResponse("Order ID is required", { status: 400 })
-    }
-
-    const permissionCheck = await checkApiPermission(storeId, Permission.MANAGE_ORDERS, 'PATCH')
-    if (permissionCheck.error) {
-      return permissionCheck.error
-    }
-    if (!permissionCheck.hasPermission) {
-      return new NextResponse("Access denied. You don't have permission to update orders.", { status: 403 })
-    }
-
     let finalUserId = null
-    if (customerId) {
-      const existingUser = await prismadb.user.findUnique({
-        where: { id: customerId }
-      })
+    if (paymentValidation !== process.env.IS_SKIP_VALIDATION) {
 
-      if (existingUser) {
-        finalUserId = customerId
+      if (!userId) {
+        return new NextResponse("Unauthenticated", { status: 401 })
+      }
+
+      if (!orderId) {
+        return new NextResponse("Order ID is required", { status: 400 })
+      }
+
+      const permissionCheck = await checkApiPermission(storeId, Permission.MANAGE_ORDERS, 'PATCH')
+      if (permissionCheck.error) {
+        return permissionCheck.error
+      }
+      if (!permissionCheck.hasPermission) {
+        return new NextResponse("Access denied. You don't have permission to update orders.", { status: 403 })
+      }
+
+      if (customerId) {
+        const existingUser = await prismadb.user.findUnique({
+          where: { id: customerId }
+        })
+
+        if (existingUser) {
+          finalUserId = customerId
+        }
       }
     }
-
     // const storeByUserId = await prismadb.store.findFirst({
     //   where: {
     //     id: storeId,

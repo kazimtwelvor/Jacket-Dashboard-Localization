@@ -11,6 +11,7 @@ import { useState, useEffect, useRef } from "react"
 import { createPortal } from "react-dom"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { AlertModal } from "@/components/modals/alert-modal"
+import { useToast } from "@/hooks/use-toast"
 import type { ProductFormValues } from "../../product-form-schema"
 
 interface ColorLinksSectionProps {
@@ -18,6 +19,7 @@ interface ColorLinksSectionProps {
   storeId?: string
   currentProductId?: string
   initialData?: any
+  onInitialDataUpdate?: (updatedData: any) => void
 }
 
 interface Product {
@@ -28,7 +30,8 @@ interface Product {
   image: string | null
 }
 
-export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, storeId, currentProductId, initialData }) => {
+export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, storeId, currentProductId, initialData, onInitialDataUpdate }) => {
+  const { toast } = useToast()
   const [copiedColor, setCopiedColor] = useState<string | null>(null)
   const selectedColors = form.watch("specifications.color") || []
   const variationColors = form.watch("categories.variationColors") || []
@@ -523,6 +526,11 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
         const responseData = await response.json()
         console.log('Color links, details, and parent product ID published successfully')
         
+        toast({
+          title: "Success!",
+          description: "Color links have been published successfully.",
+        })
+        
         // Update the form state to reflect the published changes
         if (responseData.product) {
           const { colorLinks, colorDetails, parentProductId } = responseData.product
@@ -557,6 +565,17 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
             setSelectedParentProduct(null)
             setUserRemovedParent(true)
           }
+        }
+        
+        // Update initial data with the new published values
+        if (onInitialDataUpdate && responseData.product) {
+          const { colorLinks, colorDetails, parentProductId } = responseData.product
+          onInitialDataUpdate({
+            ...initialData,
+            colorLinks: colorLinks || {},
+            colorDetails: colorDetails || [],
+            parentProductId: parentProductId || null
+          })
         }
         
         setShowPublishModal(false)

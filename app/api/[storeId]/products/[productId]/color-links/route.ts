@@ -34,16 +34,16 @@ export async function PATCH(
     const validatedData = updateColorLinksSchema.parse(body)
 
     // Verify the store exists and user has access
-    const store = await prismadb.store.findFirst({
-      where: {
-        id: storeId,
-        userId,
-      },
-    })
+    // const store = await prismadb.store.findFirst({
+    //   where: {
+    //     id: storeId,
+    //     userId,
+    //   },
+    // })
 
-    if (!store) {
-      return NextResponse.json({ error: "Store not found" }, { status: 404 })
-    }
+    // if (!store) {
+    //   return NextResponse.json({ error: "Store not found" }, { status: 404 })
+    // }
 
     // Verify the product exists and belongs to the store
     const product = await prismadb.product.findFirst({

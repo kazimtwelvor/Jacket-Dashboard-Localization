@@ -18,7 +18,6 @@ interface ColorLinksSectionProps {
   storeId?: string
   currentProductId?: string
   initialData?: any
-  onInitialDataUpdate?: (updatedData: any) => void
 }
 
 interface Product {
@@ -29,7 +28,7 @@ interface Product {
   image: string | null
 }
 
-export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, storeId, currentProductId, initialData, onInitialDataUpdate }) => {
+export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, storeId, currentProductId, initialData }) => {
   const [copiedColor, setCopiedColor] = useState<string | null>(null)
   const selectedColors = form.watch("specifications.color") || []
   const variationColors = form.watch("categories.variationColors") || []
@@ -558,17 +557,6 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
             setSelectedParentProduct(null)
             setUserRemovedParent(true)
           }
-          
-          // Update initialData to reflect the published changes
-          if (onInitialDataUpdate && initialData) {
-            const updatedInitialData = {
-              ...initialData,
-              colorLinks: colorLinks || initialData.colorLinks,
-              colorDetails: colorDetails || initialData.colorDetails,
-              parentProductId: parentProductId !== undefined ? parentProductId : initialData.parentProductId
-            }
-            onInitialDataUpdate(updatedInitialData)
-          }
         }
         
         setShowPublishModal(false)
@@ -590,19 +578,17 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
           <Link2 className="h-5 w-5" />
           <h3 className="text-base font-medium">Color Variation Links</h3>
         </div>
-        {currentProductId && (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => setShowPublishModal(true)}
-            disabled={isPublishing}
-            className="flex items-center gap-2"
-          >
-            <Upload className="h-4 w-4" />
-            {isPublishing ? "Publishing..." : "Publish Color Links"}
-          </Button>
-        )}
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => setShowPublishModal(true)}
+          disabled={isPublishing}
+          className="flex items-center gap-2"
+        >
+          <Upload className="h-4 w-4" />
+          {isPublishing ? "Publishing..." : "Publish Color Links"}
+        </Button>
       </div>
       <p className="text-sm text-muted-foreground mb-4">
         Search and select products or enter URLs manually for each color variation.
@@ -1027,16 +1013,14 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
         </div>
       )}
 
-      {currentProductId && (
-        <AlertModal
-          isOpen={showPublishModal}
-          onClose={() => setShowPublishModal(false)}
-          onConfirm={handlePublishColorLinks}
-          loading={isPublishing}
-          title="Publish Color Links"
-          description="Are you sure you want to publish the current color links, color details, and parent product ID to the database? This will update the product with the current form values."
-        />
-      )}
+      <AlertModal
+        isOpen={showPublishModal}
+        onClose={() => setShowPublishModal(false)}
+        onConfirm={handlePublishColorLinks}
+        loading={isPublishing}
+        title="Publish Color Links"
+        description="Are you sure you want to publish the current color links, color details, and parent product ID to the database? This will update the product with the current form values."
+      />
     </div>
   )
 }

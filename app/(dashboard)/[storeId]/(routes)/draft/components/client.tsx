@@ -65,6 +65,7 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
   const [genderFilter, setGenderFilter] = useState("all")
   const [dateFilter, setDateFilter] = useState("all")
   const [creatorFilter, setCreatorFilter] = useState("all")
+  const [priorityFilter, setPriorityFilter] = useState("all")
   const [showAllProducts, setShowAllProducts] = useState(false)
   const itemsPerPage = 12
 
@@ -85,6 +86,7 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
         date: dateFilter,
         creator: creatorFilter,
         status: statusFilter,
+        priority: priorityFilter,
       })
 
       // Price filter commented out for now
@@ -142,89 +144,27 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
     if (!initialLoading) {
       fetchProducts(currentPage, 'products')
     }
-  }, [currentPage, searchTerm, categoryFilter, colorFilter, materialFilter, /* priceFilter, */ statusFilter, styleFilter, genderFilter, dateFilter, creatorFilter, storeId])
+  }, [currentPage, searchTerm, categoryFilter, colorFilter, materialFilter, /* priceFilter, */ statusFilter, styleFilter, genderFilter, dateFilter, creatorFilter, priorityFilter, storeId])
 
   React.useEffect(() => {
     if (activeTab === 'trash' && !initialLoading) {
       fetchProducts(trashedPage, 'trashed')
     }
-  }, [trashedPage, activeTab, searchTerm, categoryFilter, colorFilter, materialFilter, /* priceFilter, */ statusFilter, styleFilter, genderFilter, dateFilter, creatorFilter, storeId])
+  }, [trashedPage, activeTab, searchTerm, categoryFilter, colorFilter, materialFilter, /* priceFilter, */ statusFilter, styleFilter, genderFilter, dateFilter, creatorFilter, priorityFilter, storeId])
 
   // Fetch all dropdown options once on component mount
   const fetchDropdownOptions = async () => {
     if (dropdownOptionsLoaded) return
 
     try {
-      // Fetch all products without filters to get complete dropdown options
-      const params = new URLSearchParams()
-      params.append('page', '1')
-      params.append('limit', '1000') // Large limit to get all products for dropdown options
-      params.append('type', 'products')
+      const response = await axios.get(`/api/${storeId}/filter-options`)
+      const options = response.data
 
-      const response = await axios.get(`/api/${storeId}/draft-products?${params}`)
-      const allProducts = response.data.products || []
-
-      // Extract categories
-      const categories = Array.from(new Set(allProducts.map((product: any) => {
-        try {
-          if (product.categoryData && typeof product.categoryData === 'object') {
-            const categoryData = product.categoryData as any
-            return `${categoryData.material || ''} ${categoryData.style || ''}`.trim() || 'Uncategorized'
-          }
-          return 'Uncategorized'
-        } catch {
-          return 'Uncategorized'
-        }
-      }).filter(Boolean))) as string[]
-
-      // Extract colors
-      const colors = Array.from(new Set(allProducts.flatMap((product: any) => {
-        try {
-          if (product.colorDetails) {
-            if (typeof product.colorDetails === 'string') {
-              return JSON.parse(product.colorDetails).map((c: any) => c.name)
-            } else if (Array.isArray(product.colorDetails)) {
-              return product.colorDetails.map((c: any) => c.name)
-            }
-          }
-          return []
-        } catch {
-          return []
-        }
-      }).filter(Boolean))) as string[]
-
-      // Extract materials
-      const materials = Array.from(new Set(allProducts.map((product: any) => {
-        try {
-          if (product.categoryData && typeof product.categoryData === 'object') {
-            return (product.categoryData as any).material || null
-          }
-          return null
-        } catch {
-          return null
-        }
-      }).filter(Boolean))) as string[]
-
-      // Extract styles
-      const styles = Array.from(new Set(allProducts.map((product: any) => {
-        try {
-          if (product.categoryData && typeof product.categoryData === 'object') {
-            return (product.categoryData as any).style || null
-          }
-          return null
-        } catch {
-          return null
-        }
-      }).filter(Boolean))) as string[]
-
-      // Extract genders
-      const genders = Array.from(new Set(allProducts.map((product: any) => product.gender).filter(Boolean))) as string[]
-
-      setAllCategories(categories)
-      setAllColors(colors)
-      setAllMaterials(materials)
-      setAllStyles(styles)
-      setAllGenders(genders)
+      setAllCategories(options.categories || [])
+      setAllColors(options.colors || [])
+      setAllMaterials(options.materials || [])
+      setAllStyles(options.styles || [])
+      setAllGenders(options.genders || [])
       setDropdownOptionsLoaded(true)
 
     } catch (error) {
@@ -322,6 +262,7 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
     setGenderFilter("all")
     setDateFilter("all")
     setCreatorFilter("all")
+    setPriorityFilter("all")
   }
 
   if (initialLoading) {
@@ -424,6 +365,8 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
             onDateChange={setDateFilter}
             creatorFilter={creatorFilter}
             onCreatorChange={setCreatorFilter}
+            priorityFilter={priorityFilter}
+            onPriorityChange={setPriorityFilter}
             staticCategories={dropdownCategories}
             staticColors={dropdownColors}
             staticMaterials={dropdownMaterials}
@@ -477,6 +420,8 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
             onDateChange={setDateFilter}
             creatorFilter={creatorFilter}
             onCreatorChange={setCreatorFilter}
+            priorityFilter={priorityFilter}
+            onPriorityChange={setPriorityFilter}
             staticCategories={dropdownCategories}
             staticColors={dropdownColors}
             staticMaterials={dropdownMaterials}
@@ -538,6 +483,8 @@ interface ProductsViewProps {
   onDateChange?: (date: string) => void
   creatorFilter?: string
   onCreatorChange?: (creator: string) => void
+  priorityFilter?: string
+  onPriorityChange?: (priority: string) => void
   staticCategories?: string[]
   staticColors?: string[]
   staticMaterials?: string[]
@@ -581,6 +528,8 @@ const ProductsView: React.FC<ProductsViewProps> = ({
   onDateChange,
   creatorFilter = "all",
   onCreatorChange,
+  priorityFilter = "all",
+  onPriorityChange,
   staticCategories = [],
   staticColors = [],
   staticMaterials = [],
@@ -608,7 +557,7 @@ const ProductsView: React.FC<ProductsViewProps> = ({
 
   React.useEffect(() => {
     onPageChange?.(1)
-  }, [searchTerm, categoryFilter, colorFilter, materialFilter, styleFilter, genderFilter, /* priceFilter, */ dateFilter, creatorFilter, statusFilter])
+  }, [searchTerm, categoryFilter, colorFilter, materialFilter, styleFilter, genderFilter, /* priceFilter, */ dateFilter, creatorFilter, priorityFilter, statusFilter])
 
   const handleBulkTrash = async () => {
     try {
@@ -979,6 +928,21 @@ const ProductsView: React.FC<ProductsViewProps> = ({
               <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="published">Published</SelectItem>
               <SelectItem value="archived">Archived</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={priorityFilter} onValueChange={onPriorityChange}>
+            <SelectTrigger>
+              <SelectValue placeholder="Priority" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Priorities</SelectItem>
+              <SelectItem value="none">No Priority</SelectItem>
+              {Array.from({ length: parseInt(process.env.PRODUCT_PRIORITY_LEVELS || "5") }, (_, i) => (
+                <SelectItem key={i + 1} value={(i + 1).toString()}>
+                  Priority {i + 1}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

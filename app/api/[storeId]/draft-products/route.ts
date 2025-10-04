@@ -64,6 +64,7 @@ export async function GET(
     const priceMin = parseFloat(searchParams.get('priceMin') || '0')
     const priceMax = parseFloat(searchParams.get('priceMax') || '999999')
     const status = searchParams.get('status') || 'all'
+    const priorityFilter = searchParams.get('priority') || 'all'
     const type = searchParams.get('type') || 'products'
     
     const offset = (page - 1) * limit
@@ -124,10 +125,10 @@ export async function GET(
     }
 
     if (colorFilter !== 'all') {
-      whereClause.colorDetails = {
-        array_contains: [{ name: colorFilter }]
+      whereClause.baseColor = {
+        path: ['name'],
+        string_contains: colorFilter
       }
-      
     }
 
     if (materialFilter !== 'all' || styleFilter !== 'all') {
@@ -205,6 +206,14 @@ export async function GET(
       }
     }
 
+    if (priorityFilter !== 'all') {
+      if (priorityFilter === 'none') {
+        whereClause.priority = null
+      } else {
+        whereClause.priority = parseInt(priorityFilter)
+      }
+    }
+
     const [products, totalCount] = await Promise.all([
       prismadb.product.findMany({
         where: whereClause,
@@ -222,7 +231,7 @@ export async function GET(
         orderBy: type === 'trashed'
           ? { deletedAt: 'desc' }
           : [
-              { priority: 'asc' },
+              { priority: { sort: 'asc', nulls: 'last' } },
               { createdAt: 'desc' }
             ],
         skip: offset,

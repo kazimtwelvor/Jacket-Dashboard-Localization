@@ -32,7 +32,6 @@ export async function PATCH(
       return new NextResponse("Parent product not found or not a parent", { status: 404 })
     }
 
-    // Get parent's color links and details
     let parentColorLinks = {}
     let parentColorDetails = []
 

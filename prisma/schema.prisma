@@ -38,6 +38,9 @@ model Store {
   contactForms        ContactForm[]
   newsletterForms     NewsletterForm[]
   vouchers            Voucher[]   @relation("StoreToVoucher")
+  productViews        ProductView[] @relation("StoreToProductView")
+  categoryViews       CategoryView[] @relation("StoreToCategoryView")
+  categoryPageViews   CategoryPageView[] @relation("StoreToCategoryPageView")
   // Payment fields
   paypalClientId      String?   @default("")
   paypalClientSecret  String?   @default("")
@@ -282,6 +285,8 @@ model Category {
   type        String? // Kept the type field for category types (material, style, gender)
   isBest      Boolean?   @default(false)
   categoryContent Json? // Template content for category page
+  viewCount       Int      @default(0) // Total view count for this category
+  views           CategoryView[] @relation("CategoryToView")
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
@@ -329,6 +334,8 @@ model Product {
 
   isParentProduct Boolean? @default(false)
   parentProductId String? // Reference to parent product
+  viewCount       Int      @default(0) // Total view count for this product
+  views           ProductView[] @relation("ProductToView")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -728,6 +735,8 @@ model CategoryPage {
   status          CategoryPageStatus @default(DRAFT)
   isPublished     Boolean   @default(false)
   publishedAt     DateTime?
+  viewCount       Int       @default(0) // Total view count for this category page
+  views           CategoryPageView[] @relation("CategoryPageToView")
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
@@ -814,4 +823,52 @@ enum VoucherType {
   PERCENTAGE  // FJ-30% - percentage discount
   FIXED       // FJ-100 - fixed amount discount
   BUY_X_GET_Y // Buy 2 get 1 free
+}
+
+model ProductView {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation("ProductToView", fields: [productId], references: [id], onDelete: Cascade)
+  storeId   String
+  store     Store    @relation("StoreToProductView", fields: [storeId], references: [id], onDelete: Cascade)
+  userAgent String?  // Browser user agent for analytics
+  ipAddress String?  // IP address for analytics
+  referrer  String?  // Referrer URL
+  viewedAt  DateTime @default(now())
+  
+  @@index([productId])
+  @@index([storeId])
+  @@index([viewedAt])
+}
+
+model CategoryView {
+  id         String        @id @default(cuid())
+  categoryId String
+  category   Category      @relation("CategoryToView", fields: [categoryId], references: [id], onDelete: Cascade)
+  storeId    String
+  store      Store         @relation("StoreToCategoryView", fields: [storeId], references: [id], onDelete: Cascade)
+  userAgent  String?       // Browser user agent for analytics
+  ipAddress  String?       // IP address for analytics
+  referrer   String?       // Referrer URL
+  viewedAt   DateTime      @default(now())
+  
+  @@index([categoryId])
+  @@index([storeId])
+  @@index([viewedAt])
+}
+
+model CategoryPageView {
+  id            String        @id @default(cuid())
+  categoryPageId String
+  categoryPage  CategoryPage  @relation("CategoryPageToView", fields: [categoryPageId], references: [id], onDelete: Cascade)
+  storeId       String
+  store         Store         @relation("StoreToCategoryPageView", fields: [storeId], references: [id], onDelete: Cascade)
+  userAgent     String?       // Browser user agent for analytics
+  ipAddress     String?       // IP address for analytics
+  referrer      String?       // Referrer URL
+  viewedAt      DateTime      @default(now())
+  
+  @@index([categoryPageId])
+  @@index([storeId])
+  @@index([viewedAt])
 }

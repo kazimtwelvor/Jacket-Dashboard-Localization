@@ -19,6 +19,7 @@ interface ColorLinksSectionProps {
   storeId?: string
   currentProductId?: string
   initialData?: any
+  onInitialDataUpdate?: (updatedData: any) => void
 }
 
 interface Product {
@@ -29,7 +30,7 @@ interface Product {
   image: string | null
 }
 
-export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, storeId, currentProductId, initialData }) => {
+export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, storeId, currentProductId, initialData, onInitialDataUpdate }) => {
   const { toast } = useToast()
   const [copiedColor, setCopiedColor] = useState<string | null>(null)
   const selectedColors = form.watch("specifications.color") || []
@@ -564,6 +565,17 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
             setSelectedParentProduct(null)
             setUserRemovedParent(true)
           }
+        }
+        
+        // Update initial data with the new published values
+        if (onInitialDataUpdate && responseData.product) {
+          const { colorLinks, colorDetails, parentProductId } = responseData.product
+          onInitialDataUpdate({
+            ...initialData,
+            colorLinks: colorLinks || {},
+            colorDetails: colorDetails || [],
+            parentProductId: parentProductId || null
+          })
         }
         
         setShowPublishModal(false)

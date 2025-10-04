@@ -88,7 +88,7 @@ export async function GET(
       },
       select: {
         categoryData: true,
-        colorDetails: true,
+        baseColor: true,
         sizeDetails: true,
         gender: true,
         createdByName: true
@@ -117,18 +117,18 @@ export async function GET(
       // Extract creators
       if (product.createdByName) creatorsSet.add(product.createdByName)
 
-      // Extract colors from colorDetails
-      if (product.colorDetails) {
+      // Extract colors from baseColor
+      if (product.baseColor) {
         try {
-          let colors = []
-          if (typeof product.colorDetails === 'string') {
-            colors = JSON.parse(product.colorDetails)
-          } else if (Array.isArray(product.colorDetails)) {
-            colors = product.colorDetails
+          let baseColor
+          if (typeof product.baseColor === 'string') {
+            baseColor = JSON.parse(product.baseColor)
+          } else {
+            baseColor = product.baseColor
           }
-          colors.forEach((color: any) => {
-            if (color.name) productColorsSet.add(color.name)
-          })
+          if (baseColor && baseColor.name) {
+            productColorsSet.add(baseColor.name)
+          }
         } catch (error) {
           // Ignore parsing errors
         }

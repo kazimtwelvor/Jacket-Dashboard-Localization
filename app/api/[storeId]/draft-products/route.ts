@@ -125,10 +125,10 @@ export async function GET(
     }
 
     if (colorFilter !== 'all') {
-      whereClause.colorDetails = {
-        array_contains: [{ name: colorFilter }]
+      whereClause.baseColor = {
+        path: ['name'],
+        string_contains: colorFilter
       }
-      
     }
 
     if (materialFilter !== 'all' || styleFilter !== 'all') {

@@ -54,6 +54,7 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
   const [hasLoadedInitialColorLinks, setHasLoadedInitialColorLinks] = useState(false)
   const [showPublishModal, setShowPublishModal] = useState(false)
   const [isPublishing, setIsPublishing] = useState(false)
+  const [isUpdatingChildren, setIsUpdatingChildren] = useState(false)
 
 
   useEffect(() => {
@@ -590,6 +591,47 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
     }
   }
 
+  const handleUpdateAllChildren = async () => {
+    if (!storeId || !currentProductId) return
+
+    setIsUpdatingChildren(true)
+    try {
+      const response = await fetch(`/api/${storeId}/products/${currentProductId}/update-children`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (response.ok) {
+        const responseData = await response.json()
+        console.log('Child products updated successfully:', responseData)
+        
+        toast({
+          title: "Success!",
+          description: `Updated ${responseData.updatedCount} child products with parent's color links and details.`,
+        })
+      } else {
+        const errorData = await response.json()
+        console.error('Failed to update child products:', errorData)
+        toast({
+          title: "Error",
+          description: "Failed to update child products. Please try again.",
+          variant: "destructive"
+        })
+      }
+    } catch (error) {
+      console.error('Error updating child products:', error)
+      toast({
+        title: "Error",
+        description: "An error occurred while updating child products.",
+        variant: "destructive"
+      })
+    } finally {
+      setIsUpdatingChildren(false)
+    }
+  }
+
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
@@ -636,6 +678,31 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
           </FormItem>
         )}
       />
+
+      {form.watch("isParentProduct") && (
+        <div className="mb-6 p-3 bg-green-50 dark:bg-green-900/20 rounded-md border border-green-200 dark:border-green-800">
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="text-sm font-medium text-green-900 dark:text-green-100">
+                Parent Product Actions
+              </h4>
+              <p className="text-xs text-green-700 dark:text-green-300 mt-1">
+                Update all child products with this parent's color links and details
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleUpdateAllChildren}
+              disabled={isUpdatingChildren}
+              className="bg-green-100 hover:bg-green-200 dark:bg-green-800 dark:hover:bg-green-700 border-green-300 dark:border-green-600 text-green-800 dark:text-green-200"
+            >
+              {isUpdatingChildren ? "Updating..." : "Update All Children"}
+            </Button>
+          </div>
+        </div>
+      )}
 
       {!form.watch("isParentProduct") && (
         <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-900/20 rounded-md border">

@@ -17,6 +17,7 @@ interface ColorVariationsSectionProps {
 
 export const ColorVariationsSection: React.FC<ColorVariationsSectionProps> = ({ form, colors }) => {
   const colorSpecifications = form.watch("specifications.color") || []
+  const colorVariations = form.watch("categories.variationColors") || []
 
   useEffect(() => {
     if (colorSpecifications && colorSpecifications.length > 0) {
@@ -42,6 +43,41 @@ export const ColorVariationsSection: React.FC<ColorVariationsSectionProps> = ({ 
       }
     }
   }, [colorSpecifications, form])
+
+  // Sync colorDetails with selected colors
+  useEffect(() => {
+    const currentColorDetails = form.getValues("colorDetails") || []
+    
+    // Get color objects for selected colors
+    const selectedColorObjects = colors.filter(color => 
+      colorVariations.includes(color.name)
+    )
+    
+    // Check if colorDetails needs updating
+    const needsUpdate = selectedColorObjects.length !== currentColorDetails.length ||
+      selectedColorObjects.some(color => 
+        !currentColorDetails.some((cd: any) => cd.id === color.id)
+      )
+    
+    if (needsUpdate) {
+      const updatedColorDetails = selectedColorObjects.map(color => ({
+        id: color.id,
+        name: color.name,
+        value: color.value
+      }))
+      
+      console.log('[ColorVariationsSection] Updating colorDetails:', {
+        colorVariations,
+        selectedColorObjects,
+        updatedColorDetails
+      })
+      
+      form.setValue("colorDetails", updatedColorDetails, {
+        shouldValidate: true,
+        shouldDirty: true,
+      })
+    }
+  }, [colorVariations, colors, form])
 
   return (
     <div className="space-y-6">
@@ -87,6 +123,16 @@ export const ColorVariationsSection: React.FC<ColorVariationsSectionProps> = ({ 
                             : currentColorSpecs.filter((value: string) => value !== color.name)
 
                           form.setValue("specifications.color", updatedColorSpecs, {
+                            shouldValidate: true,
+                            shouldDirty: true,
+                          })
+
+                          const currentColorDetails = form.getValues("colorDetails") || []
+                          const updatedColorDetails = isChecked
+                            ? [...currentColorDetails, { id: color.id, name: color.name, value: color.value }]
+                            : currentColorDetails.filter((c: any) => c.id !== color.id)
+
+                          form.setValue("colorDetails", updatedColorDetails, {
                             shouldValidate: true,
                             shouldDirty: true,
                           })

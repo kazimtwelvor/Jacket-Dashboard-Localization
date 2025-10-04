@@ -11,7 +11,7 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
     const { storeId } = params
     const { searchParams } = new URL(req.url)
     const page = Number.parseInt(searchParams.get("page") || "1")
-    const limit = Number.parseInt(searchParams.get("limit") || "28")
+    const limit = Number.parseInt(searchParams.get("limit") || "10000")
     const skip = (page - 1) * limit
     const isAdmin = searchParams.get("admin") === "true"
     const colors = searchParams.get("colors")

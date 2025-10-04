@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { Link2, ExternalLink, Copy, Check, Search, X } from "lucide-react"
+import { Link2, ExternalLink, Copy, Check, Search, X, Upload } from "lucide-react"
 import type { UseFormReturn } from "react-hook-form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -10,6 +10,7 @@ import { FormField, FormItem, FormControl } from "@/components/ui/form"
 import { useState, useEffect, useRef } from "react"
 import { createPortal } from "react-dom"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { AlertModal } from "@/components/modals/alert-modal"
 import type { ProductFormValues } from "../../product-form-schema"
 
 interface ColorLinksSectionProps {
@@ -48,6 +49,8 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
   const [searchResults, setSearchResults] = useState<Record<string, Product[]>>({})
   const [isSearching, setIsSearching] = useState<Record<string, boolean>>({})
   const [hasLoadedInitialColorLinks, setHasLoadedInitialColorLinks] = useState(false)
+  const [showPublishModal, setShowPublishModal] = useState(false)
+  const [isPublishing, setIsPublishing] = useState(false)
 
 
   useEffect(() => {
@@ -489,11 +492,103 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
     }
   }
 
+  const handlePublishColorLinks = async () => {
+    if (!storeId || !currentProductId) return
+
+    setIsPublishing(true)
+    try {
+      const colorLinks = form.getValues("categories.colorVariationLinks") || {}
+      const colorDetails = form.getValues("colorDetails") || []
+      const parentProductId = form.getValues("parentProductId") || ""
+
+      console.log('[Publish Color Links] Sending data:', {
+        colorLinks,
+        colorDetails,
+        parentProductId
+      })
+
+      const response = await fetch(`/api/${storeId}/products/${currentProductId}/color-links`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          colorLinks,
+          colorDetails,
+          parentProductId,
+        }),
+      })
+
+      if (response.ok) {
+        const responseData = await response.json()
+        console.log('Color links, details, and parent product ID published successfully')
+        
+        // Update the form state to reflect the published changes
+        if (responseData.product) {
+          const { colorLinks, colorDetails, parentProductId } = responseData.product
+          
+          // Update form values to match the published data
+          if (colorLinks) {
+            form.setValue("categories.colorVariationLinks", colorLinks, { shouldDirty: false })
+          }
+          if (colorDetails) {
+            form.setValue("colorDetails", colorDetails, { shouldDirty: false })
+          }
+          if (parentProductId !== undefined) {
+            form.setValue("parentProductId", parentProductId, { shouldDirty: false })
+          }
+          
+          // Update local state to reflect the published data
+          setColorLinks(colorLinks || {})
+          if (colorDetails) {
+            setColorSkus({}) // Reset color SKUs as they might have changed
+          }
+          
+          // Update parent product state if parentProductId changed
+          if (parentProductId && parentProductId !== initialData?.parentProductId) {
+            // Find the parent product in the products list
+            const parentProduct = products.find(p => p.id === parentProductId)
+            if (parentProduct) {
+              setSelectedParentProduct(parentProduct)
+              setUserRemovedParent(false)
+            }
+          } else if (!parentProductId && initialData?.parentProductId) {
+            // Parent was removed
+            setSelectedParentProduct(null)
+            setUserRemovedParent(true)
+          }
+        }
+        
+        setShowPublishModal(false)
+      } else {
+        const errorData = await response.json()
+        console.error('Failed to publish color links:', errorData)
+      }
+    } catch (error) {
+      console.error('Error publishing color links:', error)
+    } finally {
+      setIsPublishing(false)
+    }
+  }
+
   return (
     <div>
-      <div className="flex items-center gap-2 mb-4">
-        <Link2 className="h-5 w-5" />
-        <h3 className="text-base font-medium">Color Variation Links</h3>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Link2 className="h-5 w-5" />
+          <h3 className="text-base font-medium">Color Variation Links</h3>
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => setShowPublishModal(true)}
+          disabled={isPublishing}
+          className="flex items-center gap-2"
+        >
+          <Upload className="h-4 w-4" />
+          {isPublishing ? "Publishing..." : "Publish Color Links"}
+        </Button>
       </div>
       <p className="text-sm text-muted-foreground mb-4">
         Search and select products or enter URLs manually for each color variation.
@@ -917,6 +1012,15 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
           No colors selected. Please select colors in the Color Variations section first.
         </div>
       )}
+
+      <AlertModal
+        isOpen={showPublishModal}
+        onClose={() => setShowPublishModal(false)}
+        onConfirm={handlePublishColorLinks}
+        loading={isPublishing}
+        title="Publish Color Links"
+        description="Are you sure you want to publish the current color links, color details, and parent product ID to the database? This will update the product with the current form values."
+      />
     </div>
   )
 }

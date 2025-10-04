@@ -120,6 +120,7 @@ const organizeCategoriesByType = (categories: Category[]) => {
 export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, sizes, categories }) => {
   const [isUploading, setIsUploading] = useState(false)
   const [submitType, setSubmitType] = useState<"draft" | "publish" | null>(null)
+  const [currentInitialData, setCurrentInitialData] = useState(initialData)
   const [activeTab, setActiveTab] = useState("general")
   const formRef = useRef<HTMLFormElement>(null)
   const { toast } = useToast()
@@ -2188,7 +2189,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
                 categories={categorizedCategories}
                 storeId={params?.storeId?.toString()}
                 currentProductId={initialData?.id}
-                initialData={initialData}
+                initialData={currentInitialData}
+                onInitialDataUpdate={setCurrentInitialData}
               />
             </TabsContent>
 

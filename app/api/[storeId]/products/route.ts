@@ -78,9 +78,9 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
         {
           isFeatured: "desc", 
         },
-        {
-          createdAt: "desc", 
-        },
+        // {
+        //   createdAt: "desc", 
+        // },
       ]
     })
 

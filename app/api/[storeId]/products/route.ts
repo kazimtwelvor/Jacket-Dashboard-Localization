@@ -18,8 +18,8 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
     const materials = searchParams.get("materials")
     const styles = searchParams.get("styles")
     const genders = searchParams.get("genders")
-    const collar = searchParams.get("collar")
-    const closure = searchParams.get("closure")
+    const collars = searchParams.get("collars")
+    const closures = searchParams.get("closures")
     const cuffs = searchParams.get("cuffs")
     const pockets = searchParams.get("pockets")
     const search = searchParams.get("search")
@@ -275,8 +275,8 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
 
     }
 
-    if (collar) {
-      const collarList = collar.toLowerCase().split(',')
+    if (collars) {
+      const collarsList = collars.toLowerCase().split(',')
       filteredProducts = filteredProducts.filter(product => {
         if (!product.specifications) return false
 
@@ -293,13 +293,13 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
         if (!productCollars || !Array.isArray(productCollars)) return false
 
         return productCollars.some((collarValue: string) => 
-          collarList.includes(collarValue.toLowerCase())
+          collarsList.includes(collarValue.toLowerCase())
         )
       })
     }
 
-    if (closure) {
-      const closureList = closure.toLowerCase().split(',')
+    if (closures) {
+      const closuresList = closures.toLowerCase().split(',')
       filteredProducts = filteredProducts.filter(product => {
         if (!product.specifications) return false
 
@@ -316,7 +316,7 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
         if (!productClosures || !Array.isArray(productClosures)) return false
 
         return productClosures.some((closureValue: string) => 
-          closureList.includes(closureValue.toLowerCase())
+          closuresList.includes(closureValue.toLowerCase())
         )
       })
     }

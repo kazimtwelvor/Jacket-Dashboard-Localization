@@ -18,6 +18,10 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
     const materials = searchParams.get("materials")
     const styles = searchParams.get("styles")
     const genders = searchParams.get("genders")
+    const collar = searchParams.get("collar")
+    const closure = searchParams.get("closure")
+    const cuffs = searchParams.get("cuffs")
+    const pockets = searchParams.get("pockets")
     const search = searchParams.get("search")
     const trash = searchParams.get("trash") === "true"
     const status = searchParams.get("status")
@@ -269,6 +273,98 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
         return gendersList.includes(productGender.toString().toLowerCase())
       })
 
+    }
+
+    if (collar) {
+      const collarList = collar.toLowerCase().split(',')
+      filteredProducts = filteredProducts.filter(product => {
+        if (!product.specifications) return false
+
+        let specifications = product.specifications
+        if (typeof specifications === 'string') {
+          try {
+            specifications = JSON.parse(specifications)
+          } catch (e) {
+            return false
+          }
+        }
+
+        const productCollars = (specifications as any).collar
+        if (!productCollars || !Array.isArray(productCollars)) return false
+
+        return productCollars.some((collarValue: string) => 
+          collarList.includes(collarValue.toLowerCase())
+        )
+      })
+    }
+
+    if (closure) {
+      const closureList = closure.toLowerCase().split(',')
+      filteredProducts = filteredProducts.filter(product => {
+        if (!product.specifications) return false
+
+        let specifications = product.specifications
+        if (typeof specifications === 'string') {
+          try {
+            specifications = JSON.parse(specifications)
+          } catch (e) {
+            return false
+          }
+        }
+
+        const productClosures = (specifications as any).closure
+        if (!productClosures || !Array.isArray(productClosures)) return false
+
+        return productClosures.some((closureValue: string) => 
+          closureList.includes(closureValue.toLowerCase())
+        )
+      })
+    }
+
+    if (cuffs) {
+      const cuffsList = cuffs.toLowerCase().split(',')
+      filteredProducts = filteredProducts.filter(product => {
+        if (!product.specifications) return false
+
+        let specifications = product.specifications
+        if (typeof specifications === 'string') {
+          try {
+            specifications = JSON.parse(specifications)
+          } catch (e) {
+            return false
+          }
+        }
+
+        const productCuffs = (specifications as any).cuffs
+        if (!productCuffs || !Array.isArray(productCuffs)) return false
+
+        return productCuffs.some((cuffValue: string) => 
+          cuffsList.includes(cuffValue.toLowerCase())
+        )
+      })
+    }
+
+    if (pockets) {
+      const pocketsList = pockets.toLowerCase().split(',')
+      filteredProducts = filteredProducts.filter(product => {
+        if (!product.specifications) return false
+
+        let specifications = product.specifications
+        if (typeof specifications === 'string') {
+          try {
+            specifications = JSON.parse(specifications)
+          } catch (e) {
+            return false
+          }
+        }
+
+        const productPockets = (specifications as any).pockets
+        if (!productPockets || !Array.isArray(productPockets)) return false
+
+        return productPockets.some((pocketValue: string) => 
+          pocketsList.includes(pocketValue.toLowerCase())
+        )
+      })
     }
 
     const totalProducts = filteredProducts.length

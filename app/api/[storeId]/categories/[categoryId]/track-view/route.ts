@@ -2,6 +2,22 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import prismadb from "@/lib/prismadb"
 
+function corsHeaders() {
+  return {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, Accept',
+    'Access-Control-Max-Age': '86400',
+  }
+}
+
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: corsHeaders(),
+  })
+}
+
 export async function POST(
   req: NextRequest,
   { params }: { params: { storeId: string; categoryId: string } }
@@ -13,6 +29,12 @@ export async function POST(
     // Get request data
     const body = await req.json()
     const { userAgent, ipAddress, referrer } = body
+
+    // Get client IP from request headers
+    const clientIP = req.headers.get('x-forwarded-for') || 
+                    req.headers.get('x-real-ip') || 
+                    ipAddress || 
+                    'unknown'
 
     // Verify the category exists and belongs to the store
     const category = await prismadb.category.findFirst({
@@ -26,13 +48,38 @@ export async function POST(
       return new NextResponse("Category not found", { status: 404 })
     }
 
+    // Check if this IP has already viewed this category recently (within last 24 hours)
+    const twentyFourHoursAgo = new Date()
+    twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24)
+
+    const existingView = await prismadb.categoryView.findFirst({
+      where: {
+        categoryId: categoryId,
+        storeId: storeId,
+        ipAddress: clientIP,
+        viewedAt: {
+          gte: twentyFourHoursAgo
+        }
+      }
+    })
+
+    if (existingView) {
+      return NextResponse.json({
+        success: false,
+        message: "View already recorded for this IP within 24 hours",
+        duplicate: true
+      }, {
+        headers: corsHeaders()
+      })
+    }
+
     // Create view record
     const view = await prismadb.categoryView.create({
       data: {
         categoryId: categoryId,
         storeId: storeId,
         userAgent: userAgent || null,
-        ipAddress: ipAddress || null,
+        ipAddress: clientIP,
         referrer: referrer || null
       }
     })
@@ -51,6 +98,8 @@ export async function POST(
       success: true,
       viewId: view.id,
       message: "View tracked successfully"
+    }, {
+      headers: corsHeaders()
     })
 
   } catch (error) {

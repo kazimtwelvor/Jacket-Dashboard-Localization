@@ -2,6 +2,22 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import prismadb from "@/lib/prismadb"
 
+function corsHeaders() {
+  return {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, Accept',
+    'Access-Control-Max-Age': '86400',
+  }
+}
+
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: corsHeaders(),
+  })
+}
+
 export async function POST(
   req: NextRequest,
   { params }: { params: { storeId: string; categoryPageId: string } }
@@ -12,6 +28,12 @@ export async function POST(
 
     const body = await req.json()
     const { userAgent, ipAddress, referrer } = body
+
+    // Get client IP from request headers
+    const clientIP = req.headers.get('x-forwarded-for') || 
+                    req.headers.get('x-real-ip') || 
+                    ipAddress || 
+                    'unknown'
 
     const categoryPage = await prismadb.categoryPage.findFirst({
       where: {
@@ -25,12 +47,36 @@ export async function POST(
       return new NextResponse("Category page not found", { status: 404 })
     }
 
+    const twentyFourHoursAgo = new Date()
+    twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24)
+
+    const existingView = await prismadb.categoryPageView.findFirst({
+      where: {
+        categoryPageId: categoryPageId,
+        storeId: storeId,
+        ipAddress: clientIP,
+        viewedAt: {
+          gte: twentyFourHoursAgo
+        }
+      }
+    })
+
+    if (existingView) {
+      return NextResponse.json({
+        success: false,
+        message: "View already recorded for this IP within 24 hours",
+        duplicate: true
+      }, {
+        headers: corsHeaders()
+      })
+    }
+
     const view = await prismadb.categoryPageView.create({
       data: {
         categoryPageId: categoryPageId,
         storeId: storeId,
         userAgent: userAgent || null,
-        ipAddress: ipAddress || null,
+        ipAddress: clientIP,
         referrer: referrer || null
       }
     })
@@ -48,6 +94,8 @@ export async function POST(
       success: true,
       viewId: view.id,
       message: "View tracked successfully"
+    }, {
+      headers: corsHeaders()
     })
 
   } catch (error) {

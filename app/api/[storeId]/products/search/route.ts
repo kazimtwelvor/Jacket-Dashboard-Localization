@@ -45,6 +45,7 @@ export async function GET(
       },
       take: 20,
       orderBy: [
+        { viewCount: "desc" },
         { priority: "asc" },
         { name: "asc" }
       ]

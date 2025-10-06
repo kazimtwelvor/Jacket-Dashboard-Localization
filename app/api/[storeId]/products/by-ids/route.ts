@@ -37,6 +37,9 @@
         },
         orderBy: [
           {
+            viewCount: "desc",
+          },
+          {
             priority: "asc",
           },
           {

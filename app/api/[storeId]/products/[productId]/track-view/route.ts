@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import prismadb from "@/lib/prismadb"
 
-// CORS headers for tracking endpoints
 function corsHeaders() {
-  // Temporarily use wildcard for debugging - should be restricted in production
   return {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
@@ -49,7 +47,6 @@ export async function POST(
       return new NextResponse("Product not found", { status: 404 })
     }
 
-    // Check if this IP has already viewed this product recently (within last 24 hours)
     const twentyFourHoursAgo = new Date()
     twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24)
 

@@ -21,7 +21,6 @@ export async function GET(
     const daysAgo = new Date()
     daysAgo.setDate(daysAgo.getDate() - parseInt(period))
 
-    // Get top products by views
     const topProducts = await prismadb.product.findMany({
       where: {
         storeId: storeId,
@@ -53,7 +52,6 @@ export async function GET(
       take: limit
     })
 
-    // Get top categories by views
     const topCategories = await prismadb.category.findMany({
       where: {
         storeId: storeId
@@ -71,7 +69,6 @@ export async function GET(
       take: limit
     })
 
-    // Get top category pages by views
     const topCategoryPages = await prismadb.categoryPage.findMany({
       where: {
         storeId: storeId,
@@ -90,7 +87,6 @@ export async function GET(
       take: limit
     })
 
-    // Get recent view activity
     const recentProductViews = await prismadb.productView.findMany({
       where: {
         storeId: storeId,
@@ -157,7 +153,6 @@ export async function GET(
       take: 50
     })
 
-    // Calculate total views for the period
     const totalProductViews = await prismadb.productView.count({
       where: {
         storeId: storeId,

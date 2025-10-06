@@ -29,7 +29,6 @@ export async function POST(
     const body = await req.json()
     const { userAgent, ipAddress, referrer } = body
 
-    // Get client IP from request headers
     const clientIP = req.headers.get('x-forwarded-for') || 
                     req.headers.get('x-real-ip') || 
                     ipAddress || 

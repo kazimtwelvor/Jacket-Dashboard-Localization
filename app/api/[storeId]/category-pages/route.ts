@@ -303,6 +303,110 @@ export async function GET(
           console.log(`After color filter: ${filteredProducts.length} products (was ${beforeCount})`)
         }
 
+        if (categoryPage.collars && categoryPage.collars.length > 0) {
+          const beforeCount = filteredProducts.length
+          filteredProducts = filteredProducts.filter(product => {
+            if (!product.specifications) return false
+
+            let specifications = product.specifications
+            if (typeof specifications === 'string') {
+              try {
+                specifications = JSON.parse(specifications)
+              } catch (e) {
+                return false
+              }
+            }
+
+            const productCollars = (specifications as any).collar
+            if (!productCollars || !Array.isArray(productCollars)) return false
+
+            return productCollars.some((collarValue: string) => 
+              categoryPage.collars.some((categoryCollar: string) => 
+                collarValue.toLowerCase() === categoryCollar.toLowerCase()
+              )
+            )
+          })
+          console.log(`After collar filter: ${filteredProducts.length} products (was ${beforeCount})`)
+        }
+
+        if (categoryPage.closures && categoryPage.closures.length > 0) {
+          const beforeCount = filteredProducts.length
+          filteredProducts = filteredProducts.filter(product => {
+            if (!product.specifications) return false
+
+            let specifications = product.specifications
+            if (typeof specifications === 'string') {
+              try {
+                specifications = JSON.parse(specifications)
+              } catch (e) {
+                return false
+              }
+            }
+
+            const productClosures = (specifications as any).closure
+            if (!productClosures || !Array.isArray(productClosures)) return false
+
+            return productClosures.some((closureValue: string) => 
+              categoryPage.closures.some((categoryClosure: string) => 
+                closureValue.toLowerCase() === categoryClosure.toLowerCase()
+              )
+            )
+          })
+          console.log(`After closure filter: ${filteredProducts.length} products (was ${beforeCount})`)
+        }
+
+        if (categoryPage.cuffs && categoryPage.cuffs.length > 0) {
+          const beforeCount = filteredProducts.length
+          filteredProducts = filteredProducts.filter(product => {
+            if (!product.specifications) return false
+
+            let specifications = product.specifications
+            if (typeof specifications === 'string') {
+              try {
+                specifications = JSON.parse(specifications)
+              } catch (e) {
+                return false
+              }
+            }
+
+            const productCuffs = (specifications as any).cuffs
+            if (!productCuffs || !Array.isArray(productCuffs)) return false
+
+            return productCuffs.some((cuffValue: string) => 
+              categoryPage.cuffs.some((categoryCuff: string) => 
+                cuffValue.toLowerCase() === categoryCuff.toLowerCase()
+              )
+            )
+          })
+          console.log(`After cuffs filter: ${filteredProducts.length} products (was ${beforeCount})`)
+        }
+
+        if (categoryPage.pockets && categoryPage.pockets.length > 0) {
+          const beforeCount = filteredProducts.length
+          filteredProducts = filteredProducts.filter(product => {
+            if (!product.specifications) return false
+
+            let specifications = product.specifications
+            if (typeof specifications === 'string') {
+              try {
+                specifications = JSON.parse(specifications)
+              } catch (e) {
+                return false
+              }
+            }
+
+            const productPockets = (specifications as any).pockets
+            if (!productPockets || !Array.isArray(productPockets)) return false
+
+            return productPockets.some((pocketValue: string) => 
+              categoryPage.pockets.some((categoryPocket: string) => 
+                pocketValue.toLowerCase() === categoryPocket.toLowerCase()
+              )
+            )
+          })
+          console.log(`After pockets filter: ${filteredProducts.length} products (was ${beforeCount})`)
+        }
+
         console.log(`Final count for ${categoryPage.name}: ${filteredProducts.length} products`)
         return filteredProducts.length
       } catch (error) {

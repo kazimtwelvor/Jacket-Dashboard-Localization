@@ -110,11 +110,14 @@ export async function POST(
     if (voucherCode && discountAmount > 0) {
       finalTotal = Math.max(0, totalPrice - discountAmount);
     }
-
+    const isPaid =
+      paymentStatus === "succeeded" ||
+      paymentStatus === "completed" ||
+      paymentStatus === "approved";
     // Create order data common to all payment methods
     const orderData = {
       storeId: storeId,
-      isPaid: false,
+      isPaid: isPaid,
       total: finalTotal,
       discount: discountAmount,
       orderItems: {

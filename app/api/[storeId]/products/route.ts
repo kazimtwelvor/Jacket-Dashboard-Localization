@@ -70,10 +70,16 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       },
       orderBy: [
         {
-          priority: "asc",
+          viewCount: "desc", 
         },
         {
-          createdAt: "desc",
+          priority: "asc", 
+        },
+        {
+          isFeatured: "desc", 
+        },
+        {
+          createdAt: "desc", 
         },
       ]
     })
@@ -174,182 +180,182 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
           // statusMatch ||
           // deletedAtMatch
         )
-    })
-  }
-
-
-    if (colors) {
-    const colorsList = colors.toLowerCase().split(',')
-    filteredProducts = filteredProducts.filter(product => {
-      if (!product.baseColor) return false
-
-      let baseColorData = product.baseColor
-      if (typeof baseColorData === 'string') {
-        try {
-          baseColorData = JSON.parse(baseColorData)
-        } catch (e) {
-          return false
-        }
-      }
-
-      if (baseColorData && typeof baseColorData === 'object' && baseColorData !== null && 'name' in baseColorData) {
-        return typeof baseColorData.name === 'string' && colorsList.includes(baseColorData.name.toLowerCase())
-      }
-      return false
-    })
-  }
-
-  if (materials) {
-    const materialsList = materials.toLowerCase().split(',')
-    filteredProducts = filteredProducts.filter(product => {
-      if (!product.categoryData) return false
-
-      let categoryData = product.categoryData
-      if (typeof categoryData === 'string') {
-        try {
-          categoryData = JSON.parse(categoryData)
-        } catch (e) {
-          return false
-        }
-      }
-
-      const productMaterial = (categoryData as any).material
-      if (!productMaterial) return false
-
-      return materialsList.includes(productMaterial.toString().toLowerCase())
-    })
-
-  }
-
-  if (styles) {
-    const stylesList = styles.toLowerCase().split(',')
-    filteredProducts = filteredProducts.filter(product => {
-      if (!product.categoryData) return false
-
-      let categoryData = product.categoryData
-      if (typeof categoryData === 'string') {
-        try {
-          categoryData = JSON.parse(categoryData)
-        } catch (e) {
-          return false
-        }
-      }
-
-      const productStyle = (categoryData as any).style
-      if (!productStyle) return false
-
-      return stylesList.includes(productStyle.toString().toLowerCase())
-    })
-
-  }
-
-  if (genders) {
-    const gendersList = genders.toLowerCase().split(',')
-    filteredProducts = filteredProducts.filter(product => {
-      if (!product.categoryData) return false
-
-      let categoryData = product.categoryData
-      if (typeof categoryData === 'string') {
-        try {
-          categoryData = JSON.parse(categoryData)
-        } catch (e) {
-          return false
-        }
-      }
-
-      const productGender = (categoryData as any).gender
-      if (!productGender) return false
-
-      return gendersList.includes(productGender.toString().toLowerCase())
-    })
-
-  }
-
-  const totalProducts = filteredProducts.length
-  const paginatedProducts = filteredProducts.slice(skip, skip + limit)
-
-  const serializedProducts = paginatedProducts.map(product => {
-    let colorDetails = []
-    if (product.colorDetails) {
-      try {
-        colorDetails = typeof product.colorDetails === 'string' 
-          ? JSON.parse(product.colorDetails) 
-          : product.colorDetails
-      } catch (e) {
-        colorDetails = []
-      }
-    }
-
-    let baseColor = null
-    if (product.baseColor) {
-      try {
-        baseColor = typeof product.baseColor === 'string' 
-          ? JSON.parse(product.baseColor) 
-          : product.baseColor
-      } catch (e) {
-        baseColor = null
-      }
-    }
-
-    let combinedColorDetails = []
-    
-    if (baseColor && baseColor.id) {
-      combinedColorDetails.push(baseColor)
-    }
-    
-    if (Array.isArray(colorDetails)) {
-      colorDetails.forEach(color => {
-        if (color && color.id && (!baseColor || color.id !== baseColor.id)) {
-          combinedColorDetails.push(color)
-        }
       })
     }
 
-    return {
-      ...product,
-      price: product.price.toString(),
-      // originalPrice: product.originalPrice ? product.originalPrice.toString() : "0",
-      salePrice: product.salePrice ? product.salePrice.toString() : null,
-      baseColor: baseColor,
-      colorDetails: combinedColorDetails,
-      images: product.images.map(productImage => ({
-        id: productImage.imageId,
-        url: productImage.image.url,
-      })),
-      schema: product.schema ? JSON.parse(product.schema) : null,
-      reviews: product.reviews.map(review => ({
-        id: review.id,
-        userId: review.userId,
-        userName: review.userName,
-        email: review.email,
-        rating: review.rating,
-        title: review.title,
-        comment: review.comment,
-        photoUrl: review.photoUrl,
-        createdAt: review.createdAt,
-        updatedAt: review.updatedAt,
-      })),
-    }
-  })
 
-  const totalPages = Math.ceil(totalProducts / limit)
-  const hasNextPage = page < totalPages
-  const hasPreviousPage = page > 1
+    if (colors) {
+      const colorsList = colors.toLowerCase().split(',')
+      filteredProducts = filteredProducts.filter(product => {
+        if (!product.baseColor) return false
 
-  return withCors({
-    products: serializedProducts,
-    pagination: {
-      currentPage: page,
-      totalPages: totalPages,
-      totalProducts: totalProducts,
-      productsPerPage: limit,
-      hasNextPage: hasNextPage,
-      hasPreviousPage: hasPreviousPage,
+        let baseColorData = product.baseColor
+        if (typeof baseColorData === 'string') {
+          try {
+            baseColorData = JSON.parse(baseColorData)
+          } catch (e) {
+            return false
+          }
+        }
+
+        if (baseColorData && typeof baseColorData === 'object' && baseColorData !== null && 'name' in baseColorData) {
+          return typeof baseColorData.name === 'string' && colorsList.includes(baseColorData.name.toLowerCase())
+        }
+        return false
+      })
     }
-  })
-} catch (err) {
-  console.error(`[PRODUCTS_GET] Error:`, err)
-  const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred'
-  return new NextResponse(`Internal error: ${errorMessage}`, { status: 500, headers: corsHeaders })
-}
+
+    if (materials) {
+      const materialsList = materials.toLowerCase().split(',')
+      filteredProducts = filteredProducts.filter(product => {
+        if (!product.categoryData) return false
+
+        let categoryData = product.categoryData
+        if (typeof categoryData === 'string') {
+          try {
+            categoryData = JSON.parse(categoryData)
+          } catch (e) {
+            return false
+          }
+        }
+
+        const productMaterial = (categoryData as any).material
+        if (!productMaterial) return false
+
+        return materialsList.includes(productMaterial.toString().toLowerCase())
+      })
+
+    }
+
+    if (styles) {
+      const stylesList = styles.toLowerCase().split(',')
+      filteredProducts = filteredProducts.filter(product => {
+        if (!product.categoryData) return false
+
+        let categoryData = product.categoryData
+        if (typeof categoryData === 'string') {
+          try {
+            categoryData = JSON.parse(categoryData)
+          } catch (e) {
+            return false
+          }
+        }
+
+        const productStyle = (categoryData as any).style
+        if (!productStyle) return false
+
+        return stylesList.includes(productStyle.toString().toLowerCase())
+      })
+
+    }
+
+    if (genders) {
+      const gendersList = genders.toLowerCase().split(',')
+      filteredProducts = filteredProducts.filter(product => {
+        if (!product.categoryData) return false
+
+        let categoryData = product.categoryData
+        if (typeof categoryData === 'string') {
+          try {
+            categoryData = JSON.parse(categoryData)
+          } catch (e) {
+            return false
+          }
+        }
+
+        const productGender = (categoryData as any).gender
+        if (!productGender) return false
+
+        return gendersList.includes(productGender.toString().toLowerCase())
+      })
+
+    }
+
+    const totalProducts = filteredProducts.length
+    const paginatedProducts = filteredProducts.slice(skip, skip + limit)
+
+    const serializedProducts = paginatedProducts.map(product => {
+      let colorDetails = []
+      if (product.colorDetails) {
+        try {
+          colorDetails = typeof product.colorDetails === 'string'
+            ? JSON.parse(product.colorDetails)
+            : product.colorDetails
+        } catch (e) {
+          colorDetails = []
+        }
+      }
+
+      let baseColor = null
+      if (product.baseColor) {
+        try {
+          baseColor = typeof product.baseColor === 'string'
+            ? JSON.parse(product.baseColor)
+            : product.baseColor
+        } catch (e) {
+          baseColor = null
+        }
+      }
+
+      let combinedColorDetails = []
+
+      if (baseColor && baseColor.id) {
+        combinedColorDetails.push(baseColor)
+      }
+
+      if (Array.isArray(colorDetails)) {
+        colorDetails.forEach(color => {
+          if (color && color.id && (!baseColor || color.id !== baseColor.id)) {
+            combinedColorDetails.push(color)
+          }
+        })
+      }
+
+      return {
+        ...product,
+        price: product.price.toString(),
+        // originalPrice: product.originalPrice ? product.originalPrice.toString() : "0",
+        salePrice: product.salePrice ? product.salePrice.toString() : null,
+        baseColor: baseColor,
+        colorDetails: combinedColorDetails,
+        images: product.images.map(productImage => ({
+          id: productImage.imageId,
+          url: productImage.image.url,
+        })),
+        schema: product.schema ? JSON.parse(product.schema) : null,
+        reviews: product.reviews.map(review => ({
+          id: review.id,
+          userId: review.userId,
+          userName: review.userName,
+          email: review.email,
+          rating: review.rating,
+          title: review.title,
+          comment: review.comment,
+          photoUrl: review.photoUrl,
+          createdAt: review.createdAt,
+          updatedAt: review.updatedAt,
+        })),
+      }
+    })
+
+    const totalPages = Math.ceil(totalProducts / limit)
+    const hasNextPage = page < totalPages
+    const hasPreviousPage = page > 1
+
+    return withCors({
+      products: serializedProducts,
+      pagination: {
+        currentPage: page,
+        totalPages: totalPages,
+        totalProducts: totalProducts,
+        productsPerPage: limit,
+        hasNextPage: hasNextPage,
+        hasPreviousPage: hasPreviousPage,
+      }
+    })
+  } catch (err) {
+    console.error(`[PRODUCTS_GET] Error:`, err)
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred'
+    return new NextResponse(`Internal error: ${errorMessage}`, { status: 500, headers: corsHeaders })
+  }
 }

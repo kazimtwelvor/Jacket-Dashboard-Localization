@@ -178,9 +178,17 @@ export async function GET(
     }
     const categoryPages = await prismadb.categoryPage.findMany({
       where: whereClause,
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: [
+        {
+          viewCount: "desc", 
+        },
+        {
+          isBest: "desc", 
+        },
+        {
+          createdAt: "desc", 
+        },
+      ],
     })
 
     const getProductCount = async (categoryPage: any) => {

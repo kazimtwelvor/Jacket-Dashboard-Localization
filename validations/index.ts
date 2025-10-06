@@ -10,4 +10,5 @@ export * from './invitation.validations';
 export * from './blog.validations';
 export * from './form.validations';
 export * from './common.validations';
+export * from './country.validations';
 export * from './middleware';

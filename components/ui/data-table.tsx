@@ -24,9 +24,10 @@ interface DataTableProps<TData, TValue> {
   data: TData[]
   searchKey: string
   searchFields?: (keyof TData)[] // Additional fields to search in
+  onEdit?: (data: TData) => void // Optional edit handler
 }
 
-export function DataTable<TData, TValue>({ columns, data, searchKey, searchFields }: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({ columns, data, searchKey, searchFields, onEdit }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [globalFilter, setGlobalFilter] = useState("")
@@ -51,6 +52,9 @@ export function DataTable<TData, TValue>({ columns, data, searchKey, searchField
     state: {
       sorting,
       columnFilters,
+    },
+    meta: {
+      onEdit,
     },
   })
 

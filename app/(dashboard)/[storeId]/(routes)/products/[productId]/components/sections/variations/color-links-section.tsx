@@ -12,6 +12,7 @@ import { createPortal } from "react-dom"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { AlertModal } from "@/components/modals/alert-modal"
 import { useToast } from "@/hooks/use-toast"
+import { useStoreAdmin } from "@/hooks/use-store-admin"
 import type { ProductFormValues } from "../../product-form-schema"
 
 interface ColorLinksSectionProps {
@@ -32,6 +33,7 @@ interface Product {
 
 export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, storeId, currentProductId, initialData, onInitialDataUpdate }) => {
   const { toast } = useToast()
+  const { isStoreAdmin, isLoading: isCheckingAdmin } = useStoreAdmin(storeId)
   const [copiedColor, setCopiedColor] = useState<string | null>(null)
   const selectedColors = form.watch("specifications.color") || []
   const variationColors = form.watch("categories.variationColors") || []
@@ -55,6 +57,8 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
   const [showPublishModal, setShowPublishModal] = useState(false)
   const [isPublishing, setIsPublishing] = useState(false)
   const [isUpdatingChildren, setIsUpdatingChildren] = useState(false)
+  const [showRemoveParentModal, setShowRemoveParentModal] = useState(false)
+  const [isRemovingParent, setIsRemovingParent] = useState(false)
 
 
   useEffect(() => {
@@ -632,6 +636,70 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
     }
   }
 
+  const handleRemoveParent = async () => {
+    if (!storeId || !currentProductId) return
+
+    setIsRemovingParent(true)
+    try {
+      const response = await fetch(`/api/${storeId}/products/${currentProductId}/remove-parent`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (response.ok) {
+        const responseData = await response.json()
+        console.log('Parent product removed successfully:', responseData)
+        
+        form.setValue("isParentProduct", false, { shouldDirty: true })
+        form.setValue("parentProductId", "", { shouldDirty: true })
+        form.setValue("categories.colorVariationLinks", {}, { shouldDirty: true })
+        form.setValue("specifications.color", [], { shouldDirty: true })
+        form.setValue("categories.variationColors", [], { shouldDirty: true })
+        
+        setColorLinks({})
+        setColorSkus({})
+        setSelectedParentProduct(null)
+        setUserRemovedParent(true)
+        
+        if (onInitialDataUpdate) {
+          onInitialDataUpdate({
+            ...initialData,
+            isParentProduct: false,
+            parentProductId: null,
+            colorLinks: {},
+            colorDetails: [],
+          })
+        }
+        
+        toast({
+          title: "Success!",
+          description: "Parent product has been removed successfully.",
+        })
+        
+        setShowRemoveParentModal(false)
+      } else {
+        const errorData = await response.json()
+        console.error('Failed to remove parent product:', errorData)
+        toast({
+          title: "Error",
+          description: errorData.error || "Failed to remove parent product. Please try again.",
+          variant: "destructive"
+        })
+      }
+    } catch (error) {
+      console.error('Error removing parent product:', error)
+      toast({
+        title: "Error",
+        description: "An error occurred while removing parent product.",
+        variant: "destructive"
+      })
+    } finally {
+      setIsRemovingParent(false)
+    }
+  }
+
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
@@ -847,24 +915,37 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
                       <div className="text-xs text-gray-500">{selectedParentProduct.sku}</div>
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      setSelectedParentProduct(null)
-                      setUserRemovedParent(true)
-                      form.setValue("parentProductId", "", { shouldDirty: true })
-                      form.setValue("categories.colorVariationLinks", {}, { shouldDirty: true })
-                      form.setValue("specifications.color", [], { shouldDirty: true })
-                      form.setValue("categories.variationColors", [], { shouldDirty: true })
-                      setColorLinks({})
-                      setColorSkus({})
-                    }}
-                    className="p-1 hover:bg-red-100 rounded text-red-600 hover:text-red-800 transition-colors"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {/* {isStoreAdmin && !isCheckingAdmin && ( */}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowRemoveParentModal(true)}
+                        className="bg-red-50 hover:bg-red-100 border-red-200 text-red-700 hover:text-red-800"
+                      >
+                        Remove Parent
+                      </Button>
+                    {/* )} */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        setSelectedParentProduct(null)
+                        setUserRemovedParent(true)
+                        form.setValue("parentProductId", "", { shouldDirty: true })
+                        form.setValue("categories.colorVariationLinks", {}, { shouldDirty: true })
+                        form.setValue("specifications.color", [], { shouldDirty: true })
+                        form.setValue("categories.variationColors", [], { shouldDirty: true })
+                        setColorLinks({})
+                        setColorSkus({})
+                      }}
+                      className="p-1 hover:bg-red-100 rounded text-red-600 hover:text-red-800 transition-colors"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
@@ -1106,6 +1187,15 @@ export const ColorLinksSection: React.FC<ColorLinksSectionProps> = ({ form, stor
         loading={isPublishing}
         title="Publish Color Links"
         description="Are you sure you want to publish the current color links, color details, and parent product ID to the database? This will update the product with the current form values."
+      />
+
+      <AlertModal
+        isOpen={showRemoveParentModal}
+        onClose={() => setShowRemoveParentModal(false)}
+        onConfirm={handleRemoveParent}
+        loading={isRemovingParent}
+        title="Remove Parent Product"
+        description="Are you sure you want to remove the parent product from this product? This will clear all color links, color details, and parent product ID. This action cannot be undone."
       />
     </div>
   )

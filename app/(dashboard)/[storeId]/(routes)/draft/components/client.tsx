@@ -537,6 +537,7 @@ const ProductsView: React.FC<ProductsViewProps> = ({
   staticGenders = [],
   onClearFilters
 }) => {
+  const params = useParams()
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [selectedProducts, setSelectedProducts] = useState<string[]>([])
   const itemsPerPage = 12
@@ -1092,7 +1093,11 @@ const ProductsView: React.FC<ProductsViewProps> = ({
                       size="sm"
                       onClick={(e) => {
                         e.stopPropagation()
-                        onEdit(product)
+                        if (e.ctrlKey) {
+                          window.open(`/${params?.storeId}/products/${product.id}`, '_blank')
+                        } else {
+                          onEdit(product)
+                        }
                       }}
                       className="flex-1"
                     >
@@ -1244,7 +1249,11 @@ const ProductsView: React.FC<ProductsViewProps> = ({
                               size="sm"
                               onClick={(e) => {
                                 e.stopPropagation()
-                                onEdit(product)
+                                if (e.ctrlKey) {
+                                  window.open(`/${params?.storeId}/products/${product.id}`, '_blank')
+                                } else {
+                                  onEdit(product)
+                                }
                               }}
                             >
                               <Edit className="h-4 w-4 mr-1" />

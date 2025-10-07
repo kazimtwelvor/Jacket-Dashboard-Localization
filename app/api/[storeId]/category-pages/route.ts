@@ -305,6 +305,7 @@ export async function GET(
 
         if (categoryPage.collars && categoryPage.collars.length > 0) {
           const beforeCount = filteredProducts.length
+          const collarsList = categoryPage.collars.map((c: string) => c.toLowerCase())
           filteredProducts = filteredProducts.filter(product => {
             if (!product.specifications) return false
 
@@ -321,9 +322,7 @@ export async function GET(
             if (!productCollars || !Array.isArray(productCollars)) return false
 
             return productCollars.some((collarValue: string) => 
-              categoryPage.collars.some((categoryCollar: string) => 
-                collarValue.toLowerCase() === categoryCollar.toLowerCase()
-              )
+              collarsList.includes(collarValue.toLowerCase())
             )
           })
           console.log(`After collar filter: ${filteredProducts.length} products (was ${beforeCount})`)
@@ -331,6 +330,7 @@ export async function GET(
 
         if (categoryPage.closures && categoryPage.closures.length > 0) {
           const beforeCount = filteredProducts.length
+          const closuresList = categoryPage.closures.map((c: string) => c.toLowerCase())
           filteredProducts = filteredProducts.filter(product => {
             if (!product.specifications) return false
 
@@ -347,9 +347,7 @@ export async function GET(
             if (!productClosures || !Array.isArray(productClosures)) return false
 
             return productClosures.some((closureValue: string) => 
-              categoryPage.closures.some((categoryClosure: string) => 
-                closureValue.toLowerCase() === categoryClosure.toLowerCase()
-              )
+              closuresList.includes(closureValue.toLowerCase())
             )
           })
           console.log(`After closure filter: ${filteredProducts.length} products (was ${beforeCount})`)
@@ -357,6 +355,7 @@ export async function GET(
 
         if (categoryPage.cuffs && categoryPage.cuffs.length > 0) {
           const beforeCount = filteredProducts.length
+          const cuffsList = categoryPage.cuffs.map((c: string) => c.toLowerCase())
           filteredProducts = filteredProducts.filter(product => {
             if (!product.specifications) return false
 
@@ -373,9 +372,7 @@ export async function GET(
             if (!productCuffs || !Array.isArray(productCuffs)) return false
 
             return productCuffs.some((cuffValue: string) => 
-              categoryPage.cuffs.some((categoryCuff: string) => 
-                cuffValue.toLowerCase() === categoryCuff.toLowerCase()
-              )
+              cuffsList.includes(cuffValue.toLowerCase())
             )
           })
           console.log(`After cuffs filter: ${filteredProducts.length} products (was ${beforeCount})`)
@@ -383,6 +380,7 @@ export async function GET(
 
         if (categoryPage.pockets && categoryPage.pockets.length > 0) {
           const beforeCount = filteredProducts.length
+          const pocketsList = categoryPage.pockets.map((p: string) => p.toLowerCase())
           filteredProducts = filteredProducts.filter(product => {
             if (!product.specifications) return false
 
@@ -399,9 +397,7 @@ export async function GET(
             if (!productPockets || !Array.isArray(productPockets)) return false
 
             return productPockets.some((pocketValue: string) => 
-              categoryPage.pockets.some((categoryPocket: string) => 
-                pocketValue.toLowerCase() === categoryPocket.toLowerCase()
-              )
+              pocketsList.includes(pocketValue.toLowerCase())
             )
           })
           console.log(`After pockets filter: ${filteredProducts.length} products (was ${beforeCount})`)

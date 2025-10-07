@@ -23,7 +23,7 @@ export async function POST(req: Request) {
       return new NextResponse("Unauthenticated", { status: 401 })
     }
 
-    const { name, countryCode, currency, currencySymbol, phoneCode, timezone, isActive, sortOrder } = body
+    const { name, countryCode, currency, currencySymbol, timezone, isActive, sortOrder } = body
 
     if (!name) {
       return new NextResponse("Name is required", { status: 400 })
@@ -57,7 +57,6 @@ export async function POST(req: Request) {
         countryCode: countryCode.toLowerCase(),
         currency: currency?.toUpperCase(),
         currencySymbol,
-        phoneCode,
         timezone,
         isActive: isActive !== undefined ? isActive : true,
         sortOrder: sortOrder || 0,

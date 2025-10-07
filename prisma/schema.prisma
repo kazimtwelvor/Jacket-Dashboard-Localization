@@ -876,7 +876,7 @@ model CategoryPageView {
 model Country {
   id            String   @id @default(cuid())
   name          String   @unique
-  countryCode   String   @unique @db.VarChar(2) /
+  countryCode   String   @unique @db.VarChar(2) 
   currency      String?  @db.VarChar(3) 
   currencySymbol String? @db.VarChar(5) 
   timezone      String?  @db.VarChar(50) 

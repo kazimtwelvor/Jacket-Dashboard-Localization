@@ -39,9 +39,6 @@ const formSchema = z.object({
     .refine((val) => !val || val.length === 3, "Currency code must be 3 characters")
     .refine((val) => !val || /^[A-Z]{3}$/.test(val), "Currency code must be 3 uppercase letters"),
   currencySymbol: z.string().max(5, "Currency symbol must be less than 5 characters").optional(),
-  phoneCode: z.string()
-    .optional()
-    .refine((val) => !val || /^\+?[0-9]+$/.test(val), "Phone code must contain only numbers and optional + prefix"),
   timezone: z.string().max(50, "Timezone must be less than 50 characters").optional(),
   isActive: z.boolean().default(true),
   sortOrder: z.number().min(0, "Sort order must be non-negative").default(0),
@@ -70,7 +67,6 @@ export const CountryModal: React.FC<CountryModalProps> = ({
       countryCode: "",
       currency: "",
       currencySymbol: "",
-      phoneCode: "",
       timezone: "",
       isActive: true,
       sortOrder: 0,
@@ -84,7 +80,6 @@ export const CountryModal: React.FC<CountryModalProps> = ({
         countryCode: country.countryCode,
         currency: country.currency || "",
         currencySymbol: country.currencySymbol || "",
-        phoneCode: country.phoneCode || "",
         timezone: country.timezone || "",
         isActive: country.isActive,
         sortOrder: country.sortOrder,
@@ -95,7 +90,6 @@ export const CountryModal: React.FC<CountryModalProps> = ({
         countryCode: "",
         currency: "",
         currencySymbol: "",
-        phoneCode: "",
         timezone: "",
         isActive: true,
         sortOrder: 0,
@@ -140,6 +134,7 @@ export const CountryModal: React.FC<CountryModalProps> = ({
         toast.success("Country created successfully")
       }
 
+      form.reset()
       onClose()
     } catch (error: any) {
       console.error("Error saving country:", error)
@@ -250,43 +245,23 @@ export const CountryModal: React.FC<CountryModalProps> = ({
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="phoneCode"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone Code</FormLabel>
-                    <FormControl>
-                      <Input
-                        disabled={loading}
-                        placeholder="+1, +44"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="timezone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Timezone</FormLabel>
-                    <FormControl>
-                      <Input
-                        disabled={loading}
-                        placeholder="America/New_York"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="timezone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Timezone</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={loading}
+                      placeholder="America/New_York"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <div className="grid grid-cols-2 gap-4">
               <FormField

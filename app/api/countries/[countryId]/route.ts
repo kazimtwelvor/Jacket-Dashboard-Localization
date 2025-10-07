@@ -55,7 +55,7 @@ export async function PATCH(
       return new NextResponse("Country ID is required", { status: 400 })
     }
 
-    const { name, countryCode, currency, currencySymbol, phoneCode, timezone, isActive, sortOrder } = body
+    const { name, countryCode, currency, currencySymbol, timezone, isActive, sortOrder } = body
 
     // Check if country exists
     const existingCountry = await prismadb.country.findUnique({
@@ -95,7 +95,6 @@ export async function PATCH(
         ...(countryCode && { countryCode: countryCode.toLowerCase() }),
         ...(currency !== undefined && { currency: currency?.toUpperCase() }),
         ...(currencySymbol !== undefined && { currencySymbol }),
-        ...(phoneCode !== undefined && { phoneCode }),
         ...(timezone !== undefined && { timezone }),
         ...(isActive !== undefined && { isActive }),
         ...(sortOrder !== undefined && { sortOrder }),

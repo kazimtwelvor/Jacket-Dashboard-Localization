@@ -21,7 +21,6 @@ export type CountryColumn = {
   countryCode: string
   currency: string | null
   currencySymbol: string | null
-  phoneCode: string | null
   timezone: string | null
   isActive: boolean
   sortOrder: number
@@ -52,84 +51,81 @@ export const columns: ColumnDef<CountryColumn>[] = [
     accessorKey: "name",
     header: ({ column }) => {
       return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Name
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+        <div className="text-center">
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Name
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
       )
     },
+    cell: ({ row }) => <div className="text-center">{row.getValue("name")}</div>,
   },
   {
     accessorKey: "countryCode",
     header: ({ column }) => {
       return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Code
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+        <div className="text-center">
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Code
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
       )
     },
     cell: ({ row }) => (
-      <Badge variant="outline">
-        {row.getValue("countryCode")}
-      </Badge>
+      <div className="text-center">
+        <Badge variant="outline">
+          {row.getValue("countryCode")}
+        </Badge>
+      </div>
     ),
   },
   {
     accessorKey: "currency",
-    header: "Currency",
+    header: () => <div className="text-center">Currency</div>,
     cell: ({ row }) => {
       const currency = row.getValue("currency") as string | null
       const symbol = row.original.currencySymbol
       return currency ? (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-center gap-2">
           <span>{currency}</span>
           {symbol && <span className="text-muted-foreground">({symbol})</span>}
         </div>
       ) : (
-        <span className="text-muted-foreground">-</span>
-      )
-    },
-  },
-  {
-    accessorKey: "phoneCode",
-    header: "Phone Code",
-    cell: ({ row }) => {
-      const phoneCode = row.getValue("phoneCode") as string | null
-      return phoneCode ? (
-        <span>{phoneCode}</span>
-      ) : (
-        <span className="text-muted-foreground">-</span>
+        <div className="text-center text-muted-foreground">-</div>
       )
     },
   },
   {
     accessorKey: "timezone",
-    header: "Timezone",
+    header: () => <div className="text-center">Timezone</div>,
     cell: ({ row }) => {
       const timezone = row.getValue("timezone") as string | null
       return timezone ? (
-        <span className="text-sm">{timezone}</span>
+        <div className="text-center text-sm">{timezone}</div>
       ) : (
-        <span className="text-muted-foreground">-</span>
+        <div className="text-center text-muted-foreground">-</div>
       )
     },
   },
   {
     accessorKey: "isActive",
-    header: "Status",
+    header: () => <div className="text-center">Status</div>,
     cell: ({ row }) => {
       const isActive = row.getValue("isActive") as boolean
       return (
-        <Badge variant={isActive ? "default" : "secondary"}>
-          {isActive ? "Active" : "Inactive"}
-        </Badge>
+        <div className="text-center">
+          <Badge variant={isActive ? "default" : "secondary"}>
+            {isActive ? "Active" : "Inactive"}
+          </Badge>
+        </div>
       )
     },
   },
@@ -137,32 +133,37 @@ export const columns: ColumnDef<CountryColumn>[] = [
     accessorKey: "sortOrder",
     header: ({ column }) => {
       return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Order
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+        <div className="text-center">
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Order
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
       )
     },
+    cell: ({ row }) => <div className="text-center">{row.getValue("sortOrder")}</div>,
   },
   {
     accessorKey: "createdAt",
     header: ({ column }) => {
       return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Created
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+        <div className="text-center">
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Created
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
       )
     },
     cell: ({ row }) => {
       const date = new Date(row.getValue("createdAt"))
-      return date.toLocaleDateString()
+      return <div className="text-center">{date.toLocaleDateString()}</div>
     },
   },
   {

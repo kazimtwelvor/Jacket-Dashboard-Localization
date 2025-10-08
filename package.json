@@ -79,6 +79,8 @@
     "effect": "^3.17.11",
     "embla-carousel-react": "^8.5.2",
     "express-validator": "^7.2.1",
+    "facebook-nodejs-business-sdk": "^23.0.2",
+    "firebase-admin": "^13.5.0",
     "framer-motion": "^12.6.3",
     "input-otp": "^1.4.2",
     "jsonwebtoken": "^9.0.2",

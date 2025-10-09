@@ -76,7 +76,7 @@ export const OrdersClient: React.FC<OrdersClientProps> = ({ data }) => {
         onClearSelection={() => setSelectedRows([])} 
       />
       <DataTable 
-        searchKey="orderNumber" 
+        searchKey="id" 
         columns={columns} 
         data={filteredData}
         onRowSelectionChange={setSelectedRows}
@@ -91,7 +91,6 @@ export const OrdersClient: React.FC<OrdersClientProps> = ({ data }) => {
 function formatOrders(orders: any[]): OrderColumn[] {
   return orders.map((item) => ({
     id: item.id,
-    orderNumber: generateOrderNumber(item.id, item.createdAt),
     customerName: item.customerName || "Guest Customer",
     customerEmail: item.customerEmail || item.user?.email || "No email",
     phone: item.phone || "No phone",
@@ -107,13 +106,4 @@ function formatOrders(orders: any[]): OrderColumn[] {
     // fulfillmentStatus: item.fulfillmentStatus || "pending",
     createdAt: new Date(item.createdAt).toLocaleDateString(),
   }))
-}
-
-function generateOrderNumber(orderId: string, createdAt: string): string {
-  const date = new Date(createdAt)
-  const year = date.getFullYear().toString().slice(-2)
-  const month = (date.getMonth() + 1).toString().padStart(2, '0')
-  const day = date.getDate().toString().padStart(2, '0')
-  const shortId = orderId.slice(-6).toUpperCase()
-  return `ORD-${year}${month}${day}-${shortId}`
 }

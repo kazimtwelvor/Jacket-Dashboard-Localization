@@ -14,6 +14,7 @@ import { ApiList } from "@/components/ui/api-list"
 
 import { type OrderColumn, columns } from "./columns"
 import { OrderFilters } from "./order-filters"
+import { BulkActions } from "./bulk-actions"
 
 interface OrdersClientProps {
   data: any[]
@@ -23,6 +24,7 @@ export const OrdersClient: React.FC<OrdersClientProps> = ({ data }) => {
   const params = useParams()
   const router = useRouter()
   const [filteredData, setFilteredData] = useState<OrderColumn[]>(formatOrders(data))
+  const [selectedRows, setSelectedRows] = useState<string[]>([])
   const [filters, setFilters] = useState({
     status: "",
     paymentStatus: "",
@@ -69,7 +71,16 @@ export const OrdersClient: React.FC<OrdersClientProps> = ({ data }) => {
       </div>
       <Separator />
       <OrderFilters filters={filters} onFilterChange={handleFilterChange} onResetFilters={handleResetFilters} />
-      <DataTable searchKey="customerName" columns={columns} data={filteredData} />
+      <BulkActions 
+        selectedIds={selectedRows} 
+        onClearSelection={() => setSelectedRows([])} 
+      />
+      <DataTable 
+        searchKey="orderNumber" 
+        columns={columns} 
+        data={filteredData}
+        onRowSelectionChange={setSelectedRows}
+      />
       <Heading title="API" description="API Calls for Orders" />
       <Separator />
       <ApiList entityName="orders" entityIdName="orderId" />
@@ -80,6 +91,7 @@ export const OrdersClient: React.FC<OrdersClientProps> = ({ data }) => {
 function formatOrders(orders: any[]): OrderColumn[] {
   return orders.map((item) => ({
     id: item.id,
+    orderNumber: generateOrderNumber(item.id, item.createdAt),
     customerName: item.customerName || "Guest Customer",
     customerEmail: item.customerEmail || item.user?.email || "No email",
     phone: item.phone || "No phone",
@@ -95,4 +107,13 @@ function formatOrders(orders: any[]): OrderColumn[] {
     // fulfillmentStatus: item.fulfillmentStatus || "pending",
     createdAt: new Date(item.createdAt).toLocaleDateString(),
   }))
+}
+
+function generateOrderNumber(orderId: string, createdAt: string): string {
+  const date = new Date(createdAt)
+  const year = date.getFullYear().toString().slice(-2)
+  const month = (date.getMonth() + 1).toString().padStart(2, '0')
+  const day = date.getDate().toString().padStart(2, '0')
+  const shortId = orderId.slice(-6).toUpperCase()
+  return `ORD-${year}${month}${day}-${shortId}`
 }

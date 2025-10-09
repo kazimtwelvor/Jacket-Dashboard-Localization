@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -10,6 +10,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   type SortingState,
+  type RowSelectionState,
   useReactTable,
 } from "@tanstack/react-table"
 
@@ -24,12 +25,14 @@ interface DataTableProps<TData, TValue> {
   data: TData[]
   searchKey: string
   searchFields?: (keyof TData)[] // Additional fields to search in
+  onRowSelectionChange?: (selectedIds: string[]) => void
 }
 
-export function DataTable<TData, TValue>({ columns, data, searchKey, searchFields }: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({ columns, data, searchKey, searchFields, onRowSelectionChange }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [globalFilter, setGlobalFilter] = useState("")
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
   // Apply smart search to data
   const filteredData = useMemo(() => {
@@ -48,11 +51,22 @@ export function DataTable<TData, TValue>({ columns, data, searchKey, searchField
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
+    onRowSelectionChange: setRowSelection,
+    enableRowSelection: true,
+    getRowId: (row: any) => row.id,
     state: {
       sorting,
       columnFilters,
+      rowSelection,
     },
   })
+
+  useEffect(() => {
+    if (onRowSelectionChange) {
+      const selectedIds = Object.keys(rowSelection).filter(id => rowSelection[id])
+      onRowSelectionChange(selectedIds)
+    }
+  }, [rowSelection, onRowSelectionChange])
 
   return (
     <div className="px-4">

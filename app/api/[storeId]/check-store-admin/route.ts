@@ -25,7 +25,7 @@ export async function GET(req: NextRequest, { params }: { params: { storeId: str
     const store = await db.store.findFirst({
       where: {
         id: storeId,
-        userId: dbUser.id,
+        userId: userId, // Use Clerk userId directly
       },
     })
 

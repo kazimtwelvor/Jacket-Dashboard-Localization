@@ -5,10 +5,12 @@ import { ArrowUpDown } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
 import { CellAction } from "./cell-action"
 
 export type OrderColumn = {
   id: string
+  orderNumber: string
   customerName: string
   customerEmail: string
   phone: string
@@ -21,7 +23,41 @@ export type OrderColumn = {
 }
 
 export const columns: ColumnDef<OrderColumn>[] = [
-
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={table.getIsAllPageRowsSelected()}
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: "orderNumber",
+    header: ({ column }) => {
+      return (
+        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          Order Number
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: ({ row }) => (
+      <div className="font-mono font-medium">
+        {row.original.orderNumber}
+      </div>
+    ),
+  },
   {
     accessorKey: "customerName",
     header: ({ column }) => {

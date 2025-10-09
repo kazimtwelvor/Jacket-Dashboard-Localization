@@ -10,7 +10,6 @@ import { CellAction } from "./cell-action"
 
 export type OrderColumn = {
   id: string
-  orderNumber: string
   customerName: string
   customerEmail: string
   phone: string
@@ -43,18 +42,18 @@ export const columns: ColumnDef<OrderColumn>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "orderNumber",
+    accessorKey: "id",
     header: ({ column }) => {
       return (
         <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          Order Number
+          Order ID
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       )
     },
     cell: ({ row }) => (
       <div className="font-mono font-medium">
-        {row.original.orderNumber}
+        {row.original.id}
       </div>
     ),
   },

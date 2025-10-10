@@ -45,8 +45,8 @@ export async function GET(
       },
       take: 20,
       orderBy: [
+        { priority: { sort: "asc", nulls: "last" } },
         { viewCount: "desc" },
-        { priority: "asc" },
         { name: "asc" }
       ]
     })

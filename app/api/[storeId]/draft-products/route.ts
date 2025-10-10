@@ -231,8 +231,8 @@ export async function GET(
         orderBy: type === 'trashed'
           ? { deletedAt: 'desc' }
           : [
-              { viewCount: 'desc' },
               { priority: { sort: 'asc', nulls: 'last' } },
+              { viewCount: 'desc' },
               { createdAt: 'desc' }
             ],
         skip: offset,

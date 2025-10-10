@@ -74,10 +74,10 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       },
       orderBy: [
         {
-          viewCount: "desc", 
+          priority: { sort: "asc", nulls: "last" },
         },
         {
-          priority: "asc", 
+          viewCount: "desc", 
         },
         {
           isFeatured: "desc", 

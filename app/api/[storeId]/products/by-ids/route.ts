@@ -37,10 +37,10 @@
         },
         orderBy: [
           {
-            viewCount: "desc",
+            priority: { sort: "asc", nulls: "last" },
           },
           {
-            priority: "asc",
+            viewCount: "desc",
           },
           {
             createdAt: "desc",

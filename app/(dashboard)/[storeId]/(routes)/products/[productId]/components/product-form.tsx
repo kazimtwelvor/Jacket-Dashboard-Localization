@@ -58,7 +58,6 @@ const organizeCategoriesByType = (categories: Category[]) => {
   const materialCategories: Category[] = []
   const styleCategories: Category[] = []
 
-  console.log("Raw categories from database:", categories)
 
   categories.forEach((category) => {
     if ((category as any)?.type) {
@@ -107,13 +106,6 @@ const organizeCategoriesByType = (categories: Category[]) => {
       }
     }
   })
-
-  console.log("Organized categories:", {
-    genderCategories: genderCategories.map((c) => c.name),
-    materialCategories: materialCategories.map((c) => c.name),
-    styleCategories: styleCategories.map((c) => c.name),
-  })
-
   return { genderCategories, materialCategories, styleCategories }
 }
 
@@ -135,7 +127,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
 
   const extractSizeDetails = () => {
     if (initialData && initialData.sizeDetails) {
-      console.log("Raw sizeDetails from initialData:", initialData.sizeDetails)
 
       if (Array.isArray(initialData.sizeDetails)) {
         return initialData.sizeDetails
@@ -156,35 +147,27 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
 
   const processColorLinks = () => {
     if (!initialData) {
-      console.log("No initial data available for color links")
       return {}
     }
 
-    console.log("Raw initialData.colorLinks:", initialData.colorLinks)
-    console.log("Raw initialData.colorLinks type:", typeof initialData.colorLinks)
-
     try {
       if (typeof initialData.colorLinks === "object" && initialData.colorLinks !== null) {
-        console.log("colorLinks is already an object:", initialData.colorLinks)
         return initialData.colorLinks
       }
 
       if (typeof initialData.colorLinks === "string") {
         if (initialData.colorLinks === "[object Object]") {
-          console.log("Found '[object Object]' string, returning empty object")
           return {}
         }
 
         try {
           const parsed = JSON.parse(initialData.colorLinks)
-          console.log("Parsed colorLinks from string:", parsed)
           return parsed
         } catch (parseError) {
           console.error("Error parsing colorLinks string:", parseError)
 
           try {
             const doubleStringified = JSON.parse(JSON.parse(initialData.colorLinks))
-            console.log("Parsed double-stringified colorLinks:", doubleStringified)
             return doubleStringified
           } catch (doubleParseError) {
             console.error("Error parsing double-stringified colorLinks:", doubleParseError)
@@ -238,6 +221,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       status: initialData.isArchived === true ? "draft" : "published",
       regularPrice: initialData.price.toString(),
       salePrice: initialData.salePrice ? initialData.salePrice.toString() : "",
+      isSale: initialData.isSale || (initialData.salePrice && initialData.salePrice > 0) || false,
       sku: initialData.sku || "",
       stockStatus: initialData.stockStatus || "instock",
       isFeatured: initialData.isFeatured || false,
@@ -438,6 +422,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       status: "published",
       regularPrice: "",
       salePrice: "",
+      isSale: false,
       sku: "",
       stockStatus: "instock",
       brandName: "Leather Jacket By Fineyst",
@@ -480,31 +465,14 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       parentProductId: "",
     }
 
-  // Add this after the parsedInitialData definition to log the extracted schemas
   useEffect(() => {
     if (initialData && initialData.schema) {
-      console.log("Schema data loaded from database:", initialData.schema)
-      console.log(
-        "Extracted schema1:",
-        parsedInitialData.schema1 ? parsedInitialData.schema1.substring(0, 100) + "..." : "none",
-      )
-      console.log(
-        "Extracted schema2:",
-        parsedInitialData.schema2 ? parsedInitialData.schema2.substring(0, 100) + "..." : "none",
-      )
-      console.log(
-        "Extracted schema3:",
-        parsedInitialData.schema3 ? parsedInitialData.schema3.substring(0, 100) + "..." : "none",
-      )
     }
   }, [initialData, parsedInitialData])
 
-  // Log the parsed initial data
   useEffect(() => {
-    console.log("Parsed Initial Data:", parsedInitialData)
-    console.log("Parsed colorVariationLinks:", parsedInitialData.categories?.colorVariationLinks)
-    console.log("Parsed mainImageMetadata:", parsedInitialData.mainImageMetadata)
-    console.log("Parsed imagesMetadata:", parsedInitialData.imagesMetadata)
+    if (initialData) {
+    }
   }, [parsedInitialData])
 
   const form = useForm<ProductFormValues>({
@@ -513,28 +481,16 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
     mode: "onChange", // Add this to validate on change
   })
 
-  // Add this useEffect after the form initialization (around line 430)
-  // After this line: mode: "onChange", // Add this to validate on change
-
-  // Log the form values after initialization
   useEffect(() => {
-    console.log("Form Values after initialization:", form.getValues())
-    console.log("Form colorVariationLinks:", form.getValues("categories.colorVariationLinks"))
-    console.log("Form mainImageMetadata:", form.getValues("mainImageMetadata"))
-    console.log("Form imagesMetadata:", form.getValues("imagesMetadata"))
-
-    // Add this to debug color links specifically
+    const currentIsSale = form.getValues("isSale")
+    const currentSalePrice = form.getValues("salePrice")
+    if (!currentIsSale && currentSalePrice && parseFloat(currentSalePrice) > 0) {
+      form.setValue("isSale", true, { shouldValidate: false })
+    }
     const colorLinks = form.getValues("categories.colorVariationLinks")
-    console.log("Color links type:", typeof colorLinks)
-    console.log("Color links keys:", colorLinks ? Object.keys(colorLinks) : "no keys")
-    console.log("Color links values:", colorLinks ? Object.values(colorLinks) : "no values")
-
-    // Check if we have selected colors and if they match with color links
     const selectedColors = form.getValues("specifications.color") || []
-    console.log("Selected colors:", selectedColors)
     if (selectedColors.length > 0 && colorLinks) {
       selectedColors.forEach((color) => {
-        console.log(`Color ${color} link:`, colorLinks[color])
       })
     }
   }, [form])
@@ -542,15 +498,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
   // Debug keywords data
   useEffect(() => {
     if (initialData) {
-      console.log("Keywords data:", {
-        rawKeywords: (initialData as any).keywords,
-        keywordsType: typeof (initialData as any).keywords,
-        isArray: Array.isArray((initialData as any).keywords),
-        parsedKeywords: form.getValues("seo.keywords"),
-        focusKeyword: initialData.focusKeyword,
-        additionalKeywords: initialData.additionalKeywords,
-      })
-
       if (typeof (initialData as any).keywords === "string" && (initialData as any).keywords.trim() !== "") {
         const keywordsString = (initialData as any).keywords.trim()
         
@@ -560,9 +507,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
         
         try {
           const parsedKeywords = JSON.parse(keywordsString)
-          console.log("Parsed keywords from string:", parsedKeywords)
-
-          // Update the form with parsed keywords if needed
           if (
             Array.isArray(parsedKeywords) &&
             (!form.getValues("seo.keywords") || form.getValues("seo.keywords").length === 0)
@@ -575,23 +519,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       }
     }
   }, [initialData, form])
-
   useEffect(() => {
-    if (initialData) {
-      console.log("Keywords data:", {
-        rawKeywords: (initialData as any).keywords,
-        parsedKeywords: form.getValues("seo.keywords"),
-        keywordsType: typeof (initialData as any).keywords,
-        isArray: Array.isArray((initialData as any).keywords),
-      })
-    }
-  }, [initialData, form])
-
-  // After the form initialization (around line 400), add this code to set default schema values
-  useEffect(() => {
-    // Check if schema1 is empty but we have product data
     if (!form.getValues("schema1")) {
-      // Generate a basic product schema
       const productName = form.getValues("name") || "Product"
       const productDescription = form.getValues("description") || ""
       const productImage = form.getValues("mainImage") || ""
@@ -620,49 +549,22 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       const combinedSchema = { Product: defaultSchema }
       form.setValue("schema", JSON.stringify(combinedSchema), { shouldDirty: false })
 
-      console.log("Default product schema created and set in form:", schemaString.substring(0, 100) + "...")
     }
   }, [form])
 
-  // Log the form values after initialization
   useEffect(() => {
-    console.log("Form Values after initialization:", form.getValues())
-    console.log("Form colorVariationLinks:", form.getValues("categories.colorVariationLinks"))
-
-    // Add this to debug color links specifically
     const colorLinks = form.getValues("categories.colorVariationLinks")
-    console.log("Color links type:", typeof colorLinks)
-    console.log("Color links keys:", colorLinks ? Object.keys(colorLinks) : "no keys")
-    console.log("Color links values:", colorLinks ? Object.values(colorLinks) : "no values")
 
     // Check if we have selected colors and if they match with color links
     const selectedColors = form.getValues("specifications.color") || []
-    console.log("Selected colors:", selectedColors)
     if (selectedColors.length > 0 && colorLinks) {
       selectedColors.forEach((color) => {
-        console.log(`Color ${color} link:`, colorLinks[color])
       })
     }
   }, [form])
 
-  // Removed form change tracking
-
-  // Removed form submission tracking
-
-  // Removed beforeunload event handler
-
-  // Removed navigation handler with warning modal
-
-  // Removed save as draft and exit handler
-
-  // Removed discard changes handler
-
-  // Removed router method overrides and popstate handling
-
-  // Organize categories by type
   const categorizedCategories = organizeCategoriesByType(categories)
 
-  // Ensure material and style are always arrays
   useEffect(() => {
     // Ensure categories object exists
     const categoriesData = form.getValues("categories")
@@ -700,15 +602,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
     if (!colorVariationLinks || typeof colorVariationLinks !== "object") {
       form.setValue("categories.colorVariationLinks", {}, { shouldValidate: false })
     }
-
-    // Log the current values for debugging
-    console.log("Form initialized with:", {
-      categories: form.getValues("categories"),
-      material: form.getValues("categories.material"),
-      style: form.getValues("categories.style"),
-      sizes: form.getValues("categories.sizes"),
-      colorVariationLinks: form.getValues("categories.colorVariationLinks"),
-    })
   }, [form])
 
   // Function to update meta title based on product name
@@ -889,6 +782,14 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       })
     }
 
+    // Check Sale Price when isSale is true
+    if (values.isSale && (!values.salePrice || values.salePrice.trim() === "")) {
+      errors.push({
+        field: "salePrice",
+        message: "Sale price is required when product is on sale",
+      })
+    }
+
     // Check SKU
     if (!values.sku || values.sku.includes("-") || values.sku.endsWith("-")) {
       errors.push({
@@ -972,7 +873,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
 
 
   const handlePublish = async () => {
-    console.log("Publish button clicked - Direct submission approach")
     setIsUploading(true)
 
     try {
@@ -999,6 +899,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       formData.append("description", formValues.description || "")
       formData.append("regularPrice", formValues.regularPrice || "0")
       formData.append("salePrice", formValues.salePrice || "0")
+      formData.append("isSale", formValues.isSale ? "true" : "false")
       formData.append("sku", formValues.sku || "")
       formData.append("stockStatus", formValues.stockStatus || "instock")
       formData.append("isFeatured", formValues.isFeatured ? "true" : "false")
@@ -1039,7 +940,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
             })
             .filter(Boolean)
 
-          console.log("Size details being added to form:", sizeDetailsArray)
           formData.append("sizeDetails", JSON.stringify(sizeDetailsArray))
         } else {
           formData.append("sizeDetails", "[]")
@@ -1129,9 +1029,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
         formData.append("cachedReviews", JSON.stringify(formValues.cachedReviews))
       }
 
-      console.log("FormData entries:")
       for (const [key, value] of Array.from(formData?.entries() || [])) {
-        console.log(`${key}: ${typeof value === "string" ? value.substring(0, 50) : "[complex value]"}...`)
       }
 
       const result = await createProduct(formData)
@@ -1168,12 +1066,10 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
   }
 
   const handleSaveDraft = async () => {
-    console.log("Save Draft clicked - Direct submission approach")
     setIsUploading(true)
 
     try {
       const formValues = form.getValues()
-      console.log("Current form values for draft:", formValues)
 
       const formData = new FormData()
 
@@ -1196,6 +1092,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       formData.append("description", formValues.description || "")
       formData.append("regularPrice", formValues.regularPrice || "0")
       formData.append("salePrice", formValues.salePrice || "0")
+      formData.append("isSale", formValues.isSale ? "true" : "false")
       formData.append("sku", formValues.sku || "")
       formData.append("stockStatus", formValues.stockStatus || "instock")
       formData.append("isFeatured", formValues.isFeatured ? "true" : "false")
@@ -1319,21 +1216,15 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
 
       if (formValues.tempReviewsId) {
         formData.append("tempReviewsId", formValues.tempReviewsId)
-        console.log("Added tempReviewsId to draft formData:", formValues.tempReviewsId)
       }
       if (formValues.cachedReviews && Array.isArray(formValues.cachedReviews) && formValues.cachedReviews.length > 0) {
         formData.append("cachedReviews", JSON.stringify(formValues.cachedReviews))
-        console.log("Added cachedReviews to draft formData:", formValues.cachedReviews.length, "reviews")
       }
 
-      console.log("FormData entries for draft:")
       for (const [key, value] of Array.from(formData?.entries() || [])) {
-        console.log(`${key}: ${typeof value === "string" ? value.substring(0, 50) : "[complex value]"}...`)
       }
 
-      console.log("Calling createProduct server action for draft...")
       const result = await createProduct(formData)
-      console.log("Draft submission result:", result)
 
       const productId = initialData?.id || "new"
       localStorage.removeItem(`cachedReviews_${productId}`)
@@ -1391,7 +1282,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
           if (parsedSchema2) {
             const schemaType = parsedSchema2.templateName || parsedSchema2["@type"] || "FAQPage"
             combinedSchema[schemaType] = parsedSchema2
-            console.log(`Added schema2 as ${schemaType} to combined schema`)
           }
         }
 
@@ -1400,13 +1290,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
           if (parsedSchema3) {
             const schemaType = parsedSchema3.templateName || parsedSchema3["@type"] || "HowTo"
             combinedSchema[schemaType] = parsedSchema3
-            console.log(`Added schema3 as ${schemaType} to combined schema`)
           }
         }
 
         if (Object.keys(combinedSchema).length > 0) {
           values.schema = JSON.stringify(combinedSchema)
-          console.log("Created combined schema before submission with", Object.keys(combinedSchema).length, "schemas")
         }
       } catch (e) {
         console.error("Error creating combined schema before submission:", e)
@@ -1439,7 +1327,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
         }
 
         values.schema = JSON.stringify(defaultSchema)
-        console.log("Created minimal default schema before submission")
       }
     }
 
@@ -1474,11 +1361,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       }
 
       const currentFormValues = form.getValues()
-      console.log("Form values before submission:", {
-        ...currentFormValues,
-        colorLinks: currentFormValues.categories?.colorVariationLinks,
-      })
-
       let safeValues: ProductFormValues = JSON.parse(JSON.stringify(values));
 
       safeValues = ensureSchemaIsIncluded(safeValues)
@@ -1568,8 +1450,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
         const selectedColors = form.getValues("specifications.color") || []
 
         const colorLinksInput = form.getValues("categories.colorVariationLinks") || {}
-        console.log("Color links from form before submission:", colorLinksInput)
-
         const colorLinksObj: any = {}
 
         selectedColors.forEach((color) => {
@@ -1586,8 +1466,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
         const colorLinksString = JSON.stringify(colorLinksObj)
 
         formData.append("colorLinks", colorLinksString)
-        console.log("Color links structure being sent:", colorLinksObj)
-        console.log("Color links JSON string being sent:", colorLinksString)
       } catch (error) {
         console.error("Error processing color links for submission:", error)
         formData.append("colorLinks", "{}")
@@ -1600,7 +1478,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
 
         if (key === "slug") {
           formData.append("slug", value?.toString() || "")
-          console.log("Adding slug to formData:", value)
         } else if (key === "specifications") {
           formData.append("specifications", JSON.stringify(value))
           formData.append("formattedSpecifications", formattedSpecs)
@@ -1635,14 +1512,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
 
       if (safeValues.categories && Array.isArray(safeValues.categories.sizes)) {
         formData.append("sizes", JSON.stringify(safeValues.categories.sizes))
-        console.log("Appending sizes to formData:", JSON.stringify(safeValues.categories.sizes))
       }
 
       try {
         const tags = form.getValues("tags") || []
         if (Array.isArray(tags)) {
           formData.append("tags", JSON.stringify(tags))
-          console.log("Tags being included in form submission:", tags)
         }
       } catch (error) {
         console.error("Error processing tags for submission:", error)
@@ -1677,15 +1552,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
         }
 
         const selectedColors = form.getValues("specifications.color") || []
-        console.log("Selected colors for new product:", selectedColors)
 
         const selectedColorIds = colors.filter((color) => selectedColors.includes(color.name)).map((color) => color.id)
 
-        console.log("Mapped color IDs for new product:", selectedColorIds)
         formData.append("colorIds", JSON.stringify(selectedColorIds))
       }
 
-      console.log("Submitting form data...")
       if (!form.getValues("schema")) {
         const schema1 = form.getValues("schema1")
         if (schema1 && schema1.trim() !== "" && schema1.trim() !== "[object Object]") {
@@ -1743,7 +1615,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
 
         if (Object.keys(combinedSchema).length > 0) {
           formData.append("schema", JSON.stringify(combinedSchema))
-          console.log("Adding combined schema to formData:", JSON.stringify(combinedSchema).substring(0, 100) + "...")
         } else {
           const defaultSchema = {
             Product: {
@@ -1761,16 +1632,13 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
             },
           }
           formData.append("schema", JSON.stringify(defaultSchema))
-          console.log("Adding default schema to formData")
         }
       } catch (error) {
         console.error("Error creating combined schema for form submission:", error)
         formData.append("schema", "")
       }
 
-      console.log("FormData entries:")
       for (const [key, value] of Array.from(formData.entries())) {
-        console.log(`${key}: ${typeof value === "string" ? value.substring(0, 50) : "[complex value]"}...`)
       }
 
       if (safeValues.seo && safeValues.seo.keywords) {
@@ -1779,13 +1647,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
         }
 
         (safeValues as any).keywords = safeValues.seo.keywords
-        console.log("Keywords being submitted:", (safeValues as any).keywords)
       }
 
       try {
         try {
           const selectedSizeIds = form.getValues("categories.sizes") || []
-          console.log("Selected size IDs:", selectedSizeIds)
 
           if (selectedSizeIds.length > 0) {
             const sizeDetailsArray = selectedSizeIds
@@ -1800,9 +1666,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
                   : null
               })
               .filter(Boolean)
-
-            console.log("Mapped size details:", sizeDetailsArray)
-
             formData.append("sizeDetails", JSON.stringify(sizeDetailsArray))
           }
         } catch (error) {
@@ -1811,8 +1674,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
         }
 
         const result = await createProduct(formData)
-        console.log("Form submission result:", result)
-
         toast({
           title: "Success!",
           description: `Product has been ${type === "draft" ? "saved as draft" : "published"} successfully.`,
@@ -1928,18 +1789,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
             }
           })
           data.categories.colorVariationLinks = cleanedColorLinks
-          console.log("[Color Links Validation] Cleaned color links:", cleanedColorLinks)
-          console.log("[Color Links Validation] Valid colors:", Array.from(validColorNames))
         }
 
         const toastMessage = initialData ? "Product updated!" : "Product created!"
 
         const selectedColors = form.getValues("specifications.color") || []
         const selectedColorIds = colors.filter((color) => selectedColors.includes(color.name)).map((color) => color.id)
-
-        console.log("Selected colors in onSubmit:", selectedColors)
-        console.log("Mapped color IDs in onSubmit:", selectedColorIds)
-
         const mainImage = data.mainImage
           ? {
             url: data.mainImage,
@@ -2075,8 +1930,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
     }
 
     const handleDraft = () => {
-      console.log("Draft button clicked")
-
       const formValues = form.getValues()
       const validationErrors = validateRequiredFields(formValues)
 
@@ -2111,7 +1964,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
     }
 
     const onSubmit = (data: ProductFormValues) => {
-      console.log("Form submitted with data:", data)
       handleFormSubmit(data)
     }
 
@@ -2205,7 +2057,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
               variant="outline"
               className="transition-all duration-200 hover:bg-muted"
               onClick={() => {
-                console.log("Save Draft button clicked - direct handler")
                 handleSaveDraft()
               }}
               disabled={isUploading || loading}
@@ -2224,7 +2075,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
               disabled={isUploading || loading}
               className="transition-all duration-200 hover:opacity-90"
               onClick={() => {
-                console.log("Publish button clicked - direct handler")
                 handlePublish()
               }}
             >

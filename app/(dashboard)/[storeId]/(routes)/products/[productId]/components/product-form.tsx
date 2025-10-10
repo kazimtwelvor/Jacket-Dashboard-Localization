@@ -238,6 +238,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       status: initialData.isArchived === true ? "draft" : "published",
       regularPrice: initialData.price.toString(),
       salePrice: initialData.salePrice ? initialData.salePrice.toString() : "",
+      isSale: initialData.isSale || (initialData.salePrice && initialData.salePrice > 0) || false,
       sku: initialData.sku || "",
       stockStatus: initialData.stockStatus || "instock",
       isFeatured: initialData.isFeatured || false,
@@ -438,6 +439,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       status: "published",
       regularPrice: "",
       salePrice: "",
+      isSale: false,
       sku: "",
       stockStatus: "instock",
       brandName: "Leather Jacket By Fineyst",
@@ -505,7 +507,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
     console.log("Parsed colorVariationLinks:", parsedInitialData.categories?.colorVariationLinks)
     console.log("Parsed mainImageMetadata:", parsedInitialData.mainImageMetadata)
     console.log("Parsed imagesMetadata:", parsedInitialData.imagesMetadata)
-  }, [parsedInitialData])
+    console.log("Parsed isSale:", parsedInitialData.isSale)
+    if (initialData) {
+      console.log("Raw initialData.isSale:", initialData.isSale)
+      console.log("Raw initialData.salePrice:", initialData.salePrice)
+    }
+  }, [parsedInitialData, initialData])
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(formSchema),
@@ -516,12 +523,22 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
   // Add this useEffect after the form initialization (around line 430)
   // After this line: mode: "onChange", // Add this to validate on change
 
-  // Log the form values after initialization
+  // Log the form values after initialization and set isSale if needed
   useEffect(() => {
     console.log("Form Values after initialization:", form.getValues())
     console.log("Form colorVariationLinks:", form.getValues("categories.colorVariationLinks"))
     console.log("Form mainImageMetadata:", form.getValues("mainImageMetadata"))
     console.log("Form imagesMetadata:", form.getValues("imagesMetadata"))
+    console.log("Form isSale:", form.getValues("isSale"))
+    console.log("Form salePrice:", form.getValues("salePrice"))
+    
+    // Auto-set isSale if there's a sale price but isSale is false
+    const currentIsSale = form.getValues("isSale")
+    const currentSalePrice = form.getValues("salePrice")
+    if (!currentIsSale && currentSalePrice && parseFloat(currentSalePrice) > 0) {
+      form.setValue("isSale", true, { shouldValidate: false })
+      console.log("Auto-set isSale to true because sale price exists")
+    }
 
     // Add this to debug color links specifically
     const colorLinks = form.getValues("categories.colorVariationLinks")
@@ -889,6 +906,14 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       })
     }
 
+    // Check Sale Price when isSale is true
+    if (values.isSale && (!values.salePrice || values.salePrice.trim() === "")) {
+      errors.push({
+        field: "salePrice",
+        message: "Sale price is required when product is on sale",
+      })
+    }
+
     // Check SKU
     if (!values.sku || values.sku.includes("-") || values.sku.endsWith("-")) {
       errors.push({
@@ -999,6 +1024,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       formData.append("description", formValues.description || "")
       formData.append("regularPrice", formValues.regularPrice || "0")
       formData.append("salePrice", formValues.salePrice || "0")
+      formData.append("isSale", formValues.isSale ? "true" : "false")
       formData.append("sku", formValues.sku || "")
       formData.append("stockStatus", formValues.stockStatus || "instock")
       formData.append("isFeatured", formValues.isFeatured ? "true" : "false")
@@ -1196,6 +1222,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       formData.append("description", formValues.description || "")
       formData.append("regularPrice", formValues.regularPrice || "0")
       formData.append("salePrice", formValues.salePrice || "0")
+      formData.append("isSale", formValues.isSale ? "true" : "false")
       formData.append("sku", formValues.sku || "")
       formData.append("stockStatus", formValues.stockStatus || "instock")
       formData.append("isFeatured", formValues.isFeatured ? "true" : "false")

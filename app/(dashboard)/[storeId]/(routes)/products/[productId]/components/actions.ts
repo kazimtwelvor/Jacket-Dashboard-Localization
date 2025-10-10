@@ -202,6 +202,8 @@ export async function createProduct(formData: FormData) {
 
     const salePriceStr = formData.get("salePrice") as string
     const salePrice = salePriceStr && salePriceStr.trim() !== "" ? Number.parseFloat(salePriceStr) : 0
+    const isSaleValue = formData.get("isSale")
+    const isSale = isSaleValue === "true" || String(isSaleValue) === "true"
     const manualSku = formData.get("sku") as string
     const stockStatus = formData.get("stockStatus") as string
     const isArchived = submitType === "draft"
@@ -528,6 +530,7 @@ export async function createProduct(formData: FormData) {
       description,
       price: isNaN(price) ? 0 : price,
       salePrice: isNaN(salePrice) ? 0 : salePrice,
+      isSale,
       stockStatus,
       isArchived,
       isPublished: !isArchived,

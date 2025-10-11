@@ -187,10 +187,10 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
       brand: {
         "@type": "Brand",
         name: brandName,
-      },
+      }, 
       offers: {
         "@type": "Offer",
-        url: productData.slug ? `${window.location.origin}/${productData.slug}` : window.location.href,
+        url: productData.slug ? `https://www.fineystjackets.com/${productData.slug}` : window.location.href,
         priceCurrency: "USD",
         price,
         priceValidUntil: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split("T")[0],
@@ -309,7 +309,7 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
         name: productData.storeName || "Store",
         logo: {
           "@type": "ImageObject",
-          url: `${window.location.origin}/logo.png`,
+          url: `https://www.fineystjackets.com/logo.png`,
         },
       },
       datePublished: new Date().toISOString(),
@@ -326,13 +326,13 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
           "@type": "ListItem",
           position: 1,
           name: "Home",
-          item: window.location.origin,
+          item: "https://www.fineystjackets.com",
         },
         {
           "@type": "ListItem",
           position: 2,
           name: productData.categoryName || "Products",
-          item: `${window.location.origin}/products`,
+          item: `https://www.fineystjackets.com/products`,
         },
         {
           "@type": "ListItem",
@@ -349,8 +349,8 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
       "@context": "https://schema.org",
       "@type": "Organization",
       name: productData.storeName || "Store",
-      url: window.location.origin,
-      logo: `${window.location.origin}/logo.png`,
+      url: "https://www.fineystjackets.com",
+      logo: `https://www.fineystjackets.com/logo.png`,
       contactPoint: {
         "@type": "ContactPoint",
         telephone: "+1-800-123-4567",
@@ -378,7 +378,7 @@ export const SchemaEditor: React.FC<SchemaEditorProps> = ({
       isPartOf: {
         "@type": "WebSite",
         name: productData.storeName || "Store",
-        url: window.location.origin,
+        url: "https://www.fineystjackets.com",
       },
     }
   }

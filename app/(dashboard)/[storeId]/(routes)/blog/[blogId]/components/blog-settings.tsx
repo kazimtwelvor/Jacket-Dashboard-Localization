@@ -6,23 +6,28 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ChevronDown, ChevronUp } from "lucide-react"
 import { EditableText } from "./editable-text"
+import { CountryMultiSelector } from "@/components/ui/country-multi-selector"
 
 interface BlogSettingsProps {
   slug: string
   isPublished: boolean
+  countryIds?: string[]
   isExpanded: boolean
   onToggleExpand: () => void
   onSaveText: (field: string, value: string) => void
   onPublishChange: (value: boolean) => void
+  onCountryChange: (value: string[]) => void
 }
 
 export const BlogSettings: React.FC<BlogSettingsProps> = ({
   slug,
   isPublished,
+  countryIds,
   isExpanded,
   onToggleExpand,
   onSaveText,
   onPublishChange,
+  onCountryChange,
 }) => {
   return (
     <Card>
@@ -35,17 +40,28 @@ export const BlogSettings: React.FC<BlogSettingsProps> = ({
         </div>
 
         {isExpanded && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium">Slug</label>
-              <EditableText field="slug" value={slug} onSave={onSaveText} className="mt-1 border rounded-md p-2" />
-              <p className="text-xs text-gray-500 mt-1">This will be used for the URL of your blog post</p>
+              <label className="text-sm font-medium">Countries</label>
+              <CountryMultiSelector
+                value={countryIds || []}
+                onChange={onCountryChange}
+                placeholder="Select countries for this blog post"
+              />
+              <p className="text-xs text-gray-500 mt-1">Select countries where this blog post is available. Leave empty for global availability.</p>
             </div>
-            <div className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-              <Checkbox checked={isPublished} onCheckedChange={(checked) => onPublishChange(!!checked)} />
-              <div className="space-y-1 leading-none">
-                <p className="font-medium">Published</p>
-                <p className="text-xs text-gray-500">This blog post will be visible on your site</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium">Slug</label>
+                <EditableText field="slug" value={slug} onSave={onSaveText} className="mt-1 border rounded-md p-2" />
+                <p className="text-xs text-gray-500 mt-1">This will be used for the URL of your blog post</p>
+              </div>
+              <div className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                <Checkbox checked={isPublished} onCheckedChange={(checked) => onPublishChange(!!checked)} />
+                <div className="space-y-1 leading-none">
+                  <p className="font-medium">Published</p>
+                  <p className="text-xs text-gray-500">This blog post will be visible on your site</p>
+                </div>
               </div>
             </div>
           </div>

@@ -6,6 +6,7 @@ import { Plus, Package, List, Filter, Search, X, CheckCircle, Upload, RefreshCw,
 import { useParams, useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 import { toast } from "react-hot-toast"
+import { useDashboardCountry } from "@/hooks/use-dashboard-country"
 
 import { Button } from "@/components/ui/button"
 import { ApiList } from "@/components/ui/api-list"
@@ -62,6 +63,7 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ storeId, isOwner
 
   const params = useParams()
   const router = useRouter()
+  const { getCountryCode, selectedCountry } = useDashboardCountry()
   const [activeTab, setActiveTab] = useState("published")
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
@@ -107,7 +109,8 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ storeId, isOwner
       setLoading(true)
 
       const limit = typeof itemsPerPage === "number" ? itemsPerPage : 1000
-      let apiUrl = `/api/${storeId}/products?page=${page}&limit=${limit}&admin=true`
+      const countryCode = getCountryCode()
+      let apiUrl = `/api/${storeId}/products?page=${page}&limit=${limit}&admin=true&cn=${countryCode}`
 
       if (search) {
         apiUrl += `&search=${encodeURIComponent(search)}`
@@ -118,6 +121,8 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ storeId, isOwner
       } else {
         apiUrl += `&status=${status}`
       }
+      
+      console.log('[PRODUCTS_CLIENT] Fetching products with country:', countryCode)
 
       const response = await fetch(apiUrl)
       if (response.ok) {
@@ -220,6 +225,14 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ storeId, isOwner
       fetchProducts(currentPage, activeTab)
     }
   }, [currentPage, itemsPerPage])
+
+  // Re-fetch products when country changes
+  useEffect(() => {
+    if (!initialLoading) {
+      setCurrentPage(1)
+      fetchProducts(1, activeTab)
+    }
+  }, [selectedCountry?.countryCode])
 
   const searchProducts = async (searchQuery: string) => {
     if (!searchQuery.trim()) {

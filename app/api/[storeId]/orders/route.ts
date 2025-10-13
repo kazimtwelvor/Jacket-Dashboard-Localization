@@ -14,6 +14,7 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
     const paymentStatus = searchParams.get("paymentStatus") || undefined
     const fulfillmentStatus = searchParams.get("fulfillmentStatus") || undefined
     const customerId = searchParams.get("customerId") || undefined
+    const cn = searchParams.get("cn") // Country code parameter
     const page = Number.parseInt(searchParams.get("page") || "1")
     const limit = Number.parseInt(searchParams.get("limit") || "10")
     const skip = (page - 1) * limit
@@ -30,6 +31,16 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       return new NextResponse("Access denied. You don't have permission to view orders.", { status: 403 })
     }
 
+    let countryId: string | undefined = undefined
+    if (cn) {
+      const country = await prismadb.country.findUnique({
+        where: { countryCode: cn.toLowerCase() }
+      })
+      if (country) {
+        countryId = country.id
+      }
+    }
+
     const orders = await prismadb.order.findMany({
       where: {
         storeId: params.storeId,
@@ -37,6 +48,7 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
         ...(paymentStatus && { paymentStatus }),
         // ...(fulfillmentStatus && { fulfillmentStatus }),
         ...(customerId && { userId: customerId }),
+        ...(countryId && { countryId }),
       },
       include: {
         orderItems: {
@@ -64,6 +76,7 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
         ...(paymentStatus && { paymentStatus }),
         // ...(fulfillmentStatus && { fulfillmentStatus }),
         ...(customerId && { userId: customerId }),
+        ...(countryId && { countryId }),
       },
     })
 
@@ -131,6 +144,7 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       // expirationDate,
       // securityCode,
       // cardCountry,
+      countryId,
     } = body
 
     if (!userId) {
@@ -202,6 +216,7 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       data: {
         id: orderId,
         storeId: params.storeId,
+        countryId: countryId || null,
         userId: finalUserId,
         customerName: customerName || null,
         phone: phone || "",

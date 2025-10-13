@@ -7,6 +7,13 @@ const BlogPage = async ({ params }: { params: { blogId: string } }) => {
     where: {
       id: params.blogId,
     },
+    include: {
+      blogCountries: {
+        include: {
+          country: true
+        }
+      }
+    }
   })
 
   let transformedBlog = null
@@ -22,6 +29,7 @@ const BlogPage = async ({ params }: { params: { blogId: string } }) => {
       bannerImage: content.hero?.bannerImage || "",
       content: content.mainContent?.content || "",
       isPublished: content.metadata?.isPublished || false,
+      blogCountries: blog.blogCountries || [],
       author: content.hero?.author || "",
       date: content.hero?.date || "",
       category: content.hero?.category || "",

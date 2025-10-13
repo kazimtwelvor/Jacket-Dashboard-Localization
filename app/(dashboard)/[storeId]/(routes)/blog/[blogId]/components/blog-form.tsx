@@ -28,6 +28,7 @@ const formSchema = z.object({
   subtitle: z.string().optional(),
   bannerImage: z.string().optional(),
   isPublished: z.boolean().default(false),
+  countryIds: z.array(z.string()).default([]),
   author: z.string().default(""),
   date: z.string().default(""),
   category: z.string().default(""),
@@ -211,6 +212,8 @@ interface BlogFormProps {
     bannerImage?: string
     content?: string
     isPublished?: boolean
+    countryIds?: string[]
+    blogCountries?: Array<{ countryId: string }>
     author?: string
     date?: string
     category?: string
@@ -828,10 +831,12 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
           <BlogSettings
             slug={form.watch("slug")}
             isPublished={form.watch("isPublished")}
+            countryIds={form.watch("countryIds")}
             isExpanded={expandedSections.settings}
             onToggleExpand={() => toggleSection("settings")}
             onSaveText={handleSaveText}
             onPublishChange={handlePublishChange}
+            onCountryChange={(value) => form.setValue("countryIds", value)}
           />
 
           <div className="border rounded-md overflow-hidden bg-white shadow-sm">

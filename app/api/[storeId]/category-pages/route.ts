@@ -58,6 +58,7 @@ export async function POST(
       categoryContent,
       status,
       isPublished,
+      countryIds,
     } = body
 
 
@@ -126,6 +127,11 @@ export async function POST(
         isPublished: status === "PUBLISHED" || isPublished === true,
         publishedAt: (status === "PUBLISHED" || isPublished === true) ? new Date() : null,
         storeId: storeId,
+        categoryPageCountries: {
+          create: (countryIds || []).map((countryId: string) => ({
+            countryId
+          }))
+        }
       },
     })
 
@@ -154,9 +160,24 @@ export async function GET(
     const slug = searchParams.get("slug")
     const forTemplate = searchParams.get("forTemplate") === "true"
     const isBest = searchParams.get("isBest")
+    const cn = searchParams.get("cn") 
 
     let whereClause: any = {
       storeId: storeId,
+    }
+
+    if (cn) {
+      const country = await prismadb.country.findUnique({
+        where: { countryCode: cn.toLowerCase() }
+      })
+      if (country) {
+        console.log(`[CATEGORY_PAGES_GET] STRICT filtering by country: ${country.name}`)
+        whereClause.categoryPageCountries = {
+          some: {
+            countryId: country.id
+          }
+        }
+      }
     }
 
     if (slug) {

@@ -13,10 +13,12 @@ import { ApiCallsSection } from "./components/api-calls-section"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import axios from "axios"
 import { toast } from "react-hot-toast"
+import { useDashboardCountry } from "@/hooks/use-dashboard-country"
 
 export default function CategoryPage() {
   const params = useParams()
   const router = useRouter()
+  const { getCountryCode, selectedCountry } = useDashboardCountry()
   const [loading, setLoading] = useState(true)
   const [categoryPages, setCategoryPages] = useState<any[]>([])
   const [bestFilter, setBestFilter] = useState<string>("all")
@@ -56,8 +58,9 @@ export default function CategoryPage() {
     const fetchCategoryPages = async () => {
       try {
         setLoading(true)
+        const countryCode = getCountryCode()
         let url = `/api/${params?.storeId}/category-pages`
-        const params_array = ["includeAll=true"]
+        const params_array = ["includeAll=true", `cn=${countryCode}`]
 
         if (bestFilter === "best") {
           params_array.push("isBest=true")
@@ -71,6 +74,7 @@ export default function CategoryPage() {
           params_array.push("status=PUBLISHED")
         }
 
+        console.log('[CATEGORY_PAGE_CLIENT] Fetching with country:', countryCode)
         url += "?" + params_array.join("&")
 
         const response = await axios.get(url)
@@ -84,7 +88,7 @@ export default function CategoryPage() {
     }
 
     fetchCategoryPages()
-  }, [params?.storeId, bestFilter, statusFilter, accessVerified])
+  }, [params?.storeId, bestFilter, statusFilter, accessVerified, selectedCountry?.countryCode])
 
   const loadProductCounts = async () => {
     if (categoryPages.length === 0) return

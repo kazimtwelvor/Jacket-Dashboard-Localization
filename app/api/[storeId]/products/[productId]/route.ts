@@ -102,6 +102,11 @@ export async function GET(req: Request, { params }: { params: { productId: strin
         isDeleted: false,
       },
       include: {
+        productCountries: {
+          include: {
+            country: true
+          }
+        },
         images: {
           include: {
             image: {
@@ -339,6 +344,7 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       baseColor,
       cachedReviews,
       relatedProducts,
+      countryIds,
     } = body
 
 
@@ -459,6 +465,10 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
     }
 
    
+    await prismadb.productCountry.deleteMany({
+      where: { productId }
+    })
+    
     try {
       const product = await prismadb.product.update({
         where: {
@@ -493,6 +503,11 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
           updatedById: user?.id || null,
           updatedByName: user?.name || "Unknown",
           updatedByEmail: user?.email || null,
+          productCountries: {
+            create: (countryIds || []).map((countryId: string) => ({
+              countryId
+            }))
+          }
         },
       })
     } catch (dbError) {

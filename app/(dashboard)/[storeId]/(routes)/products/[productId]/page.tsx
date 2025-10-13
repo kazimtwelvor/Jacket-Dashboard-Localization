@@ -37,6 +37,11 @@ const ProductPage: React.FC<ProductPageProps> = async ({ params }) => {
       colorDetails: true,
       baseColor: true,
       sizeDetails: true,
+      productCountries: {
+        include: {
+          country: true
+        }
+      },
       images: {
         include: {
           image: {

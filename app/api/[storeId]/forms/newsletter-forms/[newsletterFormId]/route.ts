@@ -40,7 +40,7 @@ export async function PATCH(
   try {
     const body = await req.json()
 
-    const { email, status } = body
+    const { email, status, countryId } = body
 
     const permissionCheck = await checkApiPermission(params.storeId, Permission.EDIT_FORMS, 'PATCH')
     if (permissionCheck.error) {
@@ -56,6 +56,7 @@ export async function PATCH(
         storeId: params.storeId,
       },
       data: {
+        countryId: countryId || null,
         email,
         status,
       },

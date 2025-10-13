@@ -14,6 +14,7 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
     const limit = Number.parseInt(searchParams.get("limit") || "10000")
     const skip = (page - 1) * limit
     const isAdmin = searchParams.get("admin") === "true"
+    const cn = searchParams.get("cn") 
     const colors = searchParams.get("colors")
     const materials = searchParams.get("materials")
     const styles = searchParams.get("styles")
@@ -29,6 +30,20 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
     let baseWhereClause: any = {
       storeId: storeId,
       ...(trash ? { isDeleted: true } : { isDeleted: false }),
+    }
+
+    if (cn) {
+      const country = await prismadb.country.findUnique({
+        where: { countryCode: cn.toLowerCase() }
+      })
+      if (country) {
+        baseWhereClause.productCountries = {
+          some: {
+            countryId: country.id
+          }
+        }
+      } else {
+      }
     }
 
     if (!trash && status) {
@@ -55,6 +70,11 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
     const allProducts = await prismadb.product.findMany({
       where: baseWhereClause,
       include: {
+        productCountries: {
+          include: {
+            country: true
+          }
+        },
         images: {
           include: {
             image: true,
@@ -369,6 +389,10 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
 
     const totalProducts = filteredProducts.length
     const paginatedProducts = filteredProducts.slice(skip, skip + limit)
+
+    console.log(`[PRODUCTS_GET] Total products after filtering: ${totalProducts}, Country filter: ${cn || 'none'}`)
+    console.log(`[PRODUCTS_GET] Products with countries: ${paginatedProducts.filter(p => p.productCountries && p.productCountries.length > 0).length}`)
+    console.log(`[PRODUCTS_GET] Products without countries (global): ${paginatedProducts.filter(p => !p.productCountries || p.productCountries.length === 0).length}`)
 
     const serializedProducts = paginatedProducts.map(product => {
       let colorDetails = []

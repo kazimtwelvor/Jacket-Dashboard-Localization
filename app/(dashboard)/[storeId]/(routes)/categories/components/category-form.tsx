@@ -21,6 +21,7 @@ import { AlertModal } from "@/components/modals/alert-modal"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { CountryFormSelector } from "@/components/ui/country-selector"
 
 interface CategoryFormProps {
   initialData: Category | null
@@ -33,6 +34,7 @@ const formSchema = z.object({
   billboardId: z.string().optional(),
   type: z.enum(["material", "style", "gender", "regular"]),
   isBest: z.boolean().optional(),
+  countryId: z.string().optional(),
 })
 
 type CategoryFormValues = z.infer<typeof formSchema>
@@ -58,6 +60,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ initialData, billboa
           ...initialData,
           type: (initialData.type as "material" | "style" | "gender" | "regular") || "regular",
           isBest: initialData.isBest || false,
+          countryId: (initialData as any).countryId || "",
         }
       : {
           name: "",
@@ -65,6 +68,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ initialData, billboa
           billboardId: undefined,
           type: (typeParam as "material" | "style" | "gender" | "regular") || "regular",
           isBest: false,
+          countryId: "",
         },
   })
 
@@ -154,6 +158,23 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ initialData, billboa
       <Separator />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 pt-4">
+          <FormField
+            control={form.control}
+            name="countryId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Country</FormLabel>
+                <CountryFormSelector
+                  value={field.value}
+                  onChange={field.onChange}
+                  disabled={loading}
+                  placeholder="Select a country (optional)"
+                />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-6">
               <FormField

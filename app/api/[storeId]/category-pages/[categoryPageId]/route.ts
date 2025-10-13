@@ -19,6 +19,13 @@ export async function GET(
       where: {
         id: categoryPageId,
       },
+      include: {
+        categoryPageCountries: {
+          include: {
+            country: true
+          }
+        }
+      }
     })
 
     if (!categoryPage) {
@@ -109,6 +116,7 @@ export async function PATCH(
       enableSchema,
       schemaType,
       customSchema,
+      countryIds,
     } = body
 
     if (!name) {
@@ -208,6 +216,16 @@ export async function PATCH(
       }
     } else {
       updateData.status = "DRAFT"
+    }
+
+    await prismadb.categoryPageCountry.deleteMany({
+      where: { categoryPageId }
+    })
+
+    updateData.categoryPageCountries = {
+      create: (countryIds || []).map((countryId: string) => ({
+        countryId
+      }))
     }
 
     const categoryPage = await prismadb.categoryPage.update({

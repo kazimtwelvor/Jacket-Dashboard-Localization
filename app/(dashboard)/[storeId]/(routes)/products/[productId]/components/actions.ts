@@ -214,6 +214,8 @@ export async function createProduct(formData: FormData) {
     const tagsJson = formData.get("tags") as string
 
     const relatedProductsJson = formData.get("relatedProducts") as string
+    
+    const countryIdsJson = formData.get("countryIds") as string
 
     const isFeaturedValue = formData.get("isFeatured")
     const isFeatured = isFeaturedValue === "true" || String(isFeaturedValue) === "true"
@@ -252,6 +254,20 @@ export async function createProduct(formData: FormData) {
       }
     } catch (e) {
       relatedProducts = []
+    }
+
+    let countryIds: string[] = []
+    try {
+      if (countryIdsJson && countryIdsJson.trim() !== "") {
+        const parsedCountryIds = safeJsonParse(countryIdsJson, [])
+        if (Array.isArray(parsedCountryIds)) {
+          countryIds = parsedCountryIds.filter((id: any) => typeof id === 'string' && id.trim() !== '')
+        }
+      }
+      console.log('[CREATE_PRODUCT] Country IDs:', { raw: countryIdsJson, parsed: countryIds })
+    } catch (e) {
+      console.error('[CREATE_PRODUCT] Error parsing countryIds:', e)
+      countryIds = []
     }
 
     const materialParsed = safeJsonParse(materialJson, [])
@@ -626,6 +642,13 @@ export async function createProduct(formData: FormData) {
           ? currentProduct.priority
           : (priority || 4)
 
+        console.log('[UPDATE_PRODUCT] Updating product with countryIds:', countryIds)
+        
+        // Delete existing country relations
+        await prismadb.productCountry.deleteMany({
+          where: { productId: id }
+        })
+
         try {
           const product = await prismadb.product.update({
             where: {
@@ -639,6 +662,13 @@ export async function createProduct(formData: FormData) {
               updatedById: dbUser.id,
               updatedByName: dbUser.name || "Unknown",
               updatedByEmail: dbUser.email,
+              ...(countryIds.length > 0 && {
+                productCountries: {
+                  create: countryIds.map((countryId) => ({
+                    countryId
+                  }))
+                }
+              })
             },
           })
         } catch (dbError) {
@@ -728,14 +758,25 @@ export async function createProduct(formData: FormData) {
         const resolvedCategoryData = productData.categoryData;
 
 
+        console.log('[CREATE_PRODUCT] Creating product with countryIds:', countryIds)
+        
         const product = await prismadb.product.create({
           data: {
             ...productData,
             sku: uniqueSku,
             storeId: storeId,
             categoryData: resolvedCategoryData,
+            ...(countryIds.length > 0 && {
+              productCountries: {
+                create: countryIds.map((countryId) => ({
+                  countryId
+                }))
+              }
+            })
           },
         })
+        
+        console.log('[CREATE_PRODUCT] Product created with ID:', product.id)
 
 
         for (const image of images) {

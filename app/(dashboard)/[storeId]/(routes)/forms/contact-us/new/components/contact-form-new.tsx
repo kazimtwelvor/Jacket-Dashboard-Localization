@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Heading } from "@/components/ui/heading"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "react-hot-toast"
+import { CountryFormSelector } from "@/components/ui/country-selector"
 
 export const ContactFormNew = () => {
   const router = useRouter()
@@ -23,7 +24,8 @@ export const ContactFormNew = () => {
     subject: "",
     message: "",
     agreeToPrivacyPolicy: false,
-    status: "PENDING"
+    status: "PENDING",
+    countryId: ""
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -69,6 +71,15 @@ export const ContactFormNew = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="countryId">Country</Label>
+              <CountryFormSelector
+                value={formData.countryId}
+                onChange={(value) => handleChange("countryId", value)}
+                placeholder="Select a country (optional)"
+                useFormControl={false}
+              />
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="firstName">First Name</Label>

@@ -9,7 +9,7 @@ import { Trash } from "lucide-react"
 import * as z from "zod"
 
 import { Button } from "@/components/ui/button"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
@@ -17,6 +17,7 @@ import { Switch } from "@/components/ui/switch"
 import { Separator } from "@/components/ui/separator"
 import { Heading } from "@/components/ui/heading"
 import { AlertModal } from "@/components/modals/alert-modal"
+import { CountryMultiSelector } from "@/components/ui/country-multi-selector"
 
 const formSchema = z.object({
   code: z.string().min(1, "Code is required"),
@@ -30,6 +31,7 @@ const formSchema = z.object({
   description: z.string().optional(),
   buyQuantity: z.coerce.number().optional(),
   getQuantity: z.coerce.number().optional(),
+  countryIds: z.array(z.string()).default([]),
 })
 
 type VoucherFormValues = z.infer<typeof formSchema>
@@ -57,11 +59,13 @@ export const VoucherForm: React.FC<VoucherFormProps> = ({ initialData }) => {
       minOrderAmount: initialData.minOrderAmount ? parseFloat(String(initialData.minOrderAmount)) : undefined,
       maxDiscount: initialData.maxDiscount ? parseFloat(String(initialData.maxDiscount)) : undefined,
       validUntil: initialData.validUntil ? new Date(initialData.validUntil).toISOString().split('T')[0] : undefined,
+      countryIds: initialData.voucherCountries?.map((vc: any) => vc.countryId) || [],
     } : {
       code: "",
       type: "PERCENTAGE",
       value: 0,
       isActive: true,
+      countryIds: [],
     }
   })
 
@@ -151,6 +155,26 @@ export const VoucherForm: React.FC<VoucherFormProps> = ({ initialData }) => {
       <Separator />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
+          <FormField
+            control={form.control}
+            name="countryIds"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Countries</FormLabel>
+                <CountryMultiSelector
+                  value={field.value || []}
+                  onChange={field.onChange}
+                  disabled={loading}
+                  placeholder="Select countries for this voucher"
+                />
+                <FormDescription>
+                  Select countries where this voucher is valid. Leave empty for global vouchers.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <FormField
               control={form.control}

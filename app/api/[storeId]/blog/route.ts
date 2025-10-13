@@ -251,6 +251,11 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       data: {
         storeId: params.storeId,
         content: contentJson,
+        blogCountries: {
+          create: (body.countryIds || []).map((countryId: string) => ({
+            countryId
+          }))
+        }
       },
     })
 
@@ -266,9 +271,36 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       return new NextResponse("Store ID is required", { status: 400 })
     }
 
+    const { searchParams } = new URL(req.url)
+    const cn = searchParams.get("cn")
+
+    let whereClause: any = {
+      storeId: params.storeId,
+    }
+
+    if (cn) {
+      const country = await prismadb.country.findUnique({
+        where: { countryCode: cn.toLowerCase() }
+      })
+      if (country) {
+        console.log(`[BLOG_GET] STRICT filtering by country: ${country.name} (${country.countryCode})`)
+        // STRICT: Show ONLY blogs explicitly assigned to this country
+        whereClause.blogCountries = {
+          some: {
+            countryId: country.id
+          }
+        }
+      }
+    }
+
     const blogs = await prismadb.blog.findMany({
-      where: {
-        storeId: params.storeId,
+      where: whereClause,
+      include: {
+        blogCountries: {
+          include: {
+            country: true
+          }
+        }
       },
       orderBy: {
         createdAt: "desc",

@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -33,6 +34,7 @@ import { PocketSelector } from "./pocket-selector"
 import { SeoSettings } from "./seo-settings"
 import { EditableCategoryTemplateWrapper } from "./editable-category-template-wrapper"
 import { ApiSlugDisplay } from "./api-slug-display"
+import { CountryMultiSelector } from "@/components/ui/country-multi-selector"
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -65,6 +67,7 @@ const formSchema = z.object({
   schemaType: z.string().optional(),
   customSchema: z.string().optional(),
   status: z.enum(["DRAFT", "PUBLISHED"]).optional(),
+  countryIds: z.array(z.string()).default([]),
 })
 
 type CategoryPageFormValues = z.infer<typeof formSchema>
@@ -101,6 +104,7 @@ export const CategoryPageForm: React.FC<CategoryPageFormProps> = ({ initialData 
     schemaType: initialData.schemaType || "CollectionPage",
     customSchema: initialData.customSchema || "",
     status: initialData.status || "DRAFT",
+    countryIds: initialData.categoryPageCountries?.map((cpc: any) => cpc.countryId) || [],
   } : null;
   
   
@@ -137,6 +141,7 @@ export const CategoryPageForm: React.FC<CategoryPageFormProps> = ({ initialData 
       schemaType: "CollectionPage",
       customSchema: "",
       status: "DRAFT",
+      countryIds: [],
     }
   })
 
@@ -224,6 +229,7 @@ export const CategoryPageForm: React.FC<CategoryPageFormProps> = ({ initialData 
         customSchema: data.customSchema ? (typeof data.customSchema === 'string' ? data.customSchema : JSON.stringify(data.customSchema)) : null,
         status,
         isPublished: status === 'PUBLISHED',
+        countryIds: data.countryIds || [],
       }
       
       
@@ -295,6 +301,26 @@ export const CategoryPageForm: React.FC<CategoryPageFormProps> = ({ initialData 
                 <CardTitle>Basic Information</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="countryIds"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Countries</FormLabel>
+                      <CountryMultiSelector
+                        value={field.value || []}
+                        onChange={field.onChange}
+                        disabled={loading}
+                        placeholder="Select countries for this category page"
+                      />
+                      <FormDescription>
+                        Select countries where this category page is available. Leave empty for global availability.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="name"

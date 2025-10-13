@@ -9,6 +9,7 @@ import { getUserRole } from "@/utils/roles"
 import { Button } from "@/components/ui/button"
 import { Shield, ShieldAlert, User } from "lucide-react"
 import { MainNav } from "./sidebar/main-nav"
+import { DashboardCountrySelector } from "./dashboard-country-selector"
 
 export const Navbar = async () => {
   const { userId } = await auth()
@@ -26,6 +27,7 @@ export const Navbar = async () => {
         <div className="ml-auto flex items-center space-x-4">
           <GlobalSearch />
           <Notifications />
+          <DashboardCountrySelector />
 
           {userRole === "admin" && (
             <Button variant="outline" size="sm" asChild>

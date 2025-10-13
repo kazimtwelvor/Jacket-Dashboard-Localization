@@ -226,6 +226,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       name: initialData.name,
       slug: initialData.slug || "",
       description: initialData.description || "",
+      countryIds: (initialData as any).productCountries?.map((pc: any) => pc.countryId) || [],
       specifications: safeJsonParse(initialData.specifications, {
         externalMaterial: [],
         internalMaterial: [],
@@ -426,6 +427,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       name: "",
       slug: "", // Initialize top-level slug as empty
       description: "",
+      countryIds: [],
       specifications: {
         externalMaterial: [],
         internalMaterial: [],
@@ -1004,6 +1006,13 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       formData.append("isFeatured", formValues.isFeatured ? "true" : "false")
       formData.append("baseColor", formValues.baseColor ? JSON.stringify(formValues.baseColor) : "")
 
+      // Countries
+      if (formValues.countryIds && Array.isArray(formValues.countryIds)) {
+        formData.append("countryIds", JSON.stringify(formValues.countryIds))
+      } else {
+        formData.append("countryIds", "[]")
+      }
+
       if (formValues.specifications) {
         formData.append("specifications", JSON.stringify(formValues.specifications))
       }
@@ -1200,6 +1209,13 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       formData.append("stockStatus", formValues.stockStatus || "instock")
       formData.append("isFeatured", formValues.isFeatured ? "true" : "false")
       formData.append("baseColor", formValues.baseColor ? JSON.stringify(formValues.baseColor) : "")
+
+      // Countries
+      if (formValues.countryIds && Array.isArray(formValues.countryIds)) {
+        formData.append("countryIds", JSON.stringify(formValues.countryIds))
+      } else {
+        formData.append("countryIds", "[]")
+      }
 
       if (formValues.specifications) {
         formData.append("specifications", JSON.stringify(formValues.specifications))

@@ -42,14 +42,38 @@ export async function GET(
       })
     }
 
+    const { searchParams } = new URL(req.url)
+    const cn = searchParams.get("cn")
+
+
+    let whereClause: any = {
+      storeId: params.storeId,
+    }
+
+    if (cn) {
+      const country = await prismadb.country.findUnique({
+        where: { countryCode: cn.toLowerCase() }
+      })
+      if (country) {
+        whereClause.countryId = country.id
+      } else {
+      }
+    } else {
+    }
+
+    console.log(`[NEWSLETTER_FORMS_GET] whereClause:`, JSON.stringify(whereClause))
+
     const newsletterForms = await prismadb.newsletterForm.findMany({
-      where: {
-        storeId: params.storeId,
+      where: whereClause,
+      include: {
+        country: true
       },
       orderBy: {
         updatedAt: "desc",
       },
     })
+
+    
 
     return NextResponse.json(newsletterForms, {
       headers: corsHeaders(),
@@ -69,7 +93,7 @@ export async function POST(
   try {
     const body = await req.json()
 
-    const { email, status } = body
+    const { email, status, countryId } = body
 
     if (!email) {
       return new NextResponse("Email is required", { 
@@ -82,6 +106,7 @@ export async function POST(
     const newsletterForm = await prismadb.newsletterForm.create({
       data: {
         storeId: params.storeId,
+        countryId: countryId || null,
         email,
         status: status || "ACTIVE",
       },

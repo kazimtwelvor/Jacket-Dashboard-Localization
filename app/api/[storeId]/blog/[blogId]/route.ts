@@ -14,6 +14,13 @@ export async function GET(req: Request, { params }: { params: { blogId: string }
       where: {
         id: params.blogId,
       },
+      include: {
+        blogCountries: {
+          include: {
+            country: true
+          }
+        }
+      }
     })
 
     return NextResponse.json(blog)
@@ -283,12 +290,22 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
     }
 
 
+    // Delete existing country relations
+    await prismadb.blogCountry.deleteMany({
+      where: { blogId: params.blogId }
+    })
+
     const blog = await prismadb.blog.update({
       where: {
         id: params.blogId,
       },
       data: {
         content: contentJson,
+        blogCountries: {
+          create: (body.countryIds || []).map((countryId: string) => ({
+            countryId
+          }))
+        }
       },
     })
 

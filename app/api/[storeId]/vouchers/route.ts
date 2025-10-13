@@ -30,6 +30,7 @@ export async function POST(
       description,
       buyQuantity,
       getQuantity,
+      countryIds,
     } = body;
 
     if (!code) {
@@ -76,6 +77,11 @@ export async function POST(
         buyQuantity: buyQuantity ? parseInt(buyQuantity.toString()) : null,
         getQuantity: getQuantity ? parseInt(getQuantity.toString()) : null,
         storeId: params.storeId,
+        voucherCountries: {
+          create: (countryIds || []).map((countryId: string) => ({
+            countryId
+          }))
+        }
       }
     });
 
@@ -100,9 +106,36 @@ export async function GET(
       return new NextResponse("Store id is required", { status: 400 });
     }
 
+    const { searchParams } = new URL(req.url)
+    const cn = searchParams.get("cn") 
+    const isActive = searchParams.get("isActive")
+    
+    let whereClause: any = {
+      storeId: params.storeId,
+      ...(isActive && { isActive: isActive === "true" }),
+    }
+    
+    if (cn) {
+      const country = await prismadb.country.findUnique({
+        where: { countryCode: cn.toLowerCase() }
+      })
+      if (country) {
+        whereClause.voucherCountries = {
+          some: {
+            countryId: country.id
+          }
+        }
+      }
+    }
+
     const vouchers = await prismadb.voucher.findMany({
-      where: {
-        storeId: params.storeId
+      where: whereClause,
+      include: {
+        voucherCountries: {
+          include: {
+            country: true
+          }
+        }
       }
     });
 

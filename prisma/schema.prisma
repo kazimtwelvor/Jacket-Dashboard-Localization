@@ -298,6 +298,7 @@ model Product {
   id            String         @id @default(cuid())
   storeId       String
   store         Store          @relation("StoreToProduct", fields: [storeId], references: [id])
+  productCountries ProductCountry[] @relation("ProductToCountries")
   categoryData  Json?          // Stores {material: string, style: string, gender: string}
   name          String
   price         Decimal
@@ -515,6 +516,8 @@ model Order {
   id                 String      @id
   storeId            String
   store              Store       @relation("StoreToOrder", fields: [storeId], references: [id])
+  countryId          String?
+  countryRelation    Country?    @relation("CountryToOrder", fields: [countryId], references: [id])
   userId             String?
   user               StoreUser?  @relation("UserToOrder", fields: [userId], references: [id], onDelete: SetNull)
   orderItems         OrderItem[]
@@ -556,6 +559,7 @@ model Order {
   updatedAt          DateTime    @updatedAt
 
   @@index([storeId])
+  @@index([countryId])
   @@index([status])
   @@index([userId])
   @@index([transactionId])
@@ -686,6 +690,7 @@ model Blog {
   id            String    @id @default(uuid())
   storeId       String
   store         Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  blogCountries BlogCountry[] @relation("BlogToCountries")
   slug          String?
   title         String?
   isPublished   Boolean   @default(false)
@@ -700,6 +705,7 @@ model CategoryPage {
   id              String    @id @default(uuid())
   storeId         String
   store           Store     @relation("StoreToCategoryPage", fields: [storeId], references: [id], onDelete: Cascade)
+  categoryPageCountries CategoryPageCountry[] @relation("CategoryPageToCountries")
   name            String
   slug            String
   apiSlug         String?   // Query string for filtering products
@@ -753,6 +759,8 @@ model ContactForm {
   id                    String            @id @default(cuid())
   storeId               String
   store                 Store             @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  countryId             String?
+  country               Country?          @relation("CountryToContactForm", fields: [countryId], references: [id])
   firstName             String
   lastName              String
   email                 String
@@ -764,6 +772,7 @@ model ContactForm {
   updatedAt             DateTime          @updatedAt
 
   @@index([storeId])
+  @@index([countryId])
   @@index([email])
 }
 
@@ -778,12 +787,15 @@ model NewsletterForm {
   id        String              @id @default(cuid())
   storeId   String
   store     Store               @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  countryId String?
+  country   Country?            @relation("CountryToNewsletterForm", fields: [countryId], references: [id])
   email     String
   status    NewsletterFormStatus @default(ACTIVE)
   createdAt DateTime            @default(now())
   updatedAt DateTime            @updatedAt
 
   @@index([storeId])
+  @@index([countryId])
   @@index([email])
 }
 
@@ -797,6 +809,7 @@ model Voucher {
   id              String      @id @default(cuid())
   storeId         String
   store           Store       @relation("StoreToVoucher", fields: [storeId], references: [id], onDelete: Cascade)
+  voucherCountries VoucherCountry[] @relation("VoucherToCountries")
   code            String      @unique
   type            VoucherType
   value           Decimal     // Percentage or fixed amount
@@ -874,18 +887,79 @@ model CategoryPageView {
 }
 
 model Country {
-  id            String   @id @default(cuid())
-  name          String   @unique
-  countryCode   String   @unique @db.VarChar(2) 
-  currency      String?  @db.VarChar(3) 
-  currencySymbol String? @db.VarChar(5) 
-  timezone      String?  @db.VarChar(50) 
-  isActive      Boolean  @default(true)
-  sortOrder     Int      @default(0) 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id             String         @id @default(cuid())
+  name           String         @unique
+  countryCode    String         @unique @db.VarChar(2) 
+  currency       String?        @db.VarChar(3) 
+  currencySymbol String?        @db.VarChar(5) 
+  timezone       String?        @db.VarChar(50) 
+  languages      String[]       @default([]) // Array of language codes (e.g., ["en", "fr", "es"])
+  isActive       Boolean        @default(true)
+  sortOrder      Int            @default(0) 
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  productCountries       ProductCountry[]      @relation("CountryToProducts")
+  categoryPageCountries  CategoryPageCountry[] @relation("CountryToCategoryPages")
+  voucherCountries       VoucherCountry[]      @relation("CountryToVouchers")
+  blogCountries          BlogCountry[]         @relation("CountryToBlogs")
+  orders                 Order[]               @relation("CountryToOrder")
+  contactForms           ContactForm[]         @relation("CountryToContactForm")
+  newsletterForms        NewsletterForm[]      @relation("CountryToNewsletterForm")
 
   @@index([countryCode])
   @@index([isActive])
   @@index([sortOrder])
+}
+
+model ProductCountry {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation("ProductToCountries", fields: [productId], references: [id], onDelete: Cascade)
+  countryId String
+  country   Country  @relation("CountryToProducts", fields: [countryId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  
+  @@unique([productId, countryId])
+  @@index([productId])
+  @@index([countryId])
+}
+
+model CategoryPageCountry {
+  id             String       @id @default(cuid())
+  categoryPageId String
+  categoryPage   CategoryPage @relation("CategoryPageToCountries", fields: [categoryPageId], references: [id], onDelete: Cascade)
+  countryId      String
+  country        Country      @relation("CountryToCategoryPages", fields: [countryId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+  
+  @@unique([categoryPageId, countryId])
+  @@index([categoryPageId])
+  @@index([countryId])
+}
+
+model VoucherCountry {
+  id        String   @id @default(cuid())
+  voucherId String
+  voucher   Voucher  @relation("VoucherToCountries", fields: [voucherId], references: [id], onDelete: Cascade)
+  countryId String
+  country   Country  @relation("CountryToVouchers", fields: [countryId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  
+  @@unique([voucherId, countryId])
+  @@index([voucherId])
+  @@index([countryId])
+}
+
+model BlogCountry {
+  id        String   @id @default(cuid())
+  blogId    String
+  blog      Blog     @relation("BlogToCountries", fields: [blogId], references: [id], onDelete: Cascade)
+  countryId String
+  country   Country  @relation("CountryToBlogs", fields: [countryId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  
+  @@unique([blogId, countryId])
+  @@index([blogId])
+  @@index([countryId])
 }

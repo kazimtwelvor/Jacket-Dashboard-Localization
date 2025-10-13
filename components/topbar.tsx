@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "./theme-toggle"
 import { useRouter } from "next/navigation"
 import { useStoreModal } from "@/hooks/use-store-modal"
+import { DashboardCountrySelector } from "./dashboard-country-selector"
 
 interface TopbarProps {
   stores: Record<string, any>[]
@@ -66,14 +67,15 @@ export default function Topbar({ stores = [] }: TopbarProps) {
           {/* Store Name - Only on mobile */}
           <div className="md:hidden mt-1">
             <p className="text-[#8a9cb8] text-sm font-medium">
-              {stores.find((store) => store.id === params.storeId)?.name || "Select a store"}
+              {stores.find((store) => store.id === params?.storeId)?.name || "Select a store"}
             </p>
           </div>
         </div>
       </div>
 
       {/* User Button and Theme Toggle - Right aligned on desktop */}
-      <div className="fixed right-4 top-4 md:relative md:right-0 md:top-0 md:w-[100px] md:flex md:justify-end md:items-center md:gap-2">
+      <div className="fixed right-4 top-4 md:relative md:right-0 md:top-0 md:flex md:justify-end md:items-center md:gap-2">
+        <DashboardCountrySelector />
         <ThemeToggle />
         <Button
           variant="ghost"

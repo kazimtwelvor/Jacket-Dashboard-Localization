@@ -29,6 +29,7 @@ import { CalendarIcon } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
+import { CountryFormSelector } from "@/components/ui/country-selector"
 
 const formSchema = z.object({
   customerName: z.string().optional(),
@@ -59,6 +60,7 @@ const formSchema = z.object({
   // expirationDate: z.string().optional(),
   // securityCode: z.string().optional(),
   // cardCountry: z.string().optional(),
+  countryId: z.string().optional(),
 })
 
 type OrderFormValues = z.infer<typeof formSchema>
@@ -125,6 +127,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
         // expirationDate: initialData.expirationDate || "",
         // securityCode: initialData.securityCode || "",
         // cardCountry: initialData.cardCountry || "",
+        countryId: initialData.countryId || "",
       }
     : {
         customerName: "",
@@ -155,6 +158,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
         // expirationDate: "",
         // securityCode: "",
         // cardCountry: "",
+        countryId: "",
       }
 
   const form = useForm<OrderFormValues>({
@@ -333,6 +337,23 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
       <Separator />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <FormField
+            control={form.control}
+            name="countryId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Order Country</FormLabel>
+                <CountryFormSelector
+                  value={field.value}
+                  onChange={field.onChange}
+                  disabled={loading}
+                  placeholder="Select order country (optional)"
+                />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <Tabs defaultValue="general" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="general">General</TabsTrigger>
@@ -589,7 +610,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
                       <FormField
                         control={form.control}
                         name="zipCode"
-                        render={({ field }) => (
+                        render={({ field }) => ( 
                           <FormItem>
                             <FormLabel>Zip/Postal Code</FormLabel>
                             <FormControl>

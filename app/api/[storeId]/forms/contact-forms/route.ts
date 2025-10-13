@@ -42,15 +42,37 @@ export async function GET(
       })
     }
 
+    const { searchParams } = new URL(req.url)
+    const cn = searchParams.get("cn")
+
+
+    let whereClause: any = {
+      storeId: params.storeId,
+    }
+
+    if (cn) {
+      const country = await prismadb.country.findUnique({
+        where: { countryCode: cn.toLowerCase() }
+      })
+      if (country) {
+        whereClause.countryId = country.id
+      } else {
+      }
+    } else {
+    }
+
+
     const contactForms = await prismadb.contactForm.findMany({
-      where: {
-        storeId: params.storeId,
+      where: whereClause,
+      include: {
+        country: true
       },
       orderBy: {
         createdAt: "desc",
       },
     })
 
+  
     return NextResponse.json(contactForms, {
       headers: corsHeaders(),
     })
@@ -69,7 +91,7 @@ export async function POST(
   try {
     const body = await req.json()
 
-    const { firstName, lastName, email, subject, message, agreeToPrivacyPolicy, status } = body
+    const { firstName, lastName, email, subject, message, agreeToPrivacyPolicy, status, countryId } = body
 
     if (!firstName || !lastName || !email || !subject || !message) {
       return new NextResponse("Missing required fields", {
@@ -82,6 +104,7 @@ export async function POST(
     const contactForm = await prismadb.contactForm.create({
       data: {
         storeId: params.storeId,
+        countryId: countryId || null,
         firstName,
         lastName,
         email,

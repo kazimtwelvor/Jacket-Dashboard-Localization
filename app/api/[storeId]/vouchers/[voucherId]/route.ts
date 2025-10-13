@@ -14,6 +14,13 @@ export async function GET(
     const voucher = await prismadb.voucher.findUnique({
       where: {
         id: params.voucherId
+      },
+      include: {
+        voucherCountries: {
+          include: {
+            country: true
+          }
+        }
       }
     });
 
@@ -83,6 +90,7 @@ export async function PATCH(
       description,
       buyQuantity,
       getQuantity,
+      countryIds,
     } = body;
 
     if (!userId) {
@@ -112,6 +120,10 @@ export async function PATCH(
       return new NextResponse("Unauthorized", { status: 405 });
     }
 
+    await prismadb.voucherCountry.deleteMany({
+      where: { voucherId: params.voucherId }
+    })
+
     const voucher = await prismadb.voucher.update({
       where: {
         id: params.voucherId
@@ -128,6 +140,11 @@ export async function PATCH(
         description: description || null,
         buyQuantity: buyQuantity ? parseInt(buyQuantity.toString()) : null,
         getQuantity: getQuantity ? parseInt(getQuantity.toString()) : null,
+        voucherCountries: {
+          create: (countryIds || []).map((countryId: string) => ({
+            countryId
+          }))
+        }
       }
     });
 

@@ -12,6 +12,7 @@ import { contactColumns } from "./contact-columns"
 import { newsletterColumns } from "./newsletter-columns"
 import { allFormsColumns } from "./all-forms-columns"
 import { toast } from "react-hot-toast"
+import { useDashboardCountry } from "@/hooks/use-dashboard-country"
 
 import { useParams, useRouter } from "next/navigation"
 
@@ -30,15 +31,20 @@ export const FormsClient = ({ contactForms: initialContactForms, newsletterForms
 
   const params = useParams()
   const router = useRouter()
+  const { getCountryCode } = useDashboardCountry()
 
   const fetchForms = async () => {
     if (!params?.storeId) return
     
     setIsLoading(true)
+    const countryCode = getCountryCode() || 'us'
+    
+    console.log('[FORMS_CLIENT_REFRESH] Refreshing forms with country:', countryCode)
+    
     try {
       const [contactResponse, newsletterResponse] = await Promise.all([
-        fetch(`/api/${params.storeId}/forms/contact-forms`),
-        fetch(`/api/${params.storeId}/forms/newsletter-forms`)
+        fetch(`/api/${params.storeId}/forms/contact-forms?cn=${countryCode}`),
+        fetch(`/api/${params.storeId}/forms/newsletter-forms?cn=${countryCode}`)
       ])
 
       if (contactResponse.ok && newsletterResponse.ok) {
@@ -73,6 +79,14 @@ export const FormsClient = ({ contactForms: initialContactForms, newsletterForms
     }
   }
 
+  // Sync state with props when they change (country changes in parent)
+  useEffect(() => {
+    console.log('[FORMS_CLIENT] Props changed - updating state')
+    setContactForms(initialContactForms)
+    setNewsletterForms(initialNewsletterForms)
+    setAllForms(initialAllForms)
+  }, [initialContactForms, initialNewsletterForms, initialAllForms])
+
   useEffect(() => {
     const handleFocus = () => {
       fetchForms()
@@ -82,9 +96,7 @@ export const FormsClient = ({ contactForms: initialContactForms, newsletterForms
     return () => window.removeEventListener('focus', handleFocus)
   }, [params?.storeId])
 
-  useEffect(() => {
-    fetchForms()
-  }, [params?.storeId])
+  // Note: Removed initial fetchForms() on mount since parent (page.tsx) already fetches with country filter
 
   return (
     <>

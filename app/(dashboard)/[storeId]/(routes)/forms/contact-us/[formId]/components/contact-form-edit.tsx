@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Heading } from "@/components/ui/heading"
 import { Separator } from "@/components/ui/separator"
+import { CountryFormSelector } from "@/components/ui/country-selector"
 
 interface ContactFormEditProps {
   initialData: {
@@ -22,6 +23,7 @@ interface ContactFormEditProps {
     message: string
     agreeToPrivacyPolicy: boolean
     status: string
+    countryId?: string | null
   }
 }
 
@@ -35,7 +37,8 @@ export const ContactFormEdit = ({ initialData }: ContactFormEditProps) => {
     subject: initialData.subject,
     message: initialData.message,
     agreeToPrivacyPolicy: initialData.agreeToPrivacyPolicy,
-    status: initialData.status
+    status: initialData.status,
+    countryId: initialData.countryId || ""
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -78,6 +81,14 @@ export const ContactFormEdit = ({ initialData }: ContactFormEditProps) => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="countryId">Country</Label>
+              <CountryFormSelector
+                value={formData.countryId}
+                onChange={(value) => handleChange("countryId", value)}
+                placeholder="Select a country (optional)"
+              />
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="firstName">First Name</Label>

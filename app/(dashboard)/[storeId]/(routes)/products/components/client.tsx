@@ -245,7 +245,8 @@ export const ProductsClient: React.FC<ProductsClientProps> = ({ storeId, isOwner
     setIsSearching(true)
     try {
       const isTrashSearch = activeTab === "trash"
-      let apiUrl = `/api/${storeId}/products?search=${encodeURIComponent(searchQuery)}&admin=true`
+      const countryCode = getCountryCode()
+      let apiUrl = `/api/${storeId}/products?search=${encodeURIComponent(searchQuery)}&admin=true&cn=${countryCode}`
 
       if (isTrashSearch) {
         apiUrl += '&trash=true'

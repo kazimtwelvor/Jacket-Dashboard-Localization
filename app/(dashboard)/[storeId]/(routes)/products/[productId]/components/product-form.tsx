@@ -211,7 +211,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       name: initialData.name,
       slug: initialData.slug || "",
       description: initialData.description || "",
-      countryIds: (initialData as any).productCountries?.map((pc: any) => pc.countryId) || (getCountryId() ? [getCountryId()] : []),
+      countryIds: (initialData as any).productCountries?.length > 0 
+        ? (initialData as any).productCountries.map((pc: any) => pc.countryId)
+        : (getCountryId() ? [getCountryId()].filter(Boolean) as string[] : []),
       specifications: safeJsonParse(initialData.specifications, {
         externalMaterial: [],
         internalMaterial: [],
@@ -413,7 +415,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       name: "",
       slug: "", // Initialize top-level slug as empty
       description: "",
-      countryIds: getCountryId() ? [getCountryId()] : [],
+      countryIds: getCountryId() ? [getCountryId()].filter(Boolean) as string[] : [],
       specifications: {
         externalMaterial: [],
         internalMaterial: [],

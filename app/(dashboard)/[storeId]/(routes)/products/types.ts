@@ -39,6 +39,11 @@ export interface Product {
   seoScore?: number
   productSizes?: ProductSize[]
   sizeDetails?: any
+  productCountries?: any[]
+  relatedProducts?: any[]
+  isParentProduct?: boolean
+  parentProductId?: string | null
+  keywords?: string[]
   createdAt: Date
   updatedAt: Date
 }

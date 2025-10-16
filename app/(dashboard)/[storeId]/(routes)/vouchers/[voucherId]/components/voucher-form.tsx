@@ -61,7 +61,9 @@ export const VoucherForm: React.FC<VoucherFormProps> = ({ initialData }) => {
       minOrderAmount: initialData.minOrderAmount ? parseFloat(String(initialData.minOrderAmount)) : undefined,
       maxDiscount: initialData.maxDiscount ? parseFloat(String(initialData.maxDiscount)) : undefined,
       validUntil: initialData.validUntil ? new Date(initialData.validUntil).toISOString().split('T')[0] : undefined,
-      countryIds: initialData.voucherCountries?.map((vc: any) => vc.countryId) || (getCountryId() ? [getCountryId()] : []),
+      countryIds: initialData.voucherCountries?.length > 0
+        ? initialData.voucherCountries.map((vc: any) => vc.countryId)
+        : (getCountryId() ? [getCountryId()] : []),
     } : {
       code: "",
       type: "PERCENTAGE",

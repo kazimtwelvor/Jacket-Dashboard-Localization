@@ -106,7 +106,9 @@ export const CategoryPageForm: React.FC<CategoryPageFormProps> = ({ initialData 
     schemaType: initialData.schemaType || "CollectionPage",
     customSchema: initialData.customSchema || "",
     status: initialData.status || "DRAFT",
-    countryIds: initialData.categoryPageCountries?.map((cpc: any) => cpc.countryId) || (getCountryId() ? [getCountryId()] : []),
+    countryIds: initialData.categoryPageCountries?.length > 0
+      ? initialData.categoryPageCountries.map((cpc: any) => cpc.countryId)
+      : (getCountryId() ? [getCountryId()] : []),
   } : null;
   
   

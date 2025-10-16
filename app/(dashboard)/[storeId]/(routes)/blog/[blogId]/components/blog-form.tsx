@@ -299,7 +299,9 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
     resolver: zodResolver(formSchema),
     defaultValues: initialData ? {
       ...initialData,
-      countryIds: initialData.blogCountries?.map((bc: any) => bc.countryId) || (getCountryId() ? [getCountryId()] : []),
+      countryIds: initialData.blogCountries?.length > 0
+        ? initialData.blogCountries.map((bc: any) => bc.countryId)
+        : (getCountryId() ? [getCountryId()] : []),
     } : {
       title: "How to Create Iron-on Patches",
       slug: "how-to-create-iron-on-patches",

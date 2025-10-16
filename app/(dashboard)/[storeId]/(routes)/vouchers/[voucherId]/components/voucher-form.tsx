@@ -18,6 +18,7 @@ import { Separator } from "@/components/ui/separator"
 import { Heading } from "@/components/ui/heading"
 import { AlertModal } from "@/components/modals/alert-modal"
 import { CountryMultiSelector } from "@/components/ui/country-multi-selector"
+import { useDashboardCountry } from "@/hooks/use-dashboard-country"
 
 const formSchema = z.object({
   code: z.string().min(1, "Code is required"),
@@ -45,6 +46,7 @@ export const VoucherForm: React.FC<VoucherFormProps> = ({ initialData }) => {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const { getCountryId } = useDashboardCountry()
 
   const title = initialData ? "Edit voucher" : "Create voucher"
   const description = initialData ? "Edit a voucher" : "Add a new voucher"
@@ -59,13 +61,13 @@ export const VoucherForm: React.FC<VoucherFormProps> = ({ initialData }) => {
       minOrderAmount: initialData.minOrderAmount ? parseFloat(String(initialData.minOrderAmount)) : undefined,
       maxDiscount: initialData.maxDiscount ? parseFloat(String(initialData.maxDiscount)) : undefined,
       validUntil: initialData.validUntil ? new Date(initialData.validUntil).toISOString().split('T')[0] : undefined,
-      countryIds: initialData.voucherCountries?.map((vc: any) => vc.countryId) || [],
+      countryIds: initialData.voucherCountries?.map((vc: any) => vc.countryId) || (getCountryId() ? [getCountryId()] : []),
     } : {
       code: "",
       type: "PERCENTAGE",
       value: 0,
       isActive: true,
-      countryIds: [],
+      countryIds: getCountryId() ? [getCountryId()] : [],
     }
   })
 

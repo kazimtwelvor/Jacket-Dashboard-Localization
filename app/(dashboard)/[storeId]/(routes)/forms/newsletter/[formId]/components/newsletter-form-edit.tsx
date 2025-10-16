@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Heading } from "@/components/ui/heading"
 import { Separator } from "@/components/ui/separator"
 import { CountryFormSelector } from "@/components/ui/country-selector"
+import { useDashboardCountry } from "@/hooks/use-dashboard-country"
 
 interface NewsletterFormEditProps {
   initialData: {
@@ -24,10 +25,11 @@ interface NewsletterFormEditProps {
 export const NewsletterFormEdit = ({ initialData }: NewsletterFormEditProps) => {
   const router = useRouter()
   const params = useParams()
+  const { getCountryId } = useDashboardCountry()
   const [formData, setFormData] = useState({
     email: initialData.email,
     status: initialData.status,
-    countryId: initialData.countryId || ""
+    countryId: initialData.countryId || getCountryId() || ""
   })
 
   const handleSubmit = async (e: React.FormEvent) => {

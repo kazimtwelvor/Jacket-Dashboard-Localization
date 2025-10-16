@@ -21,6 +21,7 @@ import { BlogHeroSection } from "./blog-hero-section"
 import { BlogContentSection } from "./blog-content-section"
 import { BlogSettings } from "./blog-settings"
 import { BlogGuideContent } from "./blog-guide-content"
+import { useDashboardCountry } from "@/hooks/use-dashboard-country"
 
 const formSchema = z.object({
   title: z.string().min(1),
@@ -279,6 +280,7 @@ interface BlogFormProps {
 export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
   const params = useParams()
   const router = useRouter()
+  const { getCountryId } = useDashboardCountry()
 
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -295,7 +297,10 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
 
   const form = useForm<BlogFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData || {
+    defaultValues: initialData ? {
+      ...initialData,
+      countryIds: initialData.blogCountries?.map((bc: any) => bc.countryId) || (getCountryId() ? [getCountryId()] : []),
+    } : {
       title: "How to Create Iron-on Patches",
       slug: "how-to-create-iron-on-patches",
       subtitle: "",
@@ -569,6 +574,7 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
         },
       },
     },
+    countryIds: getCountryId() ? [getCountryId()] : [],
   })
 
   useEffect(() => {

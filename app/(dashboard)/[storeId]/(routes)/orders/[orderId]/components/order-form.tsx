@@ -30,6 +30,7 @@ import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import { CountryFormSelector } from "@/components/ui/country-selector"
+import { useDashboardCountry } from "@/hooks/use-dashboard-country"
 
 const formSchema = z.object({
   customerName: z.string().optional(),
@@ -86,6 +87,7 @@ const normalizePaymentMethod = (method: string | null | undefined): string => {
 export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, storeUsers }) => {
   const params = useParams()
   const router = useRouter()
+  const { getCountryId } = useDashboardCountry()
 
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -127,7 +129,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
         // expirationDate: initialData.expirationDate || "",
         // securityCode: initialData.securityCode || "",
         // cardCountry: initialData.cardCountry || "",
-        countryId: initialData.countryId || "",
+        countryId: initialData.countryId || getCountryId() || "",
       }
     : {
         customerName: "",
@@ -158,7 +160,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
         // expirationDate: "",
         // securityCode: "",
         // cardCountry: "",
-        countryId: "",
+        countryId: getCountryId() || "",
       }
 
   const form = useForm<OrderFormValues>({

@@ -12,14 +12,16 @@ import { Heading } from "@/components/ui/heading"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "react-hot-toast"
 import { CountryFormSelector } from "@/components/ui/country-selector"
+import { useDashboardCountry } from "@/hooks/use-dashboard-country"
 
 export const NewsletterFormNew = () => {
   const router = useRouter()
   const params = useParams()
+  const { getCountryId } = useDashboardCountry()
   const [formData, setFormData] = useState({
     email: "",
     status: "ACTIVE",
-    countryId: ""
+    countryId: getCountryId() || ""
   })
 
   const handleSubmit = async (e: React.FormEvent) => {

@@ -44,6 +44,7 @@ const safeJsonParse = (value: any, fallback: any = null) => {
 import type { Product, Category, Size, Color } from "../../types"
 import axios from "axios"
 import { useStoreName } from "./store-name-provider"
+import { useDashboardCountry } from "@/hooks/use-dashboard-country"
 
 export interface ProductFormProps {
   initialData: Product | null
@@ -123,6 +124,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
   const [currentInitialData, setCurrentInitialData] = useState(initialData)
   const [activeTab, setActiveTab] = useState("general")
   const formRef = useRef<HTMLFormElement>(null)
+  const { getCountryId } = useDashboardCountry()
   const { toast } = useToast()
   const router = useRouter()
   const params = useParams()
@@ -226,7 +228,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       name: initialData.name,
       slug: initialData.slug || "",
       description: initialData.description || "",
-      countryIds: (initialData as any).productCountries?.map((pc: any) => pc.countryId) || [],
+      countryIds: (initialData as any).productCountries?.map((pc: any) => pc.countryId) || (getCountryId() ? [getCountryId()] : []),
       specifications: safeJsonParse(initialData.specifications, {
         externalMaterial: [],
         internalMaterial: [],
@@ -427,7 +429,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       name: "",
       slug: "", // Initialize top-level slug as empty
       description: "",
-      countryIds: [],
+      countryIds: getCountryId() ? [getCountryId()] : [],
       specifications: {
         externalMaterial: [],
         internalMaterial: [],

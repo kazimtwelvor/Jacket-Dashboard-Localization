@@ -13,10 +13,12 @@ import { Heading } from "@/components/ui/heading"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "react-hot-toast"
 import { CountryFormSelector } from "@/components/ui/country-selector"
+import { useDashboardCountry } from "@/hooks/use-dashboard-country"
 
 export const ContactFormNew = () => {
   const router = useRouter()
   const params = useParams()
+  const { getCountryId } = useDashboardCountry()
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -25,7 +27,7 @@ export const ContactFormNew = () => {
     message: "",
     agreeToPrivacyPolicy: false,
     status: "PENDING",
-    countryId: ""
+    countryId: getCountryId() || ""
   })
 
   const handleSubmit = async (e: React.FormEvent) => {

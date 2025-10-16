@@ -35,6 +35,7 @@ import { SeoSettings } from "./seo-settings"
 import { EditableCategoryTemplateWrapper } from "./editable-category-template-wrapper"
 import { ApiSlugDisplay } from "./api-slug-display"
 import { CountryMultiSelector } from "@/components/ui/country-multi-selector"
+import { useDashboardCountry } from "@/hooks/use-dashboard-country"
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -80,6 +81,7 @@ export const CategoryPageForm: React.FC<CategoryPageFormProps> = ({ initialData 
   const params = useParams()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const { getCountryId } = useDashboardCountry()
   const [shouldScrollToTop, setShouldScrollToTop] = useState(false)
   
   
@@ -104,7 +106,7 @@ export const CategoryPageForm: React.FC<CategoryPageFormProps> = ({ initialData 
     schemaType: initialData.schemaType || "CollectionPage",
     customSchema: initialData.customSchema || "",
     status: initialData.status || "DRAFT",
-    countryIds: initialData.categoryPageCountries?.map((cpc: any) => cpc.countryId) || [],
+    countryIds: initialData.categoryPageCountries?.map((cpc: any) => cpc.countryId) || (getCountryId() ? [getCountryId()] : []),
   } : null;
   
   
@@ -141,7 +143,7 @@ export const CategoryPageForm: React.FC<CategoryPageFormProps> = ({ initialData 
       schemaType: "CollectionPage",
       customSchema: "",
       status: "DRAFT",
-      countryIds: [],
+      countryIds: getCountryId() ? [getCountryId()] : [],
     }
   })
 

@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Heading } from "@/components/ui/heading"
 import { Separator } from "@/components/ui/separator"
 import { CountryFormSelector } from "@/components/ui/country-selector"
+import { useDashboardCountry } from "@/hooks/use-dashboard-country"
 
 interface ContactFormEditProps {
   initialData: {
@@ -30,6 +31,7 @@ interface ContactFormEditProps {
 export const ContactFormEdit = ({ initialData }: ContactFormEditProps) => {
   const router = useRouter()
   const params = useParams()
+  const { getCountryId } = useDashboardCountry()
   const [formData, setFormData] = useState({
     firstName: initialData.firstName,
     lastName: initialData.lastName,
@@ -38,7 +40,7 @@ export const ContactFormEdit = ({ initialData }: ContactFormEditProps) => {
     message: initialData.message,
     agreeToPrivacyPolicy: initialData.agreeToPrivacyPolicy,
     status: initialData.status,
-    countryId: initialData.countryId || ""
+    countryId: initialData.countryId || getCountryId() || ""
   })
 
   const handleSubmit = async (e: React.FormEvent) => {

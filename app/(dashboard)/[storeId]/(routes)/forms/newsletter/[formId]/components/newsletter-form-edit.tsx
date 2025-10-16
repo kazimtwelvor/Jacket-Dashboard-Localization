@@ -29,14 +29,14 @@ export const NewsletterFormEdit = ({ initialData }: NewsletterFormEditProps) => 
   const [formData, setFormData] = useState({
     email: initialData.email,
     status: initialData.status,
-    countryId: initialData.countryId || getCountryId() || ""
+    countryId: initialData.countryId || ""
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     try {
-      const response = await fetch(`/api/${params.storeId}/forms/newsletter-forms/${initialData.id}`, {
+      const response = await fetch(`/api/${params?.storeId}/forms/newsletter-forms/${initialData.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -78,6 +78,7 @@ export const NewsletterFormEdit = ({ initialData }: NewsletterFormEditProps) => 
                 value={formData.countryId}
                 onChange={(value) => handleChange("countryId", value)}
                 placeholder="Select a country (optional)"
+                useFormControl={false}
               />
             </div>
             <div className="space-y-2">

@@ -107,6 +107,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
       // expirationDate,
       // securityCode,
       // cardCountry,
+      countryId,
       orderItems,
     } = body
 
@@ -205,6 +206,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ storeI
         // expirationDate: expirationDate !== undefined ? expirationDate : undefined,
         // securityCode: securityCode !== undefined ? securityCode : undefined,
         // cardCountry: cardCountry !== undefined ? cardCountry : undefined,
+        countryId: countryId !== undefined ? countryId : undefined,
       },
       include: {
         orderItems: {

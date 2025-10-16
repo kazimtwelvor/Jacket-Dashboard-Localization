@@ -165,12 +165,18 @@ export const ProductPreviewModal = ({ isOpen, onClose, product }: ProductPreview
 
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold text-primary">
-                  ${typeof product.price === 'number' ? product.price.toFixed(2) : product.price}
-                </span>
-                {isValidSalePrice(product.salePrice?.toString()) && (
-                  <span className="text-lg text-muted-foreground line-through">
-                    ${typeof product.salePrice === 'number' ? product.salePrice.toFixed(2) : product.salePrice}
+                {isValidSalePrice(product.salePrice?.toString()) ? (
+                  <>
+                    <span className="text-2xl font-bold text-red-600">
+                      ${typeof product.salePrice === 'number' ? product.salePrice.toFixed(2) : product.salePrice}
+                    </span>
+                    <span className="text-lg text-muted-foreground line-through">
+                      ${typeof product.price === 'number' ? product.price.toFixed(2) : product.price}
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-2xl font-bold text-primary">
+                    ${typeof product.price === 'number' ? product.price.toFixed(2) : product.price}
                   </span>
                 )}
               </div>

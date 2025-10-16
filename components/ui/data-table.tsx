@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -10,6 +10,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   type SortingState,
+  type RowSelectionState,
   useReactTable,
 } from "@tanstack/react-table"
 
@@ -25,17 +26,19 @@ interface DataTableProps<TData, TValue> {
   searchKey: string
   searchFields?: (keyof TData)[] // Additional fields to search in
   onEdit?: (data: TData) => void // Optional edit handler
+  onRowSelectionChange?: (selectedIds: string[]) => void
 }
 
-export function DataTable<TData, TValue>({ columns, data, searchKey, searchFields, onEdit }: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({ columns, data, searchKey, searchFields, onEdit, onRowSelectionChange }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [globalFilter, setGlobalFilter] = useState("")
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
   // Apply smart search to data
   const filteredData = useMemo(() => {
     if (!globalFilter.trim()) return data
-    
+
     const fieldsToSearch = searchFields || [searchKey as keyof TData]
     return smartSearch(data, globalFilter, fieldsToSearch)
   }, [data, globalFilter, searchKey, searchFields])
@@ -49,14 +52,25 @@ export function DataTable<TData, TValue>({ columns, data, searchKey, searchField
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
+    onRowSelectionChange: setRowSelection,
+    enableRowSelection: true,
+    getRowId: (row: any) => row.id,
     state: {
       sorting,
       columnFilters,
+      rowSelection,
     },
     meta: {
       onEdit,
     },
   })
+
+  useEffect(() => {
+    if (onRowSelectionChange) {
+      const selectedIds = Object.keys(rowSelection).filter(id => rowSelection[id])
+      onRowSelectionChange(selectedIds)
+    }
+  }, [rowSelection, onRowSelectionChange])
 
   return (
     <div className="px-4">
@@ -76,7 +90,7 @@ export function DataTable<TData, TValue>({ columns, data, searchKey, searchField
                 {headerGroup.headers.map((header) => {
                   const canSort = header.column.getCanSort()
                   const isSorted = header.column.getIsSorted()
-                  
+
                   return (
                     <TableHead key={header.id}>
                       {header.isPlaceholder ? null : (

@@ -94,10 +94,10 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       },
       orderBy: [
         {
-          viewCount: "desc", 
+          priority: { sort: "asc", nulls: "last" },
         },
         {
-          priority: "asc", 
+          viewCount: "desc", 
         },
         {
           isFeatured: "desc", 
@@ -436,6 +436,7 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
         price: product.price.toString(),
         // originalPrice: product.originalPrice ? product.originalPrice.toString() : "0",
         salePrice: product.salePrice ? product.salePrice.toString() : null,
+        isSale: product.isSale || false,
         baseColor: baseColor,
         colorDetails: combinedColorDetails,
         images: product.images.map(productImage => ({

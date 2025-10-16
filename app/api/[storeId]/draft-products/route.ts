@@ -65,6 +65,7 @@ export async function GET(
     const priceMax = parseFloat(searchParams.get('priceMax') || '999999')
     const status = searchParams.get('status') || 'all'
     const priorityFilter = searchParams.get('priority') || 'all'
+    const saleFilter = searchParams.get('sale') || 'all'
     const type = searchParams.get('type') || 'products'
     
     const offset = (page - 1) * limit
@@ -214,6 +215,11 @@ export async function GET(
       }
     }
 
+    if (saleFilter !== 'all') {
+      whereClause.isSale = saleFilter === 'true'
+    }
+
+    
     const [products, totalCount] = await Promise.all([
       prismadb.product.findMany({
         where: whereClause,
@@ -231,8 +237,8 @@ export async function GET(
         orderBy: type === 'trashed'
           ? { deletedAt: 'desc' }
           : [
-              { viewCount: 'desc' },
               { priority: { sort: 'asc', nulls: 'last' } },
+              { viewCount: 'desc' },
               { createdAt: 'desc' }
             ],
         skip: offset,
@@ -247,6 +253,7 @@ export async function GET(
       ...product,
       price: product.price.toString(),
       salePrice: product.salePrice ? product.salePrice.toString() : null,
+      isSale: product.isSale,
     }))
 
     const totalPages = Math.ceil(totalCount / limit)

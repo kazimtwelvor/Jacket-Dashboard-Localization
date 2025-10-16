@@ -41,6 +41,7 @@ model Store {
   productViews        ProductView[] @relation("StoreToProductView")
   categoryViews       CategoryView[] @relation("StoreToCategoryView")
   categoryPageViews   CategoryPageView[] @relation("StoreToCategoryPageView")
+  visits              Visit[] @relation("StoreToVisit")
   // Payment fields
   paypalClientId      String?   @default("")
   paypalClientSecret  String?   @default("")
@@ -320,6 +321,7 @@ model Product {
   stockStatus    String?  @default("instock") // instock, outofstock, onbackorder
   description    String?  @db.Text
   salePrice      Decimal?
+  isSale         Boolean  @default(false) // New field to indicate if product is on sale
   specifications Json?   
   tags           String[]
   gender         String?
@@ -555,6 +557,28 @@ model Order {
 //  securityCode       String?     // CVC
 //  cardCountry        String?
   
+  // Attribution fields
+  anonymousId         String?
+  firstSource         String?
+  firstMedium         String?
+  firstCampaign       String?
+  firstContent        String?
+  firstTerm           String?
+  source              String?
+  firstClickId        String?
+  firstReferrer       String?
+  firstTouchAt        DateTime?
+  lastSource          String?
+  lastMedium          String?
+  lastCampaign        String?
+  lastContent         String?
+  lastTerm            String?
+  lastClickId         String?
+  lastReferrer        String?
+  lastTouchAt         DateTime?
+  firstVisitId        String?
+  lastVisitId         String?
+  
   createdAt          DateTime    @default(now())
   updatedAt          DateTime    @updatedAt
 
@@ -563,6 +587,7 @@ model Order {
   @@index([status])
   @@index([userId])
   @@index([transactionId])
+  @@index([anonymousId])
 }
 
 enum OrderStatus {
@@ -962,4 +987,26 @@ model BlogCountry {
   @@unique([blogId, countryId])
   @@index([blogId])
   @@index([countryId])
+}
+
+model Visit {
+  id           String   @id @default(cuid())
+  storeId      String
+  store        Store    @relation("StoreToVisit", fields: [storeId], references: [id], onDelete: Cascade)
+  anonymousId  String
+  userId       String?
+  path         String
+  referrer     String?
+  source       String?
+  medium       String?
+  campaign     String?
+  term         String?
+  content      String?
+  clickId      String?
+  userAgent    String?
+  ipAddress    String?
+  visitedAt    DateTime @default(now())
+
+  @@index([storeId, anonymousId, visitedAt])
+  @@index([storeId, userId, visitedAt])
 }

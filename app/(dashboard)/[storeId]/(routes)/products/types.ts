@@ -16,6 +16,7 @@ export interface Product {
   stockStatus?: string
   description?: string
   salePrice?: number | string | null
+  isSale?: boolean
   specifications?: string
   material?: string[]
   style?: string[]
@@ -135,6 +136,7 @@ export type ProductColumn = {
   name: string
   price: string
   salePrice?: string | null
+  isSale?: boolean
   category?: string
   sku?: string
   isArchived: boolean

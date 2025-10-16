@@ -280,7 +280,7 @@ interface BlogFormProps {
 export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
   const params = useParams()
   const router = useRouter()
-  const { getCountryId } = useDashboardCountry()
+  const { getCountryId, selectedCountry } = useDashboardCountry()
 
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -586,6 +586,16 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
       })
     }
   }, [form])
+
+  useEffect(() => {
+    if (!initialData) {
+      const currentCountryIds = form.getValues("countryIds")
+      const dashboardCountryId = getCountryId()
+      if ((!currentCountryIds || currentCountryIds.length === 0) && dashboardCountryId) {
+        form.setValue("countryIds", [dashboardCountryId], { shouldValidate: false })
+      }
+    }
+  }, [getCountryId, form, initialData])
 
   const handleToggleStep = useCallback(
     (index: number, value: boolean) => {

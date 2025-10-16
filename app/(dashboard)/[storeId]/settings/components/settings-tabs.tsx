@@ -11,23 +11,18 @@ export function SettingsTabs() {
   const tabs = [
     {
       title: "General",
-      href: `/${params.storeId}/settings`,
-      active: pathname === `/${params.storeId}/settings`,
-    },
-    {
-      title: "Countries",
-      href: `/${params.storeId}/settings/countries`,
-      active: pathname === `/${params.storeId}/settings/countries`,
+      href: `/${params?.storeId}/settings`,
+      active: pathname === `/${params?.storeId}/settings`,
     },
     {
       title: "Members",
-      href: `/${params.storeId}/settings/members`,
-      active: pathname === `/${params.storeId}/settings/members`,
+      href: `/${params?.storeId}/settings/members`,
+      active: pathname === `/${params?.storeId}/settings/members`,
     },
     {
       title: "reCAPTCHA",
-      href: `/${params.storeId}/settings/recaptcha`,
-      active: pathname === `/${params.storeId}/settings/recaptcha`,
+      href: `/${params?.storeId}/settings/recaptcha`,
+      active: pathname === `/${params?.storeId}/settings/recaptcha`,
     },
   ]
 

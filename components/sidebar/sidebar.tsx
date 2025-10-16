@@ -28,6 +28,7 @@ import {
   ClipboardList,
   Ticket,
   TestTube,
+  Globe,
 } from "lucide-react";
 import {
   Popover,
@@ -193,6 +194,12 @@ export const Sidebar = ({
           label: "Settings",
           icon: Settings,
           active: pathname?.includes(`/${params?.storeId}/settings`),
+        },
+        {
+          href: `/${params?.storeId}/countries`,
+          label: "Countries",
+          icon: Globe,
+          active: pathname?.includes(`/${params?.storeId}/countries`),
         },
         {
           href: `/${params?.storeId}/settings/members`,

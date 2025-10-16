@@ -67,12 +67,31 @@ export async function GET(
     const priorityFilter = searchParams.get('priority') || 'all'
     const saleFilter = searchParams.get('sale') || 'all'
     const type = searchParams.get('type') || 'products'
+    const cn = searchParams.get('cn') 
     
     const offset = (page - 1) * limit
+
+    let countryId: string | undefined = undefined
+    if (cn) {
+      const country = await prismadb.country.findUnique({
+        where: { countryCode: cn.toLowerCase() }
+      })
+      if (country) {
+        countryId = country.id
+      }
+    }
 
     const whereClause: any = {
       storeId: storeId,
       isDeleted: type === 'trashed' ? true : false,
+    }
+
+    if (countryId) {
+      whereClause.productCountries = {
+        some: {
+          countryId: countryId
+        }
+      }
     }
 
     if (search) {

@@ -21,6 +21,7 @@ import { Heading } from "@/components/ui/heading"
 import { Separator } from "@/components/ui/separator"
 import { AlertModal } from "@/components/modals/alert-modal"
 import { ProductPreviewModal } from "../../products/components/product-preview-modal"
+import { useDashboardCountry } from "@/hooks/use-dashboard-country"
 
 interface DraftClientProps {
   storeId: string
@@ -30,6 +31,7 @@ interface DraftClientProps {
 export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) => {
   const router = useRouter()
   const params = useParams()
+  const { getCountryCode, selectedCountry } = useDashboardCountry()
   const [loading, setLoading] = useState(false)
   const [initialLoading, setInitialLoading] = useState(true)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
@@ -74,6 +76,7 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
   const fetchProducts = async (page: number = 1, type: 'products' | 'trashed' = 'products') => {
     try {
       setLoading(true)
+      const countryCode = getCountryCode()
       const params = new URLSearchParams({
         page: page.toString(),
         limit: itemsPerPage.toString(),
@@ -89,6 +92,7 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
         status: statusFilter,
         priority: priorityFilter,
         sale: saleFilter,
+        cn: countryCode,
       })
 
       // Price filter commented out for now
@@ -153,6 +157,15 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
       fetchProducts(trashedPage, 'trashed')
     }
   }, [trashedPage, activeTab, searchTerm, categoryFilter, colorFilter, materialFilter, /* priceFilter, */ statusFilter, styleFilter, genderFilter, dateFilter, creatorFilter, priorityFilter, saleFilter, storeId])
+
+  React.useEffect(() => {
+    if (!initialLoading) {
+      fetchProducts(currentPage, 'products')
+      if (activeTab === 'trash') {
+        fetchProducts(trashedPage, 'trashed')
+      }
+    }
+  }, [selectedCountry?.countryCode])
 
   // Fetch all dropdown options once on component mount
   const fetchDropdownOptions = async () => {

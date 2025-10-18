@@ -21,7 +21,7 @@ export const formSchema = z.object({
   status: z.string().min(1, "Status is required"),
   isFeatured: z.boolean().default(false),
   relatedProducts: z.array(z.string()).default([]),
-  countryIds: z.array(z.string()).default([]),
+  countryId: z.string().optional(),
 
   sizeDetails: z
     .array(

@@ -116,9 +116,15 @@ export function DashboardCountrySelector() {
             if (defaultCountry) {
               console.log('[COUNTRY_SELECTOR] Setting default country:', defaultCountry.countryCode)
               setSelectedCountry(defaultCountry)
+              if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('dashboard-country-changed', { detail: defaultCountry }))
+              }
             }
           } else {
             console.log('[COUNTRY_SELECTOR] Using persisted country:', selectedCountry.countryCode)
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('dashboard-country-changed', { detail: selectedCountry }))
+            }
           }
         }
       } catch (error) {

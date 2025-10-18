@@ -129,7 +129,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialData, products, sto
         // expirationDate: initialData.expirationDate || "",
         // securityCode: initialData.securityCode || "",
         // cardCountry: initialData.cardCountry || "",
-        countryId: initialData.countryId || getCountryId() || "",
+        countryId: initialData.countryId || "",
       }
     : {
         customerName: "",

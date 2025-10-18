@@ -3,6 +3,8 @@
 import { auth } from "@clerk/nextjs/server"
 import prismadb from "@/lib/prismadb"
 
+console.log('📝 generate-and-save-reviews.ts module loaded');
+
 interface ProductReview {
   id?: string
   text: string
@@ -18,15 +20,18 @@ export async function generateAndSaveReviews(
   productDescription: string,
   reviewCount: number
 ) {
+  
   try {
     const { userId } = await auth()
     if (!userId) {
       throw new Error("Unauthenticated")
     }
+    
 
     if (!process.env.GEMINI_API_KEY) {
       throw new Error("GEMINI_API_KEY environment variable is not set")
     }
+    
 
     const product = await prismadb.product.findFirst({
       where: {
@@ -69,11 +74,16 @@ export async function generateAndSaveReviews(
     
     while (retryCount < maxRetries) {
       try {
+        const apiKey = process.env.GEMINI_API_KEY?.replace(/['"]/g, '').trim();
+        
         response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${process.env.GEMINI_API_KEY}`,
+          'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent',
           {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+              "Content-Type": "application/json",
+              "x-goog-api-key": apiKey || ''
+            },
             body: JSON.stringify({
               contents: [{ parts: [{ text: prompt }] }],
               generationConfig: {
@@ -85,6 +95,7 @@ export async function generateAndSaveReviews(
             }),
           }
         )
+        
         
         if (response.status === 429) {
           const waitTime = Math.pow(2, retryCount) * 1000 
@@ -104,6 +115,14 @@ export async function generateAndSaveReviews(
     }
 
     if (!response || !response.ok) {
+      
+      try {
+        const errorText = await response?.text();
+        console.error('   Error Body:', errorText);
+      } catch (e) {
+        console.error('   Could not read error body');
+      }
+      
       if (response?.status === 429) {
         const fallbackReviews = generateFallbackReviews(reviewCount, productName)
         
@@ -114,7 +133,7 @@ export async function generateAndSaveReviews(
           fallback: true,
         }
       }
-      const errorData = response ? await response.json() : {}
+      const errorData = response ? await response.json().catch(() => ({})) : {}
       throw new Error(`API call failed: ${response?.statusText || 'Network error'}`)
     }
 

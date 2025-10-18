@@ -40,14 +40,14 @@ export const ContactFormEdit = ({ initialData }: ContactFormEditProps) => {
     message: initialData.message,
     agreeToPrivacyPolicy: initialData.agreeToPrivacyPolicy,
     status: initialData.status,
-    countryId: initialData.countryId || getCountryId() || ""
+    countryId: initialData.countryId || ""
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     try {
-      const response = await fetch(`/api/${params.storeId}/forms/contact-forms/${initialData.id}`, {
+      const response = await fetch(`/api/${params?.storeId}/forms/contact-forms/${initialData.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -89,6 +89,7 @@ export const ContactFormEdit = ({ initialData }: ContactFormEditProps) => {
                 value={formData.countryId}
                 onChange={(value) => handleChange("countryId", value)}
                 placeholder="Select a country (optional)"
+                useFormControl={false}
               />
             </div>
             <div className="grid grid-cols-2 gap-4">

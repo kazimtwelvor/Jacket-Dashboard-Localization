@@ -27,6 +27,8 @@ import {
   FileType,
   ClipboardList,
   Ticket,
+  TestTube,
+  Globe,
 } from "lucide-react";
 import {
   Popover,
@@ -194,6 +196,12 @@ export const Sidebar = ({
           active: pathname?.includes(`/${params?.storeId}/settings`),
         },
         {
+          href: `/${params?.storeId}/countries`,
+          label: "Countries",
+          icon: Globe,
+          active: pathname?.includes(`/${params?.storeId}/countries`),
+        },
+        {
           href: `/${params?.storeId}/settings/members`,
           label: "Team Members",
           icon: Users,
@@ -205,6 +213,17 @@ export const Sidebar = ({
           label: "Payments",
           icon: DollarSign,
           active: pathname?.includes(`/${params?.storeId}/settings/payments`),
+        },
+      ],
+    },
+    {
+      category: "Testing",
+      items: [
+        {
+          href: `/${params?.storeId}/testing/404-checker`,
+          label: "404 Checker",
+          icon: TestTube,
+          active: pathname?.includes(`/${params?.storeId}/testing`),
         },
       ],
     },

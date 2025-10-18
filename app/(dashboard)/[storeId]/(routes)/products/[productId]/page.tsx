@@ -165,6 +165,7 @@ const ProductPage: React.FC<ProductPageProps> = async ({ params }) => {
         schema: product.schema || undefined,
         sizeDetails: product.sizeDetails,
         relatedProducts: product.relatedProducts || [],
+        productCountries: product.productCountries || [],
         createdAt: product.createdAt,
         updatedAt: product.updatedAt,
       }

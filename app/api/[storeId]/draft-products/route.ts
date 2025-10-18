@@ -65,13 +65,33 @@ export async function GET(
     const priceMax = parseFloat(searchParams.get('priceMax') || '999999')
     const status = searchParams.get('status') || 'all'
     const priorityFilter = searchParams.get('priority') || 'all'
+    const saleFilter = searchParams.get('sale') || 'all'
     const type = searchParams.get('type') || 'products'
+    const cn = searchParams.get('cn') 
     
     const offset = (page - 1) * limit
+
+    let countryId: string | undefined = undefined
+    if (cn) {
+      const country = await prismadb.country.findUnique({
+        where: { countryCode: cn.toLowerCase() }
+      })
+      if (country) {
+        countryId = country.id
+      }
+    }
 
     const whereClause: any = {
       storeId: storeId,
       isDeleted: type === 'trashed' ? true : false,
+    }
+
+    if (countryId) {
+      whereClause.productCountries = {
+        some: {
+          countryId: countryId
+        }
+      }
     }
 
     if (search) {
@@ -214,6 +234,11 @@ export async function GET(
       }
     }
 
+    if (saleFilter !== 'all') {
+      whereClause.isSale = saleFilter === 'true'
+    }
+
+    
     const [products, totalCount] = await Promise.all([
       prismadb.product.findMany({
         where: whereClause,
@@ -231,8 +256,8 @@ export async function GET(
         orderBy: type === 'trashed'
           ? { deletedAt: 'desc' }
           : [
-              { viewCount: 'desc' },
               { priority: { sort: 'asc', nulls: 'last' } },
+              { viewCount: 'desc' },
               { createdAt: 'desc' }
             ],
         skip: offset,
@@ -247,6 +272,7 @@ export async function GET(
       ...product,
       price: product.price.toString(),
       salePrice: product.salePrice ? product.salePrice.toString() : null,
+      isSale: product.isSale,
     }))
 
     const totalPages = Math.ceil(totalCount / limit)

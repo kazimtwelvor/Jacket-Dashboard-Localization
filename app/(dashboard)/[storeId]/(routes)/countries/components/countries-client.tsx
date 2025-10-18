@@ -9,9 +9,9 @@ import { Heading } from "@/components/ui/heading"
 import { Separator } from "@/components/ui/separator"
 import { DataTable } from "@/components/ui/data-table"
 import { ApiList } from "@/components/ui/api-list"
-
-import { columns, CountryColumn } from "./columns"
+import { CountryColumn } from "./columns"
 import { CountryModal } from "./country-modal"
+import { columns } from "./columns"
 
 interface CountriesClientProps {
   data: CountryColumn[]
@@ -58,3 +58,4 @@ export const CountriesClient: React.FC<CountriesClientProps> = ({
     </>
   )
 }
+

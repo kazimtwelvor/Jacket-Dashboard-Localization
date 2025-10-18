@@ -9,6 +9,7 @@ export const formSchema = z.object({
 
   regularPrice: z.string().min(1, "Regular price is required"),
   salePrice: z.string().optional(),
+  isSale: z.boolean().default(false),
 
   sku: z
     .string()

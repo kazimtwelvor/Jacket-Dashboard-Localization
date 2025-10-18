@@ -14,6 +14,7 @@ import { ApiList } from "@/components/ui/api-list"
 
 import { type OrderColumn, columns } from "./columns"
 import { OrderFilters } from "./order-filters"
+import { BulkActions } from "./bulk-actions"
 
 interface OrdersClientProps {
   data: any[]
@@ -23,6 +24,7 @@ export const OrdersClient: React.FC<OrdersClientProps> = ({ data }) => {
   const params = useParams()
   const router = useRouter()
   const [filteredData, setFilteredData] = useState<OrderColumn[]>(formatOrders(data))
+  const [selectedRows, setSelectedRows] = useState<string[]>([])
   const [filters, setFilters] = useState({
     status: "",
     paymentStatus: "",
@@ -69,7 +71,16 @@ export const OrdersClient: React.FC<OrdersClientProps> = ({ data }) => {
       </div>
       <Separator />
       <OrderFilters filters={filters} onFilterChange={handleFilterChange} onResetFilters={handleResetFilters} />
-      <DataTable searchKey="customerName" columns={columns} data={filteredData} />
+      <BulkActions 
+        selectedIds={selectedRows} 
+        onClearSelection={() => setSelectedRows([])} 
+      />
+      <DataTable 
+        searchKey="id" 
+        columns={columns} 
+        data={filteredData}
+        onRowSelectionChange={setSelectedRows}
+      />
       <Heading title="API" description="API Calls for Orders" />
       <Separator />
       <ApiList entityName="orders" entityIdName="orderId" />

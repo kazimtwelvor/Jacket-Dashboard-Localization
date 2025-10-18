@@ -82,6 +82,11 @@ export const EnhancedProductList = ({ products, storeId, onSelectItems, searchTe
       const priceB = Number.parseFloat(b.price.replace(/[^0-9.-]+/g, ""))
       return sortDirection === "asc" ? priceA - priceB : priceB - priceA
     }
+    if (sortField === "salePrice") {
+      const salePriceA = a.salePrice ? Number.parseFloat(a.salePrice.replace(/[^0-9.-]+/g, "")) : 0
+      const salePriceB = b.salePrice ? Number.parseFloat(b.salePrice.replace(/[^0-9.-]+/g, "")) : 0
+      return sortDirection === "asc" ? salePriceA - salePriceB : salePriceB - salePriceA
+    }
     if (sortField === "sku") {
       const skuA = a.sku || ""
       const skuB = b.sku || ""
@@ -332,7 +337,7 @@ export const EnhancedProductList = ({ products, storeId, onSelectItems, searchTe
               />
             </div>
 
-            <div className="col-span-4 flex items-center gap-2">
+            <div className="col-span-3 flex items-center gap-2">
               <button
                 onClick={() => handleSort("name")}
                 className="flex items-center hover:text-primary transition-colors"
@@ -379,11 +384,11 @@ export const EnhancedProductList = ({ products, storeId, onSelectItems, searchTe
 
             <div className="col-span-1 hidden lg:flex items-center gap-2">
               <button
-                onClick={() => handleSort("createdByName")}
+                onClick={() => handleSort("price")}
                 className="flex items-center hover:text-primary transition-colors"
               >
-                Created By
-                {sortField === "createdByName" &&
+                Regular Price
+                {sortField === "price" &&
                   (sortDirection === "asc" ? (
                     <ChevronUp className="ml-1 h-4 w-4" />
                   ) : (
@@ -394,11 +399,11 @@ export const EnhancedProductList = ({ products, storeId, onSelectItems, searchTe
 
             <div className="col-span-1 hidden lg:flex items-center gap-2">
               <button
-                onClick={() => handleSort("updatedByName")}
+                onClick={() => handleSort("salePrice")}
                 className="flex items-center hover:text-primary transition-colors"
               >
-                Updated By
-                {sortField === "updatedByName" &&
+                Sale Price
+                {sortField === "salePrice" &&
                   (sortDirection === "asc" ? (
                     <ChevronUp className="ml-1 h-4 w-4" />
                   ) : (
@@ -422,22 +427,7 @@ export const EnhancedProductList = ({ products, storeId, onSelectItems, searchTe
               </button>
             </div>
 
-            <div className="col-span-1 hidden xl:flex items-center gap-2">
-              <button
-                onClick={() => handleSort("createdAt")}
-                className="flex items-center hover:text-primary transition-colors"
-              >
-                Created At
-                {sortField === "createdAt" &&
-                  (sortDirection === "asc" ? (
-                    <ChevronUp className="ml-1 h-4 w-4" />
-                  ) : (
-                    <ChevronDown className="ml-1 h-4 w-4" />
-                  ))}
-              </button>
-            </div>
-
-            <div className="flex items-center justify-end col-span-6 md:col-span-5 lg:col-span-3 xl:col-span-1">Actions</div>
+            <div className="flex items-center justify-end col-span-3 md:col-span-3 lg:col-span-3 xl:col-span-2">Actions</div>
           </div>
 
           <div className="divide-y">
@@ -452,7 +442,7 @@ export const EnhancedProductList = ({ products, storeId, onSelectItems, searchTe
                     />
                   </div>
 
-                  <div className="col-span-4 flex items-center gap-3">
+                  <div className="col-span-3 flex items-center gap-3">
                     <div className="relative h-16 w-12 overflow-hidden bg-muted flex-shrink-0">
                       {product.imageUrl ? (
                         <Image
@@ -483,11 +473,11 @@ export const EnhancedProductList = ({ products, storeId, onSelectItems, searchTe
                   </div>
 
                   <div className="col-span-1 hidden lg:flex items-center">
-                    <span className="text-sm truncate">{product.createdByName || "System"}</span>
+                    <span className="text-sm font-medium">{product.price}</span>
                   </div>
 
                   <div className="col-span-1 hidden lg:flex items-center">
-                    <span className="text-sm truncate">{product.updatedByName || "Not updated"}</span>
+                    <span className="text-sm font-medium">{product.salePrice || "-"}</span>
                   </div>
 
                   <div className="col-span-1 hidden xl:flex items-center">
@@ -503,14 +493,7 @@ export const EnhancedProductList = ({ products, storeId, onSelectItems, searchTe
                     )}
                   </div>
 
-                  <div className="col-span-1 hidden xl:flex items-center">
-                    <div className="flex items-center">
-                      <Clock className="h-3.5 w-3.5 mr-2 text-muted-foreground" />
-                      <span className="text-sm">{product.createdAt || "Unknown"}</span>
-                    </div>
-                  </div>
-
-                  <div className="col-span-6 md:col-span-5 lg:col-span-3 xl:col-span-1 flex items-center justify-end gap-1">
+                  <div className="col-span-3 md:col-span-3 lg:col-span-3 xl:col-span-2 flex items-center justify-end gap-1">
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -593,11 +576,20 @@ export const EnhancedProductList = ({ products, storeId, onSelectItems, searchTe
                                 <span className="text-muted-foreground">Specifications:</span>
                                 <div className="text-right">
                                   {fullProduct.specifications ? (
-                                    Object.entries(fullProduct.specifications).map(([key, value]) => (
-                                      <div key={key} className="text-sm">
-                                        <span className="font-medium">{key}:</span> {Array.isArray(value) ? value.join(', ') : value}
-                                      </div>
-                                    ))
+                                    Object.entries(fullProduct.specifications).map(([key, value]) => {
+                                      if (key === 'color') {
+                                        return (
+                                          <div key={key} className="text-sm">
+                                            <span className="font-medium">{key}:</span> {fullProduct.baseColor?.name || "N/A"}
+                                          </div>
+                                        )
+                                      }
+                                      return (
+                                        <div key={key} className="text-sm">
+                                          <span className="font-medium">{key}:</span> {Array.isArray(value) ? value.join(', ') : value}
+                                        </div>
+                                      )
+                                    })
                                   ) : "N/A"}
                                 </div>
                               </div>

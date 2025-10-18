@@ -21,6 +21,7 @@ import { Heading } from "@/components/ui/heading"
 import { Separator } from "@/components/ui/separator"
 import { AlertModal } from "@/components/modals/alert-modal"
 import { ProductPreviewModal } from "../../products/components/product-preview-modal"
+import { useDashboardCountry } from "@/hooks/use-dashboard-country"
 
 interface DraftClientProps {
   storeId: string
@@ -30,6 +31,7 @@ interface DraftClientProps {
 export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) => {
   const router = useRouter()
   const params = useParams()
+  const { getCountryCode, selectedCountry } = useDashboardCountry()
   const [loading, setLoading] = useState(false)
   const [initialLoading, setInitialLoading] = useState(true)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
@@ -66,6 +68,7 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
   const [dateFilter, setDateFilter] = useState("all")
   const [creatorFilter, setCreatorFilter] = useState("all")
   const [priorityFilter, setPriorityFilter] = useState("all")
+  const [saleFilter, setSaleFilter] = useState("all")
   const [showAllProducts, setShowAllProducts] = useState(false)
   const itemsPerPage = 12
 
@@ -73,6 +76,7 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
   const fetchProducts = async (page: number = 1, type: 'products' | 'trashed' = 'products') => {
     try {
       setLoading(true)
+      const countryCode = getCountryCode()
       const params = new URLSearchParams({
         page: page.toString(),
         limit: itemsPerPage.toString(),
@@ -87,6 +91,8 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
         creator: creatorFilter,
         status: statusFilter,
         priority: priorityFilter,
+        sale: saleFilter,
+        cn: countryCode,
       })
 
       // Price filter commented out for now
@@ -144,13 +150,22 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
     if (!initialLoading) {
       fetchProducts(currentPage, 'products')
     }
-  }, [currentPage, searchTerm, categoryFilter, colorFilter, materialFilter, /* priceFilter, */ statusFilter, styleFilter, genderFilter, dateFilter, creatorFilter, priorityFilter, storeId])
+  }, [currentPage, searchTerm, categoryFilter, colorFilter, materialFilter, /* priceFilter, */ statusFilter, styleFilter, genderFilter, dateFilter, creatorFilter, priorityFilter, saleFilter, storeId])
 
   React.useEffect(() => {
     if (activeTab === 'trash' && !initialLoading) {
       fetchProducts(trashedPage, 'trashed')
     }
-  }, [trashedPage, activeTab, searchTerm, categoryFilter, colorFilter, materialFilter, /* priceFilter, */ statusFilter, styleFilter, genderFilter, dateFilter, creatorFilter, priorityFilter, storeId])
+  }, [trashedPage, activeTab, searchTerm, categoryFilter, colorFilter, materialFilter, /* priceFilter, */ statusFilter, styleFilter, genderFilter, dateFilter, creatorFilter, priorityFilter, saleFilter, storeId])
+
+  React.useEffect(() => {
+    if (!initialLoading) {
+      fetchProducts(currentPage, 'products')
+      if (activeTab === 'trash') {
+        fetchProducts(trashedPage, 'trashed')
+      }
+    }
+  }, [selectedCountry?.countryCode])
 
   // Fetch all dropdown options once on component mount
   const fetchDropdownOptions = async () => {
@@ -263,6 +278,7 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
     setDateFilter("all")
     setCreatorFilter("all")
     setPriorityFilter("all")
+    setSaleFilter("all")
   }
 
   if (initialLoading) {
@@ -367,6 +383,8 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
             onCreatorChange={setCreatorFilter}
             priorityFilter={priorityFilter}
             onPriorityChange={setPriorityFilter}
+            saleFilter={saleFilter}
+            onSaleChange={setSaleFilter}
             staticCategories={dropdownCategories}
             staticColors={dropdownColors}
             staticMaterials={dropdownMaterials}
@@ -422,6 +440,8 @@ export const DraftClient: React.FC<DraftClientProps> = ({ storeId, userRole }) =
             onCreatorChange={setCreatorFilter}
             priorityFilter={priorityFilter}
             onPriorityChange={setPriorityFilter}
+            saleFilter={saleFilter}
+            onSaleChange={setSaleFilter}
             staticCategories={dropdownCategories}
             staticColors={dropdownColors}
             staticMaterials={dropdownMaterials}
@@ -485,6 +505,8 @@ interface ProductsViewProps {
   onCreatorChange?: (creator: string) => void
   priorityFilter?: string
   onPriorityChange?: (priority: string) => void
+  saleFilter?: string
+  onSaleChange?: (sale: string) => void
   staticCategories?: string[]
   staticColors?: string[]
   staticMaterials?: string[]
@@ -530,6 +552,8 @@ const ProductsView: React.FC<ProductsViewProps> = ({
   onCreatorChange,
   priorityFilter = "all",
   onPriorityChange,
+  saleFilter = "all",
+  onSaleChange,
   staticCategories = [],
   staticColors = [],
   staticMaterials = [],
@@ -558,7 +582,7 @@ const ProductsView: React.FC<ProductsViewProps> = ({
 
   React.useEffect(() => {
     onPageChange?.(1)
-  }, [searchTerm, categoryFilter, colorFilter, materialFilter, styleFilter, genderFilter, /* priceFilter, */ dateFilter, creatorFilter, priorityFilter, statusFilter])
+  }, [searchTerm, categoryFilter, colorFilter, materialFilter, styleFilter, genderFilter, /* priceFilter, */ dateFilter, creatorFilter, priorityFilter, saleFilter, statusFilter])
 
   const handleBulkTrash = async () => {
     try {
@@ -948,6 +972,16 @@ const ProductsView: React.FC<ProductsViewProps> = ({
           </Select>
         </div>
         <div className="flex items-center gap-2">
+          <Select value={saleFilter} onValueChange={onSaleChange}>
+            <SelectTrigger className="w-[150px]">
+              <SelectValue placeholder="Sale Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Products</SelectItem>
+              <SelectItem value="true">On Sale</SelectItem>
+              <SelectItem value="false">Not On Sale</SelectItem>
+            </SelectContent>
+          </Select>
           {creators.length > 0 && (
             <Select value={creatorFilter} onValueChange={onCreatorChange}>
               <SelectTrigger className="w-[200px]">
@@ -1014,9 +1048,20 @@ const ProductsView: React.FC<ProductsViewProps> = ({
                 <p className="text-xs text-muted-foreground mb-2">SKU: {product.sku || 'N/A'}</p>
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex flex-col">
-                    <span className="font-bold text-lg">
-                      {formatPrice(product.price)}
-                    </span>
+                    {(product.isSale === true || product.isSale === 'true') && product.salePrice ? (
+                      <div className="flex flex-col">
+                        <span className="font-bold text-lg text-red-600">
+                          {formatPrice(product.salePrice)}
+                        </span>
+                        <span className="text-sm text-muted-foreground line-through">
+                          {formatPrice(product.price)}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="font-bold text-lg">
+                        {formatPrice(product.price)}
+                      </span>
+                    )}
                     <span className="text-xs text-muted-foreground">
                       {(() => {
                         try {
@@ -1205,9 +1250,20 @@ const ProductsView: React.FC<ProductsViewProps> = ({
                         </div>
                       </div>
                       <div className="text-right">
-                        <span className="font-bold text-xl">
-                          {formatPrice(product.price)}
-                        </span>
+                        {(product.isSale === true || product.isSale === 'true') && product.salePrice ? (
+                          <div className="flex flex-col items-end">
+                            <span className="font-bold text-xl text-red-600">
+                              {formatPrice(product.salePrice)}
+                            </span>
+                            <span className="text-sm text-muted-foreground line-through">
+                              {formatPrice(product.price)}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="font-bold text-xl">
+                            {formatPrice(product.price)}
+                          </span>
+                        )}
                         <div className="flex gap-1 mt-1 mb-2">
                           {product.priority && (
                             <Badge className="text-xs bg-yellow-500 hover:bg-yellow-600">

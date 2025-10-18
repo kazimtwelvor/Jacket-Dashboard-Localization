@@ -16,6 +16,7 @@ export interface Product {
   stockStatus?: string
   description?: string
   salePrice?: number | string | null
+  isSale?: boolean
   specifications?: string
   material?: string[]
   style?: string[]
@@ -38,6 +39,11 @@ export interface Product {
   seoScore?: number
   productSizes?: ProductSize[]
   sizeDetails?: any
+  productCountries?: any[]
+  relatedProducts?: any[]
+  isParentProduct?: boolean
+  parentProductId?: string | null
+  keywords?: string[]
   createdAt: Date
   updatedAt: Date
 }
@@ -135,6 +141,7 @@ export type ProductColumn = {
   name: string
   price: string
   salePrice?: string | null
+  isSale?: boolean
   category?: string
   sku?: string
   isArchived: boolean

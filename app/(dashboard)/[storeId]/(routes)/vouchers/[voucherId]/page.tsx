@@ -9,6 +9,13 @@ const VoucherPage = async ({
   const voucher = await prismadb.voucher.findUnique({
     where: {
       id: params.voucherId
+    },
+    include: {
+      voucherCountries: {
+        include: {
+          country: true
+        }
+      }
     }
   })
 
@@ -18,6 +25,7 @@ const VoucherPage = async ({
     value: voucher.value ? Number(voucher.value) : 0,
     minOrderAmount: voucher.minOrderAmount ? Number(voucher.minOrderAmount) : null,
     maxDiscount: voucher.maxDiscount ? Number(voucher.maxDiscount) : null,
+    voucherCountries: voucher.voucherCountries || [],
   } : null
 
   return (

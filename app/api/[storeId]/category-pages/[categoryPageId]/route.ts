@@ -116,7 +116,7 @@ export async function PATCH(
       enableSchema,
       schemaType,
       customSchema,
-      countryIds,
+      countryId,
     } = body
 
     if (!name) {
@@ -131,22 +131,34 @@ export async function PATCH(
       return new NextResponse("Category page ID is required", { status: 400 })
     }
 
-    const existingCategoryPageBySlug = await prismadb.categoryPage.findFirst({
+    // Check for duplicate slug + country combination (exclude current page)
+    const existingCategoryPages = await prismadb.categoryPage.findMany({
       where: {
         storeId: storeId,
         slug,
         NOT: {
-          id: categoryPageId,
+          id: categoryPageId, // Exclude current page being edited
         },
       },
+      include: {
+        categoryPageCountries: true
+      }
     })
 
-    if (existingCategoryPageBySlug) {
-      return new NextResponse("Slug already exists", { status: 400 })
+    for (const existingPage of existingCategoryPages) {
+      const existingCountryIds = existingPage.categoryPageCountries.map(cpc => cpc.countryId)
+      
+      // If either page has no country (global), or they share the same country, it's not allowed
+      if ((existingCountryIds.length === 0 && !countryId) || 
+          (countryId && existingCountryIds.includes(countryId)) ||
+          (!countryId && existingCountryIds.length === 0)) {
+        return new NextResponse(`A category page with slug "${slug}" already exists for this country. Please use a different slug.`, { status: 400 })
+      }
     }
 
+    // Check for duplicate name + country combination (exclude current page)
     const trimmedName = name.trim()
-    const existingCategoryPageByName = await prismadb.categoryPage.findFirst({
+    const existingCategoryPagesByName = await prismadb.categoryPage.findMany({
       where: {
         storeId: storeId,
         name: {
@@ -154,14 +166,22 @@ export async function PATCH(
           mode: 'insensitive'
         },
         NOT: {
-          id: categoryPageId,
+          id: categoryPageId, // Exclude current page being edited
         },
       },
+      include: {
+        categoryPageCountries: true
+      }
     })
 
-
-    if (existingCategoryPageByName) {
-      return new NextResponse("Name already exists", { status: 400 })
+    for (const existingPage of existingCategoryPagesByName) {
+      const existingCountryIds = existingPage.categoryPageCountries.map(cpc => cpc.countryId)
+      
+      if ((existingCountryIds.length === 0 && !countryId) || 
+          (countryId && existingCountryIds.includes(countryId)) ||
+          (!countryId && existingCountryIds.length === 0)) {
+        return new NextResponse(`A category page with name "${trimmedName}" already exists for this country. Please use a different name.`, { status: 400 })
+      }
     }
 
     const finalImageUrl = imageUrl || "";
@@ -222,10 +242,12 @@ export async function PATCH(
       where: { categoryPageId }
     })
 
-    updateData.categoryPageCountries = {
-      create: (countryIds || []).map((countryId: string) => ({
-        countryId
-      }))
+    if (countryId) {
+      updateData.categoryPageCountries = {
+        create: {
+          countryId
+        }
+      }
     }
 
     const categoryPage = await prismadb.categoryPage.update({

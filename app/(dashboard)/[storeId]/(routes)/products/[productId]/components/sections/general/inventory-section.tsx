@@ -11,7 +11,7 @@ import { useState } from "react"
 import { Info } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { RelatedProductsSelector } from "../../related-products-selector"
-import { CountryMultiSelector } from "@/components/ui/country-multi-selector"
+import { CountryFormSelector } from "@/components/ui/country-selector"
 
 interface InventorySectionProps {
   form: any
@@ -108,18 +108,18 @@ export const InventorySection: React.FC<InventorySectionProps> = ({ form, storeI
 
       <FormField
         control={form.control}
-        name="countryIds"
+        name="countryId"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Countries</FormLabel>
-            <CountryMultiSelector
-              value={field.value || []}
+            <FormLabel>Country</FormLabel>
+            <CountryFormSelector
+              value={field.value || ""}
               onChange={field.onChange}
               disabled={form.formState.isSubmitting}
-              placeholder="Select countries for this product"
+              placeholder="Select a country for this product"
             />
             <FormDescription>
-              Select countries where this product is available. Leave empty for global products available in all countries.
+              Select the country where this product is available.
             </FormDescription>
             <FormMessage />
           </FormItem>

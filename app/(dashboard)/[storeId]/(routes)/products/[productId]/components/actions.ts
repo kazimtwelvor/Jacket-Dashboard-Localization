@@ -217,7 +217,7 @@ export async function createProduct(formData: FormData) {
 
     const relatedProductsJson = formData.get("relatedProducts") as string
     
-    const countryIdsJson = formData.get("countryIds") as string
+    const countryId = formData.get("countryId") as string | null
 
     const isFeaturedValue = formData.get("isFeatured")
     const isFeatured = isFeaturedValue === "true" || String(isFeaturedValue) === "true"
@@ -258,19 +258,7 @@ export async function createProduct(formData: FormData) {
       relatedProducts = []
     }
 
-    let countryIds: string[] = []
-    try {
-      if (countryIdsJson && countryIdsJson.trim() !== "") {
-        const parsedCountryIds = safeJsonParse(countryIdsJson, [])
-        if (Array.isArray(parsedCountryIds)) {
-          countryIds = parsedCountryIds.filter((id: any) => typeof id === 'string' && id.trim() !== '')
-        }
-      }
-      console.log('[CREATE_PRODUCT] Country IDs:', { raw: countryIdsJson, parsed: countryIds })
-    } catch (e) {
-      console.error('[CREATE_PRODUCT] Error parsing countryIds:', e)
-      countryIds = []
-    }
+    console.log('[CREATE_PRODUCT] Country ID:', countryId)
 
     const materialParsed = safeJsonParse(materialJson, [])
     const styleParsed = safeJsonParse(styleJson, [])
@@ -645,7 +633,62 @@ export async function createProduct(formData: FormData) {
           ? currentProduct.priority
           : (priority || 4)
 
-        console.log('[UPDATE_PRODUCT] Updating product with countryIds:', countryIds)
+        // Check for duplicate slug + country combination (exclude current product)
+        if (productSlugForDb) {
+          const existingProducts = await prismadb.product.findMany({
+            where: {
+              storeId,
+              slug: productSlugForDb,
+              isDeleted: false,
+              id: {
+                not: id // Exclude current product being edited
+              }
+            },
+            include: {
+              productCountries: true
+            }
+          })
+
+          for (const existingProduct of existingProducts) {
+            const existingCountryIds = existingProduct.productCountries.map(pc => pc.countryId)
+            
+            // If either product has no country (global), or they share the same country, it's not allowed
+            if ((existingCountryIds.length === 0 && !countryId) || 
+                (countryId && existingCountryIds.includes(countryId)) ||
+                (!countryId && existingCountryIds.length === 0)) {
+              throw new Error(`A product with slug "${productSlugForDb}" already exists for this country. Please use a different slug.`)
+            }
+          }
+        }
+
+        // Check for duplicate name + country combination (exclude current product)
+        if (productData.name) {
+          const existingProductsByName = await prismadb.product.findMany({
+            where: {
+              storeId,
+              name: productData.name,
+              isDeleted: false,
+              id: {
+                not: id // Exclude current product being edited
+              }
+            },
+            include: {
+              productCountries: true
+            }
+          })
+
+          for (const existingProduct of existingProductsByName) {
+            const existingCountryIds = existingProduct.productCountries.map(pc => pc.countryId)
+            
+            if ((existingCountryIds.length === 0 && !countryId) || 
+                (countryId && existingCountryIds.includes(countryId)) ||
+                (!countryId && existingCountryIds.length === 0)) {
+              throw new Error(`A product with name "${productData.name}" already exists for this country. Please use a different name.`)
+            }
+          }
+        }
+
+        console.log('[UPDATE_PRODUCT] Updating product with countryId:', countryId)
         
         // Delete existing country relations
         await prismadb.productCountry.deleteMany({
@@ -665,11 +708,11 @@ export async function createProduct(formData: FormData) {
               updatedById: dbUser.id,
               updatedByName: dbUser.name || "Unknown",
               updatedByEmail: dbUser.email,
-              ...(countryIds.length > 0 && {
+              ...(countryId && {
                 productCountries: {
-                  create: countryIds.map((countryId) => ({
+                  create: {
                     countryId
-                  }))
+                  }
                 }
               })
             },
@@ -760,8 +803,56 @@ export async function createProduct(formData: FormData) {
 
         const resolvedCategoryData = productData.categoryData;
 
+        // Check for duplicate slug + country combination
+        if (productSlugForDb) {
+          const existingProducts = await prismadb.product.findMany({
+            where: {
+              storeId,
+              slug: productSlugForDb,
+              isDeleted: false,
+            },
+            include: {
+              productCountries: true
+            }
+          })
 
-        console.log('[CREATE_PRODUCT] Creating product with countryIds:', countryIds)
+          for (const existingProduct of existingProducts) {
+            const existingCountryIds = existingProduct.productCountries.map(pc => pc.countryId)
+            
+            // If either product has no country (global), or they share the same country, it's not allowed
+            if ((existingCountryIds.length === 0 && !countryId) || 
+                (countryId && existingCountryIds.includes(countryId)) ||
+                (!countryId && existingCountryIds.length === 0)) {
+              throw new Error(`A product with slug "${productSlugForDb}" already exists for this country. Please use a different slug.`)
+            }
+          }
+        }
+
+        // Check for duplicate name + country combination
+        if (productData.name) {
+          const existingProductsByName = await prismadb.product.findMany({
+            where: {
+              storeId,
+              name: productData.name,
+              isDeleted: false,
+            },
+            include: {
+              productCountries: true
+            }
+          })
+
+          for (const existingProduct of existingProductsByName) {
+            const existingCountryIds = existingProduct.productCountries.map(pc => pc.countryId)
+            
+            if ((existingCountryIds.length === 0 && !countryId) || 
+                (countryId && existingCountryIds.includes(countryId)) ||
+                (!countryId && existingCountryIds.length === 0)) {
+              throw new Error(`A product with name "${productData.name}" already exists for this country. Please use a different name.`)
+            }
+          }
+        }
+
+        console.log('[CREATE_PRODUCT] Creating product with countryId:', countryId)
         
         const product = await prismadb.product.create({
           data: {
@@ -769,11 +860,11 @@ export async function createProduct(formData: FormData) {
             sku: uniqueSku,
             storeId: storeId,
             categoryData: resolvedCategoryData,
-            ...(countryIds.length > 0 && {
+            ...(countryId && {
               productCountries: {
-                create: countryIds.map((countryId) => ({
+                create: {
                   countryId
-                }))
+                }
               }
             })
           },

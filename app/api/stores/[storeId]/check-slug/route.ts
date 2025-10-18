@@ -21,7 +21,9 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
       )
     }
 
-    const existingProduct = await prismadb.product.findFirst({
+    const countryId = searchParams.get("countryId")
+
+    const productsWithSameSlug = await prismadb.product.findMany({
       where: {
         slug: slug,
         storeId: params.storeId,
@@ -30,10 +32,37 @@ export async function GET(req: Request, { params }: { params: { storeId: string 
         },
         isDeleted: false,
       },
+      include: {
+        productCountries: true
+      }
     })
 
+    if (productsWithSameSlug.length === 0) {
+      return NextResponse.json({
+        isUnique: true,
+      })
+    }
+
+    for (const product of productsWithSameSlug) {
+      const existingCountryIds = product.productCountries.map(pc => pc.countryId)
+      
+      if (existingCountryIds.length === 0 || !countryId) {
+        return NextResponse.json({
+          isUnique: false,
+          message: "A product with this slug already exists for this country"
+        })
+      }
+      
+      if (existingCountryIds.includes(countryId)) {
+        return NextResponse.json({
+          isUnique: false,
+          message: "A product with this slug already exists for the selected country"
+        })
+      }
+    }
+
     return NextResponse.json({
-      isUnique: !existingProduct,
+      isUnique: true,
     })
   } catch (error) {
     return NextResponse.json(

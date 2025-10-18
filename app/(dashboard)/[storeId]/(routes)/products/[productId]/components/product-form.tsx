@@ -211,9 +211,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       name: initialData.name,
       slug: initialData.slug || "",
       description: initialData.description || "",
-      countryIds: (initialData as any).productCountries?.length > 0 
-        ? (initialData as any).productCountries.map((pc: any) => pc.countryId)
-        : (getCountryId() ? [getCountryId()].filter(Boolean) as string[] : []),
+      countryId: (initialData as any).productCountries?.length > 0 
+        ? (initialData as any).productCountries[0].countryId
+        : (getCountryId() || ""),
       specifications: safeJsonParse(initialData.specifications, {
         externalMaterial: [],
         internalMaterial: [],
@@ -226,7 +226,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       status: initialData.isArchived === true ? "draft" : "published",
       regularPrice: initialData.price.toString(),
       salePrice: initialData.salePrice ? initialData.salePrice.toString() : "",
-      isSale: initialData.isSale || (initialData.salePrice && initialData.salePrice > 0) || false,
+      isSale: initialData.isSale || (initialData.salePrice && Number(initialData.salePrice) > 0) || false,
       sku: initialData.sku || "",
       stockStatus: initialData.stockStatus || "instock",
       isFeatured: initialData.isFeatured || false,
@@ -415,7 +415,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       name: "",
       slug: "", // Initialize top-level slug as empty
       description: "",
-      countryIds: getCountryId() ? [getCountryId()].filter(Boolean) as string[] : [],
+      countryId: getCountryId() || "",
       specifications: {
         externalMaterial: [],
         internalMaterial: [],
@@ -911,11 +911,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       formData.append("isFeatured", formValues.isFeatured ? "true" : "false")
       formData.append("baseColor", formValues.baseColor ? JSON.stringify(formValues.baseColor) : "")
 
-      // Countries
-      if (formValues.countryIds && Array.isArray(formValues.countryIds)) {
-        formData.append("countryIds", JSON.stringify(formValues.countryIds))
-      } else {
-        formData.append("countryIds", "[]")
+      // Country
+      if (formValues.countryId) {
+        formData.append("countryId", formValues.countryId)
       }
 
       if (formValues.specifications) {
@@ -1111,11 +1109,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, colors, s
       formData.append("isFeatured", formValues.isFeatured ? "true" : "false")
       formData.append("baseColor", formValues.baseColor ? JSON.stringify(formValues.baseColor) : "")
 
-      // Countries
-      if (formValues.countryIds && Array.isArray(formValues.countryIds)) {
-        formData.append("countryIds", JSON.stringify(formValues.countryIds))
-      } else {
-        formData.append("countryIds", "[]")
+      // Country
+      if (formValues.countryId) {
+        formData.append("countryId", formValues.countryId)
       }
 
       if (formValues.specifications) {

@@ -58,7 +58,7 @@ export async function POST(
       categoryContent,
       status,
       isPublished,
-      countryIds,
+      countryId,
     } = body
 
 
@@ -71,19 +71,30 @@ export async function POST(
       return new NextResponse("Slug is required", { status: 400, headers: corsHeaders })
     }
 
-    const existingCategoryPageBySlug = await prismadb.categoryPage.findFirst({
+    // Check for duplicate slug + country combination
+    const existingCategoryPages = await prismadb.categoryPage.findMany({
       where: {
         storeId: storeId,
         slug,
       },
+      include: {
+        categoryPageCountries: true
+      }
     })
 
-    if (existingCategoryPageBySlug) {
-      return new NextResponse("Slug already exists", { status: 400, headers: corsHeaders })
+    for (const existingPage of existingCategoryPages) {
+      const existingCountryIds = existingPage.categoryPageCountries.map(cpc => cpc.countryId)
+      
+      if ((existingCountryIds.length === 0 && !countryId) || 
+          (countryId && existingCountryIds.includes(countryId)) ||
+          (!countryId && existingCountryIds.length === 0)) {
+        return new NextResponse(`A category page with slug "${slug}" already exists for this country. Please use a different slug.`, { status: 400, headers: corsHeaders })
+      }
     }
 
+    // Check for duplicate name + country combination
     const trimmedName = name.trim()
-    const existingCategoryPageByName = await prismadb.categoryPage.findFirst({
+    const existingCategoryPagesByName = await prismadb.categoryPage.findMany({
       where: {
         storeId: storeId,
         name: {
@@ -91,12 +102,19 @@ export async function POST(
           mode: 'insensitive'
         },
       },
+      include: {
+        categoryPageCountries: true
+      }
     })
 
-
-
-    if (existingCategoryPageByName) {
-      return new NextResponse("Name already exists", { status: 400, headers: corsHeaders })
+    for (const existingPage of existingCategoryPagesByName) {
+      const existingCountryIds = existingPage.categoryPageCountries.map(cpc => cpc.countryId)
+      
+      if ((existingCountryIds.length === 0 && !countryId) || 
+          (countryId && existingCountryIds.includes(countryId)) ||
+          (!countryId && existingCountryIds.length === 0)) {
+        return new NextResponse(`A category page with name "${trimmedName}" already exists for this country. Please use a different name.`, { status: 400, headers: corsHeaders })
+      }
     }
 
     const finalImageUrl = imageUrl || "";
@@ -127,11 +145,11 @@ export async function POST(
         isPublished: status === "PUBLISHED" || isPublished === true,
         publishedAt: (status === "PUBLISHED" || isPublished === true) ? new Date() : null,
         storeId: storeId,
-        categoryPageCountries: {
-          create: (countryIds || []).map((countryId: string) => ({
+        categoryPageCountries: countryId ? {
+          create: {
             countryId
-          }))
-        }
+          }
+        } : undefined
       },
     })
 

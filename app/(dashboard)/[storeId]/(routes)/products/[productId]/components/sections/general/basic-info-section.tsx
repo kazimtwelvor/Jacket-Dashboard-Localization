@@ -80,9 +80,10 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
       setIsCheckingSlug(true);
       const storeId = params?.storeId;
       const productId = params?.productId !== "new" ? params?.productId : null;
+      const countryId = form.getValues("countryId");
       
       const response = await fetch(
-        `/api/stores/${storeId}/check-slug?slug=${encodeURIComponent(slug)}${productId ? `&productId=${productId}` : ""}`
+        `/api/stores/${storeId}/check-slug?slug=${encodeURIComponent(slug)}${productId ? `&productId=${productId}` : ""}${countryId ? `&countryId=${countryId}` : ""}`
       );
       
       if (!response.ok) {
@@ -118,6 +119,19 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
       checkSlugUniqueness(formattedSlug);
     }, 500); 
   }
+
+  // Re-check slug uniqueness when country changes
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === "countryId") {
+        const currentSlug = form.getValues("slug");
+        if (currentSlug) {
+          checkSlugUniqueness(currentSlug);
+        }
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form]);
 
   const safeSpecOptions = {
     ...specificationOptions,

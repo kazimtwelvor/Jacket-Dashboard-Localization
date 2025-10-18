@@ -34,7 +34,7 @@ import { PocketSelector } from "./pocket-selector"
 import { SeoSettings } from "./seo-settings"
 import { EditableCategoryTemplateWrapper } from "./editable-category-template-wrapper"
 import { ApiSlugDisplay } from "./api-slug-display"
-import { CountryMultiSelector } from "@/components/ui/country-multi-selector"
+import { CountryFormSelector } from "@/components/ui/country-selector"
 import { useDashboardCountry } from "@/hooks/use-dashboard-country"
 
 const formSchema = z.object({
@@ -68,7 +68,7 @@ const formSchema = z.object({
   schemaType: z.string().optional(),
   customSchema: z.string().optional(),
   status: z.enum(["DRAFT", "PUBLISHED"]).optional(),
-  countryIds: z.array(z.string()).default([]),
+  countryId: z.string().optional(),
 })
 
 type CategoryPageFormValues = z.infer<typeof formSchema>
@@ -106,9 +106,9 @@ export const CategoryPageForm: React.FC<CategoryPageFormProps> = ({ initialData 
     schemaType: initialData.schemaType || "CollectionPage",
     customSchema: initialData.customSchema || "",
     status: initialData.status || "DRAFT",
-    countryIds: initialData.categoryPageCountries?.length > 0
-      ? initialData.categoryPageCountries.map((cpc: any) => cpc.countryId)
-      : (getCountryId() ? [getCountryId()] : []),
+    countryId: initialData.categoryPageCountries?.length > 0
+      ? initialData.categoryPageCountries[0].countryId
+      : (getCountryId() || ""),
   } : null;
   
   
@@ -145,7 +145,7 @@ export const CategoryPageForm: React.FC<CategoryPageFormProps> = ({ initialData 
       schemaType: "CollectionPage",
       customSchema: "",
       status: "DRAFT",
-      countryIds: getCountryId() ? [getCountryId()] : [],
+      countryId: getCountryId() || "",
     }
   })
 
@@ -233,7 +233,7 @@ export const CategoryPageForm: React.FC<CategoryPageFormProps> = ({ initialData 
         customSchema: data.customSchema ? (typeof data.customSchema === 'string' ? data.customSchema : JSON.stringify(data.customSchema)) : null,
         status,
         isPublished: status === 'PUBLISHED',
-        countryIds: data.countryIds || [],
+        countryId: data.countryId || "",
       }
       
       
@@ -307,18 +307,18 @@ export const CategoryPageForm: React.FC<CategoryPageFormProps> = ({ initialData 
               <CardContent className="space-y-4">
                 <FormField
                   control={form.control}
-                  name="countryIds"
+                  name="countryId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Countries</FormLabel>
-                      <CountryMultiSelector
-                        value={field.value || []}
+                      <FormLabel>Country</FormLabel>
+                      <CountryFormSelector
+                        value={field.value || ""}
                         onChange={field.onChange}
                         disabled={loading}
-                        placeholder="Select countries for this category page"
+                        placeholder="Select a country for this category page"
                       />
                       <FormDescription>
-                        Select countries where this category page is available. Leave empty for global availability.
+                        Select the country where this category page is available.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>

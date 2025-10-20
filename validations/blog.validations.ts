@@ -22,6 +22,10 @@ export const validateCreateBlog = () => [
     .isString()
     .isLength({ min: 1, max: 200 })
     .withMessage('Title must be between 1 and 200 characters'),
+  body('countryId')
+    .optional()
+    .isUUID()
+    .withMessage('Country ID must be a valid UUID'),
   validateBoolean('isPublished'),
   body('content')
     .custom((value) => {
@@ -52,6 +56,10 @@ export const validateUpdateBlog = () => [
     .isString()
     .isLength({ min: 1, max: 200 })
     .withMessage('Title must be between 1 and 200 characters'),
+  body('countryId')
+    .optional()
+    .isUUID()
+    .withMessage('Country ID must be a valid UUID'),
   validateBoolean('isPublished'),
   body('content')
     .optional()

@@ -29,7 +29,7 @@ const formSchema = z.object({
   subtitle: z.string().optional(),
   bannerImage: z.string().optional(),
   isPublished: z.boolean().default(false),
-  countryIds: z.array(z.string()).default([]),
+  countryId: z.string().optional(),
   author: z.string().default(""),
   date: z.string().default(""),
   category: z.string().default(""),
@@ -213,7 +213,7 @@ interface BlogFormProps {
     bannerImage?: string
     content?: string
     isPublished?: boolean
-    countryIds?: string[]
+    countryId?: string
     blogCountries?: Array<{ countryId: string }>
     author?: string
     date?: string
@@ -299,9 +299,9 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
     resolver: zodResolver(formSchema),
     defaultValues: initialData ? {
       ...initialData,
-      countryIds: initialData.blogCountries?.length > 0
-        ? initialData.blogCountries.map((bc: any) => bc.countryId)
-        : (getCountryId() ? [getCountryId()] : []),
+      countryId: initialData.blogCountries?.length > 0
+        ? initialData.blogCountries[0].countryId
+        : getCountryId() || "",
     } : {
       title: "How to Create Iron-on Patches",
       slug: "how-to-create-iron-on-patches",
@@ -576,7 +576,7 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
         },
       },
     },
-    countryIds: getCountryId() ? [getCountryId()] : [],
+    countryId: getCountryId() || "",
   })
 
   useEffect(() => {
@@ -591,10 +591,10 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
 
   useEffect(() => {
     if (!initialData) {
-      const currentCountryIds = form.getValues("countryIds")
+      const currentCountryId = form.getValues("countryId")
       const dashboardCountryId = getCountryId()
-      if ((!currentCountryIds || currentCountryIds.length === 0) && dashboardCountryId) {
-        form.setValue("countryIds", [dashboardCountryId], { shouldValidate: false })
+      if (!currentCountryId && dashboardCountryId) {
+        form.setValue("countryId", dashboardCountryId, { shouldValidate: false })
       }
     }
   }, [getCountryId, form, initialData])
@@ -849,12 +849,12 @@ export const BlogForm: React.FC<BlogFormProps> = ({ initialData }) => {
           <BlogSettings
             slug={form.watch("slug")}
             isPublished={form.watch("isPublished")}
-            countryIds={form.watch("countryIds")}
+            countryId={form.watch("countryId")}
             isExpanded={expandedSections.settings}
             onToggleExpand={() => toggleSection("settings")}
             onSaveText={handleSaveText}
             onPublishChange={handlePublishChange}
-            onCountryChange={(value) => form.setValue("countryIds", value)}
+            onCountryChange={(value) => form.setValue("countryId", value)}
           />
 
           <div className="border rounded-md overflow-hidden bg-white shadow-sm">

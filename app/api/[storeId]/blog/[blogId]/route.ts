@@ -58,7 +58,8 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       return new NextResponse("Access denied. You don't have permission to edit blogs.", { status: 403 })
     }
 
-    const existingBlogBySlug = await prismadb.blog.findFirst({
+    // Check for duplicate slug + country combination (exclude current blog)
+    const existingBlogsBySlug = await prismadb.blog.findMany({
       where: {
         storeId: params.storeId,
         content: {
@@ -69,12 +70,21 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
           id: params.blogId,
         },
       },
+      include: {
+        blogCountries: true
+      }
     })
 
-    if (existingBlogBySlug) {
-      return new NextResponse("Slug already exists", { status: 400 })
+    for (const existingBlog of existingBlogsBySlug) {
+      const existingCountryIds = existingBlog.blogCountries.map(bc => bc.countryId)
+      const newCountryId = body.countryId
+      
+      if (newCountryId && existingCountryIds.includes(newCountryId)) {
+        return new NextResponse(`A blog with slug "${body.slug}" already exists for the selected country. Please use a different slug.`, { status: 400 })
+      }
     }
 
+    // Check for duplicate title + country combination (exclude current blog)
     const trimmedTitle = body.title.trim()
     const allBlogs = await prismadb.blog.findMany({
       where: {
@@ -86,19 +96,29 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       select: {
         id: true,
         content: true,
+        blogCountries: true
       },
     })
 
     const existingBlogByTitle = allBlogs.find((blog) => {
       const content = blog.content as any
       const blogTitle = content?.metadata?.title
-      return blogTitle && blogTitle.toLowerCase().trim() === trimmedTitle.toLowerCase()
+      const titleMatches = blogTitle && blogTitle.toLowerCase().trim() === trimmedTitle.toLowerCase()
+      
+      if (titleMatches) {
+        const existingCountryIds = blog.blogCountries.map(bc => bc.countryId)
+        const newCountryId = body.countryId
+        
+        if (newCountryId && existingCountryIds.includes(newCountryId)) {
+          return true
+        }
+      }
+      
+      return false
     })
 
-  
-
     if (existingBlogByTitle) {
-      return new NextResponse("Title already exists", { status: 400 })
+      return new NextResponse(`A blog with title "${trimmedTitle}" already exists for the selected country. Please use a different title.`, { status: 400 })
     }
 
 
@@ -301,11 +321,11 @@ export async function PATCH(req: Request, { params }: { params: { storeId: strin
       },
       data: {
         content: contentJson,
-        blogCountries: {
-          create: (body.countryIds || []).map((countryId: string) => ({
-            countryId
-          }))
-        }
+        blogCountries: body.countryId ? {
+          create: {
+            countryId: body.countryId
+          }
+        } : undefined
       },
     })
 

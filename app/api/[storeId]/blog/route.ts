@@ -33,7 +33,7 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       return new NextResponse("Access denied. You don't have permission to create blogs.", { status: 403 })
     }
 
-    const existingBlogBySlug = await prismadb.blog.findFirst({
+    const existingBlogsBySlug = await prismadb.blog.findMany({
       where: {
         storeId: params.storeId,
         content: {
@@ -41,10 +41,18 @@ export async function POST(req: Request, { params }: { params: { storeId: string
           equals: body.slug,
         },
       },
+      include: {
+        blogCountries: true
+      }
     })
 
-    if (existingBlogBySlug) {
-      return new NextResponse("Slug already exists", { status: 400 })
+    for (const existingBlog of existingBlogsBySlug) {
+      const existingCountryIds = existingBlog.blogCountries.map(bc => bc.countryId)
+      const newCountryId = body.countryId
+      
+      if (newCountryId && existingCountryIds.includes(newCountryId)) {
+        return new NextResponse(`A blog with slug "${body.slug}" already exists for the selected country. Please use a different slug.`, { status: 400 })
+      }
     }
 
     const trimmedTitle = body.title.trim()
@@ -55,19 +63,29 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       select: {
         id: true,
         content: true,
+        blogCountries: true
       },
     })
 
     const existingBlogByTitle = allBlogs.find((blog) => {
       const content = blog.content as any
       const blogTitle = content?.metadata?.title
-      return blogTitle && blogTitle.toLowerCase().trim() === trimmedTitle.toLowerCase()
+      const titleMatches = blogTitle && blogTitle.toLowerCase().trim() === trimmedTitle.toLowerCase()
+      
+      if (titleMatches) {
+        const existingCountryIds = blog.blogCountries.map(bc => bc.countryId)
+        const newCountryId = body.countryId
+        
+        if (newCountryId && existingCountryIds.includes(newCountryId)) {
+          return true
+        }
+      }
+      
+      return false
     })
 
-
-
     if (existingBlogByTitle) {
-      return new NextResponse("Title already exists", { status: 400 })
+      return new NextResponse(`A blog with title "${trimmedTitle}" already exists for the selected country. Please use a different title.`, { status: 400 })
     }
 
     const processedSteps =
@@ -251,11 +269,11 @@ export async function POST(req: Request, { params }: { params: { storeId: string
       data: {
         storeId: params.storeId,
         content: contentJson,
-        blogCountries: {
-          create: (body.countryIds || []).map((countryId: string) => ({
-            countryId
-          }))
-        }
+        blogCountries: body.countryId ? {
+          create: {
+            countryId: body.countryId
+          }
+        } : undefined
       },
     })
 

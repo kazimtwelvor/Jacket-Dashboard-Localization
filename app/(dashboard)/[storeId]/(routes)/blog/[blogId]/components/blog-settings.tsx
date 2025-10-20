@@ -6,23 +6,23 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ChevronDown, ChevronUp } from "lucide-react"
 import { EditableText } from "./editable-text"
-import { CountryMultiSelector } from "@/components/ui/country-multi-selector"
+import { CountryFormSelector } from "@/components/ui/country-selector"
 
 interface BlogSettingsProps {
   slug: string
   isPublished: boolean
-  countryIds?: string[]
+  countryId?: string
   isExpanded: boolean
   onToggleExpand: () => void
   onSaveText: (field: string, value: string) => void
   onPublishChange: (value: boolean) => void
-  onCountryChange: (value: string[]) => void
+  onCountryChange: (value: string) => void
 }
 
 export const BlogSettings: React.FC<BlogSettingsProps> = ({
   slug,
   isPublished,
-  countryIds,
+  countryId,
   isExpanded,
   onToggleExpand,
   onSaveText,
@@ -42,13 +42,13 @@ export const BlogSettings: React.FC<BlogSettingsProps> = ({
         {isExpanded && (
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium">Countries</label>
-              <CountryMultiSelector
-                value={countryIds || []}
+              <label className="text-sm font-medium">Country</label>
+              <CountryFormSelector
+                value={countryId || ""}
                 onChange={onCountryChange}
-                placeholder="Select countries for this blog post"
+                placeholder="Select a country for this blog post"
               />
-              <p className="text-xs text-gray-500 mt-1">Select countries where this blog post is available. Leave empty for global availability.</p>
+              <p className="text-xs text-gray-500 mt-1">Select the country where this blog post is available.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>

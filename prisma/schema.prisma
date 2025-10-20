@@ -771,7 +771,7 @@ model CategoryPage {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
-  @@unique([storeId, slug])
+ // @@unique([storeId, slug])
   @@index([storeId])
 }
 
